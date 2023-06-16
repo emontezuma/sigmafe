@@ -1,0 +1,86 @@
+@use '@angular/material' as mat;
+
+@include mat.core();
+
+$primary-01: (
+    50 : #e6f2fd,
+    100 : #c0def9,
+    200 : #97c9f6,
+    300 : #6db3f2,
+    400 : #4da2ef,
+    500 : #2e92ec,
+    600 : #298aea,
+    700 : #237fe7,
+    800 : #1d75e4,
+    900 : #1263df,
+    A100 : #ffffff,
+    A200 : #dae7ff,
+    A400 : #a7c6ff,
+    A700 : #8db6ff,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #ffffff,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$accent-01: (
+    50 : #edf5ea,
+    100 : #d2e5ca,
+    200 : #b5d4a7,
+    300 : #97c284,
+    400 : #80b569,
+    500 : #6aa84f,
+    600 : #62a048,
+    700 : #57973f,
+    800 : #4d8d36,
+    900 : #3c7d26,
+    A100 : #cdffbe,
+    A200 : #a6ff8b,
+    A400 : #7fff58,
+    A700 : #6cff3f,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #ffffff,
+        600 : #000000,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
+);
+
+$my-primary: mat.define-palette($primary-01, 500);
+$my-accent: mat.define-palette($accent-01, 500, A100, A400);
+$my-typography: mat.define-typography-config(
+    $font-family: 'Titillium Web',
+);
+  
+
+$my-theme: mat.define-light-theme((
+ color: (
+   primary: $my-primary,
+   accent: $my-accent,
+ ),
+  typography: $my-typography,
+));
+
+@include mat.all-component-themes($my-theme);
