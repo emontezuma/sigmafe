@@ -8,6 +8,7 @@ import { StoreModule } from '@ngrx/store';
 import { MaterialModule } from './material/material.module';
 import { EffectsModule } from '@ngrx/effects';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { reducers } from '../app/state/app.state';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,7 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
     AppRoutingModule,
     BrowserAnimationsModule,
     MaterialModule,
-    StoreModule.forRoot({}, {}),
+    StoreModule.forRoot(reducers),
     EffectsModule.forRoot([]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true })
   ],

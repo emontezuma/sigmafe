@@ -1,9 +1,9 @@
 import { createAction, props } from '@ngrx/store';
-import { ScreenObject } from '../models/store/shared';
+import { Screen } from '../../shared/models/screen.models';
 
 export const changeScreenState = createAction(
     '[Shared] changeScreenState',
-    props<{ screenSize: ScreenObject }>()
+    props<{ screenSize: Screen }>()
 );
 
 export const setToolbar = createAction(
