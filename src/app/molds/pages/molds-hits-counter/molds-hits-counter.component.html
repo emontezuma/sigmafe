@@ -1,0 +1,17 @@
+<div class="container">  
+  <p>mold-hits-counter works!</p>
+  <ng-container *ngTemplateOutlet="!moldsData.loading ? molds : loading">
+  </ng-container>
+  <ng-template #molds>
+      <mat-grid-list [cols]="colsBySize" rowHeight="1:1" [gutterSize]="'3px'">
+          <mat-grid-tile *ngFor="let mold of moldsData.molds; let i = index">
+            <app-mold-hits-counter [data]="mold"></app-mold-hits-counter>
+          </mat-grid-tile>
+      </mat-grid-list>
+  </ng-template>
+  <ng-template #loading>
+    <div class="item">
+      <ngx-skeleton-loader count="5"></ngx-skeleton-loader>
+    </div>
+  </ng-template>
+</div>

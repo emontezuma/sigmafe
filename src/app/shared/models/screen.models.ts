@@ -1,4 +1,17 @@
+export interface Platform {
+    ANDROID: boolean,
+    BLINK: boolean,
+    EDGE: boolean,
+    FIREFOX: boolean,
+    IOS: boolean,
+    SAFARI: boolean,
+    TRIDENT: boolean,
+    WEBKIT: boolean,
+    isBrowser: boolean,
+}
+
 export interface Screen  {
+    platform: Platform,
     size: string;
     availableHeight: number;
     availableWidth: number;

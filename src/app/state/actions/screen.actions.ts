@@ -3,7 +3,7 @@ import { Screen } from '../../shared/models/screen.models';
 
 export const changeScreenState = createAction(
     '[Shared] changeScreenState',
-    props<{ screenSize: Screen }>()
+    props<{ screen: Screen }>()
 );
 
 export const setToolbar = createAction(

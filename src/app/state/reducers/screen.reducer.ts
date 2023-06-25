@@ -4,6 +4,17 @@ import { SharedState } from '../../shared/models/screen.models';
 
 export const initialState: SharedState = {
   screen: {
+    platform: {
+      ANDROID: false,
+      BLINK: false,
+      EDGE: false,
+      FIREFOX: false,
+      IOS: false,
+      SAFARI: false,
+      TRIDENT: false,
+      WEBKIT: false,
+      isBrowser: false,
+    },
     size: '',
     availableHeight: 0,
     availableWidth: 0,
@@ -20,7 +31,7 @@ export const initialState: SharedState = {
 
 export const sharedReducer = createReducer(
   initialState,
-  on(sharedActions.changeScreenState, (state, { screenSize } ) => ({ ...state, screenSize })),
+  on(sharedActions.changeScreenState, (state, { screen } ) => ({ ...state, screen })),
   on(sharedActions.setToolbar, (state, { withToolbar } ) => ({ ...state, withToolbar })),
 );
   

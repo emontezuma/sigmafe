@@ -8,6 +8,10 @@ const routes: Routes = [
     loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule)
   },
   {
+    path: 'molds',
+    loadChildren: () => import('./molds/molds.module').then(m => m.MoldsModule)
+  },
+  {
     path: '404',
     component: NotFoundComponent
   },

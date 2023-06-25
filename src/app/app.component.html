@@ -3,7 +3,7 @@
     <button mat-mini-fab class="button menu" color="primary" aria-label="icon-button with menu icon" (click)="sidenav.open()">
       <mat-icon class="icon-toolbar">menu</mat-icon>
     </button>
-    <h1>APLICACION TOYOTA <strong>size</strong></h1>
+    <h1 i18n>APLICACION TOYOTA <strong>{{ size }}</strong></h1>
     <span class="example-spacer"></span>
   </mat-toolbar>
   
@@ -38,12 +38,12 @@
           disableClose
       >
         <mat-nav-list>
-          <a routerLink="checklists"
+          <a routerLink="molds"
             mat-list-item
             (click)="sidenav.close()">
-            <span i18n>Checklists</span>
+            <span i18n>Moldes</span>
           </a>
-          <a routerLink="checklists/1"
+          <a routerLink="checklists"
             mat-list-item
             (click)="sidenav.close()">
             <span i18n>Checklist específico</span>
@@ -57,7 +57,7 @@
       </mat-sidenav-content>
   </mat-sidenav-container>
   <mat-toolbar class="footer" color="primary">
-    <span>APLICACION TOYOTA <strong>Draft-01</strong></span>
+    <span i18n>APLICACION TOYOTA <strong>Draft-01</strong></span>
     <span class="example-spacer"></span>
   </mat-toolbar>
 </ng-container>
