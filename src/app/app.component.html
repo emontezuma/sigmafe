@@ -1,38 +1,27 @@
-<ng-container class="container">
+<ng-container class="container">  
+    
   <mat-toolbar class="toolbar" color="accent">
-    <button mat-mini-fab class="button menu" color="primary" aria-label="icon-button with menu icon" (click)="sidenav.open()">
+    <button
+      mat-mini-fab
+      class="button menu"
+      color="primary"
+      aria-label="icon-button with menu icon"
+      (click)="sidenav.open()"
+    >
       <mat-icon class="icon-toolbar">menu</mat-icon>
     </button>
     <h1 i18n>APLICACION TOYOTA <strong>{{ size }}</strong></h1>
     <span class="example-spacer"></span>
   </mat-toolbar>
-  
-  <mat-toolbar class="buttons-bar">
-    <div class="buttons-container" #buttonsContainer>
-      <ng-container>
-        <button
-          mat-raised-button 
-          [ngClass]="{ 'button-normal-toolbar': showNormalToolbar, 'button small': !showNormalToolbar }"
-          aria-label="icon-button with menu icon"
-          matTooltip="This is a sample"
-        >
-          <mat-icon
-            class="icon-toolbar"
-            [ngClass]="{ medium: !showNormalToolbar }"
-          >
-          </mat-icon>
-          Sample
-        </button>
-      </ng-container>
-      
-    </div>
-  </mat-toolbar>
+  <mat-progress-bar *ngIf="isWaitingForProcess" mode="indeterminate"></mat-progress-bar>    
+  <app-toolbar *ngIf="isToolbarActive"></app-toolbar>
   <mat-sidenav-container
       class="drawer-container" 
       (backdropClick)="sidenav.close()"
-      [ngStyle]="{ 'top': withToolbar ? '98px' : '48px' }"
+      [ngStyle]="{ 'top': isToolbarActive ? '100px' : '50px' }"
   >
-      <mat-sidenav 
+      
+    <mat-sidenav 
           #sidenav 
           (keydown.escape)="sidenav.close()" 
           disableClose
@@ -53,11 +42,31 @@
       </mat-sidenav>
 
       <mat-sidenav-content>
-          <router-outlet></router-outlet>
+        <div class="page-content"> <!-- [style.height.px]="allHeight" >-->
+          <router-outlet #o="outlet"></router-outlet>
+        </div>
+        <div *ngIf="loading" class="process-container" @dissolve>
+            <div class="process-bar">
+              <mat-progress-spinner class="process-loading" diameter="80"
+                mode="indeterminate">
+              </mat-progress-spinner>
+            </div>
+        </div>
+        <div class="gotop-container" *ngIf="onTopStatus === 'active'" @appearing>
+          <button
+            mat-mini-fab
+            class="gotop-button"
+            (click)="goToTop()"
+          >
+              <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
+          </button>
+        </div>
       </mat-sidenav-content>
+
   </mat-sidenav-container>
+  
   <mat-toolbar class="footer" color="primary">
     <span i18n>APLICACION TOYOTA <strong>Draft-01</strong></span>
     <span class="example-spacer"></span>
-  </mat-toolbar>
+  </mat-toolbar>  
 </ng-container>

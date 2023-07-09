@@ -2,5 +2,22 @@
 
 @use './assets/styles/app-color-palette.scss';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%; 
+  font-family: "Titillium Web", "Helvetica Neue", sans-serif !important;
+  font-size: 12px;
+}
+
+body { 
+  margin: 0; 
+}
+
+.close-icon {
+    width: 64px;
+    height: 64px;    
+  }
+
+.close-button {
+    margin-right: 5px;
+}
+  

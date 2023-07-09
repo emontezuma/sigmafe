@@ -1,17 +1,33 @@
 <div class="container">  
-  <p>mold-hits-counter works!</p>
-  <ng-container *ngTemplateOutlet="!moldsData.loading ? molds : loading">
+  <ng-container *ngTemplateOutlet="!loading ? molds : loader">
   </ng-container>
   <ng-template #molds>
-      <mat-grid-list [cols]="colsBySize" rowHeight="1:1" [gutterSize]="'3px'">
-          <mat-grid-tile *ngFor="let mold of moldsData.molds; let i = index">
-            <app-mold-hits-counter [data]="mold"></app-mold-hits-counter>
-          </mat-grid-tile>
-      </mat-grid-list>
-  </ng-template>
-  <ng-template #loading>
-    <div class="item">
-      <ngx-skeleton-loader count="5"></ngx-skeleton-loader>
+    <div class="container-animated" @fromTop>   
+      <div class="cards-container">
+        <div *ngFor="let mold of moldsData.molds | filter:filterMoldsBy; let i = index; trackBy: trackByFn">
+          <app-mold-hits-counter [mold]="mold"></app-mold-hits-counter>
+        </div>
     </div>
+    </div>
+  </ng-template>
+  <ng-template #loader>
+    <div class="container-animated" @fromTop>
+    <div class="cards-container">
+        <mat-card *ngFor="let number of [0, 1, 2, 4]">
+          <mat-card-content>
+            <ngx-skeleton-loader count="3"></ngx-skeleton-loader>              
+          </mat-card-content>
+          <mat-divider class="divider"></mat-divider>
+          <mat-card-content class="image-container">
+            <ngx-skeleton-loader [theme]="{ width: '170px', height: '170px' }" count="1" appearance="circle"></ngx-skeleton-loader>
+          </mat-card-content>
+          <mat-divider class="divider"></mat-divider>       
+          <mat-card-footer class="image-text">
+            <ngx-skeleton-loader class="image" count="1" appearance="circle"></ngx-skeleton-loader>   
+            <ngx-skeleton-loader class="text" [theme]="{height: '50px'}" count="1"></ngx-skeleton-loader> 
+          </mat-card-footer>
+        </mat-card>
+    </div>
+  </div>
   </ng-template>
 </div>

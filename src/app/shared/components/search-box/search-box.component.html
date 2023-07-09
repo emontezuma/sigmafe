@@ -1,0 +1,21 @@
+<ng-container>
+    <mat-form-field>
+        <input
+            matInput
+            [formControl]="textBox"
+            [maxlength]="maxLength"
+            [placeholder]="placeHolder"
+            name="search"
+        >
+        <button
+            class="close-button"
+            mat-mini-fab
+            [disabled]="!textBox.value"
+            matSuffix
+            aria-label="Clear"
+            (click)="textBox.setValue('')"  
+        >
+            <mat-icon class="close-icon">close</mat-icon>            
+        </button>        
+    </mat-form-field>
+</ng-container>

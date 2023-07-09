@@ -1,23 +1,36 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormControl } from '@angular/forms';
-
-import { sampleMoldsData } from '../../../shared/sample-data'
+import { fromTop } from '../../../shared/animations/shared.animations';
 import { MoldsData } from '../../models/molds.models';
 import { AppState } from '../../../state/app.state'; 
+import { selectSharedScreen } from '../../../state/selectors/screen.selectors'; 
+import { selectMoldsData, selectLoadingState } from '../../../state/selectors/molds.selectors'; 
+import { loadMoldsData } from 'src/app/state/actions/molds.actions';
+import { SharedService } from 'src/app/shared/services/shared.service';
+import { ModulesWithSearchBox } from 'src/app/shared/models/screen.models';
+import { SettingsData } from '../../../shared/models/settings.models'
+import { loadSettingsData } from 'src/app/state/actions/settings.actions';
+import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 
 
 @Component({
   selector: 'app-molds-hits-counter',
+  animations: [ fromTop ],
   templateUrl: './molds-hits-counter.component.html',
   styleUrls: ['./molds-hits-counter.component.scss']
 })
-export class MoldsHitsCounterComponent {
+export class MoldsHitsCounterComponent implements OnInit {
+  @ViewChild('moldsList') moldList: ElementRef;
 
-  // Variables ================
-  moldsData: MoldsData = sampleMoldsData;
+// Variables ===============
+  moldsData: MoldsData;
+  settingsData: SettingsData;
   colsBySize: number = 2;
   size: string = 'Small';
+  cardWidth: string;
+  loading: boolean = true;
+  filterMoldsBy: string = '';
 
   form = new FormGroup({
 
@@ -25,27 +38,42 @@ export class MoldsHitsCounterComponent {
 
   constructor(
     private store: Store<AppState>,
+    private sharedService: SharedService,
   ) { }
 
-  // Hooks ====================
+// Hooks ====================
   ngOnInit() {
-    this.store.select('shared').subscribe( shared => {
-      this.size = shared.screen.size;
-      this.calculateLayout(this.size);
+    this.store.dispatch(loadMoldsData());
+    this.store.dispatch(loadSettingsData());
+    this.store.select(selectSettingsData).subscribe( settingsData => {
+      this.settingsData = settingsData; 
     });
-    setTimeout(() => {
-      this.moldsData.loading = false;
-    }, 3000);
+    this.store.select(selectSharedScreen).subscribe( shared => {
+      this.size = shared.size;      
+    });
+    this.store.select(selectLoadingState).subscribe( loading => {
+      this.loading = loading;
+      this.sharedService.setGeneralLoading(
+        ModulesWithSearchBox.MOLDSHITSQUERY,
+        loading,
+      );   
+    });
+    this.sharedService.setSearchBox(
+      ModulesWithSearchBox.MOLDSHITSQUERY,
+      true,
+    );
+     this.store.select(selectMoldsData).subscribe( moldsData => { 
+      this.moldsData = moldsData;            
+    });
+    this.sharedService.search.subscribe((searchBox) => {
+      if (searchBox.from === ModulesWithSearchBox.MOLDSHITSQUERY) {
+        this.filterMoldsBy = searchBox.textToSearch;  
+      }
+    });
   }
 
-   // Functions ================
-   calculateLayout(size: string) {
-    const maxCols = this.calculateCols(size);
-    const minCols = 1; 
-    this.colsBySize = this.moldsData.molds.length < maxCols ? this.moldsData.molds.length : maxCols;
-  }
-
-  prepareToolbar() {
+// Functions ================
+   repareToolbar() {
     const toolbar = [{
       caption: "Reiniciar",
       tooltip: "Reiniciar el checklist",
@@ -70,24 +98,9 @@ export class MoldsHitsCounterComponent {
     }];
   }
 
-  calculateCols(size: string = 'Small') {
-    switch(size) {
-      case 'Handset': return 2;
-      case 'HandsetLandscape': return 2;
-      case 'HandsetPortrait': return 1;
-      case 'Large': return 5;
-      case 'Medium': return 3;
-      case 'Small': return 3;
-      case 'Tablet': return 2;
-      case 'TabletLandscape': return 4;
-      case 'TabletPortrait': return 2;
-      case 'Web': return 4;
-      case 'WebLandscape': return 5;
-      case 'WebPortrait': return 3;
-      case 'XLarge': return 8;
-      case 'XSmall': return 1;
-      default: return 2;  
-    }
+  trackByFn(index: any, item: any) { 
+    return index; 
   }
-  // End ======================
+
+// End ======================
 }

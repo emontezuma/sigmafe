@@ -1,0 +1,11 @@
+<mat-toolbar class="buttons-bar">
+    <app-search-box
+        textToSearch="hello"
+        i18n-placeHolder
+        placeHolder="Filtrar"
+        maxLength="50"
+        (searchBy)="sendSearchText($event)"
+    >
+    </app-search-box>
+
+</mat-toolbar>

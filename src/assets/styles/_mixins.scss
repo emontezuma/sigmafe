@@ -1,0 +1,55 @@
+// Mixins ==============
+
+@mixin grid (
+    $grid-gap: 10px, 
+    $column-count: 8,
+    $justify-content: space-evenly,
+    $min-width: 300px,
+    $padding: 10px,
+) {    
+    /**
+   * Calculated values.
+   */
+   $gap-count: calc($column-count - 1);
+   $total-gap-width: calc($gap-count * $grid-gap);
+   $grid-item-max-width: calc((100% - $total-gap-width) / $column-count);
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(max($min-width, $grid-item-max-width), 1fr));
+   grid-gap: $grid-gap;
+   padding: $padding;
+   justify-content: $justify-content;   
+}
+
+@mixin flexbox(
+    $direction: row, 
+    $wrap: wrap, 
+    $gap: 10px, 
+    $justify-content: space-evenly
+) {
+    display: flex;
+    flex-direction: $direction;    
+    flex-wrap: $wrap;
+    gap: $gap;
+    justify-content: $justify-content;
+}
+
+@mixin text-ellipsis (
+    $lines: 1,
+) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+@mixin divider (
+    $margin-top: 5px, 
+    $margin-bottom: 5px,
+    $margin-left: 10px,
+    $margin-right: 10px,
+) {
+    margin-top: $margin-top;
+    margin-bottom: $margin-bottom;
+    margin-left: $margin-left;
+    margin-right: $margin-right;
+} 

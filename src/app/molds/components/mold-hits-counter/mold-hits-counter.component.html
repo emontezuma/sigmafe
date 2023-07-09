@@ -1,4 +1,62 @@
-
-<p>{{ data.id }}</p>
-<p>{{ data.name }}</p>
-<p>{{ data.hits }}</p>
+<div class="container">
+  <mat-card class="card">
+    <mat-progress-bar
+      *ngIf="messageByProgress"
+      mode="indeterminate"
+      color="warn"
+      class="progress"
+    >
+    </mat-progress-bar> 
+    <mat-card-header>
+      <mat-card-title-group class="border">
+        <mat-card-title class="title">{{ mold.name }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Nombre del molde</mat-card-subtitle>
+      </mat-card-title-group>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-card-title>{{ mold.id }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Id del molde</mat-card-subtitle>
+    </mat-card-content>
+    <mat-card-content class="columns">
+      <div class="column">
+        <mat-card-title class="subtitle">{{ mold.lastMaintenance.date | date }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Últ. mantto.</mat-card-subtitle>
+      </div>
+      <div class="column">
+        <mat-card-title class="subtitle">{{ mold.lastMaintenance.nextMaintenance | date }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Sig. mantto.</mat-card-subtitle>
+      </div>
+      <div class="column last border-days" [ngStyle]="{ 'border-color': leftDaysColor, 'color': leftDaysColor }">
+        <mat-card-title class="subtitle">{{ leftDays | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan</mat-card-subtitle>
+      </div>
+    </mat-card-content>
+    <mat-divider class="divider extended"></mat-divider>
+    <mat-card-content class="card-image">
+        <div class="image-container">
+          <img 
+            appImageNotFound
+            class="mold-image"                        
+            [ngSrc]="mold.mainImage"
+            [alt]="mold.name"            
+            fill
+          >          
+        </div>
+    </mat-card-content>
+    <mat-divider class="divider"></mat-divider>       
+    <mat-card-footer>        
+      <div class="molds-hits-data">
+        <div echarts [options]="chartData" class="demo-chart"></div>      
+        <div class="mold-hits" [ngStyle]="{ 'border-color': progressBarColor }">
+          <ng-container *ngFor="let show of showNumber; let number = index; trackBy: trackByFn">
+            <div class="number-container" [ngStyle]="{ 'background-color': progressBackgroundColor, 'color': progressForeColor }">
+              <div class="number" @numbers *ngIf="showNumber[number] === 'Pair'">{{ digitPair[number] }}</div>
+              <div class="number" @numbers *ngIf="showNumber[number] === 'Odd'">{{ digitOdd[number] }}</div>
+            </div>
+          </ng-container>
+        </div>
+      </div>    
+    </mat-card-footer>
+  </mat-card>
+</div> 
+  

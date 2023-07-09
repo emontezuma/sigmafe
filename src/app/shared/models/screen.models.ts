@@ -34,3 +34,18 @@ export interface SharedState {
     screen: Screen;
     withToolbar: boolean;
 }
+
+export interface SearchBox {
+    textToSearch: string;
+    from: string;
+}
+
+export interface ShowElement {
+    from: string;
+    show: boolean;
+}
+
+export enum ModulesWithSearchBox {
+    MOLDSHITSQUERY = 'Molds-hits-query',
+    MOLDHITSQUERY = 'Mold-hits-query',
+}
