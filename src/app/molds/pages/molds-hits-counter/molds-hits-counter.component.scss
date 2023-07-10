@@ -15,7 +15,9 @@ mat-card {
 }
 
 .cards-container {
-    @include mixins.grid (10px, 8, space-evenly, 300px, 10px);    
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+   gap: 10px;
 }
 
 .loader {

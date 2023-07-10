@@ -150,7 +150,8 @@ export const sampleSettings: SettingsData = {
         "useGeneral": null,
         "warning": 50,
         "alarm": 75,
-    }
+    },
+    "animate": false,
 }
 
 export const sampleProfile: ProfileData = {

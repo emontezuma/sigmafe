@@ -3,7 +3,7 @@ import * as settingsActions from '../actions/settings.actions';
 import { SettingsState } from '../../shared/models/settings.models';
 
 export const initialState: SettingsState = {
-  loading: false,
+  loading: true,
   settingsData: {
     waitingColor: 'gray',
     okColor: 'green',
@@ -13,7 +13,8 @@ export const initialState: SettingsState = {
       useGeneral: null,
       warning: 0,
       alarm: 0,
-    }
+    },
+    animate: false,
   }  
 };
 

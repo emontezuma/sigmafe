@@ -108,7 +108,6 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
-    console.log('entrro en app.component');
     this.scrollingSubscription = this.scroll
     .scrolled()
     .subscribe((data: any) => {

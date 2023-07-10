@@ -14,7 +14,6 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ProfileData } from 'src/app/shared/models/profile.module';
 
-
 @Component({
   selector: 'app-molds-hits-counter',
   animations: [ fromTop ],
@@ -46,7 +45,6 @@ export class MoldsHitsCounterComponent implements OnInit {
 
 // Hooks ====================
   ngOnInit() {
-    console.log('entrro en molds');
     this.store.dispatch(loadMoldsData());
     this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;

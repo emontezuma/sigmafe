@@ -7,7 +7,7 @@ import { Mold } from '../../models/molds.models';
 import { numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
-import { HelpersService } from '../../../shared/services/helpers.service';
+import { SharedService } from '../../../shared/services/shared.service';
 
 @Component({
   selector: 'app-mold-hits-counter',
@@ -35,7 +35,7 @@ export class MoldHitsCounterComponent {
 
   constructor(
     private store: Store<AppState>,
-    private helpersService: HelpersService,
+    private sharedService: SharedService,
   ) { }
 
 // Hooks ====================
@@ -57,7 +57,7 @@ export class MoldHitsCounterComponent {
 
 // Functions ================
   calcData() {
-    this.elapsedTimeLabel = this.helpersService.labelElapsedTime(this.mold.lastHit?.date);
+    this.elapsedTimeLabel = this.sharedService.labelElapsedTime(this.mold.lastHit?.date);
     this.leftColor = this.mold.nextMaintenance.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
   }
   

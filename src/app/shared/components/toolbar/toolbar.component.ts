@@ -19,7 +19,7 @@ export class ToolbarComponent {
 
   // Hooks ====================
   ngOnInit(): void {
-    this.sharedService.show.subscribe((searchBox) => {
+    this.sharedService.showSearch.subscribe((searchBox) => {
       this.showSearchBox = searchBox;
     })
   }

@@ -26,12 +26,10 @@ export const initialState: SharedState = {
     outerWidth: 0,
     width: 0,
   },
-  withToolbar: false,
 };
 
 export const sharedReducer = createReducer(
   initialState,
   on(sharedActions.changeScreenState, (state, { screen } ) => ({ ...state, screen })),
-  on(sharedActions.setToolbar, (state, { withToolbar } ) => ({ ...state, withToolbar })),
 );
   

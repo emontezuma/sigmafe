@@ -5,8 +5,3 @@ export const changeScreenState = createAction(
     '[Shared] changeScreenState',
     props<{ screen: Screen }>()
 );
-
-export const setToolbar = createAction(
-    '[Shared] SetToolbar',
-    props<{ withToolbar: boolean }>()
-);

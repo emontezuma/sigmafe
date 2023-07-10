@@ -10,6 +10,7 @@ export interface SettingsData {
     warningColor: string;
     alarmedColor: string;
     levelAlert: LevelAlert;
+    animate: boolean;
 }
 
 export interface SettingsState {

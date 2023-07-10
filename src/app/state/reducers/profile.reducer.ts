@@ -6,7 +6,7 @@ export const initialState: ProfileState = {
   loading: false,
   profileData: {
     id: '',
-    animate: false,
+    animate: true,
     fiestName: '',
     lastName: '',
     userProfile: '',

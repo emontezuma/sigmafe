@@ -1,4 +1,4 @@
-import { APP_INITIALIZER, NgModule } from '@angular/core';
+import { APP_INITIALIZER, Inject, NgModule } from '@angular/core';
 import { ConfigService } from './config.service';
 
 @NgModule({
@@ -6,12 +6,16 @@ import { ConfigService } from './config.service';
     {
       provide: APP_INITIALIZER,
       multi: true,
+      deps: [ [new Inject(ConfigService)] ],
       useFactory: (config: ConfigService) => {
         return () => {
-          return config.setSettings();
+          return config.load().then((loadingResult) => {
+            if (!loadingResult) {
+              // TODO: Error management;
+            }
+          });
         }
-      },
-      deps: [ConfigService]
+      },      
     }
   ]
 })

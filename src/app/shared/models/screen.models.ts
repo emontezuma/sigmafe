@@ -32,7 +32,6 @@ export interface ToolbarButtons  {
 }
 export interface SharedState {
     screen: Screen;
-    withToolbar: boolean;
 }
 
 export interface SearchBox {
