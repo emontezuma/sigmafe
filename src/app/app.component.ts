@@ -10,6 +10,7 @@ import { SharedService } from './shared/services/shared.service';
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve } from '../app/shared/animations/shared.animations';
+import { loadProfileData } from './state/actions/profile.action';
 
 @Component({
   selector: 'app-root',
@@ -40,10 +41,6 @@ export class AppComponent implements AfterViewInit {
     this.allHeight = metricsToFollow.innerHeight;
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onWindowScroll($event: any) {
-  }
-  
 // Variables ================
   title = 'sigma';
   size: string = '';  
@@ -111,6 +108,7 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
+    console.log('entrro en app.component');
     this.scrollingSubscription = this.scroll
     .scrolled()
     .subscribe((data: any) => {
@@ -118,10 +116,10 @@ export class AppComponent implements AfterViewInit {
     });
     this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       this.loading = showLoader.show;
-    });   
+    });
+    this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
    }
    
-
   ngAfterViewInit(): void { }
 
 // Functions ================

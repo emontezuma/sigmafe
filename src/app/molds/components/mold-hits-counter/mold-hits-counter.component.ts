@@ -28,11 +28,10 @@ export class MoldHitsCounterComponent {
   progressBackgroundColor: string = "none";
   progressBarColor: string = "lightgray";
   progressForeColor: string = "lightgray";
-  messageByProgress = false;
   warningLevel = 0;
   alarmLevel = 0;
-  leftDays = 0;
-  leftDaysColor: string = "lightgray";
+  leftColor: string = "lightgray";
+  elapsedTimeLabel: string = "";
 
   constructor(
     private store: Store<AppState>,
@@ -58,10 +57,8 @@ export class MoldHitsCounterComponent {
 
 // Functions ================
   calcData() {
-    this.leftDays = this.helpersService.substractDates(this.mold.lastMaintenance?.date, '', "d");
-    this.leftDaysColor = this.leftDays <= this.mold.leftDaysAlarmed ? this.settingsData?.alarmedColor : this.leftDays <= this.mold.leftDaysWarning ? this.settingsData?.warningColor : this.settingsData?.okColor;
-    this.warningLevel = this.mold?.levelAlert?.useGeneral ? this.settingsData?.levelAlert?.warning : this.mold.levelAlert.warning;
-    this.alarmLevel = this.mold?.levelAlert?.useGeneral ? this.settingsData?.levelAlert?.alarm : this.mold.levelAlert.alarm;
+    this.elapsedTimeLabel = this.helpersService.labelElapsedTime(this.mold.lastHit?.date);
+    this.leftColor = this.mold.nextMaintenance.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
   }
   
   assignSettings() {
@@ -93,17 +90,16 @@ export class MoldHitsCounterComponent {
     };    
   }
 
-  setProgressColors(progress: number) {
-    this.progressBarColor = progress < this.warningLevel || this.warningLevel === 0 || this.alarmLevel === 0 ? this.settingsData?.okColor : progress < this.alarmLevel ? this.settingsData?.warningColor : this.settingsData?.alarmedColor;
-    this.progressBackgroundColor = progress < this.alarmLevel || this.alarmLevel === 0 ? 'none' : this.settingsData?.alarmedColor;
-    this.progressForeColor = progress < this.alarmLevel || this.alarmLevel === 0 ? '#000000' : '#FFFFFF';
-    this.messageByProgress = progress >= this.alarmLevel && this.alarmLevel !== 0;
+  setProgressColors() {
+    this.progressBarColor = this.mold.warned ? this.settingsData?.warningColor : this.mold.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
+    this.progressBackgroundColor = this.mold.alarmed ? this.settingsData?.alarmedColor : 'none';
+    this.progressForeColor = this.mold.alarmed ? '#FFFFFF' : '#606060';
   }
 
   prepareDataToChart(current: number, limit: number) {
     const progress = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
     const fontSize = progress < 100 ? 30 : progress < 999 ? 22 : 16;
-    this.setProgressColors(progress)
+    this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
     
     this.chartData = {
       series: [

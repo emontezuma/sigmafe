@@ -1,6 +1,6 @@
 import { Directive, ElementRef, HostListener, Input } from '@angular/core';
 
-import { environment } from '../../../environments/environment.prod';
+import { environment } from '../../../environments/environment';
 
 @Directive({
   selector: '[appImageNotFound]'

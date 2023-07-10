@@ -16,6 +16,8 @@ import { NotFoundComponent } from './shared/pages/not-found/not-found.component'
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { SearchBoxComponent } from './shared/components/search-box/search-box.component';
 import { ToolbarComponent } from './shared/components/toolbar/toolbar.component';
+import { ProfileEffects } from './state/effects/profile.effects';
+import { InitializerModule } from './initializer/initializer.module';
 
 @NgModule({
   declarations: [
@@ -32,9 +34,10 @@ import { ToolbarComponent } from './shared/components/toolbar/toolbar.component'
     BrowserAnimationsModule,
     NgOptimizedImage,
     MaterialModule,
+    InitializerModule,
     NgxSkeletonLoaderModule.forRoot(),
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([MoldsEffects, SettingsEffects]),
+    EffectsModule.forRoot([MoldsEffects, SettingsEffects, ProfileEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true })
   ],
   providers: [],

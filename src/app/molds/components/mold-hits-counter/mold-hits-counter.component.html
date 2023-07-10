@@ -1,7 +1,7 @@
 <div class="container">
   <mat-card class="card">
     <mat-progress-bar
-      *ngIf="messageByProgress"
+      *ngIf="this.mold.alarmed"
       mode="indeterminate"
       color="warn"
       class="progress"
@@ -17,18 +17,87 @@
       <mat-card-title>{{ mold.id }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Id del molde</mat-card-subtitle>
     </mat-card-content>
-    <mat-card-content class="columns">
+    <mat-card-content class="maintenance">
       <div class="column">
         <mat-card-title class="subtitle">{{ mold.lastMaintenance.date | date }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Últ. mantto.</mat-card-subtitle>
       </div>
-      <div class="column">
-        <mat-card-title class="subtitle">{{ mold.lastMaintenance.nextMaintenance | date }}</mat-card-title>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'specific-date'">
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.specificDate | date }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Sig. mantto.</mat-card-subtitle>
       </div>
-      <div class="column last border-days" [ngStyle]="{ 'border-color': leftDaysColor, 'color': leftDaysColor }">
-        <mat-card-title class="subtitle">{{ leftDays | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan</mat-card-subtitle>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'days'">
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.days | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Total (d)</mat-card-subtitle>
+      </div>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'hours'">
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.hours | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Total (hr)</mat-card-subtitle>
+      </div>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'hits'">
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.hits | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Total (g)</mat-card-subtitle>
+      </div>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'hits-or-hours'">
+        <mat-card-title class="subtitle">
+          <span>{{ mold.nextMaintenance.hits | number }}</span> / 
+          <span>{{ mold.nextMaintenance.hours | number }}</span>
+        </mat-card-title>
+        <mat-card-subtitle class="label" i18n>Total (g/hr)</mat-card-subtitle>
+      </div>
+      <div class="column" *ngIf="mold.nextMaintenance.strategy === 'hits-or-days'">
+        <mat-card-title class="subtitle">
+          <span>{{ mold.nextMaintenance.hits | number }}</span> / 
+          <span>{{ mold.nextMaintenance.days | number }}</span>
+        </mat-card-title>
+        <mat-card-subtitle class="label" i18n>Total (g/d)</mat-card-subtitle>
+      </div>
+      
+      <div
+        class="column border-days"
+        *ngIf="mold.nextMaintenance.strategy === 'days' || mold.nextMaintenance.strategy === 'specific-date'"
+        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+      >
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.timeToLeft | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan (d)</mat-card-subtitle>
+      </div>
+      <div
+        class="column border-days"
+        *ngIf="mold.nextMaintenance.strategy === 'hours'"
+        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+      >
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.timeToLeft | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan (hr)</mat-card-subtitle>
+      </div>
+      <div
+        class="column border-days"
+        *ngIf="mold.nextMaintenance.strategy === 'hits'"
+        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+      >
+        <mat-card-title class="subtitle">{{ mold.nextMaintenance.hitsToLeft | number }}</mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan (g)</mat-card-subtitle>
+      </div>
+      <div
+        class="column border-days"
+        *ngIf="mold.nextMaintenance.strategy === 'hits-or-hours'"
+        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+      >
+        <mat-card-title class="subtitle">
+          <span>{{ mold.nextMaintenance.hitsToLeft | number }}</span>/
+          <span>{{ mold.nextMaintenance.timeToLeft | number }}</span>
+        </mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan (g/hr)</mat-card-subtitle>
+      </div>
+      <div
+        class="column border-days"
+        *ngIf="mold.nextMaintenance.strategy === 'hits-or-days'"
+        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+      >
+        <mat-card-title class="subtitle">
+          <span>{{ mold.nextMaintenance.hitsToLeft | number }}</span>/
+          <span>{{ mold.nextMaintenance.timeToLeft | number }}</span>
+        </mat-card-title>
+        <mat-card-subtitle class="label" i18n>Faltan (g/d)</mat-card-subtitle>
       </div>
     </mat-card-content>
     <mat-divider class="divider extended"></mat-divider>
@@ -55,7 +124,21 @@
             </div>
           </ng-container>
         </div>
-      </div>    
+      </div>
+      <mat-card-subtitle class="last-hit" [matTooltip]="mold.lastHit.date" matTooltipClass = "tooltip-general" matTooltipShowDelay = "100" >
+        <span i18n>Últ. golpe: </span>
+        <span *ngIf="elapsedTimeLabel">
+          <strong>{{ elapsedTimeLabel }}</strong>
+        </span>
+        <span *ngIf="!elapsedTimeLabel && mold.lastHit.date">
+          <strong>{{ mold.lastHit.date | date:'EEEE, YYYY-MMM-dd HH:mm:ss' }}</strong>
+        </span>
+        <span
+          *ngIf="!mold.lastHit.date"
+          i18n>
+          <strong>Indeterminado...</strong>
+        </span>
+      </mat-card-subtitle>
     </mat-card-footer>
   </mat-card>
 </div> 

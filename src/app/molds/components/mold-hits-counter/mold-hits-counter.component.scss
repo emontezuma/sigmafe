@@ -22,9 +22,9 @@
 
 .border {
     background-color: #eeeeee;
-    padding-left: 2px;
-    padding-right: 2px;
-    border-radius: 4px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 8px 0px;
     border: 2px solid #dddddd;
 }
 
@@ -33,12 +33,14 @@
 }
 
 .subtitle {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
+    @include mixins.text-ellipsis();
 }
 
 .label {
     font-size: 1.3rem;
     margin-top: -5px;
+    @include mixins.text-ellipsis();
 }
 
 mat-card-title {
@@ -118,7 +120,7 @@ mat-card-title {
 }
 
 .image-container {    
-    height: 170px;    
+    height: 140px;    
     position: relative;
     padding: 10px;
 }
@@ -132,27 +134,32 @@ mat-card-title {
     height: 90px;
 }
 
-.columns {
-    @include mixins.flexbox(row, wrap, 1px, end);   
+.maintenance {
+    @include mixins.flexbox(row, nowrap, 1px, space-between);   
 }
 
 .column {
-    flex: 1;
+    text-align: center;
 }
 
-.last {
-    flex: 0;
-    text-align: right;
+.column:first-child {
+    text-align: left;
 }
 
 .border-days {
-    padding-left: 4px;
+    padding: 2px;
     padding-right: 4px;
-    border-radius: 4px;
-    border: 2px solid silver;
+    border-radius: 8px 0px;
+    border: 2px solid silver;    
 }
 
 .progress {
     margin-top: 5px;
     margin-bottom: -9px;
+}
+
+.last-hit {
+    text-align: right;
+    margin-right: 15px;
+    margin-bottom: 5px;
 }

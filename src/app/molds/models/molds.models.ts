@@ -1,9 +1,24 @@
 import { LevelAlert } from "src/app/shared/models/settings.models";
 
+export interface NextMaintenance {
+    strategy: 'hits' | 'days' | 'hours' | 'specific-date' | 'hits-or-hours' | 'hits-or-days';    
+    specificDate: string;
+    hits: number;
+    days: number;
+    hours: number;
+    timeToLeft: number;
+    hitsToLeft: number;
+    alarmed: boolean;
+}
+
 export interface LastMaintenance {
     vendorName: string;
     date: string;
-    nextMaintenance: string;
+}
+
+export interface LastHit {
+    location: string;
+    date: string;
 }
 export interface Location {
     code: string;
@@ -25,10 +40,14 @@ export interface Mold {
     mainImage: string;
     location: Location;
     lastMaintenance: LastMaintenance;
+    nextMaintenance: NextMaintenance;
     levelAlert: LevelAlert;
     leftDaysWarning: number;
     leftDaysAlarmed: number;
+    lastHit: LastHit;
     status: SimpleTable;
+    warned: boolean;
+    alarmed: boolean;
 }
 
 export interface MoldsData {

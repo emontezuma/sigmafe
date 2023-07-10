@@ -10,8 +10,9 @@ import { loadMoldsData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { ModulesWithSearchBox } from 'src/app/shared/models/screen.models';
 import { SettingsData } from '../../../shared/models/settings.models'
-import { loadSettingsData } from 'src/app/state/actions/settings.actions';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
+import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
+import { ProfileData } from 'src/app/shared/models/profile.module';
 
 
 @Component({
@@ -26,10 +27,12 @@ export class MoldsHitsCounterComponent implements OnInit {
 // Variables ===============
   moldsData: MoldsData;
   settingsData: SettingsData;
+  profileData: ProfileData;
   colsBySize: number = 2;
   size: string = 'Small';
   cardWidth: string;
   loading: boolean = true;
+  animate: boolean = true;
   filterMoldsBy: string = '';
 
   form = new FormGroup({
@@ -43,13 +46,16 @@ export class MoldsHitsCounterComponent implements OnInit {
 
 // Hooks ====================
   ngOnInit() {
+    console.log('entrro en molds');
     this.store.dispatch(loadMoldsData());
-    this.store.dispatch(loadSettingsData());
     this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData; 
+      this.settingsData = settingsData;
     });
     this.store.select(selectSharedScreen).subscribe( shared => {
       this.size = shared.size;      
+    });
+    this.store.select(selectProfileData).subscribe( profileData => {
+      this.profileData = profileData;
     });
     this.store.select(selectLoadingState).subscribe( loading => {
       this.loading = loading;
@@ -62,7 +68,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       ModulesWithSearchBox.MOLDSHITSQUERY,
       true,
     );
-     this.store.select(selectMoldsData).subscribe( moldsData => { 
+    this.store.select(selectMoldsData).subscribe( moldsData => { 
       this.moldsData = moldsData;            
     });
     this.sharedService.search.subscribe((searchBox) => {

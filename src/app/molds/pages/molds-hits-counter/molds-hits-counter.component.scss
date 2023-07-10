@@ -1,5 +1,9 @@
 @use "../../../../assets/styles/mixins";
 
+mat-card {
+    max-width: 400px;
+    min-width: 300px;
+}
 .container {
     position: relative;
 }
@@ -49,4 +53,3 @@
 .skeleton-box {
     height: 50px;
 }
-

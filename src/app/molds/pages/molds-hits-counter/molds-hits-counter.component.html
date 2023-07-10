@@ -11,23 +11,26 @@
     </div>
   </ng-template>
   <ng-template #loader>
-    <div class="container-animated" @fromTop>
-    <div class="cards-container">
+    <div *ngIf="profileData.animate" class="container-animated" @fromTop>
+      <div class="cards-container">
         <mat-card *ngFor="let number of [0, 1, 2, 4]">
           <mat-card-content>
             <ngx-skeleton-loader count="3"></ngx-skeleton-loader>              
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>
           <mat-card-content class="image-container">
-            <ngx-skeleton-loader [theme]="{ width: '170px', height: '170px' }" count="1" appearance="circle"></ngx-skeleton-loader>
+            <ngx-skeleton-loader [theme]="{ width: '140px', height: '140px' }" count="1" appearance="circle"></ngx-skeleton-loader>
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>       
           <mat-card-footer class="image-text">
             <ngx-skeleton-loader class="image" count="1" appearance="circle"></ngx-skeleton-loader>   
             <ngx-skeleton-loader class="text" [theme]="{height: '50px'}" count="1"></ngx-skeleton-loader> 
           </mat-card-footer>
+          <mat-card-content>
+            <ngx-skeleton-loader count="1"></ngx-skeleton-loader>              
+          </mat-card-content>
         </mat-card>
+      </div>
     </div>
-  </div>
   </ng-template>
 </div>
