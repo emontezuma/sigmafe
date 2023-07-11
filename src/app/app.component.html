@@ -13,60 +13,67 @@
     <h1 i18n>APLICACION TOYOTA <strong>{{ size }}</strong></h1>
     <span class="example-spacer"></span>
   </mat-toolbar>
-  <mat-progress-bar *ngIf="isWaitingForProcess" mode="indeterminate"></mat-progress-bar>    
-  <app-toolbar *ngIf="isToolbarActive"></app-toolbar>
+  <mat-progress-bar *ngIf="progressBarData.show" mode="indeterminate"></mat-progress-bar>
   <mat-sidenav-container
       class="drawer-container" 
       (backdropClick)="sidenav.close()"
-      [ngStyle]="{ 'top': isToolbarActive ? '100px' : '50px' }"
+      [ngStyle]="{ 'top': outletPosition }"
   >
-      
     <mat-sidenav 
-          #sidenav 
-          (keydown.escape)="sidenav.close()" 
-          disableClose
+        #sidenav 
+        (keydown.escape)="sidenav.close()" 
+        disableClose
       >
-        <mat-nav-list>
-          <a routerLink="molds"
-            mat-list-item
-            (click)="sidenav.close()">
-            <span i18n>Moldes</span>
-          </a>
-          <a routerLink="checklists"
-            mat-list-item
-            (click)="sidenav.close()">
-            <span i18n>Checklist específico</span>
-          </a>
-          <mat-divider></mat-divider>
-        </mat-nav-list>             
-      </mat-sidenav>
+      <mat-nav-list>
+        <a routerLink="molds"
+          mat-list-item
+          (click)="sidenav.close()">
+          <span i18n>Moldes</span>
+        </a>
+        <a routerLink="checklists"
+          mat-list-item
+          (click)="sidenav.close()">
+          <span i18n>Checklist específico</span>
+        </a>
+        <mat-divider></mat-divider>
+      </mat-nav-list>             
+    </mat-sidenav>
 
-      <mat-sidenav-content>
-        <div class="page-content"> <!-- [style.height.px]="allHeight" >-->
-          <router-outlet #o="outlet"></router-outlet>
-        </div>
-        <div *ngIf="loading" class="process-container" @dissolve>
-            <div class="process-bar">
-              <mat-progress-spinner class="process-loading" diameter="80"
-                mode="indeterminate">
-              </mat-progress-spinner>
-            </div>
-        </div>
-        <div class="gotop-container" *ngIf="onTopStatus === 'active'" @appearing>
-          <button
-            mat-mini-fab
-            class="gotop-button"
-            (click)="goToTop()"
-          >
-              <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
-          </button>
-        </div>
-      </mat-sidenav-content>
+    <mat-sidenav-content>
+      <div *ngIf="toolbarData.show" @downUp>
+        <app-toolbar [from]="toolbarData.from" [buttons]="toolbarData.buttons"></app-toolbar>
+      </div>
+      <div
+        class="page-content"
+        [style.height.px]="allHeight"
+        [ngClass]="{ 'noOverflow': !scrollBarData.show, 'withOverflow': scrollBarData.show }"
+        cdkScrollable
+      >
+      <!--<div class="page-content">-->
+        <router-outlet #o="outlet"></router-outlet>
+      </div>
+      <div *ngIf="loading" class="process-container" @dissolve>
+          <div class="process-bar">
+            <mat-progress-spinner class="process-loading" diameter="80"
+              mode="indeterminate">
+            </mat-progress-spinner>
+          </div>
+      </div>
+      <div class="gotop-container" *ngIf="onTopStatus === 'active'" @appearing>
+        <button
+          mat-mini-fab
+          class="gotop-button"
+          (click)="goToTop()"
+        >
+            <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
+        </button>
+      </div>
+    </mat-sidenav-content>
 
   </mat-sidenav-container>
   
   <mat-toolbar class="footer" color="primary">
-    <span i18n>APLICACION TOYOTA <strong>Draft-01</strong></span>
+    <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
     <span class="example-spacer"></span>
   </mat-toolbar>  
 </ng-container>

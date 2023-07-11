@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { SearchBox, ShowElement } from '../models/screen.models';
+import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons } from '../models/screen.models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +16,15 @@ export class SharedService {
   private showGeneralLoader: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showLoader: Observable<ShowElement> = this.showGeneralLoader.asObservable();
 
-  private toolbar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
-  showToolbar: Observable<ShowElement> = this.toolbar.asObservable();
+  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', show: false, buttons: [] });
+  showToolbar: Observable<ToolbarElement> = this.toolbar.asObservable();
+
+  private showGeneralProgressBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showProgressBar: Observable<ShowElement> = this.showGeneralProgressBar.asObservable();
+
+  private showGeneralScrollBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showScrollBar: Observable<ShowElement> = this.showGeneralScrollBar.asObservable();
+
 
   constructor() { }
 
@@ -33,9 +40,17 @@ export class SharedService {
   setGeneralLoading(from: string, showLoading: boolean) {
     this.showGeneralLoader.next({ from, show: showLoading });
   }
+
+  setGeneralPreogressBar(from: string, showProgress: boolean) {
+    this.showGeneralProgressBar.next({ from, show: showProgress });
+  }
   
-  setToolbar(from: string, showToolbar: boolean) {
-    this.toolbar.next({ from, show: showToolbar });
+  setToolbar(from: string, showToolbar: boolean, buttons: ToolbarButtons[]) {
+    this.toolbar.next({ from, show: showToolbar, buttons });
+  }
+  
+  setGeneralScrollBar(from: string, showScrollBar: boolean) {
+    this.showGeneralScrollBar.next({ from, show: showScrollBar });
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {

@@ -13,6 +13,10 @@ mat-sidenav-container {
   right: 0;
 }
 
+mat-sidenav-content {
+  overflow: hidden;
+}
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -24,7 +28,7 @@ mat-sidenav-container {
 
 .button {
   height: 36px;
-  width: 48px;
+  width: 36px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -96,4 +100,12 @@ mat-toolbar {
   right: 0;
   margin-bottom: 45px;
   margin-right: 25px;
+}
+
+.withOverflow {
+  overflow-y: auto;
+}
+
+.noOverflow {
+  overflow: hidden;
 }

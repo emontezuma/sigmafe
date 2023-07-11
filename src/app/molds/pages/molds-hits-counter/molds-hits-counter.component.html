@@ -2,7 +2,7 @@
   <ng-container *ngTemplateOutlet="!loading ? molds : loader">
   </ng-container>
   <ng-template #molds>
-    <div class="container-animated" @fromTop>   
+    <div class="container-animated" @fromTop (@fromTop.done)="animateToolbar($event)">   
       <div class="cards-container">
         <div *ngFor="let mold of moldsData.molds | filter:filterMoldsBy; let i = index; trackBy: trackByFn">
           <app-mold-hits-counter [mold]="mold"></app-mold-hits-counter>

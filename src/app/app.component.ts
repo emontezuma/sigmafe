@@ -5,17 +5,17 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
 import { Subscription } from 'rxjs';
 
-import { Screen, ShowElement } from './shared/models/screen.models'; 
+import { Screen, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
 import { SharedService } from './shared/services/shared.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
-import { appearing, dissolve } from '../app/shared/animations/shared.animations';
+import { appearing, dissolve, downUp } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  animations: [ appearing, dissolve ],
+  animations: [ appearing, dissolve, downUp ],
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
@@ -38,7 +38,8 @@ export class AppComponent implements AfterViewInit {
       innerWidth,
     };
     this.handlerScreenSizeChange(metricsToFollow);
-    this.allHeight = metricsToFollow.innerHeight;
+    this.calculateOutletPosition();
+    console.log(this.allHeight);
   }
 
 // Variables ================
@@ -48,10 +49,14 @@ export class AppComponent implements AfterViewInit {
   withToolbar = true;
   toggleSlider = false;
   loading = false;
-  isToolbarActive = false;
-  isWaitingForProcess = true;
+  toolbarData: ToolbarElement;
+  progressBarData: ShowElement;
+  scrollBarData: ShowElement;
   onTopStatus: string  = 'inactive';
-  allHeight: number = 0;
+  outletPosition =  '48px';
+  overflow = false;
+  // allHeight: number = 300;
+  allHeight = window.innerHeight - 48;
   scrollingSubscription: Subscription;
   goTopButtonTimer: any;
   displayNameMap = new Map([
@@ -116,12 +121,28 @@ export class AppComponent implements AfterViewInit {
     this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       this.loading = showLoader.show;
     });
+    this.sharedService.showToolbar.subscribe((toolbar) => {
+      this.toolbarData = toolbar;
+      this.calculateOutletPosition(); 
+    })
+    this.sharedService.showScrollBar.subscribe((scrollBarData) => {
+      this.scrollBarData = scrollBarData;
+    })
+    this.sharedService.showProgressBar.subscribe((progressBar) => {
+      this.progressBarData = progressBar;
+      this.calculateOutletPosition();
+    })
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
    }
    
   ngAfterViewInit(): void { }
 
 // Functions ================
+  calculateOutletPosition() {
+    this.outletPosition = (48  + (this.progressBarData?.show ? 4 : 0)).toString() + 'px';
+    this.allHeight = window.innerHeight - 88  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show ? 72 : 0);
+  }
+
   handlerScreenSizeChange(metricsToFollow: Screen) {
     this.store.dispatch(
       appActions.changeScreenState({ screen: metricsToFollow })
@@ -146,6 +167,7 @@ export class AppComponent implements AfterViewInit {
   goToTop() {
     this.onTopStatus = 'temp';
     this.changeDetectorRef.detectChanges();
+    console.log('entro aqui00');
     this.cdkScrollable.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

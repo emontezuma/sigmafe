@@ -31,8 +31,20 @@ export const fromTop = trigger('fromTop', [
       transform: 'translateY(0px)',
     })
   ),
-  transition('void => *', [ style({ opacity: 0.3, transform: 'translateY(20px)' }), animate('0.3s ease-in') ]),
-  transition('* => void', [ animate('0.3s ease-out'), style({ opacity: 0, transform: 'translateY(20px)', }) ]),
+  transition('void => *', [ style({ opacity: 0.3, transform: 'translateY(5px)' }), animate('0.3s ease-in') ]),
+  transition('* => void', [ animate('0.3s ease-out'), style({ opacity: 0, transform: 'translateY(5x)', }) ]),
+]);
+
+export const downUp = trigger('downUp', [
+  state(
+    'in',
+    style({
+      opacity: 1,
+      transform: 'translateY(0px)',
+    })
+  ),
+  transition('void => *', [ style({ opacity: 0, transform: 'translateY(-15px)' }), animate('0.2s ease-in') ]),
+  transition('* => void', [ animate('0.2s ease-out'), style({ opacity: 0, transform: 'translateY(-15px)', }) ]),
 ]);
 
 export const appearing = trigger('appearing', [

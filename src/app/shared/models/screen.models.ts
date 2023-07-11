@@ -25,10 +25,15 @@ export interface Screen  {
 }
 
 export interface ToolbarButtons  {
+    type: 'button' | 'divider' | 'searchbox';
     caption: string;
+    showTooltip: boolean;
     tooltip: string;
+    showIcon: boolean;
     icon: string;
+    iconSize: string;
     primary: boolean;
+    disabled: boolean;
 }
 export interface SharedState {
     screen: Screen;
@@ -44,7 +49,14 @@ export interface ShowElement {
     show: boolean;
 }
 
-export enum ModulesWithSearchBox {
-    MOLDSHITSQUERY = 'Molds-hits-query',
-    MOLDHITSQUERY = 'Mold-hits-query',
+export interface ToolbarElement {
+    from: string;
+    show: boolean;
+    buttons: ToolbarButtons[];
 }
+
+export enum ApplicationModules {
+    MOLDS_HITS_VIEW = 'Molds-hits-view',
+}
+
+
