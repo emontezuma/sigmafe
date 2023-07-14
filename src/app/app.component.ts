@@ -1,16 +1,15 @@
-import { Component, OnInit, HostListener, AfterViewInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, AfterViewInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
-import { Subscription } from 'rxjs';
 
-import { Screen, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
+import { Screen, ScreenSizes, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
 import { SharedService } from './shared/services/shared.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve, downUp } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
+import { ApplicationModules } from 'src/app/shared/models/screen.models';
 
 @Component({
   selector: 'app-root',
@@ -19,27 +18,21 @@ import { loadProfileData } from './state/actions/profile.action';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
-  @ViewChild(CdkScrollable, { static: false }) cdkScrollable: CdkScrollable;
-  
+
   @HostListener('window:resize', ['$event'])
   onResize({ target } : any) {
     const { screen, outerHeight, innerHeight, outerWidth, innerWidth } = target;
-    const metricsToFollow: Screen = {
+    const screenData: Screen = {
       platform: this.platform,
       size: this.size,
-      width: screen.width,
-      height: screen.height,
-      availableWidth: screen.availWidth,
-      availableHeight: screen.availHeight,
       orientation: screen.orientation.type,
       outerHeight,
       innerHeight,
       outerWidth,
       innerWidth,
-    };
-    this.handlerScreenSizeChange(metricsToFollow);
+    }
+    this.handlerScreenSizeChange(screenData);
     this.calculateOutletPosition();
-    console.log(this.allHeight);
   }
 
 // Variables ================
@@ -54,11 +47,11 @@ export class AppComponent implements AfterViewInit {
   scrollBarData: ShowElement;
   onTopStatus: string  = 'inactive';
   outletPosition =  '48px';
-  overflow = false;
-  // allHeight: number = 300;
-  allHeight = window.innerHeight - 48;
-  scrollingSubscription: Subscription;
+  smartphoneView = false;
+  invalidSize = false;
   goTopButtonTimer: any;
+  // allHeight: number = 300;
+  allHeight = window.innerHeight - 50;
   displayNameMap = new Map([
     [Breakpoints.Handset, 'Handset'],
     [Breakpoints.HandsetLandscape, 'HandsetLandscape'],
@@ -79,10 +72,8 @@ export class AppComponent implements AfterViewInit {
   constructor(
     private store: Store<AppState>,
     public platform: Platform,
-    public scroll: ScrollDispatcher,
     private breakpointObserver: BreakpointObserver,
-    private changeDetectorRef: ChangeDetectorRef,
-    private sharedService: SharedService,    
+    private sharedService: SharedService,
     ) { 
     breakpointObserver
     .observe([
@@ -113,25 +104,25 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
-    this.scrollingSubscription = this.scroll
-    .scrolled()
-    .subscribe((data: any) => {
-      this.miScroll(data);
-    });
     this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       this.loading = showLoader.show;
     });
     this.sharedService.showToolbar.subscribe((toolbar) => {
       this.toolbarData = toolbar;
+      this.smartphoneView = this.toolbarData.size === ScreenSizes.SMALL;
       this.calculateOutletPosition(); 
-    })
+    });
     this.sharedService.showScrollBar.subscribe((scrollBarData) => {
       this.scrollBarData = scrollBarData;
-    })
+    });
     this.sharedService.showProgressBar.subscribe((progressBar) => {
       this.progressBarData = progressBar;
       this.calculateOutletPosition();
-    })
+    });
+    this.sharedService.showGoTop.subscribe((goTop) => {
+      this.onTopStatus = goTop.status;
+    });
+    this.handlerScreenSizeChange(null);
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
    }
    
@@ -140,35 +131,34 @@ export class AppComponent implements AfterViewInit {
 // Functions ================
   calculateOutletPosition() {
     this.outletPosition = (48  + (this.progressBarData?.show ? 4 : 0)).toString() + 'px';
-    this.allHeight = window.innerHeight - 88  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show ? 72 : 0);
+    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show && !this.smartphoneView ? 64 : 0);
   }
 
-  handlerScreenSizeChange(metricsToFollow: Screen) {
-    this.store.dispatch(
-      appActions.changeScreenState({ screen: metricsToFollow })
-    );
-  }
-
-  miScroll(data: CdkScrollable) {    
-    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
-    if (scrollTop < 5) {
-      this.onTopStatus = 'inactive';
-    } else if (this.onTopStatus !== 'temp') {
-      this.onTopStatus = 'active';
-      clearTimeout(this.goTopButtonTimer);
-      this.goTopButtonTimer = setTimeout(() => {
-        this.onTopStatus = 'inactive';
-        this.changeDetectorRef.detectChanges();    
-      }, 2500);
+  handlerScreenSizeChange(screen: Screen | null) {
+    if (!screen) {
+      screen = {
+        platform: this.platform,
+        size: this.size,
+        orientation: window.screen.orientation.type,
+        innerHeight: window.innerHeight,
+        outerHeight: window.outerHeight,
+        outerWidth: window.outerWidth,
+        innerWidth: window.innerWidth,
+      };
     }
-    this.changeDetectorRef.detectChanges();    
+    this.invalidSize = screen.innerWidth < 350 || screen.innerHeight < 400;
+    if (!this.invalidSize) {
+      this.store.dispatch(
+        appActions.changeScreenState({ screen })
+      );
+    }    
   }
 
   goToTop() {
-    this.onTopStatus = 'temp';
-    this.changeDetectorRef.detectChanges();
-    console.log('entro aqui00');
-    this.cdkScrollable.scrollTo({ top: 0, behavior: 'smooth' });
+    this.sharedService.setGoTopButton(
+      ApplicationModules.GENERAL,
+      'temp',
+    );    
   }
 
 // End ======================

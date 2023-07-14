@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons } from '../models/screen.models';
+import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, ScreenSizes } from '../models/screen.models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class SharedService {
   private showGeneralLoader: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showLoader: Observable<ShowElement> = this.showGeneralLoader.asObservable();
 
-  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', show: false, buttons: [] });
+  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', show: false, size: ScreenSizes.NORMAL, buttons: [] });
   showToolbar: Observable<ToolbarElement> = this.toolbar.asObservable();
 
   private showGeneralProgressBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
@@ -25,6 +25,8 @@ export class SharedService {
   private showGeneralScrollBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showScrollBar: Observable<ShowElement> = this.showGeneralScrollBar.asObservable();
 
+  private showGoTopButton: BehaviorSubject<GoTopButtonStatus> = new BehaviorSubject<GoTopButtonStatus>({ from: '', status: 'inactive' });
+  showGoTop: Observable<GoTopButtonStatus> = this.showGoTopButton.asObservable();
 
   constructor() { }
 
@@ -45,12 +47,16 @@ export class SharedService {
     this.showGeneralProgressBar.next({ from, show: showProgress });
   }
   
-  setToolbar(from: string, showToolbar: boolean, buttons: ToolbarButtons[]) {
-    this.toolbar.next({ from, show: showToolbar, buttons });
+  setToolbar(from: string, showToolbar: boolean, size: ScreenSizes, buttons: ToolbarButtons[]) {
+    this.toolbar.next({ from, show: showToolbar, size, buttons });
   }
   
   setGeneralScrollBar(from: string, showScrollBar: boolean) {
     this.showGeneralScrollBar.next({ from, show: showScrollBar });
+  }
+
+  setGoTopButton(from: string, status: string) {
+    this.showGoTopButton.next({ from, status });
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {

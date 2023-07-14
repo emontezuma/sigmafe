@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
 import { EChartsOption } from 'echarts';
 
-import { Mold } from '../../models/molds.models';
+import { MoldHitsQuery } from '../../models/molds.models';
 import { numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
@@ -16,7 +16,7 @@ import { SharedService } from '../../../shared/services/shared.service';
   styleUrls: ['./mold-hits-counter.component.scss']
 })
 export class MoldHitsCounterComponent {
-@Input() mold: Mold;
+@Input() mold: MoldHitsQuery;
 
 // Variables ================
   hits = 0;
@@ -25,13 +25,14 @@ export class MoldHitsCounterComponent {
   digitOdd: number[] = [];
   showNumber: string[] = [];
   chartData: EChartsOption = { };
-  progressBackgroundColor: string = "none";
-  progressBarColor: string = "lightgray";
-  progressForeColor: string = "lightgray";
+  progressBackgroundColor: string = 'none';
+  progressBarColor: string = 'lightgray';
+  progressForeColor: string = 'lightgray';
   warningLevel = 0;
   alarmLevel = 0;
-  leftColor: string = "lightgray";
-  elapsedTimeLabel: string = "";
+  leftColor: string = 'lightgray';
+  elapsedTimeLabel: string = '';
+  lastChartValue: number = 0;
 
   constructor(
     private store: Store<AppState>,
@@ -98,94 +99,96 @@ export class MoldHitsCounterComponent {
 
   prepareDataToChart(current: number, limit: number) {
     const progress = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
-    const fontSize = progress < 100 ? 30 : progress < 999 ? 22 : 16;
-    this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
-    
-    this.chartData = {
-      series: [
-        {
-          type: 'gauge',
-          startAngle: 0,
-          endAngle: 360,
-          min: 0,
-          max: 100,
-          splitNumber: 4,
-          itemStyle: {
-            color: this.progressBarColor,
-            shadowColor: 'rgba(0,138,255,0.5)',
-            shadowBlur: 10,
-            shadowOffsetX: 2,
-            shadowOffsetY: 2
-          },
-          progress: {
-            show: true,
-            roundCap: false,
-            width: 6
-          },
-          pointer: {
-            show: false,
-          },
-          axisLine: {
-            roundCap: false,
-            lineStyle: {
-              width: 6
-            }
-          },
-          axisTick: {
-            show: false,
-          },
-          splitLine: {
-            show: false,
-            length: 15,
-            distance: 1,
-            lineStyle: {
-              width: 2,
-              color: '#aaaaaa'
-            }
-          },
-          axisLabel: {
-            show: false,            
-          },
-          title: {
-            show: true,
-          },
-          detail: {
-            backgroundColor: 'none',
-            width: '70%',
-            lineHeight: 35,
-            height: 30,
-            offsetCenter: [0, '0%'],
-            valueAnimation: true,
-            formatter: function (value) {
-              if (value > 999) {
-                return '{value|>' + 999 + '}{unit|%}';
-              } else {
-                return '{value|' + value.toFixed(0) + '}{unit|%}';
-              }
-              
+    if (this.lastChartValue !== progress) {
+      this.lastChartValue = progress;
+      const fontSize = progress < 100 ? 30 : progress < 999 ? 22 : 16;
+      this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
+      
+      this.chartData = {
+        series: [
+          {
+            type: 'gauge',
+            startAngle: 0,
+            endAngle: 360,
+            min: 0,
+            max: 100,
+            splitNumber: 4,
+            itemStyle: {
+              color: this.progressBarColor,
+              shadowColor: 'rgba(0,138,255,0.5)',
+              shadowBlur: 10,
+              shadowOffsetX: 2,
+              shadowOffsetY: 2
             },
-            rich: {
-              value: {
-                fontSize: fontSize,
-                fontWeight: 'bolder',
-                color: this.progressBarColor,
-                
-              },
-              unit: {                
-                fontSize: 12,
-                fontWeight: 'bolder',
-                color: this.progressBarColor,
+            progress: {
+              show: true,
+              roundCap: false,
+              width: 6
+            },
+            pointer: {
+              show: false,
+            },
+            axisLine: {
+              roundCap: false,
+              lineStyle: {
+                width: 6
               }
-            }
-          },
-          data: [
-            {
-              value: progress,
-            }
-          ]
-        }
-      ]
-    };
+            },
+            axisTick: {
+              show: false,
+            },
+            splitLine: {
+              show: false,
+              length: 15,
+              distance: 1,
+              lineStyle: {
+                width: 2,
+                color: '#aaaaaa'
+              }
+            },
+            axisLabel: {
+              show: false,            
+            },
+            title: {
+              show: false,
+            },
+            detail: {
+              backgroundColor: 'none',
+              width: '70%',
+              lineHeight: 35,
+              height: 30,
+              offsetCenter: [0, '0%'],
+              valueAnimation: true,
+              formatter: function (value) {
+                if (value > 999) {
+                  return '{value|>' + 999 + '}{unit|%}';
+                } else {
+                  return '{value|' + value.toFixed(0) + '}{unit|%}';
+                }                
+              },
+              rich: {
+                value: {
+                  fontSize: fontSize,
+                  fontWeight: 'bolder',
+                  color: this.progressBarColor,
+                  
+                },
+                unit: {                
+                  fontSize: 12,
+                  fontWeight: 'bolder',
+                  color: this.progressBarColor,
+                }
+              }
+            },
+            data: [
+              {
+                value: progress,
+              }
+            ]
+          }
+        ]
+      };
+    }    
   }
 
   trackByFn(index: any, item: any) { 

@@ -1,79 +1,127 @@
-<ng-container class="container">  
-    
-  <mat-toolbar class="toolbar" color="accent">
-    <button
-      mat-mini-fab
-      class="button menu"
-      color="primary"
-      aria-label="icon-button with menu icon"
-      (click)="sidenav.open()"
+<ng-container class="container">
+  <ng-container *ngTemplateOutlet="invalidSize ? invalid : valid">
+  </ng-container>
+  <ng-template #valid>
+    <mat-toolbar class="toolbar" color="accent">
+      <button
+        mat-mini-fab
+        class="button menu"
+        color="primary"
+        aria-label="icon-button with menu icon"
+        (click)="sidenav.open()"
+        @appearing
+      >
+        <mat-icon class="icon-toolbar">menu</mat-icon>
+      </button>
+      <h1 i18n>APLICACION TOYOTA <strong>{{ smartphoneView }}</strong></h1>
+      
+      <button
+        mat-mini-fab
+        class="button toolbar-menu"
+        aria-label="icon-button with menu icon"
+        (click)="sidenav.open()"
+        *ngIf="smartphoneView"
+        @appearing
+      >
+        <mat-icon class="icon-toolbar">more_vert</mat-icon>
+      </button>
+    </mat-toolbar>
+    <mat-progress-bar
+      *ngIf="progressBarData?.show"
+      mode="indeterminate"
     >
-      <mat-icon class="icon-toolbar">menu</mat-icon>
-    </button>
-    <h1 i18n>APLICACION TOYOTA <strong>{{ size }}</strong></h1>
-    <span class="example-spacer"></span>
-  </mat-toolbar>
-  <mat-progress-bar *ngIf="progressBarData.show" mode="indeterminate"></mat-progress-bar>
-  <mat-sidenav-container
-      class="drawer-container" 
-      (backdropClick)="sidenav.close()"
-      [ngStyle]="{ 'top': outletPosition }"
-  >
-    <mat-sidenav 
-        #sidenav 
-        (keydown.escape)="sidenav.close()" 
-        disableClose
-      >
-      <mat-nav-list>
-        <a routerLink="molds"
-          mat-list-item
-          (click)="sidenav.close()">
-          <span i18n>Moldes</span>
-        </a>
-        <a routerLink="checklists"
-          mat-list-item
-          (click)="sidenav.close()">
-          <span i18n>Checklist específico</span>
-        </a>
-        <mat-divider></mat-divider>
-      </mat-nav-list>             
-    </mat-sidenav>
-
-    <mat-sidenav-content>
-      <div *ngIf="toolbarData.show" @downUp>
-        <app-toolbar [from]="toolbarData.from" [buttons]="toolbarData.buttons"></app-toolbar>
-      </div>
-      <div
-        class="page-content"
-        [style.height.px]="allHeight"
-        [ngClass]="{ 'noOverflow': !scrollBarData.show, 'withOverflow': scrollBarData.show }"
-        cdkScrollable
-      >
-      <!--<div class="page-content">-->
-        <router-outlet #o="outlet"></router-outlet>
-      </div>
-      <div *ngIf="loading" class="process-container" @dissolve>
-          <div class="process-bar">
-            <mat-progress-spinner class="process-loading" diameter="80"
-              mode="indeterminate">
-            </mat-progress-spinner>
-          </div>
-      </div>
-      <div class="gotop-container" *ngIf="onTopStatus === 'active'" @appearing>
-        <button
-          mat-mini-fab
-          class="gotop-button"
-          (click)="goToTop()"
+    </mat-progress-bar>
+    <mat-sidenav-container
+        class="drawer-container" 
+        (backdropClick)="sidenav.close()"
+        [ngStyle]="{ 'top': outletPosition }"
+    >
+      <mat-sidenav 
+          #sidenav 
+          (keydown.escape)="sidenav.close()" 
+          disableClose
         >
-            <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
-        </button>
-      </div>
-    </mat-sidenav-content>
+        <mat-nav-list>
+          <a routerLink="molds"
+            mat-list-item
+            (click)="sidenav.close()">
+            <span i18n>Moldes</span>
+          </a>
+          <a routerLink="checklists"
+            mat-list-item
+            (click)="sidenav.close()">
+            <span i18n>Checklist específico</span>
+          </a>
+          <mat-divider></mat-divider>
+        </mat-nav-list>             
+      </mat-sidenav>
 
-  </mat-sidenav-container>
-  
-  <mat-toolbar class="footer" color="primary">
-    <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
-    <span class="example-spacer"></span>
-  </mat-toolbar>  
+      <mat-sidenav-content>
+        <div
+          *ngIf="toolbarData?.show && !smartphoneView"
+          @downUp
+        >
+          <app-toolbar [toolbar]="toolbarData"></app-toolbar>
+        </div>
+        <div
+          cdkScrollable
+          class="page-content"
+          [style.height.px]="allHeight"
+          [ngClass]="{ 'noOverflow': !scrollBarData.show, 'withOverflow': scrollBarData.show }"        
+        >
+        <!--<div class="page-content">-->
+          <router-outlet #o="outlet"></router-outlet>
+        </div>
+        <div
+          *ngIf="loading"
+          class="process-container"
+          @dissolve
+        >
+            <div class="process-bar">
+              <mat-progress-spinner
+                class="process-loading"
+                diameter="80"
+                mode="indeterminate"
+              >
+              </mat-progress-spinner>
+            </div>
+        </div>
+        <div class="gotop-container"
+          *ngIf="onTopStatus === 'active'"
+          @appearing
+        >
+          <button
+            mat-mini-fab
+            class="gotop-button"
+            (click)="goToTop()"
+          >
+            <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
+          </button>
+        </div>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+    <mat-toolbar
+      class="footer"
+      color="primary"
+    >
+      <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
+      <span class="example-spacer"></span>
+    </mat-toolbar>
+  </ng-template>
+  <ng-template #invalid>
+    <mat-toolbar class="toolbar" color="accent">
+    </mat-toolbar>
+    <div class="error-box">
+      <mat-icon class="big-icon">error_outline</mat-icon>
+      <div class class="invalid-message">
+        <div i18n>La resolución mínima para ejecutar la aplicaición es de:</div>
+        <div i18n>Ancho: <strong>350 pixeles</strong></div>
+        <div i18n>Alto: <strong>400 pixeles</strong></div>
+      </div>
+    </div>
+    <mat-toolbar
+      class="footer error"
+    >
+    </mat-toolbar>
+  </ng-template>
 </ng-container>

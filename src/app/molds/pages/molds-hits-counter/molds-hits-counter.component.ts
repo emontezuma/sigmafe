@@ -1,14 +1,17 @@
-import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormControl } from '@angular/forms';
+import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
+import { Subscription } from 'rxjs';
+
 import { fromTop } from '../../../shared/animations/shared.animations';
-import { MoldsData } from '../../models/molds.models';
+import { MoldsHitsQueryData } from '../../models/molds.models';
 import { AppState } from '../../../state/app.state'; 
 import { selectSharedScreen } from '../../../state/selectors/screen.selectors'; 
-import { selectMoldsData, selectLoadingState } from '../../../state/selectors/molds.selectors'; 
-import { loadMoldsData } from 'src/app/state/actions/molds.actions';
+import { selectMoldsHitsQueryData, selectLoadingState } from '../../../state/selectors/molds.selectors'; 
+import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ApplicationModules, ToolbarButtons } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
@@ -21,38 +24,59 @@ import { ProfileData } from 'src/app/shared/models/profile.module';
   styleUrls: ['./molds-hits-counter.component.scss']
 })
 export class MoldsHitsCounterComponent implements OnInit {
-  @ViewChild('moldsList') moldList: ElementRef;
-
+  @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
+  @ViewChild('moldsQueryList') private moldsQueryList: ElementRef;
+  
+  
 // Variables ===============
-  moldsData: MoldsData;
+  moldsHitsQueryData: MoldsHitsQueryData;
   settingsData: SettingsData;
   profileData: ProfileData;
   colsBySize: number = 2;
-  size: string = 'Small';
+  currentSize: string = '';
   cardWidth: string;
   loading: boolean = true;
   animate: boolean = true;
   filterMoldsBy: string = '';
   buttons: ToolbarButtons[] = [];
-
+  onTopStatus: string  = 'inactive';
+  goTopButtonTimer: any;
+  loaded: boolean = false;
+  
   form = new FormGroup({
-
   });
 
   constructor(
     private store: Store<AppState>,
     private sharedService: SharedService,
+    public scrollDispatcher: ScrollDispatcher,
   ) { }
 
 // Hooks ====================
   ngOnInit() {
-    this.store.dispatch(loadMoldsData());
-    this.calcButtons();
     this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;
     });
     this.store.select(selectSharedScreen).subscribe( shared => {
-      this.size = shared.size;      
+      if (this.loaded) {
+        if (shared.innerWidth <= 500 && this.currentSize !== ScreenSizes.SMALL) {
+          this.calcButtons(ScreenSizes.SMALL);
+          this.sharedService.setToolbar(
+            ApplicationModules.MOLDS_HITS_VIEW,
+            true,
+            ScreenSizes.SMALL,
+            this.buttons,
+          );
+        } else if (shared.innerWidth > 500 && this.currentSize !== ScreenSizes.NORMAL) {
+          this.calcButtons(ScreenSizes.NORMAL);
+          this.sharedService.setToolbar(
+            ApplicationModules.MOLDS_HITS_VIEW,
+            true,
+            ScreenSizes.NORMAL,
+            this.buttons,
+          );
+        }      
+      }              
     });
     this.store.select(selectProfileData).subscribe( profileData => {
       this.profileData = profileData;
@@ -66,29 +90,53 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.sharedService.setGeneralPreogressBar(
         ApplicationModules.MOLDS_HITS_VIEW,
         loading,
-      );      
+      );
+      this.loaded = loading === false;
     });
+    this.store.select(selectMoldsHitsQueryData).subscribe( moldsHitsQueryData => { 
+      this.moldsHitsQueryData = moldsHitsQueryData;            
+    });
+
     this.sharedService.setSearchBox(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
-    );
-    
-    this.store.select(selectMoldsData).subscribe( moldsData => { 
-      this.moldsData = moldsData;            
-    });
+    );    
     this.sharedService.search.subscribe((searchBox) => {
       if (searchBox.from === ApplicationModules.MOLDS_HITS_VIEW) {
         this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
+    this.sharedService.showGoTop.subscribe((goTop) => {
+      if (goTop.status === 'temp') {
+        this.onTopStatus = 'active';
+        this.moldsQueryList.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+        });
+        // Ensure
+      }      
+    });
+
+    this.scrollDispatcher
+    .scrolled()
+    .subscribe((data: any) => {
+      this.getScrolling(data);
+    });
+
+    this.store.dispatch(loadMoldsHitsQueryData());
+    this.calcButtons(ScreenSizes.NORMAL);
   }
 
   ngOnDestroy() : void {
     this.sharedService.setToolbar(
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
+      ScreenSizes.NORMAL,
       this.buttons,
-    );  
+    );
+    this.sharedService.setGeneralScrollBar(
+      ApplicationModules.MOLDS_HITS_VIEW,
+      false,
+    );
   }
 
 // Functions ================
@@ -98,6 +146,7 @@ export class MoldsHitsCounterComponent implements OnInit {
         this.sharedService.setToolbar(
           ApplicationModules.MOLDS_HITS_VIEW,
           true,
+          ScreenSizes.NORMAL,
           this.buttons,
         );
         this.sharedService.setGeneralScrollBar(
@@ -108,7 +157,9 @@ export class MoldsHitsCounterComponent implements OnInit {
     }
   }
 
-  calcButtons() {
+  calcButtons(size: string) {
+    const showCaption = size === ScreenSizes.NORMAL;
+    this.currentSize = size;
     this.buttons = [{
       type: 'button',
       caption: $localize`Actualizar`,
@@ -116,8 +167,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: 'replay',
       primary: false,
       iconSize: '24px',
+      showThis: true,
       showIcon: true,
       showTooltip: true,
+      showCaption,
       disabled: false,
     },{
       type: 'divider',
@@ -126,8 +179,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: "",
       primary: false,
       iconSize: "",
+      showThis: true,
       showIcon: true,
       showTooltip: true,
+      showCaption,
       disabled: true,
     },{
       type: 'button',
@@ -136,8 +191,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: 'download',
       primary: false,
       iconSize: '24px',
+      showThis: true,
       showIcon: true,
       showTooltip: true,
+      showCaption,
       disabled: false,
     },{
       type: 'divider',
@@ -146,8 +203,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: "",
       primary: false,
       iconSize: "",
+      showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
+      showCaption,
       disabled: true,
     },{
       type: 'searchbox',
@@ -156,14 +215,44 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: '',
       primary: false,
       iconSize: '',
+      showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
+      showCaption,
       disabled: true,
     },];
   }
   
   trackByFn(index: any, item: any) { 
     return index; 
+  }
+
+  getScrolling(data: CdkScrollable) {   
+    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
+    let status = 'inactive'
+    if (scrollTop < 5) {
+      status = 'inactive';
+    } else if (this.onTopStatus !== 'temp') {
+      status = 'active';
+      clearTimeout(this.goTopButtonTimer);
+      this.goTopButtonTimer = setTimeout(() => {
+        if (this.onTopStatus !== 'inactive') {
+          this.onTopStatus = 'inactive';
+          this.sharedService.setGoTopButton(
+            ApplicationModules.GENERAL,
+            'inactive',
+          );
+        }
+        return;
+      }, 2500);
+    }
+    if (this.onTopStatus !== status) {
+      this.onTopStatus = status;
+      this.sharedService.setGoTopButton(
+        ApplicationModules.GENERAL,
+        status,
+      );
+    }
   }
 
 // End ======================

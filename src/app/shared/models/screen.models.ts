@@ -13,27 +13,25 @@ export interface Platform {
 export interface Screen  {
     platform: Platform,
     size: string;
-    availableHeight: number;
-    availableWidth: number;
-    height: number;
     innerHeight: number;
     innerWidth: number;
     orientation: string;
     outerHeight: number;
     outerWidth: number;
-    width: number;
 }
 
 export interface ToolbarButtons  {
     type: 'button' | 'divider' | 'searchbox';
     caption: string;
-    showTooltip: boolean;
     tooltip: string;
-    showIcon: boolean;
     icon: string;
     iconSize: string;
     primary: boolean;
     disabled: boolean;
+    showThis: boolean;
+    showCaption: boolean;
+    showIcon: boolean;
+    showTooltip: boolean;
 }
 export interface SharedState {
     screen: Screen;
@@ -49,14 +47,26 @@ export interface ShowElement {
     show: boolean;
 }
 
+export interface GoTopButtonStatus {
+    from: string;
+    status: string;
+}
+
 export interface ToolbarElement {
     from: string;
     show: boolean;
+    size: ScreenSizes;
     buttons: ToolbarButtons[];
 }
 
 export enum ApplicationModules {
-    MOLDS_HITS_VIEW = 'Molds-hits-view',
+    MOLDS_HITS_VIEW = 'molds-hits-view',
+    GENERAL = 'general',
+}
+
+export enum ScreenSizes {
+    NORMAL = 'normal',
+    SMALL = 'small',
 }
 
 

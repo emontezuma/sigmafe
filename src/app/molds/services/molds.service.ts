@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, of } from 'rxjs';
 
-import { sampleMoldsData } from '../../shared/sample-data';
-import { MoldsData } from '../../molds/models/molds.models';
+import { sampleMoldsHitsQueryData } from '../../shared/sample-data';
+import { MoldsHitsQueryData } from '../../molds/models/molds.models';
 
 @Injectable({
   providedIn: 'root'
@@ -10,15 +10,15 @@ import { MoldsData } from '../../molds/models/molds.models';
 export class MoldsService {
 
   // Variables ===============
-  fakeMoldsData: MoldsData = sampleMoldsData;
-  data$: BehaviorSubject<MoldsData> = new BehaviorSubject(sampleMoldsData);
+  fakeMoldsHitsQueryData: MoldsHitsQueryData = sampleMoldsHitsQueryData;
+  data$: BehaviorSubject<MoldsHitsQueryData> = new BehaviorSubject(sampleMoldsHitsQueryData);
 
 
   constructor() { }
 
   // Functions ================  
-  getMoldsData(): Observable<MoldsData> {
-    return of(this.fakeMoldsData).pipe(
+  getMoldsHitsQueryData(): Observable<MoldsHitsQueryData> {
+    return of(this.fakeMoldsHitsQueryData).pipe(
       delay(1500)
     );
   }

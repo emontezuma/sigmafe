@@ -4,17 +4,18 @@ import { MoldsState } from '../../molds/models/molds.models';
 
 export const initialState: MoldsState = {
   loading: false,
-  moldsData: {
+  moldsHitsQueryData: {
     molds: [],
     page: 0,
     pageSize: 0,
     moreData: false,
+    totalRecs: 0,
   }  
 };
 
 export const moldsReducer = createReducer(
   initialState,
-  on(moldsActions.loadMoldsData, ( state ) => ({ ...state, loading: true })),
-  on(moldsActions.loadedMoldsData, (state, { moldsData } ) => ({ ...state, loading: false, moldsData })),
+  on(moldsActions.loadMoldsHitsQueryData, ( state ) => ({ ...state, loading: true })),
+  on(moldsActions.loadedMoldsHitsQueryData, (state, { moldsHitsQueryData } ) => ({ ...state, loading: false, moldsHitsQueryData })),
 );
   

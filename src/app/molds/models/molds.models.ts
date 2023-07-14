@@ -32,7 +32,7 @@ export interface SimpleTable {
     description: string;
 }
 
-export interface Mold {
+export interface MoldHitsQuery {
     id: string;
     name: string;
     hits: number;
@@ -50,15 +50,16 @@ export interface Mold {
     alarmed: boolean;
 }
 
-export interface MoldsData {
-    molds: Mold[];
+export interface MoldsHitsQueryData {
+    molds: MoldHitsQuery[];
     page: number;
     pageSize: number;
     moreData: boolean;
+    totalRecs: number;
 }
 
 export interface MoldsState {
     loading: boolean;
-    moldsData: MoldsData;
+    moldsHitsQueryData: MoldsHitsQueryData;
 }
 

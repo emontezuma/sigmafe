@@ -2,7 +2,7 @@
 
 .toolbar {
     border-bottom: 1px solid silver;
-    height: 72px
+    height: 64px
 }
 
 .toolbar-grid {
@@ -12,16 +12,18 @@
 
 .button-normal {
     margin-right: 5px;
-    margin-top: 19px;
+    margin-top: 20px;
     font-size: 1.3rem;
     height: 40px;
     display: flex;
     flex-direction: column;
-    height: 58px;
+    height: 56px;
+    border-radius: 8px 0px;
+    border: 1.5px solid silver;
 }
 
 ::ng-deep .mdc-button__label {
-    margin-top: -5px;
+    margin-top: -8px;
 }
 
 .icon-toolbar {

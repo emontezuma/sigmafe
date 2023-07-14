@@ -2,18 +2,33 @@
   <ng-container *ngTemplateOutlet="!loading ? molds : loader">
   </ng-container>
   <ng-template #molds>
-    <div class="container-animated" @fromTop (@fromTop.done)="animateToolbar($event)">   
-      <div class="cards-container">
-        <div *ngFor="let mold of moldsData.molds | filter:filterMoldsBy; let i = index; trackBy: trackByFn">
+    <div
+      class="container-animated"
+      (@fromTop.done)="animateToolbar($event)"
+      @fromTop      
+    >   
+      <div
+        class="cards-container"
+        cdkScrollable
+        #moldsQueryList
+      >
+        <div *ngFor="let mold of moldsHitsQueryData.molds | filter:filterMoldsBy; let i = index; trackBy: trackByFn" >
           <app-mold-hits-counter [mold]="mold"></app-mold-hits-counter>
         </div>
-    </div>
+      </div>
     </div>
   </ng-template>
   <ng-template #loader>
-    <div *ngIf="profileData.animate" class="container-animated" @fromTop>
+    <div
+      *ngIf="profileData.animate"
+      class="container-animated"
+      @fromTop      
+    >
       <div class="cards-container">
-        <mat-card *ngFor="let number of [0, 1, 2, 4]">
+        <mat-card
+          class="card"
+          *ngFor="let number of [0, 1, 2, 4]"
+        >
           <mat-card-content>
             <ngx-skeleton-loader count="3"></ngx-skeleton-loader>              
           </mat-card-content>
@@ -23,8 +38,18 @@
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>       
           <mat-card-footer class="image-text">
-            <ngx-skeleton-loader class="image" count="1" appearance="circle"></ngx-skeleton-loader>   
-            <ngx-skeleton-loader class="text" [theme]="{height: '50px'}" count="1"></ngx-skeleton-loader> 
+            <ngx-skeleton-loader
+              class="image"
+              count="1"
+              appearance="circle"
+            >
+            </ngx-skeleton-loader>   
+            <ngx-skeleton-loader
+              class="text"
+              [theme]="{height: '50px'}"
+              count="1"
+            >
+          </ngx-skeleton-loader> 
           </mat-card-footer>
           <mat-card-content>
             <ngx-skeleton-loader count="1"></ngx-skeleton-loader>              

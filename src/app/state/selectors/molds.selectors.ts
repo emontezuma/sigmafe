@@ -4,9 +4,9 @@ import { MoldsState } from '../../molds/models/molds.models';
 
 export const selectMoldsFeature = ( state: AppState ) => state.molds;
 
-export const selectMoldsData = createSelector(
+export const selectMoldsHitsQueryData = createSelector(
     selectMoldsFeature,
-    (state: MoldsState) => state.moldsData
+    (state: MoldsState) => state.moldsHitsQueryData
 );
 
 export const selectLoadingState = createSelector(

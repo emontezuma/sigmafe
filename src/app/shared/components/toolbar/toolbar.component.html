@@ -1,41 +1,43 @@
 <div class="container">
-    <mat-toolbar class="toolbar">
+    <mat-toolbar class="toolbar" [style.height.px]="toolbarHeight">
         <div class="toolbar-grid">
-            <div *ngFor="let button of buttons; let i = index; trackBy: trackByFn">
-                <button
-                    *ngIf="button.type === 'button'"
-                    mat-stroked-button 
-                    class="button-normal"
-                    aria-label="icon-button with menu icon"
-                    [matTooltipDisabled]="!button.showTooltip"
-                    [matTooltip]="button.tooltip"
-                    matTooltipClass = "tooltip-general"
-                    matTooltipShowDelay = "100"
-                    [disabled]="button.disabled"
-                    i18n-placeHolder
-                >
-                    <mat-icon
-                        *ngIf="button.showIcon"
-                        class="icon-toolbar medium"
+            <div *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
+                <div *ngIf="button.showThis">
+                    <button
+                        *ngIf="button.type === 'button'"
+                        mat-stroked-button 
+                        class="button-normal"
+                        aria-label="icon-button with menu icon"
+                        [matTooltipDisabled]="!button.showTooltip"
+                        [matTooltip]="button.tooltip"
+                        matTooltipClass = "tooltip-general"
+                        matTooltipShowDelay = "100"
+                        [disabled]="button.disabled"
+                        i18n-placeHolder
                     >
-                        {{ button.icon }}
-                    </mat-icon>
-                    {{ button.caption }}
-                </button>
-                <mat-divider
-                    *ngIf="button.type === 'divider'"
-                    vertical class="divider"
-                >
-                </mat-divider>
-                <app-search-box
-                    *ngIf="button.type === 'searchbox'"
-                    textToSearch="hello"
-                    i18n-placeHolder
-                    placeHolder="Filtrar"
-                    maxLength="50"
-                    (searchBy)="sendSearchText($event)"
-                >
-                </app-search-box>
+                        <mat-icon
+                            *ngIf="button.showIcon"
+                            class="icon-toolbar medium"
+                        >
+                            {{ button.icon }}
+                        </mat-icon>
+                        {{ button.showCaption ? button.caption : '' }}
+                    </button>
+                    <mat-divider
+                        *ngIf="button.type === 'divider'"
+                        vertical class="divider"
+                    >
+                    </mat-divider>
+                    <app-search-box
+                        *ngIf="button.type === 'searchbox'"
+                        textToSearch="hello"
+                        i18n-placeHolder
+                        placeHolder="Filtrar"
+                        maxLength="50"
+                        (searchBy)="sendSearchText($event)"
+                    >
+                    </app-search-box>
+                </div>
             </div>            
         </div>
     </mat-toolbar>

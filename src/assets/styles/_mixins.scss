@@ -24,7 +24,7 @@
     $direction: row, 
     $wrap: wrap, 
     $gap: 10px, 
-    $justify-content: space-evenly
+    $justify-content: space-evenly,
 ) {
     display: flex;
     flex-direction: $direction;    

@@ -10,9 +10,9 @@ export class MoldsEffects {
  
   loadMolds$ = createEffect(() => this.actions$.pipe(
     ofType('[Molds] Load Molds Data'),
-    exhaustMap(() => this.moldsService.getMoldsData()
+    exhaustMap(() => this.moldsService.getMoldsHitsQueryData()
       .pipe(
-        map(moldsData => ({ type: '[Molds] Loaded Molds Data sucesssfully', moldsData })),
+        map(moldsHitsQueryData => ({ type: '[Molds] Loaded Molds Data sucesssfully', moldsHitsQueryData })),
         catchError(() => EMPTY)
       ))
     )

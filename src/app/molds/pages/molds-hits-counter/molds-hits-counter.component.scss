@@ -3,6 +3,7 @@
 mat-card {
     max-width: 400px;
     min-width: 300px;
+    border-radius: 10px 0px;
 }
 .container {
     position: relative;
@@ -10,12 +11,11 @@ mat-card {
 
 .container-animated {
     position: absolute;
-    height: 100%;
     width: 100%;
 }
 
 .cards-container {
-    @include mixins.grid(10px, 8, space-evenly, 300px, 10px);
+    @include mixins.grid(10px, 8, space-evenly, 300px, 5px);
 }
 
 .loader {

@@ -16,15 +16,11 @@ export const initialState: SharedState = {
       isBrowser: false,
     },
     size: '',
-    availableHeight: 0,
-    availableWidth: 0,
-    height: 0,
     innerHeight: 0,
     innerWidth: 0,
     orientation: '',
     outerHeight: 0,
     outerWidth: 0,
-    width: 0,
   },
 };
 
