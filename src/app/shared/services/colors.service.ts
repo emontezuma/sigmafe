@@ -1,0 +1,118 @@
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, delay, of } from 'rxjs';
+
+import { sampleColors } from '../../shared/sample-data';
+import { ColorsData } from '../../shared/models/colors.models';
+
+import tinycolor from 'tinycolor2';
+import { ApplicationModules } from '../models/screen.models';
+import { ColorVariable } from '../models/colors.models';
+
+export interface Color {
+  name: string;
+  hex: string;
+  darkContrast: boolean;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ColorsService {
+
+// Variables ===============
+  primaryColor = '#1fc103';
+  accentColor = '#0e67cc';
+  warnColor = '#FF0000';
+  primaryColorPalette: Color[] = [];
+  accentColorPalette: Color[] = [];
+  warnColorPalette: Color[] = [];
+  fakeColorsData: ColorsData = sampleColors;
+  data$: BehaviorSubject<ColorsData> = new BehaviorSubject(sampleColors);
+
+  constructor() {
+    this.savePrimaryColor();
+    this.saveAccentColor();
+    this.saveWarnColor();
+  }
+
+// Functions ================
+  savePrimaryColor() {
+    this.primaryColorPalette = computeColors(this.primaryColor);
+    updateTheme(this.primaryColorPalette, 'primary');
+  }
+
+  saveAccentColor() {
+    this.accentColorPalette = computeColors(this.accentColor);
+    updateTheme(this.accentColorPalette, 'accent');
+  }
+
+  saveWarnColor() {
+    this.warnColorPalette = computeColors(this.warnColor);
+    updateTheme(this.warnColorPalette, 'warn');
+  }
+
+  saveOtherColors() {
+    this.accentColorPalette = computeColors(this.warnColor);
+    updateTheme(this.warnColorPalette, 'warn');
+  }
+
+  saveSpecificColor(variableName: string, value: string) {
+    document.documentElement.style.setProperty(variableName, value);
+  }
+
+  setColorVariables(module: ApplicationModules, colorsData: ColorsData) {
+    if (module = ApplicationModules.MOLDS_HITS_VIEW) {
+      colorsData.moldsHitsSpinner.forEach(variable => {
+        document.documentElement.style.setProperty(variable.variableName, variable.color)
+      });
+    }    
+  }
+
+  getSettingsData(): Observable<ColorsData> {
+    return of(this.fakeColorsData).pipe(
+      delay(1500)
+    );
+  }
+}
+
+function updateTheme(colors: Color[], theme: string) {
+  colors.forEach(color => {
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-${color.name}`,
+      color.hex
+    );
+    document.documentElement.style.setProperty(
+      `--theme-${theme}-contrast-${color.name}`,
+      color.darkContrast ? 'rgba(black, 0.87)' : 'white'
+    );
+  });
+}
+
+function computeColors(hex: string): Color[] {
+  return [
+    getColorObject(tinycolor(hex).lighten(52), '50'),
+    getColorObject(tinycolor(hex).lighten(37), '100'),
+    getColorObject(tinycolor(hex).lighten(26), '200'),
+    getColorObject(tinycolor(hex).lighten(12), '300'),
+    getColorObject(tinycolor(hex).lighten(6), '400'),
+    getColorObject(tinycolor(hex), '500'),
+    getColorObject(tinycolor(hex).darken(6), '600'),
+    getColorObject(tinycolor(hex).darken(12), '700'),
+    getColorObject(tinycolor(hex).darken(18), '800'),
+    getColorObject(tinycolor(hex).darken(24), '900'),
+    getColorObject(tinycolor(hex).lighten(50).saturate(30), 'A100'),
+    getColorObject(tinycolor(hex).lighten(30).saturate(30), 'A200'),
+    getColorObject(tinycolor(hex).lighten(10).saturate(15), 'A400'),
+    getColorObject(tinycolor(hex).lighten(5).saturate(5), 'A700')
+  ];
+}
+
+function getColorObject(value: any, name: string): Color {
+  const c = tinycolor(value);
+  return {
+    name: name,
+    hex: c.toHexString(),
+    darkContrast: c.isLight()
+  };
+}
+// End ======================

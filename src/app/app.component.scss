@@ -23,14 +23,21 @@ mat-sidenav-content.mat-drawer-content.mat-sidenav-content {
   overflow: hidden;
 }
 
+mat-sidenav {
+  margin: 3px;
+  border: 1px solid silver;
+  border-radius: 8px;
+  width: max(300px, 15%);
+}
+
+mat-panel-title {
+  @include mixins.custom-fonts(1.6rem, 900);
+}
+
 .footer {
   position: absolute;
   bottom: 0;
   height: 40px;
-}
-
-.icon-toolbar {
-  margin-top: -8px;
 }
 
 .button {
@@ -41,6 +48,10 @@ mat-sidenav-content.mat-drawer-content.mat-sidenav-content {
   align-items: center;
   margin-left: -10px;
   margin-right: 5px;
+}
+
+.principal {
+  color: var(--primary-fore-color) !important;
 }
 
 .toolbar-menu {
@@ -157,3 +168,13 @@ mat-toolbar {
 .error {
   background-color: orangered;
 }
+
+.primary {
+  color: var(--primary-fore-color);
+  background-color: var(--primary-background-color);
+}
+
+.icon-toolbar {
+  color: white !important;
+}
+

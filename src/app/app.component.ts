@@ -5,6 +5,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { Screen, ScreenSizes, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
 import { SharedService } from './shared/services/shared.service'; 
+import { ColorsService } from './shared/services/colors.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve, downUp } from '../app/shared/animations/shared.animations';
@@ -74,6 +75,7 @@ export class AppComponent implements AfterViewInit {
     public platform: Platform,
     private breakpointObserver: BreakpointObserver,
     private sharedService: SharedService,
+    private colorsService: ColorsService,
     ) { 
     breakpointObserver
     .observe([

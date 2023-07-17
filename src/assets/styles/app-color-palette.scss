@@ -2,7 +2,106 @@
 
 @include mat.core();
 
-$primary-01: (
+$dynamic-theme-primary: (
+  50 : var(--theme-primary-50),
+  100 : var(--theme-primary-100),
+  200 : var(--theme-primary-200),
+  300 : var(--theme-primary-300),
+  400 : var(--theme-primary-400),
+  500 : var(--theme-primary-500),
+  600 : var(--theme-primary-600),
+  700 : var(--theme-primary-700),
+  800 : var(--theme-primary-800),
+  900 : var(--theme-primary-900),
+  A100 : var(--theme-primary-A100),
+  A200 : var(--theme-primary-A200),
+  A400 : var(--theme-primary-A400),
+  A700 : var(--theme-primary-A700),
+  contrast: (
+    50: var(--theme-primary-contrast-50),
+    100: var(--theme-primary-contrast-100),
+    200: var(--theme-primary-contrast-200),
+    300: var(--theme-primary-contrast-300),
+    400: var(--theme-primary-contrast-400),
+    500: var(--theme-primary-contrast-500),
+    600: var(--theme-primary-contrast-600),
+    700: var(--theme-primary-contrast-700),
+    800: var(--theme-primary-contrast-800),
+    900: var(--theme-primary-contrast-900),
+    A100: var(--theme-primary-contrast-A100),
+    A200: var(--theme-primary-contrast-A200),
+    A400: var(--theme-primary-contrast-A400),
+    A700: var(--theme-primary-contrast-A700),
+  )
+);
+
+$dynamic-theme-accent: (
+  50 : var(--theme-accent-50),
+  100 : var(--theme-accent-100),
+  200 : var(--theme-accent-200),
+  300 : var(--theme-accent-300),
+  400 : var(--theme-accent-400),
+  500 : var(--theme-accent-500),
+  600 : var(--theme-accent-600),
+  700 : var(--theme-accent-700),
+  800 : var(--theme-accent-800),
+  900 : var(--theme-accent-900),
+  A100 : var(--theme-accent-A100),
+  A200 : var(--theme-accent-A200),
+  A400 : var(--theme-accent-A400),
+  A700 : var(--theme-accent-A700),
+  contrast: (
+    50: var(--theme-accent-contrast-50),
+    100: var(--theme-accent-contrast-100),
+    200: var(--theme-accent-contrast-200),
+    300: var(--theme-accent-contrast-300),
+    400: var(--theme-accent-contrast-400),
+    500: var(--theme-accent-contrast-500),
+    600: var(--theme-accent-contrast-600),
+    700: var(--theme-accent-contrast-700),
+    800: var(--theme-accent-contrast-800),
+    900: var(--theme-accent-contrast-900),
+    A100: var(--theme-accent-contrast-A100),
+    A200: var(--theme-accent-contrast-A200),
+    A400: var(--theme-accent-contrast-A400),
+    A700: var(--theme-accent-contrast-A700),
+  )
+);
+
+$dynamic-theme-warn: (
+  50 : var(--theme-warn-50),
+  100 : var(--theme-warn-100),
+  200 : var(--theme-warn-200),
+  300 : var(--theme-warn-300),
+  400 : var(--theme-warn-400),
+  500 : var(--theme-warn-500),
+  600 : var(--theme-warn-600),
+  700 : var(--theme-warn-700),
+  800 : var(--theme-warn-800),
+  900 : var(--theme-warn-900),
+  A100 : var(--theme-warn-A100),
+  A200 : var(--theme-warn-A200),
+  A400 : var(--theme-warn-A400),
+  A700 : var(--theme-warn-A700),
+  contrast: (
+    50: var(--theme-warn-contrast-50),
+    100: var(--theme-warn-contrast-100),
+    200: var(--theme-warn-contrast-200),
+    300: var(--theme-warn-contrast-300),
+    400: var(--theme-warn-contrast-400),
+    500: var(--theme-warn-contrast-500),
+    600: var(--theme-warn-contrast-600),
+    700: var(--theme-warn-contrast-700),
+    800: var(--theme-warn-contrast-800),
+    900: var(--theme-warn-contrast-900),
+    A100: var(--theme-warn-contrast-A100),
+    A200: var(--theme-warn-contrast-A200),
+    A400: var(--theme-warn-contrast-A400),
+    A700: var(--theme-warn-contrast-A700),
+  )
+);
+
+$primary: (
     50 : #e6f2fd,
     100 : #c0def9,
     200 : #97c9f6,
@@ -35,7 +134,7 @@ $primary-01: (
     )
 );
 
-$accent-01: (
+$accent: (
     50 : #edf5ea,
     100 : #d2e5ca,
     200 : #b5d4a7,
@@ -68,19 +167,59 @@ $accent-01: (
     )
 );
 
-$my-primary: mat.define-palette($primary-01, 500);
-$my-accent: mat.define-palette($accent-01, 500, A100, A400);
-$my-typography: mat.define-typography-config(
-    $font-family: 'Titillium Web',
+$warn: (
+    50 : #fbeded,
+    100 : #f6d1d1,
+    200 : #f0b3b3,
+    300 : #e99494,
+    400 : #e57d7d,
+    500 : #e06666,
+    600 : #dc5e5e,
+    700 : #d85353,
+    800 : #d34949,
+    900 : #cb3838,
+    A100 : #ffffff,
+    A200 : #ffe2e2,
+    A400 : #ffafaf,
+    A700 : #ff9696,
+    contrast: (
+        50 : #000000,
+        100 : #000000,
+        200 : #000000,
+        300 : #000000,
+        400 : #000000,
+        500 : #000000,
+        600 : #000000,
+        700 : #ffffff,
+        800 : #ffffff,
+        900 : #ffffff,
+        A100 : #000000,
+        A200 : #000000,
+        A400 : #000000,
+        A700 : #000000,
+    )
 );
+
+
+$my-primary: mat.define-palette($dynamic-theme-primary, 500);
+$my-accent: mat.define-palette($dynamic-theme-accent, 500, A200, A100, A400);
+$my-warn: mat.define-palette($dynamic-theme-warn, 500, 50, A700);
+$my-typography: mat.define-typography-config(
+    $font-family:   'Titillium Web, Roboto, "Helvetica Neue", sans-serif',    
+);
+
+$my-primary: mat.define-palette($primary, 500);
+
   
 
 $my-theme: mat.define-light-theme((
  color: (
    primary: $my-primary,
    accent: $my-accent,
+   warn: $my-warn,
  ),
   typography: $my-typography,
+  
 ));
 
 @include mat.all-component-themes($my-theme);

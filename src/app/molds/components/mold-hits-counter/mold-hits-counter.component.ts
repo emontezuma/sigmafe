@@ -8,6 +8,7 @@ import { numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
 import { SharedService } from '../../../shared/services/shared.service';
+import { Colors, SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
 
 @Component({
   selector: 'app-mold-hits-counter',
@@ -20,6 +21,7 @@ export class MoldHitsCounterComponent {
 
 // Variables ================
   hits = 0;
+  valueToChart = 0;
   settingsData: SettingsData;
   digitPair: number[] = [];
   digitOdd: number[] = [];
@@ -33,6 +35,37 @@ export class MoldHitsCounterComponent {
   leftColor: string = 'lightgray';
   elapsedTimeLabel: string = '';
   lastChartValue: number = 0;
+  limits: SpinnerLimits[] = [{
+    start: 0,
+    finish: 67,
+  },{
+    start: 67,
+    finish: 95,
+  },{
+    start: 95,
+    finish: 0,
+  }];
+  fonts: SpinnerFonts[] = [{
+    start: 0,
+    finish: 99,
+    size: 2.3,
+    weight: 700,
+  },{
+    start: 99,
+    finish: 999,
+    size: 1.8,
+    weight: 500,
+  },{
+    start: 999,
+    finish: 0,
+    size: 1.4,
+    weight: 300,
+  }];
+  smallFont: SmallFont = {
+    size: 1.4,
+    weight: 300,
+  }
+  showPrefix = false;
 
   constructor(
     private store: Store<AppState>,
@@ -52,8 +85,7 @@ export class MoldHitsCounterComponent {
       this.hits = this.hits + 1;
       this.numberToArray(this.hits);    
       this.prepareDataToChart (this.hits, this.mold.limit)
-    }, 1000);
-    
+    }, 200);    
   }
 
 // Functions ================
@@ -94,14 +126,16 @@ export class MoldHitsCounterComponent {
   setProgressColors() {
     this.progressBarColor = this.mold.warned ? this.settingsData?.warningColor : this.mold.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
     this.progressBackgroundColor = this.mold.alarmed ? this.settingsData?.alarmedColor : 'none';
-    this.progressForeColor = this.mold.alarmed ? '#FFFFFF' : '#606060';
+    this.progressForeColor = this.mold.alarmed ? '#FFFFFF' : '#606060';    
   }
 
   prepareDataToChart(current: number, limit: number) {
-    const progress = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
-    if (this.lastChartValue !== progress) {
-      this.lastChartValue = progress;
-      const fontSize = progress < 100 ? 30 : progress < 999 ? 22 : 16;
+    this.valueToChart = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
+    if (this.lastChartValue !== this.valueToChart) {
+      this.showPrefix = this.valueToChart > 999;
+      this.valueToChart = this.showPrefix ? 999 : this.valueToChart;
+      this.lastChartValue = this.valueToChart;
+      const fontSize = this.valueToChart < 100 ? 30 : this.valueToChart < 999 ? 22 : 16;
       this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
       
       this.chartData = {
@@ -182,7 +216,7 @@ export class MoldHitsCounterComponent {
             },
             data: [
               {
-                value: progress,
+                value: this.valueToChart,
               }
             ]
           }

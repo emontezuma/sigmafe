@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { ProfileData } from '../../shared/models/profile.module';
+import { ProfileData } from '../../shared/models/profile.models';
 
 export const loadProfileData = createAction(
     '[Profile] Load Profile Data'

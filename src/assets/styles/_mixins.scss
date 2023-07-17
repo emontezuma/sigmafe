@@ -53,3 +53,13 @@
     margin-left: $margin-left;
     margin-right: $margin-right;
 } 
+
+@mixin custom-fonts (
+    $font-size: inherit, 
+    $font-weight: inherit,
+    $color: inherit,
+) {
+    font-size: $font-size;
+    font-weight: $font-weight;
+    color: $color;
+}

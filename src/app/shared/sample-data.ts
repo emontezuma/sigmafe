@@ -1,6 +1,8 @@
 import { MoldsHitsQueryData } from '../molds/models/molds.models'
 import { SettingsData } from '../shared/models/settings.models'
-import { ProfileData } from './models/profile.module'
+import { ColorsData, Colors } from './models/colors.models'
+import { ProfileData } from './models/profile.models'
+import { ColorsService } from './services/colors.service'
 export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
     page: 1,
     pageSize: 10,
@@ -425,4 +427,22 @@ export const sampleProfile: ProfileData = {
     lastName: "DEL SISTEMA",
     userProfile: "ADMIN",
     id: "tetettee-ooeiiie-jjd73",
+}
+
+export const sampleColors: ColorsData = {
+    default: "S",
+    name: "S",
+    customized: "S",
+    fixed: "S",
+    selected: "S",
+    moldsHitsSpinner: [{
+        variableName: "--z-molds-hits-spinner-stroke-meter-1",
+        color: Colors.GREEN,
+    },{
+        variableName: "--z-molds-hits-spinner-stroke-meter-2",
+        color: Colors.ORANGE,
+    },{
+        variableName: "--z-molds-hits-spinner-stroke-meter-3",
+        color: Colors.REDORANGE,
+    }],
 }

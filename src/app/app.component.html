@@ -5,16 +5,15 @@
     <mat-toolbar class="toolbar" color="accent">
       <button
         mat-mini-fab
-        class="button menu"
-        color="primary"
+        class="button"
+        color="warn"
         aria-label="icon-button with menu icon"
         (click)="sidenav.open()"
         @appearing
       >
-        <mat-icon class="icon-toolbar">menu</mat-icon>
+        <mat-icon class="icon-toolbar" svgIcon="left_menu"></mat-icon>
       </button>
-      <h1 i18n>APLICACION TOYOTA <strong>{{ smartphoneView }}</strong></h1>
-      
+      <h1 i18n>APLICACION TOYOTA <strong>{{ smartphoneView }}</strong></h1>      
       <button
         mat-mini-fab
         class="button toolbar-menu"
@@ -23,7 +22,7 @@
         *ngIf="smartphoneView"
         @appearing
       >
-        <mat-icon class="icon-toolbar">more_vert</mat-icon>
+        <mat-icon class="icon-toolbar" svgIcon="vertical_menu"></mat-icon>
       </button>
     </mat-toolbar>
     <mat-progress-bar
@@ -42,17 +41,27 @@
           disableClose
         >
         <mat-nav-list>
-          <a routerLink="molds"
-            mat-list-item
-            (click)="sidenav.close()">
-            <span i18n>Moldes</span>
-          </a>
-          <a routerLink="checklists"
-            mat-list-item
-            (click)="sidenav.close()">
-            <span i18n>Checklist específico</span>
-          </a>
-          <mat-divider></mat-divider>
+          <cdk-accordion>
+            <mat-expansion-panel class="otroPanel" hideToggle expanded="true">
+              <mat-expansion-panel-header>
+                <mat-icon>published_with_changes</mat-icon>
+                <mat-panel-title class="acordion" i18n>OPERACIONES</mat-panel-title>
+              </mat-expansion-panel-header>
+                <a routerLink="molds"
+                  mat-list-item
+                  (click)="sidenav.close()">
+                  <mat-icon>backup_table</mat-icon>
+                  <span i18n>Moldes</span>
+                </a>
+                <mat-divider></mat-divider>
+                <a routerLink="checklists"
+                  mat-list-item
+                  (click)="sidenav.close()">
+                  <mat-icon>checklist</mat-icon>
+                  <span i18n>Checklist específico</span>
+                </a>
+              </mat-expansion-panel>
+          </cdk-accordion>
         </mat-nav-list>             
       </mat-sidenav>
 

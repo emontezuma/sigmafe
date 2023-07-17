@@ -10,19 +10,19 @@ import { SettingsData } from '../../shared/models/settings.models';
 })
 export class SettingsService {
 
-  // Variables ===============
+// Variables ===============
   fakeSettingsData: SettingsData = sampleSettings;
   data$: BehaviorSubject<SettingsData> = new BehaviorSubject(sampleSettings);
 
 
   constructor() { }
 
-  // Functions ================  
+// Functions ================  
   getSettingsData(): Observable<SettingsData> {
     return of(this.fakeSettingsData).pipe(
       delay(1500)
     );
   }
 
-  // End ======================
+// End ======================
 }

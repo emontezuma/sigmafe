@@ -5,6 +5,7 @@ import { MaterialModule } from '../material/material.module';
 import { MoldsHitsCounterComponent } from './pages/molds-hits-counter/molds-hits-counter.component';
 import { MoldsRoutingModule } from './molds-routing.module';
 import { MoldHitsCounterComponent } from './components/mold-hits-counter/mold-hits-counter.component';
+import { SpinnerComponent } from '../shared/components/spinner/spinner.component'
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { FilterPipe } from '../shared/pipes/filter.pipe';
 import { NotFoundDirective } from '../shared/directives/image-not-found.directive';
@@ -14,6 +15,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
   declarations: [
     MoldsHitsCounterComponent,
     MoldHitsCounterComponent,
+    SpinnerComponent,
     FilterPipe,
     NotFoundDirective,
   ],

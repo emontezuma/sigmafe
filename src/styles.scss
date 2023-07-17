@@ -1,11 +1,15 @@
-/* You can add global styles to this file, and also import other style files */
-
 @use './assets/styles/app-color-palette.scss';
 
 html, body { 
   height: 100%; 
   font-family: "Titillium Web", "Helvetica Neue", sans-serif !important;
   font-size: 12px;
+}
+
+:root {
+    --fore-color : #47475E;
+    --primary-fore-color : #FFF;
+    --primary-background-color: dodgerblue;
 }
 
 body { 

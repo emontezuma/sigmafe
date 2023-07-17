@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, of } from 'rxjs';
 
 import { sampleProfile } from '../../shared/sample-data';
-import { ProfileData } from '../../shared/models/profile.module';
+import { ProfileData } from '../models/profile.models';
 
 @Injectable({
   providedIn: 'root'

@@ -1,6 +1,6 @@
 import { createSelector } from '@ngrx/store';
 import { AppState } from '../app.state'; 
-import { ProfileState } from '../../shared/models/profile.module';
+import { ProfileState } from '../../shared/models/profile.models';
 
 export const selectProfileFeature = ( state: AppState ) => state.profile;
 

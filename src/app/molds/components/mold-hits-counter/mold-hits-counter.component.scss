@@ -130,11 +130,6 @@ mat-card-title {
     @include mixins.flexbox(row, wrap, 1px, end);    
 }
 
-.demo-chart {
-    width: 90px;
-    height: 90px;
-}
-
 .maintenance {
     @include mixins.flexbox(row, nowrap, 1px, space-between);   
 }
@@ -163,4 +158,9 @@ mat-card-title {
     text-align: right;
     margin-right: 15px;
     margin-bottom: 5px;
+}
+
+.spinner {
+    align-self: center;
+    margin-left: 10px;
 }

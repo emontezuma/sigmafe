@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store';
 import * as profileActions from '../actions/profile.action';
-import { ProfileState } from '../../shared/models/profile.module';
+import { ProfileState } from '../../shared/models/profile.models';
 
 export const initialState: ProfileState = {
   loading: false,

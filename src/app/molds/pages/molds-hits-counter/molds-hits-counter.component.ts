@@ -11,11 +11,13 @@ import { selectSharedScreen } from '../../../state/selectors/screen.selectors';
 import { selectMoldsHitsQueryData, selectLoadingState } from '../../../state/selectors/molds.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
+import { ColorsService } from 'src/app/shared/services/colors.service';
 import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { ProfileData } from 'src/app/shared/models/profile.module';
+import { ProfileData } from 'src/app/shared/models/profile.models';
+import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 
 @Component({
   selector: 'app-molds-hits-counter',
@@ -49,6 +51,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private sharedService: SharedService,
+    private colorsService: ColorsService,
     public scrollDispatcher: ScrollDispatcher,
   ) { }
 
@@ -96,15 +99,18 @@ export class MoldsHitsCounterComponent implements OnInit {
     this.store.select(selectMoldsHitsQueryData).subscribe( moldsHitsQueryData => { 
       this.moldsHitsQueryData = moldsHitsQueryData;            
     });
-
     this.sharedService.setSearchBox(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
-    );    
+    );
     this.sharedService.search.subscribe((searchBox) => {
       if (searchBox.from === ApplicationModules.MOLDS_HITS_VIEW) {
         this.filterMoldsBy = searchBox.textToSearch;  
       }
+    });
+    this.store.select(selectColorsData).subscribe( colorsData => {
+      console.log(colorsData);
+      this.colorsService.setColorVariables(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
@@ -123,7 +129,7 @@ export class MoldsHitsCounterComponent implements OnInit {
     });
 
     this.store.dispatch(loadMoldsHitsQueryData());
-    this.calcButtons(ScreenSizes.NORMAL);
+    this.calcButtons(ScreenSizes.NORMAL);    
   }
 
   ngOnDestroy() : void {

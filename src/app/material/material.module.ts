@@ -12,7 +12,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatInputModule } from '@angular/material/input';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { CdkAccordionModule } from '@angular/cdk/accordion';
 
 @NgModule({
   exports: [
@@ -30,6 +32,9 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
     MatProgressSpinnerModule,
     MatInputModule,
     ScrollingModule,
+    MatExpansionModule,
+    CdkAccordionModule,
+
   ]
 })
 

@@ -115,12 +115,43 @@
     <mat-divider class="divider"></mat-divider>       
     <mat-card-footer>        
       <div class="molds-hits-data">
-        <div echarts [options]="chartData" class="demo-chart"></div>      
-        <div class="mold-hits" [ngStyle]="{ 'border-color': progressBarColor }">
+        <!--<div echarts [options]="chartData" class="demo-chart"></div>-->
+        <app-spinner
+          class="spinner"
+          [diameter]="70"
+          [value]="valueToChart"
+          [showBackgound]="true"
+          [suffix]="'%'"
+          [limits]="limits"
+          [fonts]="fonts"
+          [exhaustedValue]="'999'"
+          [prefix]="'>'"
+          [showPrefix]="showPrefix"
+          [smallFont]="smallFont"
+        ></app-spinner>
+        <div
+          class="mold-hits"
+          [ngStyle]="{ 'border-color': progressBarColor }"
+        >
           <ng-container *ngFor="let show of showNumber; let number = index; trackBy: trackByFn">
-            <div class="number-container" [ngStyle]="{ 'background-color': progressBackgroundColor, 'color': progressForeColor }">
-              <div class="number" @numbers *ngIf="showNumber[number] === 'Pair'">{{ digitPair[number] }}</div>
-              <div class="number" @numbers *ngIf="showNumber[number] === 'Odd'">{{ digitOdd[number] }}</div>
+            <div
+              class="number-container"
+              [ngStyle]="{ 'background-color': progressBackgroundColor, 'color': progressForeColor }"
+            >
+              <div
+                class="number"
+                @numbers
+                *ngIf="showNumber[number] === 'Pair'"
+              >
+                {{ digitPair[number] }}
+              </div>
+              <div
+                class="number"
+                @numbers
+                *ngIf="showNumber[number] === 'Odd'"
+              >
+                {{ digitOdd[number] }}
+              </div>
             </div>
           </ng-container>
         </div>

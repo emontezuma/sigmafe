@@ -1,0 +1,32 @@
+<div
+    class="container"
+    [ngStyle]="{ 
+        'width': diameter + 'px', 
+        'height': diameter + 'px' 
+    }"
+>
+    <mat-progress-spinner
+      *ngIf="showBackgound"
+      class="spinner gray"
+      [diameter]="diameter"      
+      [ngClass]="metterClass"
+      mode="determinate"
+      value="100"
+    >
+    </mat-progress-spinner>
+    <mat-progress-spinner
+      class="spinner"
+      [ngClass]="metterClass"
+      [diameter]="diameter"      
+      mode="determinate"
+      [value]="value"      
+    >
+    </mat-progress-spinner>
+    <div 
+      class="chart-value"
+      [ngClass]="metterClass"
+      [ngStyle]="{ 'font-size': fontSize, 'font-weight': fontWeight, }"
+    >
+      <span [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }" *ngIf="showPrefix">{{prefix}}</span><span><strong>{{ valueToShow | number }}</strong></span><span [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }" *ngIf="suffix">{{suffix}}</span>
+    </div>
+  </div>
