@@ -3,8 +3,9 @@ import { Store } from '@ngrx/store';
 
 import { AppState } from '../../app/state/app.state'; 
 import { loadSettingsData } from '../../app/state/actions/settings.actions';
-import { selectLoadingState } from '../state/selectors/settings.selectors';
+import { selectLoadingSettingsState } from '../state/selectors/settings.selectors';
 import { loadColorsData } from '../state/actions/colors.actions';
+import { selectLoadingColorsState } from '../state/selectors/colors.selectors';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import { loadColorsData } from '../state/actions/colors.actions';
 export class ConfigService {
 // Variables ================
   controlTimer: any;
+  processesFinished: number = 0;
  
   constructor(
     private store: Store<AppState>,
@@ -25,10 +27,24 @@ export class ConfigService {
       this.controlTimer = setTimeout(() => {
         resolve(false);
       }, 10000);
-      this.store.select(selectLoadingState).subscribe((loading) => {
+      this.store.select(selectLoadingSettingsState).subscribe((loading) => {
+        if (!loading) {          
+          this.processesFinished = this.processesFinished + 1;
+          console.log(this.processesFinished);
+          if (this.processesFinished === 2) {
+            clearTimeout(this.controlTimer);
+            resolve(true);
+          }          
+        }
+      });
+      this.store.select(selectLoadingColorsState).subscribe((loading) => {
         if (!loading) {
-          clearTimeout(this.controlTimer);
-          resolve(true);
+          this.processesFinished = this.processesFinished + 1;
+          console.log(this.processesFinished);
+          if (this.processesFinished === 2) {
+            clearTimeout(this.controlTimer);
+            resolve(true);
+          }          
         }
       });
     }); 

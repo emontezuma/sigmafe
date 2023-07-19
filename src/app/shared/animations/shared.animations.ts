@@ -32,7 +32,7 @@ export const fromTop = trigger('fromTop', [
     })
   ),
   transition('void => *', [ style({ opacity: 0.3, transform: 'translateY(5px)' }), animate('0.3s ease-in') ]),
-  transition('* => void', [ animate('0.3s ease-out'), style({ opacity: 0, transform: 'translateY(5x)', }) ]),
+  transition('* => void', [ animate('0.3s ease-out'), style({ opacity: 0, transform: 'translateY(5px)', }) ]),
 ]);
 
 export const downUp = trigger('downUp', [

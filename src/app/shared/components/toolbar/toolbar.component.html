@@ -1,6 +1,6 @@
 <div class="container">
     <mat-toolbar class="toolbar">
-        <div class="toolbar-grid">
+        <div #toolbarBox class="toolbar-grid">
             <div *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
                 <div *ngIf="button.showThis">
                     <button

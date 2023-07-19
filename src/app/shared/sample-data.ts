@@ -430,19 +430,30 @@ export const sampleProfile: ProfileData = {
 }
 
 export const sampleColors: ColorsData = {
+    id: "hhsffss-kksksjs-llsls",
     default: "S",
     name: "S",
     customized: "S",
     fixed: "S",
     selected: "S",
-    moldsHitsSpinner: [{
-        variableName: "--z-molds-hits-spinner-stroke-meter-1",
-        color: Colors.GREEN,
-    },{
-        variableName: "--z-molds-hits-spinner-stroke-meter-2",
-        color: Colors.ORANGE,
-    },{
-        variableName: "--z-molds-hits-spinner-stroke-meter-3",
-        color: Colors.REDORANGE,
-    }],
+    status: {
+        ok: Colors.GREEN,
+        warn: Colors.ORANGE,
+        alarm: Colors.REDORANGE,
+        none: Colors.NONE,
+    },
+    page: {
+        fore: Colors.CARBON,
+        background: Colors.WHITE,
+        foreContrast: Colors.WHITE,        
+        shadow: Colors.GRAY,
+        none: Colors.NONE,
+    },
+    fixedColors: {
+        white: Colors.WHITE,
+        carbon: Colors.CARBON,    
+        red: Colors.REDORANGE,    
+        green: Colors.GREEN,    
+        gray: Colors.GRAY,    
+    }
 }

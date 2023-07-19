@@ -5,14 +5,51 @@
     border-top: 3px solid transparent;    
 }
 
-.alarmed {
-    border-radius: 5px;
-    border-top: 3px solid red;    
+.meter-0 {
+    border-color: var(--z-page-shadow) !important;    
 }
 
-.warning {
-    border-radius: 5px;
-    border-top: 3px solid red;    
+.meter-1 {
+    border-color: var(--z-status-ok) !important;    
+}
+
+.meter-2 {
+    border-color: var(--z-status-warn) !important;    
+}
+
+.meter-3 {    
+    border-color: var(--z-status-alarm) !important;    
+}
+
+.meter-10 {
+    background-color: var(--z-status-none);    
+}
+
+.meter-11 {
+    background-color: var(--z-status-alarm);    
+}
+
+.meter-20 {
+    color: var(--z-fore-contrast);    
+}
+
+.meter-21 {
+    color: var(--z-fore);    
+}
+
+.meter-30 {
+    outline-color: var(--z-fore-shadow) !important;
+    color: var(--z-fore-shadow) !important;
+}
+
+.meter-31 {
+    outline-color: var(--z-status-alarm) !important;
+    color: var(--z-status-alarm) !important;
+}
+
+.meter-32 {
+    outline-color: var(--z-status-ok) !important;
+    color: var(--z-status-ok) !important;
 }
 
 .title {
@@ -63,7 +100,7 @@ mat-card-title {
     @include mixins.flexbox(row, wrap, 1px, end);    
     font-size: 5rem;
     font-weight: 700;
-    border: 3px solid black;
+    border: 3px solid;
     border-radius: 8px 0px;
     width: fit-content;
     margin: 10px;
@@ -71,19 +108,6 @@ mat-card-title {
     align-content: center;
     padding: 2px;
 }
-
-.pulse {
-    animation: pulse-animation 2s infinite;
-  }
-  
-@keyframes pulse-animation {
-    0% {
-      box-shadow: 0 0 0 0px rgba(227, 49, 49, 0.6);
-    }
-    100% {
-      box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
-    }
-  }
 
 .divider {
     @include mixins.divider();    
@@ -143,10 +167,10 @@ mat-card-title {
 }
 
 .border-days {
-    padding: 2px;
+    padding-left: 2px;    
     padding-right: 4px;
     border-radius: 8px 0px;
-    border: 2px solid silver;    
+    outline: 2px solid silver;    
 }
 
 .progress {

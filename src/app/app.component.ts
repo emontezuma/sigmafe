@@ -1,4 +1,4 @@
-import { Component, HostListener, AfterViewInit } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -18,8 +18,7 @@ import { ApplicationModules } from 'src/app/shared/models/screen.models';
   animations: [ appearing, dissolve, downUp ],
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements AfterViewInit {
-
+export class AppComponent {
   @HostListener('window:resize', ['$event'])
   onResize({ target } : any) {
     const { screen, outerHeight, innerHeight, outerWidth, innerWidth } = target;
@@ -48,8 +47,8 @@ export class AppComponent implements AfterViewInit {
   scrollBarData: ShowElement;
   onTopStatus: string  = 'inactive';
   outletPosition =  '48px';
-  smartphoneView = false;
   invalidSize = false;
+  toolbarWidth: number = 0;
   goTopButtonTimer: any;
   // allHeight: number = 300;
   allHeight = window.innerHeight - 50;
@@ -111,12 +110,15 @@ export class AppComponent implements AfterViewInit {
     });
     this.sharedService.showToolbar.subscribe((toolbar) => {
       this.toolbarData = toolbar;
-      this.smartphoneView = this.toolbarData.size === ScreenSizes.SMALL;
       this.calculateOutletPosition(); 
     });
     this.sharedService.showScrollBar.subscribe((scrollBarData) => {
       this.scrollBarData = scrollBarData;
     });
+    this.sharedService.showToolbarWidth.subscribe((width) => {
+      this.toolbarWidth = width + 30;
+    });
+
     this.sharedService.showProgressBar.subscribe((progressBar) => {
       this.progressBarData = progressBar;
       this.calculateOutletPosition();
@@ -127,13 +129,11 @@ export class AppComponent implements AfterViewInit {
     this.handlerScreenSizeChange(null);
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
    }
-   
-  ngAfterViewInit(): void { }
-
+ 
 // Functions ================
   calculateOutletPosition() {
     this.outletPosition = (48  + (this.progressBarData?.show ? 4 : 0)).toString() + 'px';
-    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show && !this.smartphoneView ? 64 : 0);
+    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show && this.toolbarData?.size !== ScreenSizes.SMALL ? 64 : 0);
   }
 
   handlerScreenSizeChange(screen: Screen | null) {
@@ -153,7 +153,8 @@ export class AppComponent implements AfterViewInit {
       this.store.dispatch(
         appActions.changeScreenState({ screen })
       );
-    }    
+    }  
+    this.toolbarData.size = (this.toolbarData.show && this.toolbarWidth > screen.innerWidth) ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
   }
 
   goToTop() {

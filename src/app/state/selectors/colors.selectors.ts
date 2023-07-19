@@ -9,7 +9,7 @@ export const selectColorsData = createSelector(
     (state: ColorsState) => state.colorsData
 );
 
-export const selectLoadingState = createSelector(
+export const selectLoadingColorsState = createSelector(
     selectColorsFeature,
     (state: ColorsState) => state.loading
 );

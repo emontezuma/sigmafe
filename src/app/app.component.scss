@@ -10,7 +10,6 @@ margin-to.container {
 
 mat-sidenav-container {
   position: absolute;
-  bottom: 40px;
   left: 0;
   right: 0;
 }
@@ -26,8 +25,13 @@ mat-sidenav-content.mat-drawer-content.mat-sidenav-content {
 mat-sidenav {
   margin: 3px;
   border: 1px solid silver;
-  border-radius: 8px;
+  border-radius: 4px;
   width: max(300px, 15%);
+}
+
+mat-toolbar {
+  border: 1px solid silver;
+  border-radius: 6px 6px 0px 0px;
 }
 
 mat-panel-title {
@@ -38,6 +42,7 @@ mat-panel-title {
   position: absolute;
   bottom: 0;
   height: 40px;
+  border-radius: 0px 0px 6px 6px;
 }
 
 .button {

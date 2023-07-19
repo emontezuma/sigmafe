@@ -68,5 +68,3 @@ export enum ScreenSizes {
     NORMAL = 'normal',
     SMALL = 'small',
 }
-
-

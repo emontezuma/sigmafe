@@ -6,6 +6,8 @@ export enum Colors {
     ORANGE = 'orange',
     REDORANGE = 'orangered',
     RED = 'red',
+    GRAY = 'lightgray',
+    NONE = 'none',
 }
 
 export interface SpinnerLimits {
@@ -30,16 +32,42 @@ export interface SmallFont {
     weight: number,
 }
 
+export interface StatusColors {
+    ok: string,
+    warn: string,
+    alarm: string,
+    none: string,
+}
+
+export interface PagesColors {
+    fore: string,
+    foreContrast: string,
+    background: string,
+    shadow: string,
+    none: string,
+}
+
+export interface FixedColors {
+    white: string,
+    carbon: string,    
+    red: string,    
+    green: string,    
+    gray: string,    
+}
+
 export interface ColorsData {
+    id: string,
     default: string,
     name: string,
     customized: string,
     fixed: string,
     selected: string,
-    moldsHitsSpinner: ColorVariable[],
+    status: StatusColors,   
+    page: PagesColors,
+    fixedColors: FixedColors,
 }
 
 export interface ColorsState {
-    loading: boolean;
-    colorsData: ColorsData;
+    loading: boolean,
+    colorsData: ColorsData,
 }

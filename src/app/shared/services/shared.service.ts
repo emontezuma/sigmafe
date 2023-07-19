@@ -19,6 +19,9 @@ export class SharedService {
   private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', show: false, size: ScreenSizes.NORMAL, buttons: [] });
   showToolbar: Observable<ToolbarElement> = this.toolbar.asObservable();
 
+  private toolbarWidth: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  showToolbarWidth: Observable<number> = this.toolbarWidth.asObservable();
+
   private showGeneralProgressBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showProgressBar: Observable<ShowElement> = this.showGeneralProgressBar.asObservable();
 
@@ -49,6 +52,10 @@ export class SharedService {
   
   setToolbar(from: string, showToolbar: boolean, size: ScreenSizes, buttons: ToolbarButtons[]) {
     this.toolbar.next({ from, show: showToolbar, size, buttons });
+  }
+
+  setToolbarWidth(width: number) {
+    this.toolbarWidth.next(width);
   }
   
   setGeneralScrollBar(from: string, showScrollBar: boolean) {

@@ -13,13 +13,13 @@
       >
         <mat-icon class="icon-toolbar" svgIcon="left_menu"></mat-icon>
       </button>
-      <h1 i18n>APLICACION TOYOTA <strong>{{ smartphoneView }}</strong></h1>      
+      <h1 i18n>APLICACION TOYOTA <strong>{{ toolbarData.size }}</strong></h1>      
       <button
         mat-mini-fab
         class="button toolbar-menu"
         aria-label="icon-button with menu icon"
         (click)="sidenav.open()"
-        *ngIf="smartphoneView"
+        *ngIf="toolbarData?.show && toolbarData?.size == 'small'"
         @appearing
       >
         <mat-icon class="icon-toolbar" svgIcon="vertical_menu"></mat-icon>
@@ -67,7 +67,7 @@
 
       <mat-sidenav-content>
         <div
-          *ngIf="toolbarData?.show && !smartphoneView"
+          *ngIf="toolbarData?.show && toolbarData?.size != 'small'"
           @downUp
         >
           <app-toolbar [toolbar]="toolbarData"></app-toolbar>
@@ -89,7 +89,7 @@
             <div class="process-bar">
               <mat-progress-spinner
                 class="process-loading"
-                diameter="80"
+                diameter="100"
                 mode="indeterminate"
               >
               </mat-progress-spinner>

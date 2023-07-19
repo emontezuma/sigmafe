@@ -1,16 +1,36 @@
 import { createReducer, on } from '@ngrx/store';
 import * as colorsActions from '../actions/colors.actions';
-import { ColorsState } from '../../shared/models/colors.models';
+import { Colors, ColorsState } from '../../shared/models/colors.models';
 
 export const initialState: ColorsState = {
   loading: true,
   colorsData: {
+    id: '',
     default: 'S',
     name: 'S',
     customized: 'S',
     fixed: 'S',
     selected: 'S',
-    moldsHitsSpinner: [],
+    status: {
+      ok: Colors.GREEN,
+      warn: Colors.ORANGE,
+      alarm: Colors.REDORANGE,
+      none: Colors.NONE,
+    },
+    page: {
+      fore: Colors.CARBON,
+      foreContrast: Colors.WHITE,
+      background: Colors.WHITE,
+      shadow: Colors.GRAY,
+      none: Colors.NONE,
+    },
+    fixedColors: {
+      white: Colors.WHITE,
+      carbon: Colors.CARBON,    
+      red: Colors.REDORANGE,    
+      green: Colors.GREEN,    
+      gray: Colors.GRAY,  
+    },
   }  
 };
 

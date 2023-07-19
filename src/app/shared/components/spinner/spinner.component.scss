@@ -6,23 +6,23 @@
 }
 
 .meter-1 {
-    color: var(--z-molds-hits-spinner-stroke-meter-1);
+    color: var(--z-status-ok);
     ::ng-deep circle {
-        stroke: var(--z-molds-hits-spinner-stroke-meter-1);    
+        stroke: var(--z-status-ok);    
     }
 }
 
 .meter-2 {
-    color: var(--z-molds-hits-spinner-stroke-meter-2);
+    color: var(--z-status-warn);
     ::ng-deep circle {
-        stroke: var(--z-molds-hits-spinner-stroke-meter-2);
+        stroke: var(--z-status-warn);
     }
 }
 
 .meter-3 {
-    color: var(--z-molds-hits-spinner-stroke-meter-3);
+    color: var(--z-status-alarm);
     ::ng-deep circle {
-        stroke: var(--z-molds-hits-spinner-stroke-meter-3);
+        stroke: var(--z-status-alarm);
     }
 }
 

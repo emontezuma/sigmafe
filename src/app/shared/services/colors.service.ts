@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, of } from 'rxjs';
 
 import { sampleColors } from '../../shared/sample-data';
-import { ColorsData } from '../../shared/models/colors.models';
+import { Colors, ColorsData } from '../../shared/models/colors.models';
 
 import tinycolor from 'tinycolor2';
 import { ApplicationModules } from '../models/screen.models';
@@ -60,13 +60,15 @@ export class ColorsService {
     document.documentElement.style.setProperty(variableName, value);
   }
 
-  setColorVariables(module: ApplicationModules, colorsData: ColorsData) {
-    if (module = ApplicationModules.MOLDS_HITS_VIEW) {
-      colorsData.moldsHitsSpinner.forEach(variable => {
-        document.documentElement.style.setProperty(variable.variableName, variable.color)
-      });
-    }    
-  }
+  setColors(module: ApplicationModules, colorsData: ColorsData) {
+    document.documentElement.style.setProperty('--z-status-ok', colorsData?.status.ok ?? Colors.GREEN);
+    document.documentElement.style.setProperty('--z-status-warn', colorsData?.status.warn ?? Colors.ORANGE);
+    document.documentElement.style.setProperty('--z-status-alarm', colorsData?.status.alarm ?? Colors.REDORANGE);
+    document.documentElement.style.setProperty('--z-status-none', colorsData?.status.none ?? Colors.NONE);
+    document.documentElement.style.setProperty('--z-page-shadow', colorsData?.page.shadow ?? Colors.GRAY);
+    document.documentElement.style.setProperty('--z-fore', colorsData?.page.fore ?? Colors.CARBON);
+    document.documentElement.style.setProperty('--z-fore-contrast', colorsData?.page.foreContrast ?? Colors.WHITE);
+  }    
 
   getSettingsData(): Observable<ColorsData> {
     return of(this.fakeColorsData).pipe(

@@ -6,7 +6,7 @@
     }"
 >
     <mat-progress-spinner
-      *ngIf="showBackgound"
+      *ngIf="showBackgound && value < 100"
       class="spinner gray"
       [diameter]="diameter"      
       [ngClass]="metterClass"

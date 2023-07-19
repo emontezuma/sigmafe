@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
 import { EChartsOption } from 'echarts';
@@ -16,9 +16,10 @@ import { Colors, SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/m
   animations: [ numbers ],
   styleUrls: ['./mold-hits-counter.component.scss']
 })
-export class MoldHitsCounterComponent {
+export class MoldHitsCounterComponent implements AfterViewInit {
 @Input() mold: MoldHitsQuery;
-
+@ViewChild('moldProgressBar') private moldProgressBar: ElementRef;
+  
 // Variables ================
   hits = 0;
   valueToChart = 0;
@@ -27,12 +28,12 @@ export class MoldHitsCounterComponent {
   digitOdd: number[] = [];
   showNumber: string[] = [];
   chartData: EChartsOption = { };
-  progressBackgroundColor: string = 'none';
-  progressBarColor: string = 'lightgray';
-  progressForeColor: string = 'lightgray';
+  progressBackgroundColorClass: string = 'meter-10';
+  borderColorClass: string = 'meter-0';
+  progressForeColorClass: string = 'meter-20';
   warningLevel = 0;
   alarmLevel = 0;
-  leftColor: string = 'lightgray';
+  maintenanceClass: string = 'meter-30';
   elapsedTimeLabel: string = '';
   lastChartValue: number = 0;
   limits: SpinnerLimits[] = [{
@@ -85,18 +86,24 @@ export class MoldHitsCounterComponent {
       this.hits = this.hits + 1;
       this.numberToArray(this.hits);    
       this.prepareDataToChart (this.hits, this.mold.limit)
-    }, 200);    
+    }, 1000);    
   }
 
+  ngAfterViewInit(): void {
+    const progressBars = document.getElementsByName("active-progress-bar");
+    progressBars.forEach((element) => {
+      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
+    })
+  }
 // Functions ================
   calcData() {
     this.elapsedTimeLabel = this.sharedService.labelElapsedTime(this.mold.lastHit?.date);
-    this.leftColor = this.mold.nextMaintenance.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
+    this.maintenanceClass = this.mold.nextMaintenance.alarmed ? 'meter-31' : 'meter-32'
   }
   
   assignSettings() {
-    this.progressBarColor = this.settingsData?.waitingColor;
-    this.progressForeColor = this.settingsData?.waitingColor;
+    this.borderColorClass = 'meter-0';
+    this.progressForeColorClass = this.settingsData?.waitingColor;
   }
 
   numberToArray(current: number) {
@@ -124,9 +131,9 @@ export class MoldHitsCounterComponent {
   }
 
   setProgressColors() {
-    this.progressBarColor = this.mold.warned ? this.settingsData?.warningColor : this.mold.alarmed ? this.settingsData?.alarmedColor : this.settingsData?.okColor;
-    this.progressBackgroundColor = this.mold.alarmed ? this.settingsData?.alarmedColor : 'none';
-    this.progressForeColor = this.mold.alarmed ? '#FFFFFF' : '#606060';    
+    this.borderColorClass = this.mold.warned ? 'meter-2' : this.mold.alarmed ? 'meter-3' : 'meter-1';
+    this.progressBackgroundColorClass = this.mold.alarmed ? 'meter-11' : 'meter-10';
+    this.progressForeColorClass = this.mold.alarmed ? 'meter-20' : 'meter-21';    
   }
 
   prepareDataToChart(current: number, limit: number) {
@@ -148,7 +155,7 @@ export class MoldHitsCounterComponent {
             max: 100,
             splitNumber: 4,
             itemStyle: {
-              color: this.progressBarColor,
+              color: this.borderColorClass,
               shadowColor: 'rgba(0,138,255,0.5)',
               shadowBlur: 10,
               shadowOffsetX: 2,
@@ -204,13 +211,13 @@ export class MoldHitsCounterComponent {
                 value: {
                   fontSize: fontSize,
                   fontWeight: 'bolder',
-                  color: this.progressBarColor,
+                  color: this.borderColorClass,
                   
                 },
                 unit: {                
                   fontSize: 12,
                   fontWeight: 'bolder',
-                  color: this.progressBarColor,
+                  color: this.borderColorClass,
                 }
               }
             },

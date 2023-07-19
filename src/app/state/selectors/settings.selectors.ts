@@ -9,7 +9,7 @@ export const selectSettingsData = createSelector(
     (state: SettingsState) => state.settingsData
 );
 
-export const selectLoadingState = createSelector(
+export const selectLoadingSettingsState = createSelector(
     selectSettingsFeature,
     (state: SettingsState) => state.loading
 );

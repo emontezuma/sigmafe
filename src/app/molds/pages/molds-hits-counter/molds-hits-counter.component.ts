@@ -2,13 +2,12 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
-import { Subscription } from 'rxjs';
 
 import { fromTop } from '../../../shared/animations/shared.animations';
 import { MoldsHitsQueryData } from '../../models/molds.models';
 import { AppState } from '../../../state/app.state'; 
 import { selectSharedScreen } from '../../../state/selectors/screen.selectors'; 
-import { selectMoldsHitsQueryData, selectLoadingState } from '../../../state/selectors/molds.selectors'; 
+import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { ColorsService } from 'src/app/shared/services/colors.service';
@@ -27,15 +26,14 @@ import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 })
 export class MoldsHitsCounterComponent implements OnInit {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
-  @ViewChild('moldsQueryList') private moldsQueryList: ElementRef;
-  
+  @ViewChild('moldsQueryList') private moldsQueryList: ElementRef;  
   
 // Variables ===============
   moldsHitsQueryData: MoldsHitsQueryData;
   settingsData: SettingsData;
   profileData: ProfileData;
   colsBySize: number = 2;
-  currentSize: string = '';
+  currentSize: ScreenSizes = ScreenSizes.NORMAL;
   cardWidth: string;
   loading: boolean = true;
   animate: boolean = true;
@@ -44,6 +42,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;
+  toolbar: ElementRef | null;
   
   form = new FormGroup({
   });
@@ -61,8 +60,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.settingsData = settingsData;
     });
     this.store.select(selectSharedScreen).subscribe( shared => {
+      this.currentSize = shared.innerWidth <= 300 ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
       if (this.loaded) {
-        if (shared.innerWidth <= 500 && this.currentSize !== ScreenSizes.SMALL) {
+        if (shared.innerWidth <= 300) {
           this.calcButtons(ScreenSizes.SMALL);
           this.sharedService.setToolbar(
             ApplicationModules.MOLDS_HITS_VIEW,
@@ -70,7 +70,7 @@ export class MoldsHitsCounterComponent implements OnInit {
             ScreenSizes.SMALL,
             this.buttons,
           );
-        } else if (shared.innerWidth > 500 && this.currentSize !== ScreenSizes.NORMAL) {
+        } else if (shared.innerWidth > 300) {
           this.calcButtons(ScreenSizes.NORMAL);
           this.sharedService.setToolbar(
             ApplicationModules.MOLDS_HITS_VIEW,
@@ -84,7 +84,7 @@ export class MoldsHitsCounterComponent implements OnInit {
     this.store.select(selectProfileData).subscribe( profileData => {
       this.profileData = profileData;
     });
-    this.store.select(selectLoadingState).subscribe( loading => {
+    this.store.select(selectLoadingMoldsHitsState).subscribe( loading => {
       this.loading = loading;
       this.sharedService.setGeneralLoading(
         ApplicationModules.MOLDS_HITS_VIEW,
@@ -109,8 +109,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       }
     });
     this.store.select(selectColorsData).subscribe( colorsData => {
-      console.log(colorsData);
-      this.colorsService.setColorVariables(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
+      this.colorsService.setColors(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
@@ -128,15 +127,14 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.getScrolling(data);
     });
 
-    this.store.dispatch(loadMoldsHitsQueryData());
-    this.calcButtons(ScreenSizes.NORMAL);    
+    this.store.dispatch(loadMoldsHitsQueryData());    
   }
 
   ngOnDestroy() : void {
     this.sharedService.setToolbar(
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
-      ScreenSizes.NORMAL,
+      this.currentSize,
       this.buttons,
     );
     this.sharedService.setGeneralScrollBar(
@@ -149,10 +147,11 @@ export class MoldsHitsCounterComponent implements OnInit {
   animateToolbar(e: any) {
     if (e.fromState === 'void') {
       setTimeout(() => {
+        this.calcButtons(this.currentSize);
         this.sharedService.setToolbar(
           ApplicationModules.MOLDS_HITS_VIEW,
           true,
-          ScreenSizes.NORMAL,
+          this.currentSize,
           this.buttons,
         );
         this.sharedService.setGeneralScrollBar(
@@ -163,9 +162,8 @@ export class MoldsHitsCounterComponent implements OnInit {
     }
   }
 
-  calcButtons(size: string) {
-    const showCaption = size === ScreenSizes.NORMAL;
-    this.currentSize = size;
+  calcButtons(size: ScreenSizes) {
+    this.currentSize = size;    
     this.buttons = [{
       type: 'button',
       caption: $localize`Actualizar`,
@@ -176,7 +174,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       showThis: true,
       showIcon: true,
       showTooltip: true,
-      showCaption,
+      showCaption: true,
       disabled: false,
     },{
       type: 'divider',
@@ -188,7 +186,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       showThis: true,
       showIcon: true,
       showTooltip: true,
-      showCaption,
+      showCaption: true,
       disabled: true,
     },{
       type: 'button',
@@ -200,7 +198,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       showThis: true,
       showIcon: true,
       showTooltip: true,
-      showCaption,
+      showCaption: true,
       disabled: false,
     },{
       type: 'divider',
@@ -212,7 +210,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
-      showCaption,
+      showCaption: true,
       disabled: true,
     },{
       type: 'searchbox',
@@ -224,7 +222,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
-      showCaption,
+      showCaption: true,
       disabled: true,
     },];
   }

@@ -6,8 +6,10 @@
 }
 
 .toolbar-grid {
-    @include mixins.flexbox(row, wrap, 1px, end); 
+    @include mixins.flexbox(row, nowrap, 1px, end); 
     margin-left: auto;
+    width: max-content;
+    padding-left: 10px
 }
 
 .button-normal {
@@ -38,5 +40,25 @@
 
 .divider {
     @include mixins.divider(25px, 25px, 0px, 0px);    
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
+}
+
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+    width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+    background: var(--scroll-bar-bg-color);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--scroll-bar-color);
+    border-radius: 20px;
+    border: 3px solid var(--scroll-bar-bg-color);
 }
 

@@ -4,6 +4,7 @@
       *ngIf="this.mold.alarmed"
       mode="indeterminate"
       color="warn"
+      name="active-progress-bar"
       class="progress"
     >
     </mat-progress-bar> 
@@ -56,7 +57,7 @@
       <div
         class="column border-days"
         *ngIf="mold.nextMaintenance.strategy === 'days' || mold.nextMaintenance.strategy === 'specific-date'"
-        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+        [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance.timeToLeft | number }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Faltan (d)</mat-card-subtitle>
@@ -64,7 +65,7 @@
       <div
         class="column border-days"
         *ngIf="mold.nextMaintenance.strategy === 'hours'"
-        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+        [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance.timeToLeft | number }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Faltan (hr)</mat-card-subtitle>
@@ -72,7 +73,7 @@
       <div
         class="column border-days"
         *ngIf="mold.nextMaintenance.strategy === 'hits'"
-        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+        [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance.hitsToLeft | number }}</mat-card-title>
         <mat-card-subtitle class="label" i18n>Faltan (g)</mat-card-subtitle>
@@ -80,7 +81,7 @@
       <div
         class="column border-days"
         *ngIf="mold.nextMaintenance.strategy === 'hits-or-hours'"
-        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+        [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">
           <span>{{ mold.nextMaintenance.hitsToLeft | number }}</span>/
@@ -91,7 +92,7 @@
       <div
         class="column border-days"
         *ngIf="mold.nextMaintenance.strategy === 'hits-or-days'"
-        [ngStyle]="{ 'border-color': leftColor, 'color': leftColor }"
+        [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">
           <span>{{ mold.nextMaintenance.hitsToLeft | number }}</span>/
@@ -131,12 +132,12 @@
         ></app-spinner>
         <div
           class="mold-hits"
-          [ngStyle]="{ 'border-color': progressBarColor }"
+          [ngClass]="[ borderColorClass ]"
         >
           <ng-container *ngFor="let show of showNumber; let number = index; trackBy: trackByFn">
             <div
-              class="number-container"
-              [ngStyle]="{ 'background-color': progressBackgroundColor, 'color': progressForeColor }"
+              class="number-container"              
+              [ngClass]="[ progressForeColorClass, progressBackgroundColorClass ]"
             >
               <div
                 class="number"

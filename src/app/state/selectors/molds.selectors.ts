@@ -9,7 +9,7 @@ export const selectMoldsHitsQueryData = createSelector(
     (state: MoldsState) => state.moldsHitsQueryData
 );
 
-export const selectLoadingState = createSelector(
+export const selectLoadingMoldsHitsState = createSelector(
     selectMoldsFeature,
     (state: MoldsState) => state.loading
 );
