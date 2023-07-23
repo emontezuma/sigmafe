@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/pages/not-found/not-found.component';
+import { accessValidationGuard } from './guards/access-validation.guard';
 
 const routes: Routes = [
   {
     path: 'checklists',
-    loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule)
+    loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule),
+    canActivate: [accessValidationGuard]
   },
   {
     path: 'molds',

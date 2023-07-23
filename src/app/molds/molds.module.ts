@@ -5,17 +5,15 @@ import { MaterialModule } from '../material/material.module';
 import { MoldsHitsCounterComponent } from './pages/molds-hits-counter/molds-hits-counter.component';
 import { MoldsRoutingModule } from './molds-routing.module';
 import { MoldHitsCounterComponent } from './components/mold-hits-counter/mold-hits-counter.component';
-import { SpinnerComponent } from '../shared/components/spinner/spinner.component'
+import { SpinnerModule } from '../shared/components/spinner/spinner.module';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { FilterPipe } from '../shared/pipes/filter.pipe';
 import { NotFoundDirective } from '../shared/directives/image-not-found.directive';
-import { NgxEchartsModule } from 'ngx-echarts';
 
 @NgModule({
   declarations: [
     MoldsHitsCounterComponent,
     MoldHitsCounterComponent,
-    SpinnerComponent,
     FilterPipe,
     NotFoundDirective,
   ],
@@ -25,14 +23,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
     MoldsRoutingModule,
     NgOptimizedImage,
     NgxSkeletonLoaderModule.forRoot(),
-    NgxEchartsModule.forRoot({
-      /**
-       * This will import all modules from echarts.
-       * If you only need custom modules,
-       * please refer to [Custom Build] section.
-       */
-      echarts: () => import('echarts'), // or import('./path-to-my-custom-echarts')
-    }),
+    SpinnerModule,
   ]
 })
 export class MoldsModule { }

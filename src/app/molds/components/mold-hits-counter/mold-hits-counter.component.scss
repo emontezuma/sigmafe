@@ -74,12 +74,6 @@
     @include mixins.text-ellipsis();
 }
 
-.label {
-    font-size: 1.3rem;
-    margin-top: -5px;
-    @include mixins.text-ellipsis();
-}
-
 mat-card-title {
     font-weight: 900;
 }

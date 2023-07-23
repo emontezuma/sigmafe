@@ -27,6 +27,12 @@
       [ngClass]="metterClass"
       [ngStyle]="{ 'font-size': fontSize, 'font-weight': fontWeight, }"
     >
-      <span [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }" *ngIf="showPrefix">{{prefix}}</span><span><strong>{{ valueToShow | number }}</strong></span><span [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }" *ngIf="suffix">{{suffix}}</span>
+      <span
+        *ngIf="showPrefix"
+        [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }"
+      >
+        {{prefix}}
+      </span>
+      <span><strong>{{ valueToShow | number }}</strong></span><span *ngIf="suffix" [ngStyle]="{ 'font-size': smallFont.size + 'rem', 'font-weight': smallFont.weight, }">{{suffix}}</span>
     </div>
   </div>

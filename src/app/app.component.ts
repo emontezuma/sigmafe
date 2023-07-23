@@ -50,6 +50,7 @@ export class AppComponent {
   invalidSize = false;
   toolbarWidth: number = 0;
   goTopButtonTimer: any;
+  lotsOfTabs = new Array(6).fill(0).map((_, index) => `Tab ${index}`);
   // allHeight: number = 300;
   allHeight = window.innerHeight - 50;
   displayNameMap = new Map([
@@ -116,7 +117,7 @@ export class AppComponent {
       this.scrollBarData = scrollBarData;
     });
     this.sharedService.showToolbarWidth.subscribe((width) => {
-      this.toolbarWidth = width + 30;
+      this.toolbarWidth = width + 60;
     });
 
     this.sharedService.showProgressBar.subscribe((progressBar) => {

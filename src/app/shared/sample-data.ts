@@ -447,6 +447,8 @@ export const sampleColors: ColorsData = {
         background: Colors.WHITE,
         foreContrast: Colors.WHITE,        
         shadow: Colors.GRAY,
+        buttonBorderColor: Colors.SILVER,
+        primary: Colors.GREEN,
         none: Colors.NONE,
     },
     fixedColors: {
@@ -454,6 +456,6 @@ export const sampleColors: ColorsData = {
         carbon: Colors.CARBON,    
         red: Colors.REDORANGE,    
         green: Colors.GREEN,    
-        gray: Colors.GRAY,    
+        gray: Colors.GRAY,
     }
 }

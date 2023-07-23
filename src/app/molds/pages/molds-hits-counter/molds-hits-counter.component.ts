@@ -166,9 +166,9 @@ export class MoldsHitsCounterComponent implements OnInit {
     this.currentSize = size;    
     this.buttons = [{
       type: 'button',
-      caption: $localize`Actualizar`,
+      caption: $localize`Actualizar la vista`,
       tooltip:  $localize`Actualiza la vista`,
-      icon: 'replay',
+      icon: 'reload',
       primary: false,
       iconSize: '24px',
       showThis: true,

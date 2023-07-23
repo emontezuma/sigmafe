@@ -26,7 +26,10 @@ export class SpinnerComponent implements OnChanges {
   fontColor: string = '';
   fontSize: string = '';
   fontWeight: string = '';
-// Hooks ====================
+
+  constructor() {};
+
+  // Hooks ====================
   ngOnInit() { 
     this.suffix.trim();
   }

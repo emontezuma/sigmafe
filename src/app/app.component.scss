@@ -183,3 +183,15 @@ mat-toolbar {
   color: white !important;
 }
 
+.menu-button {
+  width: 32px;
+  height: 32px;
+}
+
+.divider {
+  @include mixins.divider();    
+}
+
+.menu {
+  min-width: 300px;
+}

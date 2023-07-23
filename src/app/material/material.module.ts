@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ScrollingModule } from '@angular/cdk/scrolling';
 import { CdkAccordionModule } from '@angular/cdk/accordion';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   exports: [
@@ -34,7 +35,7 @@ import { CdkAccordionModule } from '@angular/cdk/accordion';
     ScrollingModule,
     MatExpansionModule,
     CdkAccordionModule,
-
+    MatMenuModule,
   ]
 })
 

@@ -68,6 +68,8 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-page-shadow', colorsData?.page.shadow ?? Colors.GRAY);
     document.documentElement.style.setProperty('--z-fore', colorsData?.page.fore ?? Colors.CARBON);
     document.documentElement.style.setProperty('--z-fore-contrast', colorsData?.page.foreContrast ?? Colors.WHITE);
+    document.documentElement.style.setProperty('--z-button-border', colorsData?.page.buttonBorderColor ?? Colors.SILVER);    
+    document.documentElement.style.setProperty('--z-primary', colorsData?.page.primary ?? Colors.GREEN);    
   }    
 
   getSettingsData(): Observable<ColorsData> {

@@ -1,0 +1,50 @@
+@use "../../../../assets/styles/mixins";
+
+.container {
+    
+}
+
+.progress {
+    margin-top: 5px;
+    margin-bottom: -9px;
+}
+
+.tab-label {
+    font-size: 1.6rem;  
+}
+
+.tab-general-info {
+    @include mixins.flexbox(row, wrap, 1px, start);    
+    font-size: 1.6rem;
+    font-weight: 500;
+    align-content: center;
+    margin: 10px;
+}
+
+
+mat-card-title {
+    font-weight: 900;
+}
+
+.card {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px 0px;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    @include mixins.text-ellipsis();
+}
+
+
+.label {
+    font-size: 1.3rem;
+    margin-top: -5px;
+    @include mixins.text-ellipsis();
+}
+
+.extended {
+    margin-top: 10px;
+}
+

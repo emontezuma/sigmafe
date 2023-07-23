@@ -4,6 +4,7 @@ html, body {
   height: 100%; 
   font-family: "Titillium Web", "Helvetica Neue", sans-serif !important;
   font-size: 12px;
+  color: var(--z-fore);
   overflow: hidden;
 }
 
@@ -73,3 +74,8 @@ body {
     border-radius: 3px; 
 }
   
+mat-icon {
+  color: var(--z-primary);
+  width: 32px;
+  height: 32px;
+}

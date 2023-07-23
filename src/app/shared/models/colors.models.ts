@@ -7,6 +7,7 @@ export enum Colors {
     REDORANGE = 'orangered',
     RED = 'red',
     GRAY = 'lightgray',
+    SILVER = 'silver',
     NONE = 'none',
 }
 
@@ -44,6 +45,8 @@ export interface PagesColors {
     foreContrast: string,
     background: string,
     shadow: string,
+    buttonBorderColor: string,
+    primary: string,
     none: string,
 }
 

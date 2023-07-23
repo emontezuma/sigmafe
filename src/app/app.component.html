@@ -11,19 +11,50 @@
         (click)="sidenav.open()"
         @appearing
       >
-        <mat-icon class="icon-toolbar" svgIcon="left_menu"></mat-icon>
+        <mat-icon class="svgicon icon-toolbar" svgIcon="menu"></mat-icon>
       </button>
       <h1 i18n>APLICACION TOYOTA <strong>{{ toolbarData.size }}</strong></h1>      
       <button
         mat-mini-fab
         class="button toolbar-menu"
         aria-label="icon-button with menu icon"
-        (click)="sidenav.open()"
+        (click)="sidenav.close()"
         *ngIf="toolbarData?.show && toolbarData?.size == 'small'"
+        [matMenuTriggerFor]="menu"
         @appearing
       >
-        <mat-icon class="icon-toolbar" svgIcon="vertical_menu"></mat-icon>
+        <mat-icon class="icon-toolbar" svgIcon="vertical-menu"></mat-icon>
       </button>
+      <mat-menu
+        #menu="matMenu"
+        class="menu"
+      >
+        <div *ngFor="let button of toolbarData.buttons; let i = index;">
+          <div *ngIf="button.showThis">
+              <button
+                  *ngIf="button.type === 'button'"
+                  mat-menu-item
+                  class="button-normal"
+                  aria-label="icon-button with menu icon"
+                  [disabled]="button.disabled"
+                  i18n-placeHolder
+              >
+                <mat-icon
+                    *ngIf="button.showIcon"
+                    [svgIcon]="button.icon"
+                    class="menu-button"
+                >
+                </mat-icon>
+                <span>{{ button.showCaption ? button.caption : '' }}</span>
+              </button>
+              <mat-divider
+                  *ngIf="button.type === 'divider'"
+                  class="divider"
+              >
+              </mat-divider>
+          </div>
+        </div>
+      </mat-menu>
     </mat-toolbar>
     <mat-progress-bar
       *ngIf="progressBarData?.show"

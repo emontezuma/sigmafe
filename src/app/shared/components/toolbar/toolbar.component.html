@@ -1,11 +1,14 @@
 <div class="container">
     <mat-toolbar class="toolbar">
-        <div #toolbarBox class="toolbar-grid">
+        <div 
+            #toolbarBox
+            class="toolbar-grid"
+        >
             <div *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
                 <div *ngIf="button.showThis">
                     <button
                         *ngIf="button.type === 'button'"
-                        mat-stroked-button 
+                        mat-button                        
                         class="button-normal"
                         aria-label="icon-button with menu icon"
                         [matTooltipDisabled]="!button.showTooltip"
@@ -17,11 +20,11 @@
                     >
                         <mat-icon
                             *ngIf="button.showIcon"
-                            class="icon-toolbar medium"
-                        >
-                            {{ button.icon }}
+                            class="svgicon icon-toolbar medium"
+                            [svgIcon]="button.icon"
+                        >                            
                         </mat-icon>
-                        {{ button.showCaption ? button.caption : '' }}
+                        <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>                        
                     </button>
                     <mat-divider
                         *ngIf="button.type === 'divider'"

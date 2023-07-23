@@ -6,7 +6,7 @@
 }
 
 .toolbar-grid {
-    @include mixins.flexbox(row, nowrap, 1px, end); 
+    @include mixins.flexbox(row, wrap, 1px, end); 
     margin-left: auto;
     width: max-content;
     padding-left: 10px
@@ -15,13 +15,12 @@
 .button-normal {
     margin-right: 5px;
     margin-top: 20px;
-    font-size: 1.3rem;
     height: 40px;
     display: flex;
-    flex-direction: column;
     height: 56px;
+    flex-direction: row;
     border-radius: 8px 0px;
-    border: 1.5px solid silver;
+    border: 2.5px solid var(--z-button-border);
 }
 
 .mdc-button__label {
@@ -31,34 +30,19 @@
 .icon-toolbar {
     margin-top: 12px;
 }
+
 .medium {
-    font-size: 24px !important;
+    width: 32px !important;
+    height: 32px !important;
     margin: 0px !important;
-    height: unset !important;
-    width: unset !important;
 }
 
 .divider {
     @include mixins.divider(25px, 25px, 0px, 0px);    
 }
 
-* {
-    scrollbar-width: thin;
-    scrollbar-color: var(--scroll-bar-color) var(--scroll-bar-bg-color);
+.button-label {
+    margin-left: 5px;
+    font-weight: 600;
+    font-size: 1.3rem;
 }
-
-/* Works on Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-    width: 6px;
-}
-
-*::-webkit-scrollbar-track {
-    background: var(--scroll-bar-bg-color);
-}
-
-*::-webkit-scrollbar-thumb {
-    background-color: var(--scroll-bar-color);
-    border-radius: 20px;
-    border: 3px solid var(--scroll-bar-bg-color);
-}
-

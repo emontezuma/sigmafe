@@ -17,12 +17,20 @@ export class IconsModule {
     sanitizer: DomSanitizer,
   ) {
     iconRegistry.addSvgIcon(
-      "vertical_menu",
+      "vertical-menu",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/vertical_menu.svg")
     );
     iconRegistry.addSvgIcon(
-      "left_menu",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/left_menu.svg")
+      "menu",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/menu.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "download",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/download.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "reload",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/reload.svg")
     );
   }
 }

@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store';
 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { ShowElement, ToolbarElement } from 'src/app/shared/models/screen.models';
-import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { AppState } from 'src/app/state/app.state';
 
 @Component({
@@ -45,7 +44,7 @@ export class ToolbarComponent implements AfterViewInit {
   getElementWidth() {
     this.sharedService.setToolbarWidth(this.toolbarBox.nativeElement.clientWidth as number);        
   }
-  
+
   sendSearchText(e: any) {
     this.sharedService.setText(e, this.showSearchBox.from);
   }

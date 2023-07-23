@@ -22,6 +22,8 @@ export const initialState: ColorsState = {
       foreContrast: Colors.WHITE,
       background: Colors.WHITE,
       shadow: Colors.GRAY,
+      buttonBorderColor: Colors.SILVER,
+      primary: Colors.GREEN,
       none: Colors.NONE,
     },
     fixedColors: {

@@ -1,0 +1,45 @@
+<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
+  <mat-tab>
+    <ng-template mat-tab-label>
+      <mat-icon class="svgicon tab-icon" svgIcon="reload"> </mat-icon>
+      <label class="tab-label" i18n> Información general </label>
+    </ng-template>
+    <div class="tab-general-info">
+      <mat-card class="card">
+        <mat-progress-bar
+          mode="indeterminate"
+          color="warn"
+          name="active-progress-bar"
+          class="progress"
+        >
+        </mat-progress-bar>
+        <mat-card-header>
+          <mat-card-title-group class="border">
+            <mat-card-title>133,030:</mat-card-title>
+            <mat-card-subtitle
+                i18n
+                class="label"
+            >
+                Folio Número
+            </mat-card-subtitle>
+          </mat-card-title-group>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
+          <mat-card-subtitle
+            class="label"
+            i18n
+          >
+            Nombre del checklist
+          </mat-card-subtitle>
+        </mat-card-content>        
+        <mat-divider class="divider extended"></mat-divider>        
+        <mat-divider class="divider"></mat-divider>
+        <mat-card-footer>          
+        </mat-card-footer>
+      </mat-card>
+    </div>
+  </mat-tab>
+  <mat-tab i18n label="Second">Content 2</mat-tab>
+  <mat-tab label="Third">Content 3</mat-tab>
+</mat-tab-group>
