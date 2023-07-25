@@ -9,9 +9,9 @@ html, body {
 }
 
 :root {
-    --fore-color : #47475E;
-    --primary-fore-color : #FFF;
-    --primary-background-color: dodgerblue;
+    --fore-color : var(--z-colors-carbon);
+    --primary-fore-color : var(--z-colors-white);
+    --primary-background-color: var(--z-colors-dodgercolor);
 }
 
 body { 
@@ -29,8 +29,8 @@ body {
 
 .tooltip-general {
   font-size: 2rem !important;
-  background-color: red !important;  
-  border: 2px solid red !important;
+  background-color: var(--z-colors-red) !important;  
+  border: 2px solid var(--z-colors-red) !important;
   color: white !important;
   border-radius: 4px;
   white-space: pre-line;
@@ -53,7 +53,7 @@ body {
 
 ::-webkit-scrollbar-track-piece {
     background: lightgray !important;
-    border-color: silver !important;
+    border-color: var(--z-border-color) !important;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -70,12 +70,32 @@ body {
     margin: 3px;
     border-style: solid !important;
     border-width: 1.5px !important;
-    border-color: silver !important;
+    border-color: var(--z-border-color) !important;
     border-radius: 3px; 
+}
+
+button:disabled {
+    color: var(--z-disabled-color);  
+    cursor: url("./assets/icons/unable.png"), not-allowed;    
+    .mat-icon {
+      color: var(--z-disabled-color);
+    }
 }
   
 mat-icon {
+    color: var(--z-primary);
+    width: 32px;
+    height: 32px;
+}
+
+.button-locked {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-bottom: -10px;
+    z-index: 999;
+}
+
+.small-locked {
   color: var(--z-primary);
-  width: 32px;
-  height: 32px;
 }

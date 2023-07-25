@@ -1,5 +1,13 @@
 @use "src/assets/styles/mixins";
 
+.route-container {
+    position:relative;
+}
+
+.route-container>* {
+    display:block;
+}
+
 margin-to.container {
   position: relative;
   margin: 0;
@@ -24,13 +32,13 @@ mat-sidenav-content.mat-drawer-content.mat-sidenav-content {
 
 mat-sidenav {
   margin: 3px;
-  border: 1px solid silver;
+  border: 1px solid var(--z-border-color);
   border-radius: 4px;
   width: max(300px, 15%);
 }
 
 mat-toolbar {
-  border: 1px solid silver;
+  border: 1px solid var(--z-border-color);
   border-radius: 6px 6px 0px 0px;
 }
 
@@ -124,6 +132,7 @@ mat-toolbar {
   right: 0;
   margin-bottom: 45px;
   margin-right: 25px;
+  z-index: 999;
 }
 
 .withOverflow {
@@ -149,7 +158,7 @@ mat-toolbar {
   height: 100px;
   width: 100px;
   text-align: center;
-  color: red;
+  color: var(--z-colors-red);
   animation: coloring 3s infinite;
 }
 
@@ -160,13 +169,13 @@ mat-toolbar {
 
 @keyframes coloring {
   0% {
-      color: red;
+      color: var(--z-colors-red);
   }
   50% {
       color: orange;
   }
   100% {
-    color: red;
+    color: var(--z-colors-red);
   }
 }
 
@@ -194,4 +203,9 @@ mat-toolbar {
 
 .menu {
   min-width: 300px;
+}
+
+.toolbar-content {
+  height: 64px;
+  border-bottom: 1px solid var(--z-border-color);
 }

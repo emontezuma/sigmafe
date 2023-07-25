@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, ChangeDetectorRef } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -8,14 +8,15 @@ import { SharedService } from './shared/services/shared.service';
 import { ColorsService } from './shared/services/colors.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
-import { appearing, dissolve, downUp } from '../app/shared/animations/shared.animations';
+import { appearing, dissolve, downUp, } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  animations: [ appearing, dissolve, downUp ],
+  animations: [ appearing, dissolve, downUp, ],
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
@@ -49,6 +50,8 @@ export class AppComponent {
   outletPosition =  '48px';
   invalidSize = false;
   toolbarWidth: number = 0;
+  toolbarCurrentSize: ScreenSizes = ScreenSizes.SMALL;
+  toolbarAnimated: boolean = false;
   goTopButtonTimer: any;
   lotsOfTabs = new Array(6).fill(0).map((_, index) => `Tab ${index}`);
   // allHeight: number = 300;
@@ -76,6 +79,7 @@ export class AppComponent {
     private breakpointObserver: BreakpointObserver,
     private sharedService: SharedService,
     private colorsService: ColorsService,
+    private changeDetectorRef: ChangeDetectorRef,
     ) { 
     breakpointObserver
     .observe([
@@ -107,11 +111,13 @@ export class AppComponent {
 // Hooks ====================
   ngOnInit(): void {
     this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
-      this.loading = showLoader.show;
+      setTimeout(() => {
+        this.loading = showLoader.show;        
+      }, 0);      
     });
     this.sharedService.showToolbar.subscribe((toolbar) => {
       this.toolbarData = toolbar;
-      this.calculateOutletPosition(); 
+      this.calculateOutletPosition();   
     });
     this.sharedService.showScrollBar.subscribe((scrollBarData) => {
       this.scrollBarData = scrollBarData;
@@ -119,10 +125,11 @@ export class AppComponent {
     this.sharedService.showToolbarWidth.subscribe((width) => {
       this.toolbarWidth = width + 60;
     });
-
     this.sharedService.showProgressBar.subscribe((progressBar) => {
-      this.progressBarData = progressBar;
-      this.calculateOutletPosition();
+      setTimeout(() => {
+        this.progressBarData = progressBar;
+        this.calculateOutletPosition();  
+      }, 0);      
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
@@ -132,9 +139,15 @@ export class AppComponent {
    }
  
 // Functions ================
+  animationFinished(e: any) {    
+    if (e.fromState !== 'void') {
+      this.sharedService.SetAnimationFinished(e.fromState, e.toState, true);
+    }  
+  }
+
   calculateOutletPosition() {
     this.outletPosition = (48  + (this.progressBarData?.show ? 4 : 0)).toString() + 'px';
-    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData?.show && this.toolbarData?.size !== ScreenSizes.SMALL ? 64 : 0);
+    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData.show && this.toolbarCurrentSize !== ScreenSizes.SMALL ? 64 : 0);
   }
 
   handlerScreenSizeChange(screen: Screen | null) {
@@ -155,7 +168,7 @@ export class AppComponent {
         appActions.changeScreenState({ screen })
       );
     }  
-    this.toolbarData.size = (this.toolbarData.show && this.toolbarWidth > screen.innerWidth) ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
+    this.toolbarCurrentSize = (this.toolbarData.show && this.toolbarWidth > screen.innerWidth) ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
   }
 
   goToTop() {
@@ -163,6 +176,19 @@ export class AppComponent {
       ApplicationModules.GENERAL,
       'temp',
     );    
+  }
+
+  prepareRoute(outlet: RouterOutlet) {
+    this.sharedService.SetAnimationFinished('', '', false);
+    return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
+  }
+
+  toolbarAnimationFinished(e: any) {
+    this.toolbarAnimated = true;
+  }
+
+  toolbarAnimationStarted(e: any) {
+    this.toolbarAnimated = false;
   }
 
 // End ======================

@@ -6,10 +6,12 @@ const routes: Routes = [
   {
     path: '',
     component: MoldsHitsCounterComponent,
+    data: { animation: 'MoldsHitsCounterComponent' },
     children: [
       {
         path: '**',
         component: MoldsHitsCounterComponent,
+        data: { animation: 'MoldsHitsCounterComponent' },
       },
     ]
   },

@@ -28,7 +28,7 @@ export interface ToolbarButtons  {
     iconSize: string;
     primary: boolean;
     disabled: boolean;
-    showThis: boolean;
+    locked: boolean;
     showCaption: boolean;
     showIcon: boolean;
     showTooltip: boolean;
@@ -47,6 +47,12 @@ export interface ShowElement {
     show: boolean;
 }
 
+export interface animationStatus {
+    fromState: string;
+    toState: string;
+    isFinished: boolean
+}
+
 export interface GoTopButtonStatus {
     from: string;
     status: string;
@@ -55,12 +61,14 @@ export interface GoTopButtonStatus {
 export interface ToolbarElement {
     from: string;
     show: boolean;
-    size: ScreenSizes;
+    toolbarClass: string;
+    dividerClass: string;
     buttons: ToolbarButtons[];
 }
 
 export enum ApplicationModules {
     MOLDS_HITS_VIEW = 'molds-hits-view',
+    CHECKLIST_FILLING = 'checklist-filling',
     GENERAL = 'general',
 }
 

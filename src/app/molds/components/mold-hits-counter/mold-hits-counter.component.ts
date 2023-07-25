@@ -95,6 +95,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
     })
   }
+  
 // Functions ================
   calcData() {
     this.elapsedTimeLabel = this.sharedService.labelElapsedTime(this.mold.lastHit?.date);

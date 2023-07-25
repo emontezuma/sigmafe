@@ -7,11 +7,12 @@ const routes: Routes = [
   {
     path: 'checklists',
     loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule),
+    data: { animation: 'isTop' },
     canActivate: [accessValidationGuard]
   },
   {
     path: 'molds',
-    loadChildren: () => import('./molds/molds.module').then(m => m.MoldsModule)
+    loadChildren: () => import('./molds/molds.module').then(m => m.MoldsModule),    
   },
   {
     path: '404',

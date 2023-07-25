@@ -14,7 +14,7 @@ export const initialState: ColorsState = {
     status: {
       ok: Colors.GREEN,
       warn: Colors.ORANGE,
-      alarm: Colors.REDORANGE,
+      alarm: Colors.ORANGERED,
       none: Colors.NONE,
     },
     page: {
@@ -23,15 +23,22 @@ export const initialState: ColorsState = {
       background: Colors.WHITE,
       shadow: Colors.GRAY,
       buttonBorderColor: Colors.SILVER,
+      border: Colors.SILVER,      
       primary: Colors.GREEN,
+      disabled: Colors.GRAY,
       none: Colors.NONE,
     },
     fixedColors: {
       white: Colors.WHITE,
       carbon: Colors.CARBON,    
-      red: Colors.REDORANGE,    
+      red: Colors.ORANGERED,    
       green: Colors.GREEN,    
       gray: Colors.GRAY,  
+      blue: Colors.BLUE,  
+      dodgerblue: Colors.DODGERBLUE,  
+      orange: Colors.ORANGE,  
+      orangered: Colors.ORANGERED,  
+      black: Colors.BLACK,  
     },
   }  
 };

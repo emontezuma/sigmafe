@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
-import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, ScreenSizes } from '../models/screen.models';
+import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, } from '../models/screen.models';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class SharedService {
   private showGeneralLoader: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showLoader: Observable<ShowElement> = this.showGeneralLoader.asObservable();
 
-  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', show: false, size: ScreenSizes.NORMAL, buttons: [] });
+  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', toolbarClass: 'toolbar-grid', dividerClass: 'divider', show: false, buttons: [] });
   showToolbar: Observable<ToolbarElement> = this.toolbar.asObservable();
 
   private toolbarWidth: BehaviorSubject<number> = new BehaviorSubject<number>(0);
@@ -30,6 +30,9 @@ export class SharedService {
 
   private showGoTopButton: BehaviorSubject<GoTopButtonStatus> = new BehaviorSubject<GoTopButtonStatus>({ from: '', status: 'inactive' });
   showGoTop: Observable<GoTopButtonStatus> = this.showGoTopButton.asObservable();
+
+  private routeAnimationFinished: BehaviorSubject<animationStatus> = new BehaviorSubject<animationStatus>({ toState: '', fromState: '', isFinished: false });
+  isAnimationFinished: Observable<animationStatus> = this.routeAnimationFinished.asObservable();
 
   constructor() { }
 
@@ -50,8 +53,8 @@ export class SharedService {
     this.showGeneralProgressBar.next({ from, show: showProgress });
   }
   
-  setToolbar(from: string, showToolbar: boolean, size: ScreenSizes, buttons: ToolbarButtons[]) {
-    this.toolbar.next({ from, show: showToolbar, size, buttons });
+  setToolbar(from: string, showToolbar: boolean, toolbarClass: string, dividerClass: string, buttons: ToolbarButtons[]) {
+    this.toolbar.next({ from, show: showToolbar, toolbarClass, dividerClass, buttons });
   }
 
   setToolbarWidth(width: number) {
@@ -64,6 +67,10 @@ export class SharedService {
 
   setGoTopButton(from: string, status: string) {
     this.showGoTopButton.next({ from, status });
+  }
+
+  SetAnimationFinished(fromState: string, toState: string, isFinished: boolean) {
+    this.routeAnimationFinished.next({ fromState, toState, isFinished });
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {

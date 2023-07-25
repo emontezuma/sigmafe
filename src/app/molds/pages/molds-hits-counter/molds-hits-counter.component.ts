@@ -3,10 +3,9 @@ import { Store } from '@ngrx/store';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
 
-import { fromTop } from '../../../shared/animations/shared.animations';
+import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { MoldsHitsQueryData } from '../../models/molds.models';
 import { AppState } from '../../../state/app.state'; 
-import { selectSharedScreen } from '../../../state/selectors/screen.selectors'; 
 import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
@@ -20,7 +19,7 @@ import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 
 @Component({
   selector: 'app-molds-hits-counter',
-  animations: [ fromTop ],
+  animations: [ routingAnimation, dissolve ],
   templateUrl: './molds-hits-counter.component.html',
   styleUrls: ['./molds-hits-counter.component.scss']
 })
@@ -33,8 +32,6 @@ export class MoldsHitsCounterComponent implements OnInit {
   settingsData: SettingsData;
   profileData: ProfileData;
   colsBySize: number = 2;
-  currentSize: ScreenSizes = ScreenSizes.NORMAL;
-  cardWidth: string;
   loading: boolean = true;
   animate: boolean = true;
   filterMoldsBy: string = '';
@@ -42,8 +39,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;
-  toolbar: ElementRef | null;
-  
+    
   form = new FormGroup({
   });
 
@@ -58,28 +54,6 @@ export class MoldsHitsCounterComponent implements OnInit {
   ngOnInit() {
     this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;
-    });
-    this.store.select(selectSharedScreen).subscribe( shared => {
-      this.currentSize = shared.innerWidth <= 300 ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
-      if (this.loaded) {
-        if (shared.innerWidth <= 300) {
-          this.calcButtons(ScreenSizes.SMALL);
-          this.sharedService.setToolbar(
-            ApplicationModules.MOLDS_HITS_VIEW,
-            true,
-            ScreenSizes.SMALL,
-            this.buttons,
-          );
-        } else if (shared.innerWidth > 300) {
-          this.calcButtons(ScreenSizes.NORMAL);
-          this.sharedService.setToolbar(
-            ApplicationModules.MOLDS_HITS_VIEW,
-            true,
-            ScreenSizes.NORMAL,
-            this.buttons,
-          );
-        }      
-      }              
     });
     this.store.select(selectProfileData).subscribe( profileData => {
       this.profileData = profileData;
@@ -108,6 +82,11 @@ export class MoldsHitsCounterComponent implements OnInit {
         this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
+    this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
+      if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
+        // this.animationFinished(null);
+      }      
+    });    
     this.store.select(selectColorsData).subscribe( colorsData => {
       this.colorsService.setColors(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
     });
@@ -120,13 +99,12 @@ export class MoldsHitsCounterComponent implements OnInit {
         // Ensure
       }      
     });
-
     this.scrollDispatcher
     .scrolled()
     .subscribe((data: any) => {
       this.getScrolling(data);
     });
-
+    // this.animationFinished(null);
     this.store.dispatch(loadMoldsHitsQueryData());    
   }
 
@@ -134,7 +112,8 @@ export class MoldsHitsCounterComponent implements OnInit {
     this.sharedService.setToolbar(
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
-      this.currentSize,
+      '',
+      '',
       this.buttons,
     );
     this.sharedService.setGeneralScrollBar(
@@ -144,26 +123,26 @@ export class MoldsHitsCounterComponent implements OnInit {
   }
 
 // Functions ================
-  animateToolbar(e: any) {
-    if (e.fromState === 'void') {
-      setTimeout(() => {
-        this.calcButtons(this.currentSize);
-        this.sharedService.setToolbar(
-          ApplicationModules.MOLDS_HITS_VIEW,
-          true,
-          this.currentSize,
-          this.buttons,
-        );
-        this.sharedService.setGeneralScrollBar(
-          ApplicationModules.MOLDS_HITS_VIEW,
-          true,
-        );
-      }, 300);
+  animationFinished(e: any) {
+    if (e === null || e.fromState === 'void') {
+    setTimeout(() => {
+      this.calcButtons();
+      this.sharedService.setToolbar(
+        ApplicationModules.MOLDS_HITS_VIEW,
+        true,
+        'toolbar-grid',
+        'divider',
+        this.buttons,
+      );
+      this.sharedService.setGeneralScrollBar(
+        ApplicationModules.MOLDS_HITS_VIEW,
+        true,
+      );
+      }, 500);
     }
   }
 
-  calcButtons(size: ScreenSizes) {
-    this.currentSize = size;    
+  calcButtons() {
     this.buttons = [{
       type: 'button',
       caption: $localize`Actualizar la vista`,
@@ -171,9 +150,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: 'reload',
       primary: false,
       iconSize: '24px',
-      showThis: true,
       showIcon: true,
       showTooltip: true,
+      locked: false,
       showCaption: true,
       disabled: false,
     },{
@@ -183,9 +162,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: "",
       primary: false,
       iconSize: "",
-      showThis: true,
       showIcon: true,
       showTooltip: true,
+      locked: false,
       showCaption: true,
       disabled: true,
     },{
@@ -195,9 +174,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: 'download',
       primary: false,
       iconSize: '24px',
-      showThis: true,
       showIcon: true,
       showTooltip: true,
+      locked: false,
       showCaption: true,
       disabled: false,
     },{
@@ -207,9 +186,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: "",
       primary: false,
       iconSize: "",
-      showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
+      locked: false,
       showCaption: true,
       disabled: true,
     },{
@@ -219,9 +198,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       icon: '',
       primary: false,
       iconSize: '',
-      showThis: size === ScreenSizes.NORMAL,
       showIcon: true,
       showTooltip: true,
+      locked: false,
       showCaption: true,
       disabled: true,
     },];

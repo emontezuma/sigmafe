@@ -48,7 +48,7 @@ export class SpinnerComponent implements OnChanges {
         }  
       }
     } else {
-      this.metterClass = 'meter-1';      
+      this.metterClass = 'meter-0';      
     }
     this.progressBarColor = selectedBarColor;
     let printExhaustedValue = false;

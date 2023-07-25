@@ -30,7 +30,6 @@ export class ConfigService {
       this.store.select(selectLoadingSettingsState).subscribe((loading) => {
         if (!loading) {          
           this.processesFinished = this.processesFinished + 1;
-          console.log(this.processesFinished);
           if (this.processesFinished === 2) {
             clearTimeout(this.controlTimer);
             resolve(true);
@@ -40,7 +39,6 @@ export class ConfigService {
       this.store.select(selectLoadingColorsState).subscribe((loading) => {
         if (!loading) {
           this.processesFinished = this.processesFinished + 1;
-          console.log(this.processesFinished);
           if (this.processesFinished === 2) {
             clearTimeout(this.controlTimer);
             resolve(true);

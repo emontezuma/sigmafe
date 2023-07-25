@@ -1,16 +1,18 @@
 @use "../../../../assets/styles/mixins";
 
 .container {
-    
+    margin-bottom: 10px;
 }
-
 .progress {
     margin-top: 5px;
     margin-bottom: -9px;
+    counter-reset: counter; 
 }
 
 .tab-label {
-    font-size: 1.6rem;  
+    font-size: 1.6rem;
+    font-weight: 600;
+    cursor: pointer;
 }
 
 .tab-general-info {
@@ -18,9 +20,8 @@
     font-size: 1.6rem;
     font-weight: 500;
     align-content: center;
-    margin: 10px;
+    margin: 5px 10px 0px 10px;
 }
-
 
 mat-card-title {
     font-weight: 900;
@@ -46,5 +47,95 @@ mat-card-title {
 
 .extended {
     margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
+.grid {
+    display: grid;
+    grid-template-columns: max(140px, 25%) 1fr 84px;
+    grid-gap: 5px;
+    padding: 5px;
+    width: 100%;
+}
+
+.border {
+    background-color: #eeeeee;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-radius: 8px 0px;
+    border: 2px solid #dddddd;
+}
+
+.label-progress {
+    text-align: center;
+    font-weight: 700;
+}
+
+.checklist-progress {    
+    grid-row-start: 1;
+    grid-row-end: 3;
+    grid-column-start: 3;
+    border: 2px solid var(--z-border-color);
+    border-radius: 8px 0px;
+    padding: 5px;
+}
+
+.checklist-name {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+}
+
+.flex {
+    @include mixins.flexbox(row, wrap, 5px, start);        
+    flex: 1;
+    justify-content: space-between;
+    margin: 5px;
+}
+    
+.layout {
+    @include mixins.flexbox(column, wrap, 5px, start);
+    width: 100%;  
+}
+
+.additional-info {
+    font-weight: 500px;
+    font-size: 1.5rem;
+}
+
+.grid-multiple {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-gap: 5px;
+    padding: 5px;
+    width: 100%;
+}
+
+.label::before { 
+    counter-increment: counter;
+    content: "(" counter(counter) ") ";
+}
+
+::ng-deep .mat-mdc-tab-labels {
+    background-color: white;
+    border-radius: 8px 8px 0px 0px;
+    border: 1px solid var(--z-border-color);
+    margin-left: 10px;    
+    margin-right: 3px;
+    margin-top: 5px;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    width: max-content;
+}
+
+::ng-deep .mat-mdc-tab {
+    padding-left: 12px !important;
+    padding-right: 12px !important;    
+}
+
+.tab-icon {
+    width: 32px;
+    height: 32px;
+}

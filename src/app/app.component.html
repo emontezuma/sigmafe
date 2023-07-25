@@ -2,7 +2,7 @@
   <ng-container *ngTemplateOutlet="invalidSize ? invalid : valid">
   </ng-container>
   <ng-template #valid>
-    <mat-toolbar class="toolbar" color="accent">
+    <mat-toolbar class="toolbar" color="primary">
       <button
         mat-mini-fab
         class="button"
@@ -11,15 +11,19 @@
         (click)="sidenav.open()"
         @appearing
       >
-        <mat-icon class="svgicon icon-toolbar" svgIcon="menu"></mat-icon>
+        <mat-icon
+          class="svgicon icon-toolbar"
+          svgIcon="menu"
+        >
+        </mat-icon>
       </button>
-      <h1 i18n>APLICACION TOYOTA <strong>{{ toolbarData.size }}</strong></h1>      
+      <h1 i18n>APLICACION TOYOTA <strong>{{ toolbarCurrentSize }}</strong></h1>      
       <button
         mat-mini-fab
         class="button toolbar-menu"
         aria-label="icon-button with menu icon"
         (click)="sidenav.close()"
-        *ngIf="toolbarData?.show && toolbarData?.size == 'small'"
+        *ngIf="toolbarData?.show && toolbarCurrentSize == 'small'"
         [matMenuTriggerFor]="menu"
         @appearing
       >
@@ -30,29 +34,27 @@
         class="menu"
       >
         <div *ngFor="let button of toolbarData.buttons; let i = index;">
-          <div *ngIf="button.showThis">
-              <button
-                  *ngIf="button.type === 'button'"
-                  mat-menu-item
-                  class="button-normal"
-                  aria-label="icon-button with menu icon"
-                  [disabled]="button.disabled"
-                  i18n-placeHolder
+            <button
+                *ngIf="button.type === 'button'"
+                mat-menu-item
+                class="button-normal"
+                aria-label="icon-button with menu icon"
+                [disabled]="button.disabled"
+                i18n-placeHolder
+            >
+              <mat-icon
+                  *ngIf="button.showIcon"
+                  [svgIcon]="button.icon"
+                  class="menu-button"
               >
-                <mat-icon
-                    *ngIf="button.showIcon"
-                    [svgIcon]="button.icon"
-                    class="menu-button"
-                >
-                </mat-icon>
-                <span>{{ button.showCaption ? button.caption : '' }}</span>
-              </button>
-              <mat-divider
-                  *ngIf="button.type === 'divider'"
-                  class="divider"
-              >
-              </mat-divider>
-          </div>
+              </mat-icon>
+              <span>{{ button.showCaption ? button.caption : '' }}</span>
+            </button>
+            <mat-divider
+                *ngIf="button.type === 'divider'"
+                class="divider"
+            >
+            </mat-divider>
         </div>
       </mat-menu>
     </mat-toolbar>
@@ -97,11 +99,39 @@
       </mat-sidenav>
 
       <mat-sidenav-content>
-        <div
-          *ngIf="toolbarData?.show && toolbarData?.size != 'small'"
+        <div class="gotop-container"
+          *ngIf="onTopStatus === 'active'"
+          @appearing
+        >
+          <button
+            mat-mini-fab
+            class="gotop-button"
+            (click)="goToTop()"
+          >
+            <mat-icon
+              class="gotop-icon"
+            >
+              keyboard_arrow_up
+            </mat-icon>
+          </button>
+        </div>
+        <!--<div
+          *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
           @downUp
         >
           <app-toolbar [toolbar]="toolbarData"></app-toolbar>
+        </div>-->
+        <div
+          class="toolbar-content"
+        >
+          <app-toolbar
+            *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
+            @downUp
+            (@downUp.done)="toolbarAnimationFinished($event)"
+            (@downUp.start)="toolbarAnimationStarted($event)"
+            [toolbar]="toolbarData"
+          >
+          </app-toolbar>
         </div>
         <div
           cdkScrollable
@@ -110,7 +140,7 @@
           [ngClass]="{ 'noOverflow': !scrollBarData.show, 'withOverflow': scrollBarData.show }"        
         >
         <!--<div class="page-content">-->
-          <router-outlet #o="outlet"></router-outlet>
+          <router-outlet #outlet="outlet"></router-outlet>            
         </div>
         <div
           *ngIf="loading"
@@ -122,27 +152,16 @@
                 class="process-loading"
                 diameter="100"
                 mode="indeterminate"
+                color="primary"
               >
               </mat-progress-spinner>
             </div>
-        </div>
-        <div class="gotop-container"
-          *ngIf="onTopStatus === 'active'"
-          @appearing
-        >
-          <button
-            mat-mini-fab
-            class="gotop-button"
-            (click)="goToTop()"
-          >
-            <mat-icon class="gotop-icon">keyboard_arrow_up</mat-icon>
-          </button>
-        </div>
+        </div>        
       </mat-sidenav-content>
     </mat-sidenav-container>
     <mat-toolbar
       class="footer"
-      color="primary"
+      color="accent"
     >
       <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
       <span class="example-spacer"></span>

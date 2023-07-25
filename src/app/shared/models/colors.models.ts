@@ -1,13 +1,16 @@
 export enum Colors {
     GREEN = 'green',
-    BLACK = '#000',
-    WHITE = '#FFF',
+    BLACK = 'black',
+    WHITE = 'white',
     CARBON = '#505050',
     ORANGE = 'orange',
-    REDORANGE = 'orangered',
+    ORANGERED = 'orangered',
     RED = 'red',
     GRAY = 'lightgray',
     SILVER = 'silver',
+    PRIMARY = 'dodgerblue',
+    DODGERBLUE = 'dodgerblue',
+    BLUE = 'blue',
     NONE = 'none',
 }
 
@@ -47,6 +50,8 @@ export interface PagesColors {
     shadow: string,
     buttonBorderColor: string,
     primary: string,
+    disabled: string,
+    border: string,
     none: string,
 }
 
@@ -56,6 +61,11 @@ export interface FixedColors {
     red: string,    
     green: string,    
     gray: string,    
+    orange: string,    
+    orangered: string,    
+    dodgerblue: string,    
+    blue: string,    
+    black: string,   
 }
 
 export interface ColorsData {

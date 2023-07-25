@@ -32,5 +32,34 @@ export class IconsModule {
       "reload",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/reload.svg")
     );
+    iconRegistry.addSvgIcon(
+      "attachment",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/attachment.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "save",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/save.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "cancel",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/cancel.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "checklist",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/checklist.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "support",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/support.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "checklist-header",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/checklist_header.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "small-locked",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/small_locked.svg")
+    );
+    
   }
 }

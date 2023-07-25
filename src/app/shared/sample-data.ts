@@ -439,7 +439,7 @@ export const sampleColors: ColorsData = {
     status: {
         ok: Colors.GREEN,
         warn: Colors.ORANGE,
-        alarm: Colors.REDORANGE,
+        alarm: Colors.ORANGERED,
         none: Colors.NONE,
     },
     page: {
@@ -448,14 +448,21 @@ export const sampleColors: ColorsData = {
         foreContrast: Colors.WHITE,        
         shadow: Colors.GRAY,
         buttonBorderColor: Colors.SILVER,
-        primary: Colors.GREEN,
+        border: Colors.SILVER,
+        disabled: Colors.SILVER,
+        primary: Colors.PRIMARY,
         none: Colors.NONE,
     },
     fixedColors: {
         white: Colors.WHITE,
         carbon: Colors.CARBON,    
-        red: Colors.REDORANGE,    
+        red: Colors.ORANGERED,    
         green: Colors.GREEN,    
         gray: Colors.GRAY,
+        blue: Colors.BLUE,
+        orangered: Colors.ORANGERED,
+        dodgerblue: Colors.DODGERBLUE,
+        orange: Colors.ORANGE,
+        black: Colors.BLACK,
     }
 }

@@ -7,14 +7,17 @@ const routes: Routes = [
   {
     path: '',
     component: ChecklistFillingComponent,
+    data: { animation: 'ChecklistFillingComponent' },
     children: [
       {
         path: ':id',
-        component: ChecklistFillingComponent
+        component: ChecklistFillingComponent,
+        data: { animation: 'ChecklistFillingComponent' },
       },
       {
         path: '**',
-        component: ChecklistFillingComponent
+        component: ChecklistFillingComponent,
+        data: { animation: 'ChecklistFillingComponent' },
       },
     ]
   },

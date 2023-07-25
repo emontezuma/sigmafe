@@ -2,46 +2,56 @@
     <mat-toolbar class="toolbar">
         <div 
             #toolbarBox
-            class="toolbar-grid"
+            [ngClass]="toolbar.toolbarClass"
         >
-            <div *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
-                <div *ngIf="button.showThis">
-                    <button
-                        *ngIf="button.type === 'button'"
-                        mat-button                        
-                        class="button-normal"
-                        aria-label="icon-button with menu icon"
-                        [matTooltipDisabled]="!button.showTooltip"
-                        [matTooltip]="button.tooltip"
+            <div class="toolbar-button" *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
+                <button
+                    *ngIf="button.type === 'button'"
+                    mat-button                        
+                    class="button-normal"
+                    aria-label="icon-button with menu icon"
+                    [matTooltipDisabled]="!button.showTooltip"
+                    [matTooltip]="button.tooltip"
+                    matTooltipClass = "tooltip-general"
+                    matTooltipShowDelay = "100"
+                    [disabled]="button.disabled"
+                >
+                    <mat-icon
+                        *ngIf="button.showIcon"
+                        class="svgicon icon-toolbar medium"
+                        [svgIcon]="button.icon"
+                    >                            
+                    </mat-icon>
+                    <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>                    
+                </button>
+                <mat-divider
+                    *ngIf="button.type === 'divider'"
+                    vertical [ngClass]="toolbar.dividerClass"
+                >
+                </mat-divider>
+                <app-search-box
+                    *ngIf="button.type === 'searchbox'"
+                    textToSearch="hello"
+                    i18n-placeHolder
+                    placeHolder="Filtrar"
+                    maxLength="50"
+                    (searchBy)="sendSearchText($event)"
+                >
+                </app-search-box>                
+                <div
+                    *ngIf="button.locked"
+                    class="button-locked"
+                >
+                    <mat-icon                        
+                        class="svgicon icon-toolbar small-locked"
+                        svgIcon="small-locked"                        
+                        matTooltip="Puede requerir clave"
                         matTooltipClass = "tooltip-general"
                         matTooltipShowDelay = "100"
-                        [disabled]="button.disabled"
-                        i18n-placeHolder
-                    >
-                        <mat-icon
-                            *ngIf="button.showIcon"
-                            class="svgicon icon-toolbar medium"
-                            [svgIcon]="button.icon"
-                        >                            
-                        </mat-icon>
-                        <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>                        
-                    </button>
-                    <mat-divider
-                        *ngIf="button.type === 'divider'"
-                        vertical class="divider"
-                    >
-                    </mat-divider>
-                    <app-search-box
-                        *ngIf="button.type === 'searchbox'"
-                        textToSearch="hello"
-                        i18n-placeHolder
-                        placeHolder="Filtrar"
-                        maxLength="50"
-                        (searchBy)="sendSearchText($event)"
-                    >
-                    </app-search-box>
+                    >                            
+                    </mat-icon>                      
                 </div>
-            </div>            
+            </div>
         </div>
     </mat-toolbar>
 </div>

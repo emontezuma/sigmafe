@@ -5,6 +5,13 @@
     justify-content: center;
 }
 
+.meter-0 {
+    color: var(--z-primary);
+    ::ng-deep circle {
+        stroke: var(--z-primary);    
+    }
+}
+
 .meter-1 {
     color: var(--z-status-ok);
     ::ng-deep circle {

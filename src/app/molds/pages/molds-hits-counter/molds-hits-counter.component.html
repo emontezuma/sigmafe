@@ -1,11 +1,14 @@
-<div class="container">  
+<div
+  class="container"
+  @routingAnimation  
+>  
   <ng-container *ngTemplateOutlet="!loading ? molds : loader">
   </ng-container>
   <ng-template #molds>
     <div
       class="container-animated"
-      (@fromTop.done)="animateToolbar($event)"
-      @fromTop      
+      (@dissolve.done)="animationFinished($event)"
+      @dissolve            
     >   
       <div
         class="cards-container"
@@ -21,8 +24,8 @@
   <ng-template #loader>
     <div
       *ngIf="profileData.animate"
-      class="container-animated"
-      @fromTop      
+      class="container-animated"    
+      @dissolve
     >
       <div class="cards-container">
         <mat-card

@@ -1,45 +1,661 @@
-<mat-tab-group mat-stretch-tabs="false" mat-align-tabs="start">
-  <mat-tab>
-    <ng-template mat-tab-label>
-      <mat-icon class="svgicon tab-icon" svgIcon="reload"> </mat-icon>
-      <label class="tab-label" i18n> Información general </label>
-    </ng-template>
-    <div class="tab-general-info">
-      <mat-card class="card">
-        <mat-progress-bar
-          mode="indeterminate"
-          color="warn"
-          name="active-progress-bar"
-          class="progress"
-        >
-        </mat-progress-bar>
-        <mat-card-header>
-          <mat-card-title-group class="border">
-            <mat-card-title>133,030:</mat-card-title>
-            <mat-card-subtitle
-                i18n
-                class="label"
-            >
-                Folio Número
-            </mat-card-subtitle>
-          </mat-card-title-group>
-        </mat-card-header>
-        <mat-card-content>
-          <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
-          <mat-card-subtitle
-            class="label"
-            i18n
-          >
-            Nombre del checklist
-          </mat-card-subtitle>
-        </mat-card-content>        
-        <mat-divider class="divider extended"></mat-divider>        
-        <mat-divider class="divider"></mat-divider>
-        <mat-card-footer>          
-        </mat-card-footer>
-      </mat-card>
-    </div>
-  </mat-tab>
-  <mat-tab i18n label="Second">Content 2</mat-tab>
-  <mat-tab label="Third">Content 3</mat-tab>
-</mat-tab-group>
+<div
+    class="container"
+    #checklistFilling
+    cdkScrollable
+    @routingAnimation
+    (@routingAnimation.done)="animationFinished($event)"
+>
+    <mat-tab-group
+        mat-stretch-tabs="false"
+        mat-align-tabs="start"
+        dynamicHeight="true"
+    >
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon
+                    class="svgicon tab-icon"
+                    svgIcon="checklist-header"
+                >
+                </mat-icon>
+                <label class="tab-label" i18n>Información general</label>
+            </ng-template>
+            <ng-template matTabContent>
+                <div class="tab-general-info">
+                    <mat-card class="card">
+                        <mat-progress-bar
+                        mode="indeterminate"
+                        color="warn"
+                        name="active-progress-bar"
+                        class="progress"
+                        >
+                        </mat-progress-bar>
+                        <mat-card-header>
+                            <div class="layout">
+                                <div class="grid">
+                                    <div>         
+                                        <mat-card-title>133,030</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Folio Número
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                    <mat-card-title>ACTIVO / AL DIA</mat-card-title>
+                                    <mat-card-subtitle
+                                        i18n
+                                        class="label"
+                                    >
+                                        Estatus del checklist
+                                    </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-progress">
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            Avance
+                                        </mat-card-subtitle>
+                                        <app-spinner
+                                            class="spinner"
+                                            [diameter]="70"
+                                            [value]="valueToChart"
+                                            [showBackgound]="true"
+                                            [suffix]="'%'"
+                                            [limits]="limits"
+                                            [fonts]="fonts"
+                                            [exhaustedValue]="'999'"
+                                            [prefix]="'>'"
+                                            [showPrefix]="showPrefix"
+                                            [smallFont]="smallFont"
+                                        ></app-spinner>                        
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            21 de 32
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-name">
+                                        <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
+                                        <mat-card-subtitle
+                                            class="label"
+                                            i18n
+                                        >
+                                            Nombre del checklist
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                                <mat-divider class="divider"></mat-divider>
+                                <div class="grid-multiple">
+                                    <div>         
+                                        <mat-card-title class="additional-info">ELVIS MONTEZUMA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Asignado a
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">SISTEMAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUTOMÁTICA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Tipo de asignación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>         
+                                        <mat-card-title class="additional-info">Miércoles, 21-Jul-2023 6:00:00 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de planificación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Viernes, 31-Jul-2023 9:11:14 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de inicio
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de vencimiento
+                                        </mat-card-subtitle>
+                                    </div>                 
+                                </div>
+                                <mat-divider class="divider"></mat-divider>        
+                                <div class="grid-multiple">
+                                    <div>                         
+                                        <mat-card-title class="additional-info">ELISEO PEREZ</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Planificado por
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">DIRECCIÓN DE FINANZAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUDITORIAS SEMANALES</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Proyecto
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                            </div>  
+                        </mat-card-header>
+                        
+
+
+
+
+                        <mat-card-header>
+                            <div class="layout">
+                                <div class="grid">
+                                    <div>         
+                                        <mat-card-title>133,030</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Folio Número
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                    <mat-card-title>ACTIVO / AL DIA</mat-card-title>
+                                    <mat-card-subtitle
+                                        i18n
+                                        class="label"
+                                    >
+                                        Estatus del checklist
+                                    </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-progress">
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            Avance
+                                        </mat-card-subtitle>
+                                        <app-spinner
+                                            class="spinner"
+                                            [diameter]="70"
+                                            [value]="valueToChart"
+                                            [showBackgound]="true"
+                                            [suffix]="'%'"
+                                            [limits]="limits"
+                                            [fonts]="fonts"
+                                            [exhaustedValue]="'999'"
+                                            [prefix]="'>'"
+                                            [showPrefix]="showPrefix"
+                                            [smallFont]="smallFont"
+                                        ></app-spinner>                        
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            21 de 32
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-name">
+                                        <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
+                                        <mat-card-subtitle
+                                            class="label"
+                                            i18n
+                                        >
+                                            Nombre del checklist
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                                <mat-divider class="divider"></mat-divider>
+                                <div class="grid-multiple">
+                                    <div>         
+                                        <mat-card-title class="additional-info">ELVIS MONTEZUMA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Asignado a
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">SISTEMAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUTOMÁTICA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Tipo de asignación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>         
+                                        <mat-card-title class="additional-info">Miércoles, 21-Jul-2023 6:00:00 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de planificación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Viernes, 31-Jul-2023 9:11:14 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de inicio
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de vencimiento
+                                        </mat-card-subtitle>
+                                    </div>                 
+                                </div>
+                                <mat-divider class="divider"></mat-divider>        
+                                <div class="grid-multiple">
+                                    <div>                         
+                                        <mat-card-title class="additional-info">ELISEO PEREZ</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Planificado por
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">DIRECCIÓN DE FINANZAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUDITORIAS SEMANALES</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Proyecto
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                            </div>  
+                        </mat-card-header>
+
+
+
+
+                        <mat-card-header>
+                            <div class="layout">
+                                <div class="grid">
+                                    <div>         
+                                        <mat-card-title>133,030</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Folio Número
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                    <mat-card-title>ACTIVO / AL DIA</mat-card-title>
+                                    <mat-card-subtitle
+                                        i18n
+                                        class="label"
+                                    >
+                                        Estatus del checklist
+                                    </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-progress">
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            Avance
+                                        </mat-card-subtitle>
+                                        <app-spinner
+                                            class="spinner"
+                                            [diameter]="70"
+                                            [value]="valueToChart"
+                                            [showBackgound]="true"
+                                            [suffix]="'%'"
+                                            [limits]="limits"
+                                            [fonts]="fonts"
+                                            [exhaustedValue]="'999'"
+                                            [prefix]="'>'"
+                                            [showPrefix]="showPrefix"
+                                            [smallFont]="smallFont"
+                                        ></app-spinner>                        
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            21 de 32
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-name">
+                                        <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
+                                        <mat-card-subtitle
+                                            class="label"
+                                            i18n
+                                        >
+                                            Nombre del checklist
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                                <mat-divider class="divider"></mat-divider>
+                                <div class="grid-multiple">
+                                    <div>         
+                                        <mat-card-title class="additional-info">ELVIS MONTEZUMA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Asignado a
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">SISTEMAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUTOMÁTICA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Tipo de asignación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>         
+                                        <mat-card-title class="additional-info">Miércoles, 21-Jul-2023 6:00:00 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de planificación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Viernes, 31-Jul-2023 9:11:14 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de inicio
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de vencimiento
+                                        </mat-card-subtitle>
+                                    </div>                 
+                                </div>
+                                <mat-divider class="divider"></mat-divider>        
+                                <div class="grid-multiple">
+                                    <div>                         
+                                        <mat-card-title class="additional-info">ELISEO PEREZ</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Planificado por
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">DIRECCIÓN DE FINANZAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUDITORIAS SEMANALES</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Proyecto
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                            </div>  
+                        </mat-card-header>
+
+
+
+
+                        <mat-card-header>
+                            <div class="layout">
+                                <div class="grid">
+                                    <div>         
+                                        <mat-card-title>133,030</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Folio Número
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                    <mat-card-title>ACTIVO / AL DIA</mat-card-title>
+                                    <mat-card-subtitle
+                                        i18n
+                                        class="label"
+                                    >
+                                        Estatus del checklist
+                                    </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-progress">
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            Avance
+                                        </mat-card-subtitle>
+                                        <app-spinner
+                                            class="spinner"
+                                            [diameter]="70"
+                                            [value]="valueToChart"
+                                            [showBackgound]="true"
+                                            [suffix]="'%'"
+                                            [limits]="limits"
+                                            [fonts]="fonts"
+                                            [exhaustedValue]="'999'"
+                                            [prefix]="'>'"
+                                            [showPrefix]="showPrefix"
+                                            [smallFont]="smallFont"
+                                        ></app-spinner>                        
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label-progress"
+                                        >
+                                            21 de 32
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div class="checklist-name">
+                                        <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
+                                        <mat-card-subtitle
+                                            class="label"
+                                            i18n
+                                        >
+                                            Nombre del checklist
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                                <mat-divider class="divider"></mat-divider>
+                                <div class="grid-multiple">
+                                    <div>         
+                                        <mat-card-title class="additional-info">ELVIS MONTEZUMA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Asignado a
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">SISTEMAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUTOMÁTICA</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Tipo de asignación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>         
+                                        <mat-card-title class="additional-info">Miércoles, 21-Jul-2023 6:00:00 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de planificación
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Viernes, 31-Jul-2023 9:11:14 AM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de inicio
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Fecha de vencimiento
+                                        </mat-card-subtitle>
+                                    </div>                 
+                                </div>
+                                <mat-divider class="divider"></mat-divider>        
+                                <div class="grid-multiple">
+                                    <div>                         
+                                        <mat-card-title class="additional-info">ELISEO PEREZ</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Planificado por
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">DIRECCIÓN DE FINANZAS</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Departamento
+                                        </mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title class="additional-info">AUDITORIAS SEMANALES</mat-card-title>
+                                        <mat-card-subtitle
+                                            i18n
+                                            class="label"
+                                        >
+                                            Proyecto
+                                        </mat-card-subtitle>
+                                    </div>
+                                </div>  
+                            </div>  
+                        </mat-card-header>
+                        <mat-divider class="divider"></mat-divider>
+                        <mat-card-footer>          
+                        </mat-card-footer>
+                    </mat-card>
+                </div>
+            </ng-template>
+        </mat-tab>
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="svgicon tab-icon" svgIcon="checklist"> </mat-icon>
+                <label class="tab-label" i18n>Cuestionario</label>
+            </ng-template>
+            <mat-divider class="divider extended"></mat-divider>
+            <div class="tab-general-info">
+            </div>
+            Content 2
+        </mat-tab>
+        <mat-tab>
+            <ng-template mat-tab-label>
+                <mat-icon class="svgicon tab-icon" svgIcon="support"> </mat-icon>
+                <label class="tab-label" i18n>Soporte</label>
+            </ng-template>
+            <mat-divider class="divider extended"></mat-divider>
+            <div class="tab-general-info">
+            </div>
+            Content 2
+        </mat-tab>
+    </mat-tab-group>
+</div>

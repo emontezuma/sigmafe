@@ -20,8 +20,8 @@ export interface Color {
 export class ColorsService {
 
 // Variables ===============
-  primaryColor = '#1fc103';
-  accentColor = '#0e67cc';
+  primaryColor = '#1e90ff';
+  accentColor = '#00FF00';
   warnColor = '#FF0000';
   primaryColorPalette: Color[] = [];
   accentColorPalette: Color[] = [];
@@ -63,13 +63,25 @@ export class ColorsService {
   setColors(module: ApplicationModules, colorsData: ColorsData) {
     document.documentElement.style.setProperty('--z-status-ok', colorsData?.status.ok ?? Colors.GREEN);
     document.documentElement.style.setProperty('--z-status-warn', colorsData?.status.warn ?? Colors.ORANGE);
-    document.documentElement.style.setProperty('--z-status-alarm', colorsData?.status.alarm ?? Colors.REDORANGE);
+    document.documentElement.style.setProperty('--z-status-alarm', colorsData?.status.alarm ?? Colors.ORANGERED);
     document.documentElement.style.setProperty('--z-status-none', colorsData?.status.none ?? Colors.NONE);
     document.documentElement.style.setProperty('--z-page-shadow', colorsData?.page.shadow ?? Colors.GRAY);
     document.documentElement.style.setProperty('--z-fore', colorsData?.page.fore ?? Colors.CARBON);
     document.documentElement.style.setProperty('--z-fore-contrast', colorsData?.page.foreContrast ?? Colors.WHITE);
     document.documentElement.style.setProperty('--z-button-border', colorsData?.page.buttonBorderColor ?? Colors.SILVER);    
-    document.documentElement.style.setProperty('--z-primary', colorsData?.page.primary ?? Colors.GREEN);    
+    document.documentElement.style.setProperty('--z-primary', colorsData?.page.primary ?? Colors.PRIMARY);    
+    document.documentElement.style.setProperty('--z-disabled-color', colorsData?.page.disabled ?? Colors.GRAY);    
+    document.documentElement.style.setProperty('--z-border-color', colorsData?.page.border ?? Colors.SILVER);  
+    // Custom colors
+    document.documentElement.style.setProperty('--z-colors-white', colorsData?.fixedColors.white ?? Colors.WHITE);    
+    document.documentElement.style.setProperty('--z-colors-orange', colorsData?.fixedColors.orange ?? Colors.ORANGE);    
+    document.documentElement.style.setProperty('--z-colors-carbon', colorsData?.fixedColors.carbon ?? Colors.CARBON);    
+    document.documentElement.style.setProperty('--z-colors-blue', colorsData?.fixedColors.blue ?? Colors.BLUE);    
+    document.documentElement.style.setProperty('--z-colors-orangered', colorsData?.fixedColors.orangered ?? Colors.ORANGERED);    
+    document.documentElement.style.setProperty('--z-colors-green', colorsData?.fixedColors.orangered ?? Colors.GREEN);    
+    document.documentElement.style.setProperty('--z-colors-black', colorsData?.fixedColors.black ?? Colors.BLACK);    
+    document.documentElement.style.setProperty('--z-colors-red', colorsData?.fixedColors.red ?? Colors.RED);
+    document.documentElement.style.setProperty('--z-colors-dodgerblue', colorsData?.fixedColors.blue ?? Colors.DODGERBLUE); 
   }    
 
   getSettingsData(): Observable<ColorsData> {
