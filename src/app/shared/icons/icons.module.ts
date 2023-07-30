@@ -60,6 +60,13 @@ export class IconsModule {
       "small-locked",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/small_locked.svg")
     );
-    
+    iconRegistry.addSvgIcon(
+      "arrow-up",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_up.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "arrow-down",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_down.svg")
+    );
   }
 }

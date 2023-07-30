@@ -47,11 +47,13 @@
     $margin-bottom: 5px,
     $margin-left: 10px,
     $margin-right: 10px,
+    $color: var(--z-colors-page-border),
 ) {
     margin-top: $margin-top;
     margin-bottom: $margin-bottom;
     margin-left: $margin-left;
     margin-right: $margin-right;
+    border-color: $color;
 } 
 
 @mixin custom-fonts (

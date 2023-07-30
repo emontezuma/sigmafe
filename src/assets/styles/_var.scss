@@ -76,7 +76,7 @@ $dynamic-light-theme-background: (
   card:       white,
   dialog:     white,
   disabled-button: rgba(black, 0.12),
-  raised-button: white,
+  raised-button: var(--z-colors-white),
   focused-button: $dark-focused,
   selected-button: map_get($mat-grey, 300),
   selected-disabled-button: map_get($mat-grey, 400),

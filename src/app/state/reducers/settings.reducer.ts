@@ -7,7 +7,7 @@ export const initialState: SettingsState = {
   settingsData: {
     waitingColor: 'gray',
     okColor: 'green',
-    warningColor: 'orange',
+    warningColor: '.orange',
     alarmedColor: 'red',
     levelAlert: {
       useGeneral: null,

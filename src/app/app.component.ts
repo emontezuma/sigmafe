@@ -1,4 +1,4 @@
-import { Component, HostListener, ChangeDetectorRef } from '@angular/core';
+import { Component, HostListener, ChangeDetectorRef, AfterViewInit, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
@@ -19,7 +19,9 @@ import { RouterOutlet } from '@angular/router';
   animations: [ appearing, dissolve, downUp, ],
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements AfterViewInit {
+  @ViewChildren('mainProgressBar') mainProgressBar: QueryList<ElementRef>;  
+
   @HostListener('window:resize', ['$event'])
   onResize({ target } : any) {
     const { screen, outerHeight, innerHeight, outerWidth, innerWidth } = target;
@@ -120,7 +122,7 @@ export class AppComponent {
       this.calculateOutletPosition();   
     });
     this.sharedService.showScrollBar.subscribe((scrollBarData) => {
-      this.scrollBarData = scrollBarData;
+      this.scrollBarData = scrollBarData;        
     });
     this.sharedService.showToolbarWidth.subscribe((width) => {
       this.toolbarWidth = width + 60;
@@ -129,14 +131,22 @@ export class AppComponent {
       setTimeout(() => {
         this.progressBarData = progressBar;
         this.calculateOutletPosition();  
-      }, 0);      
+      }, 1000);      
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
     });
     this.handlerScreenSizeChange(null);
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
-   }
+  }
+
+  ngAfterViewInit(): void {
+    this.mainProgressBar.changes.subscribe((components: QueryList<ElementRef>) => {
+      components.forEach((component: any) => {
+        component._elementRef.nativeElement.style.setProperty('--mdc-linear-progress-track-color', 'white');     
+      })
+    });
+  }
  
 // Functions ================
   animationFinished(e: any) {    
@@ -146,8 +156,8 @@ export class AppComponent {
   }
 
   calculateOutletPosition() {
-    this.outletPosition = (48  + (this.progressBarData?.show ? 4 : 0)).toString() + 'px';
-    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 4 : 0) - (this.toolbarData.show && this.toolbarCurrentSize !== ScreenSizes.SMALL ? 64 : 0);
+    this.outletPosition = (48  + (this.progressBarData?.show ? 5 : 0)).toString() + 'px';
+    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 5 : 0) - (this.toolbarData.show && this.toolbarCurrentSize !== ScreenSizes.SMALL ? 64 : 0);
   }
 
   handlerScreenSizeChange(screen: Screen | null) {

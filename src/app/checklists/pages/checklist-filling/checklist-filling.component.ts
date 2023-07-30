@@ -8,12 +8,10 @@ import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/co
 import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ColorsService } from 'src/app/shared/services/colors.service';
 import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 
 @Component({
   selector: 'app-checklist-filling',
@@ -25,26 +23,27 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
   @ViewChild('checklistFilling') private moldsQueryList: ElementRef;  
   
-  valueToChart = 89;
+  valueToChart = 100;
+  panelOpenState: boolean[] = [];
   limits: SpinnerLimits[] = [];
   fonts: SpinnerFonts[] = [{
     start: 0,
-    finish: 99,
-    size: 2.3,
+    finish: 100,
+    size: 1.7,
     weight: 700,
   },{
-    start: 99,
+    start: 100,
     finish: 999,
-    size: 1.8,
+    size: 1.3,
     weight: 500,
   },{
     start: 999,
     finish: 0,
-    size: 1.4,
+    size: 1,
     weight: 300,
   }];
   smallFont: SmallFont = {
-    size: 1.4,
+    size: 1,
     weight: 300,
   }
   showPrefix = false;
@@ -59,6 +58,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;
+  alarmed: boolean = true;
+  currentTabIndex: number = 0;
   
   form = new FormGroup({
   });
@@ -66,12 +67,21 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private sharedService: SharedService,
-    private colorsService: ColorsService,
     public scrollDispatcher: ScrollDispatcher,
   ) { }
 
 // Hooks ====================
   ngOnInit(): void {
+    this.sharedService.setGeneralPreogressBar(
+      ApplicationModules.CHECKLIST_FILLING,
+      true,
+    );
+    setTimeout(() => {
+      this.sharedService.setGeneralPreogressBar(
+        ApplicationModules.CHECKLIST_FILLING,
+        false,
+      );
+    }, 1000)
     this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;
     });    
@@ -79,11 +89,11 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       this.profileData = profileData;
     });
     this.sharedService.setSearchBox(
-      ApplicationModules.MOLDS_HITS_VIEW,
+      ApplicationModules.CHECKLIST_FILLING,
       true,
     );
     this.sharedService.search.subscribe((searchBox) => {
-      if (searchBox.from === ApplicationModules.MOLDS_HITS_VIEW) {
+      if (searchBox.from === ApplicationModules.CHECKLIST_FILLING) {
         // this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
@@ -92,9 +102,6 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         // this.animateToolbar(null);
       }      
     }); 
-    this.store.select(selectColorsData).subscribe( colorsData => {
-      this.colorsService.setColors(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
-    });
     this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
@@ -166,7 +173,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: $localize`Guardar`,
       tooltip:  $localize`Guarda éste checklist`,
       icon: 'save',
-      primary: false,
+      class: 'primary',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -178,7 +185,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: $localize`Cancelar`,
       tooltip:  $localize`Cancela la edición éste checklist`,
       icon: 'cancel',
-      primary: false,
+      class: 'accent',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -190,7 +197,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: '',
       tooltip: '',
       icon: "",
-      primary: false,
+      class: '',
       iconSize: "",
       showIcon: true,
       showTooltip: true,
@@ -202,7 +209,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: $localize`Adjuntos`,
       tooltip: $localize`Gestionar adjuntos`,
       icon: 'attachment',
-      primary: false,
+      class: '',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -214,7 +221,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: '',
       tooltip: '',
       icon: "",
-      primary: false,
+      class: '',
       iconSize: "",
       showIcon: true,
       showTooltip: true,
@@ -226,7 +233,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       caption: $localize`Exportar`,
       tooltip: $localize`Exporta la vista`,
       icon: 'download',
-      primary: false,
+      class: 'accent',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -266,6 +273,10 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         status,
       );
     }
+  }
+
+  setTabIndex(e: any) {
+    this.currentTabIndex = e;
   }
 
 // End ======================

@@ -9,13 +9,11 @@ import { AppState } from '../../../state/app.state';
 import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ColorsService } from 'src/app/shared/services/colors.service';
 import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ProfileData } from 'src/app/shared/models/profile.models';
-import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 
 @Component({
   selector: 'app-molds-hits-counter',
@@ -46,12 +44,15 @@ export class MoldsHitsCounterComponent implements OnInit {
   constructor(
     private store: Store<AppState>,
     private sharedService: SharedService,
-    private colorsService: ColorsService,
     public scrollDispatcher: ScrollDispatcher,
   ) { }
 
 // Hooks ====================
   ngOnInit() {
+    this.sharedService.setGeneralScrollBar(
+      ApplicationModules.MOLDS_HITS_VIEW,
+      true,
+    );
     this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;
     });
@@ -87,9 +88,6 @@ export class MoldsHitsCounterComponent implements OnInit {
         // this.animationFinished(null);
       }      
     });    
-    this.store.select(selectColorsData).subscribe( colorsData => {
-      this.colorsService.setColors(ApplicationModules.MOLDS_HITS_VIEW, colorsData)
-    });
     this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
@@ -125,19 +123,15 @@ export class MoldsHitsCounterComponent implements OnInit {
 // Functions ================
   animationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
-    setTimeout(() => {
-      this.calcButtons();
-      this.sharedService.setToolbar(
-        ApplicationModules.MOLDS_HITS_VIEW,
-        true,
-        'toolbar-grid',
-        'divider',
-        this.buttons,
-      );
-      this.sharedService.setGeneralScrollBar(
-        ApplicationModules.MOLDS_HITS_VIEW,
-        true,
-      );
+      setTimeout(() => {
+        this.calcButtons();
+        this.sharedService.setToolbar(
+          ApplicationModules.MOLDS_HITS_VIEW,
+          true,
+          'toolbar-grid',
+          'divider',
+          this.buttons,
+        );
       }, 500);
     }
   }
@@ -148,7 +142,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       caption: $localize`Actualizar la vista`,
       tooltip:  $localize`Actualiza la vista`,
       icon: 'reload',
-      primary: false,
+      class: 'warn',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -160,7 +154,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       caption: '',
       tooltip: '',
       icon: "",
-      primary: false,
+      class: '',
       iconSize: "",
       showIcon: true,
       showTooltip: true,
@@ -172,7 +166,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       caption: $localize`Exportar`,
       tooltip: $localize`Exporta la vista`,
       icon: 'download',
-      primary: false,
+      class: '',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
@@ -184,7 +178,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       caption: '',
       tooltip: '',
       icon: "",
-      primary: false,
+      class: '',
       iconSize: "",
       showIcon: true,
       showTooltip: true,
@@ -196,7 +190,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       caption: '',
       tooltip: '',
       icon: '',
-      primary: false,
+      class: '',
       iconSize: '',
       showIcon: true,
       showTooltip: true,

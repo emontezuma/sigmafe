@@ -8,7 +8,7 @@ import { numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
 import { SharedService } from '../../../shared/services/shared.service';
-import { Colors, SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
+import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
 
 @Component({
   selector: 'app-mold-hits-counter',
@@ -95,7 +95,6 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
     })
   }
-  
 // Functions ================
   calcData() {
     this.elapsedTimeLabel = this.sharedService.labelElapsedTime(this.mold.lastHit?.date);

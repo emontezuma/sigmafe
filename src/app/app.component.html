@@ -37,7 +37,7 @@
             <button
                 *ngIf="button.type === 'button'"
                 mat-menu-item
-                class="button-normal"
+                class="toolbar-button-small"
                 aria-label="icon-button with menu icon"
                 [disabled]="button.disabled"
                 i18n-placeHolder
@@ -59,8 +59,11 @@
       </mat-menu>
     </mat-toolbar>
     <mat-progress-bar
-      *ngIf="progressBarData?.show"
-      mode="indeterminate"
+        *ngIf="progressBarData?.show"
+        mode="indeterminate"
+        color="accent"
+        class="progress"
+        #mainProgressBar
     >
     </mat-progress-bar>
     <mat-sidenav-container
@@ -75,10 +78,10 @@
         >
         <mat-nav-list>
           <cdk-accordion>
-            <mat-expansion-panel class="otroPanel" hideToggle expanded="true">
+            <mat-expansion-panel class="panel-main" hideToggle expanded="true">
               <mat-expansion-panel-header>
                 <mat-icon>published_with_changes</mat-icon>
-                <mat-panel-title class="acordion" i18n>OPERACIONES</mat-panel-title>
+                <mat-panel-title class="accordion" i18n>OPERACIONES</mat-panel-title>
               </mat-expansion-panel-header>
                 <a routerLink="molds"
                   mat-list-item
@@ -137,7 +140,7 @@
           cdkScrollable
           class="page-content"
           [style.height.px]="allHeight"
-          [ngClass]="{ 'noOverflow': !scrollBarData.show, 'withOverflow': scrollBarData.show }"        
+          
         >
         <!--<div class="page-content">-->
           <router-outlet #outlet="outlet"></router-outlet>            
@@ -161,7 +164,6 @@
     </mat-sidenav-container>
     <mat-toolbar
       class="footer"
-      color="accent"
     >
       <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
       <span class="example-spacer"></span>

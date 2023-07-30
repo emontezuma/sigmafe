@@ -4,11 +4,12 @@
             #toolbarBox
             [ngClass]="toolbar.toolbarClass"
         >
-            <div class="toolbar-button" *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
+            <div class="toolbar-button-container" *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
                 <button
                     *ngIf="button.type === 'button'"
-                    mat-button                        
-                    class="button-normal"
+                    mat-button                    
+                    class="toolbar-button"    
+                    [ngClass]="[ button.class ]"
                     aria-label="icon-button with menu icon"
                     [matTooltipDisabled]="!button.showTooltip"
                     [matTooltip]="button.tooltip"
@@ -22,7 +23,7 @@
                         [svgIcon]="button.icon"
                     >                            
                     </mat-icon>
-                    <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>                    
+                    <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
                 </button>
                 <mat-divider
                     *ngIf="button.type === 'divider'"

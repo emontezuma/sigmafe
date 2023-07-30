@@ -6,6 +6,7 @@ import { loadSettingsData } from '../../app/state/actions/settings.actions';
 import { selectLoadingSettingsState } from '../state/selectors/settings.selectors';
 import { loadColorsData } from '../state/actions/colors.actions';
 import { selectLoadingColorsState } from '../state/selectors/colors.selectors';
+import { ColorsService } from 'src/app/shared/services/colors.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class ConfigService {
  
   constructor(
     private store: Store<AppState>,
+    private colorsService: ColorsService,
   ) { }
 
 // Functions ================
@@ -38,11 +40,12 @@ export class ConfigService {
       });
       this.store.select(selectLoadingColorsState).subscribe((loading) => {
         if (!loading) {
+          this.colorsService.setColors();
           this.processesFinished = this.processesFinished + 1;
           if (this.processesFinished === 2) {
             clearTimeout(this.controlTimer);
             resolve(true);
-          }          
+          }
         }
       });
     }); 

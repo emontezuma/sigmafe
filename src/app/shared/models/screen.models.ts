@@ -26,7 +26,7 @@ export interface ToolbarButtons  {
     tooltip: string;
     icon: string;
     iconSize: string;
-    primary: boolean;
+    class: string;
     disabled: boolean;
     locked: boolean;
     showCaption: boolean;

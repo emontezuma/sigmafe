@@ -20,7 +20,7 @@ export class SpinnerComponent implements OnChanges {
 
 // Variables ================
   metterClass: string = '';
-  progressBarColor: string = Colors.GREEN;
+  progressBarColor: string = Colors.green;
   valueToShow: string = '';
   previousValue: string = '';
   fontColor: string = '';
@@ -38,8 +38,8 @@ export class SpinnerComponent implements OnChanges {
     if (+this.previousValue === this.value && this.previousValue !== '') {
       return;
     }
-    let selectedFontColor:string = Colors.CARBON;
-    let selectedBarColor:string = Colors.GREEN;
+    let selectedFontColor:string = Colors.carbon;
+    let selectedBarColor:string = Colors.green;
     if (this.limits.length > 0) {
       for (let [index, limit] of this.limits.entries()) {
         if (this.value >= limit.start && this.value < limit.finish || limit.finish === 0) {
@@ -55,7 +55,7 @@ export class SpinnerComponent implements OnChanges {
     if (this.fonts.length === 0) {
       this.fontSize = '1.5rem';
       this.fontWeight = '300';
-      this.fontColor = Colors.CARBON;
+      this.fontColor = Colors.carbon;
     } else {
       for (let font of this.fonts) {
         if (this.value >= font.start && this.value < font.finish || font.finish === 0) {

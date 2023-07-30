@@ -1,5 +1,6 @@
 import { MoldsHitsQueryData } from '../molds/models/molds.models'
 import { SettingsData } from '../shared/models/settings.models'
+import { colorsReducer } from '../state/reducers/colors.reducer'
 import { ColorsData, Colors } from './models/colors.models'
 import { ProfileData } from './models/profile.models'
 import { ColorsService } from './services/colors.service'
@@ -409,7 +410,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
 }
 
 export const sampleSettings: SettingsData = {
-    waitingColor: "lightgray",
+    waitingColor: ".lightgrey",
     okColor: '#229954',
     warningColor: "#F5B041",
     alarmedColor: "#E74C3C",
@@ -437,32 +438,28 @@ export const sampleColors: ColorsData = {
     fixed: "S",
     selected: "S",
     status: {
-        ok: Colors.GREEN,
-        warn: Colors.ORANGE,
-        alarm: Colors.ORANGERED,
-        none: Colors.NONE,
+        ok: Colors.green,
+        warn: Colors.orange,
+        alarm: Colors.orangered,
+        none: Colors.none,
     },
     page: {
-        fore: Colors.CARBON,
-        background: Colors.WHITE,
-        foreContrast: Colors.WHITE,        
-        shadow: Colors.GRAY,
-        buttonBorderColor: Colors.SILVER,
-        border: Colors.SILVER,
-        disabled: Colors.SILVER,
-        primary: Colors.PRIMARY,
-        none: Colors.NONE,
-    },
-    fixedColors: {
-        white: Colors.WHITE,
-        carbon: Colors.CARBON,    
-        red: Colors.ORANGERED,    
-        green: Colors.GREEN,    
-        gray: Colors.GRAY,
-        blue: Colors.BLUE,
-        orangered: Colors.ORANGERED,
-        dodgerblue: Colors.DODGERBLUE,
-        orange: Colors.ORANGE,
-        black: Colors.BLACK,
-    }
+        fore: Colors.carbon,
+        background: Colors.white,
+        foreContrast: Colors.white,        
+        shadow: Colors.lightgrey,
+        buttonBorderColor: Colors.gray,
+        buttonDisabledBorderColor: Colors.lightgrey,
+        buttonNormalBackgroundColor: Colors.white,
+        footerFore: undefined,
+        footerBackground: undefined,
+        palettePrimaryColor: '#1e90ff',
+        paletteWarnColor: Colors.orangered,
+        paletteAccentColor: Colors.green,
+        border: Colors.silver,
+        disabled: Colors.silver,
+        cardBackgroundColor: Colors.white,
+        backgroundColor: Colors.whitesmoke,
+        none: Colors.none,
+    },    
 }

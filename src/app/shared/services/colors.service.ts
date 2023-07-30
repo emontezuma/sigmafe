@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, of } from 'rxjs';
 
+import { Store } from '@ngrx/store';
 import { sampleColors } from '../../shared/sample-data';
 import { Colors, ColorsData } from '../../shared/models/colors.models';
 
 import tinycolor from 'tinycolor2';
 import { ApplicationModules } from '../models/screen.models';
-import { ColorVariable } from '../models/colors.models';
+import { AppState } from 'src/app/state/app.state';
+import { selectColorsData } from 'src/app/state/selectors/colors.selectors';
 
 export interface Color {
   name: string;
@@ -20,68 +22,75 @@ export interface Color {
 export class ColorsService {
 
 // Variables ===============
-  primaryColor = '#1e90ff';
-  accentColor = '#00FF00';
-  warnColor = '#FF0000';
-  primaryColorPalette: Color[] = [];
-  accentColorPalette: Color[] = [];
-  warnColorPalette: Color[] = [];
+  primaryColor: string = '#1e90ff'
   fakeColorsData: ColorsData = sampleColors;
   data$: BehaviorSubject<ColorsData> = new BehaviorSubject(sampleColors);
 
-  constructor() {
-    this.savePrimaryColor();
-    this.saveAccentColor();
-    this.saveWarnColor();
-  }
+  constructor(
+    private store: Store<AppState>,
+  ) {}
 
 // Functions ================
-  savePrimaryColor() {
-    this.primaryColorPalette = computeColors(this.primaryColor);
-    updateTheme(this.primaryColorPalette, 'primary');
-  }
-
-  saveAccentColor() {
-    this.accentColorPalette = computeColors(this.accentColor);
-    updateTheme(this.accentColorPalette, 'accent');
-  }
-
-  saveWarnColor() {
-    this.warnColorPalette = computeColors(this.warnColor);
-    updateTheme(this.warnColorPalette, 'warn');
-  }
-
-  saveOtherColors() {
-    this.accentColorPalette = computeColors(this.warnColor);
-    updateTheme(this.warnColorPalette, 'warn');
-  }
-
+  setColors() {
+    this.store.select(selectColorsData).subscribe( colorsData => {
+      const accentColor = '#00FF00';
+      const warnColor = '#FF0000';
+      updateTheme(computeColors(colorsData.page.palettePrimaryColor ?? this.primaryColor), 'primary');
+      updateTheme(computeColors(colorsData.page.paletteWarnColor ?? warnColor), 'warn');
+      updateTheme(computeColors(colorsData.page.paletteAccentColor ?? accentColor), 'accent');
+      this.fillVariables(colorsData);
+    });
+  };
+  
   saveSpecificColor(variableName: string, value: string) {
     document.documentElement.style.setProperty(variableName, value);
   }
 
-  setColors(module: ApplicationModules, colorsData: ColorsData) {
-    document.documentElement.style.setProperty('--z-status-ok', colorsData?.status.ok ?? Colors.GREEN);
-    document.documentElement.style.setProperty('--z-status-warn', colorsData?.status.warn ?? Colors.ORANGE);
-    document.documentElement.style.setProperty('--z-status-alarm', colorsData?.status.alarm ?? Colors.ORANGERED);
-    document.documentElement.style.setProperty('--z-status-none', colorsData?.status.none ?? Colors.NONE);
-    document.documentElement.style.setProperty('--z-page-shadow', colorsData?.page.shadow ?? Colors.GRAY);
-    document.documentElement.style.setProperty('--z-fore', colorsData?.page.fore ?? Colors.CARBON);
-    document.documentElement.style.setProperty('--z-fore-contrast', colorsData?.page.foreContrast ?? Colors.WHITE);
-    document.documentElement.style.setProperty('--z-button-border', colorsData?.page.buttonBorderColor ?? Colors.SILVER);    
-    document.documentElement.style.setProperty('--z-primary', colorsData?.page.primary ?? Colors.PRIMARY);    
-    document.documentElement.style.setProperty('--z-disabled-color', colorsData?.page.disabled ?? Colors.GRAY);    
-    document.documentElement.style.setProperty('--z-border-color', colorsData?.page.border ?? Colors.SILVER);  
+  fillVariables(colorsData: ColorsData) {
+    document.documentElement.style.setProperty('--z-colors-status-ok', colorsData?.status.ok ?? Colors.green);
+    document.documentElement.style.setProperty('--z-colors-status-warn', colorsData?.status.warn ?? Colors.orange);
+    document.documentElement.style.setProperty('--z-colors-status-alarm', colorsData?.status.alarm ?? Colors.orangered);
+    document.documentElement.style.setProperty('--z-colors-status-none', colorsData?.status.none ?? Colors.none);
+    document.documentElement.style.setProperty('--z-colors-page-shadow', colorsData?.page.shadow ?? Colors.lightgrey);
+    document.documentElement.style.setProperty('--z-colors-page-fore', colorsData?.page.fore ?? Colors.carbon);
+    document.documentElement.style.setProperty('--z-colors-page-fore-contrast', colorsData?.page.foreContrast ?? Colors.white);
+
+    // Computed colors
+    let colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
+    document.documentElement.style.setProperty('--z-colors-page-button-border', colorsData?.page.buttonBorderColor ?? colorToUse);    
+    document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page.buttonDisabledBorderColor ?? Colors.lightgrey);
+    document.documentElement.style.setProperty('--z-colors-page-primary', colorsData?.page.palettePrimaryColor ?? Colors.primary);    
+    document.documentElement.style.setProperty('--z-colors-page-disabled-color', colorsData?.page.disabled ?? Colors.gray);    
+    document.documentElement.style.setProperty('--z-colors-page-border', colorsData?.page.border ?? Colors.silver);  
+    document.documentElement.style.setProperty('--z-colors-page-card-background-color', colorsData?.page.cardBackgroundColor ?? Colors.whitesmoke);
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-50');
+    document.documentElement.style.setProperty('--z-colors-page-background-color', colorsData?.page.backgroundColor ?? colorToUse);
+    
+    // Buttons
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
+    document.documentElement.style.setProperty('--z-colors-page-button-normal-background-color', colorsData.page.buttonNormalBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-button-normal-fore-color', colorsData?.page.fore ?? Colors.carbon);
+    
+    //Footer
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-contrast-500');
+    document.documentElement.style.setProperty('--z-colors-page-footer-fore-color', colorsData.page.footerFore ?? colorToUse);
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-500');
+    document.documentElement.style.setProperty('--z-colors-page-footer-background-color', colorsData.page.footerBackground ?? colorToUse);
+
     // Custom colors
-    document.documentElement.style.setProperty('--z-colors-white', colorsData?.fixedColors.white ?? Colors.WHITE);    
-    document.documentElement.style.setProperty('--z-colors-orange', colorsData?.fixedColors.orange ?? Colors.ORANGE);    
-    document.documentElement.style.setProperty('--z-colors-carbon', colorsData?.fixedColors.carbon ?? Colors.CARBON);    
-    document.documentElement.style.setProperty('--z-colors-blue', colorsData?.fixedColors.blue ?? Colors.BLUE);    
-    document.documentElement.style.setProperty('--z-colors-orangered', colorsData?.fixedColors.orangered ?? Colors.ORANGERED);    
-    document.documentElement.style.setProperty('--z-colors-green', colorsData?.fixedColors.orangered ?? Colors.GREEN);    
-    document.documentElement.style.setProperty('--z-colors-black', colorsData?.fixedColors.black ?? Colors.BLACK);    
-    document.documentElement.style.setProperty('--z-colors-red', colorsData?.fixedColors.red ?? Colors.RED);
-    document.documentElement.style.setProperty('--z-colors-dodgerblue', colorsData?.fixedColors.blue ?? Colors.DODGERBLUE); 
+    document.documentElement.style.setProperty('--z-colors-white', Colors.white);    
+    document.documentElement.style.setProperty('--z-colors-orange', Colors.orange);    
+    document.documentElement.style.setProperty('--z-colors-carbon', Colors.carbon);    
+    document.documentElement.style.setProperty('--z-colors-blue', Colors.blue);    
+    document.documentElement.style.setProperty('--z-colors-orangered', Colors.orangered);    
+    document.documentElement.style.setProperty('--z-colors-green', Colors.green);    
+    document.documentElement.style.setProperty('--z-colors-black', Colors.black);    
+    document.documentElement.style.setProperty('--z-colors-red', Colors.red);
+    document.documentElement.style.setProperty('--z-colors-dodgerblue', Colors.dodgerblue); 
+    document.documentElement.style.setProperty('--z-colors-none', Colors.none);
+
+    // Colors needed in RGB to apply some alpha gradient
+    document.documentElement.style.setProperty('--z-colors-page-button-border-rgb', hexToRgb(this.primaryColor));
   }    
 
   getSettingsData(): Observable<ColorsData> {
@@ -91,6 +100,7 @@ export class ColorsService {
   }
 }
 
+// Outer functions
 function updateTheme(colors: Color[], theme: string) {
   colors.forEach(color => {
     document.documentElement.style.setProperty(
@@ -130,5 +140,19 @@ function getColorObject(value: any, name: string): Color {
     hex: c.toHexString(),
     darkContrast: c.isLight()
   };
+}
+
+function componentToHex(c: any) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r: any, g: any, b: any) {
+  return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+function hexToRgb(hex: any) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : null;
 }
 // End ======================

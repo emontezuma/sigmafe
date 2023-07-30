@@ -6,50 +6,50 @@
 }
 
 .meter-0 {
-    border-color: var(--z-page-shadow) !important;    
+    border-color: var(--z-colors-page-shadow) !important;    
 }
 
 .meter-1 {
-    border-color: var(--z-status-ok) !important;    
+    border-color: var(--z-colors-status-ok) !important;    
 }
 
 .meter-2 {
-    border-color: var(--z-status-warn) !important;    
+    border-color: var(--z-colors-status-warn) !important;    
 }
 
 .meter-3 {    
-    border-color: var(--z-status-alarm) !important;    
+    border-color: var(--z-colors-status-alarm) !important;    
 }
 
 .meter-10 {
-    background-color: var(--z-status-none);    
+    background-color: var(--z-colors-status-none);    
 }
 
 .meter-11 {
-    background-color: var(--z-status-alarm);    
+    background-color: var(--z-colors-status-alarm);    
 }
 
 .meter-20 {
-    color: var(--z-fore-contrast);    
+    color: var(--z-colors-page-fore-contrast);    
 }
 
 .meter-21 {
-    color: var(--z-fore);    
+    color: var(--z-colors-page-fore);    
 }
 
 .meter-30 {
-    outline-color: var(--z-fore-shadow) !important;
-    color: var(--z-fore-shadow) !important;
+    outline-color: var(--z-colors-page-fore-shadow) !important;
+    color: var(--z-colors-page-fore-shadow) !important;
 }
 
 .meter-31 {
-    outline-color: var(--z-status-alarm) !important;
-    color: var(--z-status-alarm) !important;
+    outline-color: var(--z-colors-status-alarm) !important;
+    color: var(--z-colors-status-alarm) !important;
 }
 
 .meter-32 {
-    outline-color: var(--z-status-ok) !important;
-    color: var(--z-status-ok) !important;
+    outline-color: var(--z-colors-status-ok) !important;
+    color: var(--z-colors-status-ok) !important;
 }
 
 .title {
@@ -164,7 +164,7 @@ mat-card-title {
     padding-left: 2px;    
     padding-right: 4px;
     border-radius: 8px 0px;
-    outline: 2px solid var(--z-border-color);    
+    outline: 2px solid var(--z-colors-page-border);    
 }
 
 .progress {

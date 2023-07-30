@@ -3,33 +3,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: auto;
 }
 
 .meter-0 {
-    color: var(--z-primary);
+    color: var(--z-colors-page-primary);
     ::ng-deep circle {
-        stroke: var(--z-primary);    
+        stroke: var(--z-colors-page-primary);    
     }
 }
 
 .meter-1 {
-    color: var(--z-status-ok);
+    color: var(--z-colors-status-ok);
     ::ng-deep circle {
-        stroke: var(--z-status-ok);    
+        stroke: var(--z-colors-status-ok);    
     }
 }
 
 .meter-2 {
-    color: var(--z-status-warn);
+    color: var(--z-colors-status-warn);
     ::ng-deep circle {
-        stroke: var(--z-status-warn);
+        stroke: var(--z-colors-status-warn);
     }
 }
 
 .meter-3 {
-    color: var(--z-status-alarm);
+    color: var(--z-colors-status-alarm);
     ::ng-deep circle {
-        stroke: var(--z-status-alarm);
+        stroke: var(--z-colors-status-alarm);
     }
 }
 
