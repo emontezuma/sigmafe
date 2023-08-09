@@ -7,6 +7,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ChecklistsRoutingModule } from './checklists-routing.module';
 import { SpinnerModule } from '../shared/components/spinner/spinner.module';
+import { LabelEllipsisModule } from '../shared/components/label-ellipsis/label-ellipsis.module';
 import { IconsModule } from '../shared/icons/icons.module';
 
 @NgModule({
@@ -22,6 +23,7 @@ import { IconsModule } from '../shared/icons/icons.module';
     NgxSkeletonLoaderModule.forRoot(),
     SpinnerModule,
     IconsModule,
+    LabelEllipsisModule,
   ]
 })
 export class ChecklistsModule { }

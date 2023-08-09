@@ -25,12 +25,14 @@
     $wrap: wrap, 
     $gap: 10px, 
     $justify-content: space-evenly,
+    $align-items: center,
 ) {
     display: flex;
     flex-direction: $direction;    
     flex-wrap: $wrap;
     gap: $gap;
     justify-content: $justify-content;
+    align-items: $align-items;
 }
 
 @mixin text-ellipsis (
@@ -46,14 +48,18 @@
     $margin-top: 5px, 
     $margin-bottom: 5px,
     $margin-left: 10px,
-    $margin-right: 10px,
+    $margin-right: 10px,        
     $color: var(--z-colors-page-border),
+    $height: 1px,
+    $width: -webkit-fill-available,
 ) {
     margin-top: $margin-top;
     margin-bottom: $margin-bottom;
     margin-left: $margin-left;
-    margin-right: $margin-right;
+    margin-right: $margin-right;        
     border-color: $color;
+    height: $height;
+    width: $width;    
 } 
 
 @mixin custom-fonts (

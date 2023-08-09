@@ -35,9 +35,9 @@ export class ColorsService {
     this.store.select(selectColorsData).subscribe( colorsData => {
       const accentColor = '#00FF00';
       const warnColor = '#FF0000';
-      updateTheme(computeColors(colorsData.page.palettePrimaryColor ?? this.primaryColor), 'primary');
-      updateTheme(computeColors(colorsData.page.paletteWarnColor ?? warnColor), 'warn');
-      updateTheme(computeColors(colorsData.page.paletteAccentColor ?? accentColor), 'accent');
+      updateTheme(computeColors(colorsData.page?.palettePrimaryColor ?? this.primaryColor), 'primary');
+      updateTheme(computeColors(colorsData.page?.paletteWarnColor ?? warnColor), 'warn');
+      updateTheme(computeColors(colorsData.page?.paletteAccentColor ?? accentColor), 'accent');
       this.fillVariables(colorsData);
     });
   };
@@ -51,31 +51,31 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-status-warn', colorsData?.status.warn ?? Colors.orange);
     document.documentElement.style.setProperty('--z-colors-status-alarm', colorsData?.status.alarm ?? Colors.orangered);
     document.documentElement.style.setProperty('--z-colors-status-none', colorsData?.status.none ?? Colors.none);
-    document.documentElement.style.setProperty('--z-colors-page-shadow', colorsData?.page.shadow ?? Colors.lightgrey);
-    document.documentElement.style.setProperty('--z-colors-page-fore', colorsData?.page.fore ?? Colors.carbon);
-    document.documentElement.style.setProperty('--z-colors-page-fore-contrast', colorsData?.page.foreContrast ?? Colors.white);
+    document.documentElement.style.setProperty('--z-colors-page-shadow', colorsData?.page?.shadow ?? Colors.whitesmoke);
+    document.documentElement.style.setProperty('--z-colors-page-fore', colorsData?.page?.fore ?? Colors.carbon);
+    document.documentElement.style.setProperty('--z-colors-page-fore-contrast', colorsData?.page?.foreContrast ?? Colors.white);
 
     // Computed colors
     let colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
-    document.documentElement.style.setProperty('--z-colors-page-button-border', colorsData?.page.buttonBorderColor ?? colorToUse);    
-    document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page.buttonDisabledBorderColor ?? Colors.lightgrey);
-    document.documentElement.style.setProperty('--z-colors-page-primary', colorsData?.page.palettePrimaryColor ?? Colors.primary);    
-    document.documentElement.style.setProperty('--z-colors-page-disabled-color', colorsData?.page.disabled ?? Colors.gray);    
-    document.documentElement.style.setProperty('--z-colors-page-border', colorsData?.page.border ?? Colors.silver);  
-    document.documentElement.style.setProperty('--z-colors-page-card-background-color', colorsData?.page.cardBackgroundColor ?? Colors.whitesmoke);
+    document.documentElement.style.setProperty('--z-colors-page-button-border', colorsData?.page?.buttonBorderColor ?? colorToUse);    
+    document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page?.buttonDisabledBorderColor ?? Colors.lightgrey);
+    document.documentElement.style.setProperty('--z-colors-page-primary', colorsData?.page?.palettePrimaryColor ?? Colors.primary);    
+    document.documentElement.style.setProperty('--z-colors-page-disabled-color', colorsData?.page?.disabled ?? Colors.gray);    
+    document.documentElement.style.setProperty('--z-colors-page-border', colorsData?.page?.border ?? Colors.silver);  
+    document.documentElement.style.setProperty('--z-colors-page-card-background-color', colorsData?.page?.cardBackgroundColor ?? Colors.whitesmoke);
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-50');
-    document.documentElement.style.setProperty('--z-colors-page-background-color', colorsData?.page.backgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-background-color', colorsData?.page?.backgroundColor ?? colorToUse);
     
     // Buttons
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
-    document.documentElement.style.setProperty('--z-colors-page-button-normal-background-color', colorsData.page.buttonNormalBackgroundColor ?? colorToUse);
-    document.documentElement.style.setProperty('--z-colors-page-button-normal-fore-color', colorsData?.page.fore ?? Colors.carbon);
+    document.documentElement.style.setProperty('--z-colors-page-button-normal-background-color', colorsData.page?.buttonNormalBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-button-normal-fore-color', colorsData?.page?.fore ?? Colors.carbon);
     
     //Footer
     colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-contrast-500');
-    document.documentElement.style.setProperty('--z-colors-page-footer-fore-color', colorsData.page.footerFore ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-footer-fore-color', colorsData.page?.footerFore ?? colorToUse);
     colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-500');
-    document.documentElement.style.setProperty('--z-colors-page-footer-background-color', colorsData.page.footerBackground ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-footer-background-color', colorsData.page?.footerBackground ?? colorToUse);
 
     // Custom colors
     document.documentElement.style.setProperty('--z-colors-white', Colors.white);    

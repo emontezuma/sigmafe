@@ -12,6 +12,7 @@ import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-checklist-filling',
@@ -23,7 +24,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
   @ViewChild('checklistFilling') private moldsQueryList: ElementRef;  
   
-  valueToChart = 100;
+  valueToChart = 32;
   panelOpenState: boolean[] = [];
   limits: SpinnerLimits[] = [];
   fonts: SpinnerFonts[] = [{
@@ -60,49 +61,61 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   loaded: boolean = false;
   alarmed: boolean = true;
   currentTabIndex: number = 0;
+  scrollSubscriber: Subscription;
+  settingDataSubscriber: Subscription;
+  profileDataSubscriber: Subscription;
+  searchBoxSubscriber: Subscription;
+  showGoTopSubscriber: Subscription;
   
   form = new FormGroup({
   });
 
   constructor(
     private store: Store<AppState>,
-    private sharedService: SharedService,
+    public sharedService: SharedService,
     public scrollDispatcher: ScrollDispatcher,
   ) { }
 
 // Hooks ====================
   ngOnInit(): void {
-    this.sharedService.setGeneralPreogressBar(
-      ApplicationModules.CHECKLIST_FILLING,
-      true,
-    );
+    // Settings
     setTimeout(() => {
       this.sharedService.setGeneralPreogressBar(
         ApplicationModules.CHECKLIST_FILLING,
         false,
       );
     }, 1000)
-    this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData;
-    });    
-    this.store.select(selectProfileData).subscribe( profileData => {
-      this.profileData = profileData;
-    });
+    this.sharedService.setGeneralPreogressBar(
+      ApplicationModules.CHECKLIST_FILLING,
+      true,
+    );
     this.sharedService.setSearchBox(
       ApplicationModules.CHECKLIST_FILLING,
       true,
     );
+    this.sharedService.setGeneralLoading(
+      ApplicationModules.CHECKLIST_FILLING,
+      true,
+    );
+    
+    // Subscriptions
+    this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
+      this.settingsData = settingsData;
+    });    
+    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
+      this.profileData = profileData;
+    });
     this.sharedService.search.subscribe((searchBox) => {
       if (searchBox.from === ApplicationModules.CHECKLIST_FILLING) {
         // this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
-    this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
+    this.searchBoxSubscriber = this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
       if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
         // this.animateToolbar(null);
       }      
     }); 
-    this.sharedService.showGoTop.subscribe((goTop) => {
+    this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
         this.moldsQueryList.nativeElement.scrollIntoView({
@@ -111,15 +124,11 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         // Ensure
       }      
     });
-    this.scrollDispatcher
+    this.scrollSubscriber = this.scrollDispatcher
     .scrolled()
     .subscribe((data: any) => {      
       this.getScrolling(data);
-    });
-    this.sharedService.setGeneralLoading(
-      ApplicationModules.CHECKLIST_FILLING,
-      true,
-    );    
+    });        
     // this.store.dispatch(loadMoldsHitsQueryData());    
   }
 
@@ -142,8 +151,16 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       ApplicationModules.CHECKLIST_FILLING,
       false,
     );
+    // Turn off the subscriptions
+    if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
+    if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
+    if (this.profileDataSubscriber) this.profileDataSubscriber.unsubscribe();
+    if (this.searchBoxSubscriber) this.searchBoxSubscriber.unsubscribe();
+    if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
   }
+
 // Functions ================
+
   animationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
@@ -151,8 +168,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         this.sharedService.setToolbar(
           ApplicationModules.CHECKLIST_FILLING,
           true,
-          'toolbar-grid-adjusted',
-          'divider-adjusted',
+          'toolbar-grid',
+          'divider',
           this.buttons,
         );
         this.sharedService.setGeneralScrollBar(
@@ -240,6 +257,18 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       locked: false,
       showCaption: true,
       disabled: false,
+    },{
+      type: 'searchbox',
+      caption: '',
+      tooltip: '',
+      icon: '',
+      class: '',
+      iconSize: '',
+      showIcon: true,
+      showTooltip: true,
+      locked: false,
+      showCaption: true,
+      disabled: true,
     },];
   }
 
@@ -247,7 +276,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     return index; 
   }
 
-  getScrolling(data: CdkScrollable) {   
+  getScrolling(data: CdkScrollable) {       
     const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
     let status = 'inactive'
     if (scrollTop < 5) {

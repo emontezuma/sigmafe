@@ -6,16 +6,20 @@ html, body {
   font-size: 12px;
   color: var(--z-colors-page-fore);
   overflow: hidden;
-}
-
-:root {
-    --fore-color : var(--z-colors-carbon);
-    --primary-fore-color : var(--z-colors-white);
-    --primary-background-color: var(--z-colors-dodgercolor);
+  background-color: var(mo);
 }
 
 body { 
-  margin: 0; 
+    margin: 0; 
+    .mat-mdc-tooltip {
+        --mdc-plain-tooltip-supporting-text-size: 16px;     
+        --mdc-plain-tooltip-container-color: var(--z-colors-white); 
+        --mdc-plain-tooltip-supporting-text-color: var(--z-colors-fore);
+        --mdc-plain-tooltip-supporting-text-weight: 400;
+        --mdc-plain-tooltip-supporting-text-tracking: 0.0333333333em;
+
+        line-height: 16px;
+    }
 }
 
 .close-icon {
@@ -28,16 +32,17 @@ body {
 }
 
 .tooltip-general {
-  font-size: 2rem !important;
-  background-color: var(--z-colors-red) !important;  
-  border: 2px solid var(--z-colors-red) !important;
-  color: var(--z-colors-white) !important;
+  border: 3px solid var(--z-colors-carbon);
   border-radius: 4px;
-  white-space: pre-line;
+  max-width: unset !important;
+}
+
+.mdc-tooltip__surface {
+  max-width: unset !important;
 }
 
 ::-webkit-scrollbar {
-    width: 20px;
+    width: 18px;
     height: 16px;
 }
 
@@ -104,8 +109,9 @@ mat-icon {
 
 .toolbar-button:hover:not(.toolbar-button.primary, .toolbar-button.warn, .toolbar-button.accent) {
   animation: pulse 0.5s;
-  box-shadow: 0 0 0 0.4em rgba(#fff,0);
+  box-shadow: 0 0 0 0.5em rgba(#fff,0);
   color: var(--theme-primary-500) !important;
+  border-color: var(--theme-primary-500) !important;  
   mat-icon {
     color: var(--theme-primary-500) !important;
   }
@@ -113,22 +119,22 @@ mat-icon {
 
 .toolbar-button:hover:not(.toolbar-button.warn, .toolbar-button.primary, .toolbar-button.accent) {
   animation: pulse 0.5s;
-  box-shadow: 0 0 0 0.4em rgba(#fff,0);
+  box-shadow: 0 0 0 0.5em rgba(#fff,0);
 }
 
 .toolbar-button.warn:hover {
   animation: pulse-warn 0.5s;
-  box-shadow: 0 0 0 0.4em rgba(#fff,0);
+  box-shadow: 0 0 0 0.5em rgba(#fff,0);
 }
 
 .toolbar-button.primary:hover {
   animation: pulse-primary 0.5s;
-  box-shadow: 0 0 0 0.4em rgba(#fff,0);
+  box-shadow: 0 0 0 0.5em rgba(#fff,0);
 }
 
 .toolbar-button.accent:hover {
   animation: pulse-accent 0.5s;
-  box-shadow: 0 0 0 0.4em rgba(#fff,0);
+  box-shadow: 0 0 0 0.5em rgba(#fff,0);
 }
 
 .toolbar-button.warn:not(:disabled) {
@@ -182,7 +188,7 @@ button:disabled {
 }
 
 @keyframes pulse {
-  0% { box-shadow: 0 0 0 0 var(--z-colors-page-button-border); }
+  0% { box-shadow: 0 0 0 0 var(--theme-primary-500); }
 }
 
 @keyframes pulse-warn {

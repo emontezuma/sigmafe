@@ -1,0 +1,12 @@
+<div
+    #tooltip
+    class="label-with-ellipsis"
+    [matTooltip]="label"
+    matTooltipClass = "tooltip-general"
+    matTooltipPosition="below"
+    matTooltipShowDelay = "100"
+    [ngStyle]="{ '-webkit-line-clamp': lines }"
+    [matTooltipDisabled]="activateTooltip(tooltip)"                                                        
+>
+    {{ label }}
+</div>

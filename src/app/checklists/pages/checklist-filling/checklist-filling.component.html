@@ -1,7 +1,6 @@
 <div
     class="container"
     #checklistFilling
-    cdkScrollable
     @routingAnimation
     (@routingAnimation.done)="animationFinished($event)"
 >
@@ -23,7 +22,10 @@
             </ng-template>
             <ng-template matTabContent>
                 <div class="tabs tab-general-info">
-                    <mat-card class="card">
+                    <mat-card
+                        class="card"
+                        i18n
+                    >
                         <mat-progress-bar
                             *ngIf="alarmed"
                             mode="indeterminate"
@@ -32,181 +34,342 @@
                             class="progress"
                         >
                         </mat-progress-bar>
-                        <mat-card-header>
-                            <div class="layout">
-                                <div class="grid">
+                        <div class="layout">
+                            <div class="grid-multiple by-row">
+                                <div class="grid-multiple">
                                     <div>         
                                         <mat-card-title>133,030</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Folio Número
-                                        </mat-card-subtitle>
+                                        <mat-card-subtitle class="label">Folio Número</mat-card-subtitle>
                                     </div>
                                     <div>
                                     <mat-card-title>ACTIVO / AL DIA</mat-card-title>
-                                    <mat-card-subtitle
-                                        i18n
-                                        class="label"
-                                    >
-                                        Estatus del checklist
-                                    </mat-card-subtitle>
-                                    </div>
-                                    <div class="checklist-progress">
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label-progress"
-                                        >
-                                            Avance
-                                        </mat-card-subtitle>
-                                        <app-spinner
-                                            class="spinner"
-                                            [diameter]="50"
-                                            [value]="valueToChart"
-                                            [showBackgound]="true"
-                                            [suffix]="'%'"
-                                            [limits]="limits"
-                                            [fonts]="fonts"
-                                            [exhaustedValue]="'999'"
-                                            [prefix]="'>'"
-                                            [showPrefix]="showPrefix"
-                                            [smallFont]="smallFont"
-                                        ></app-spinner>                        
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label-progress"
-                                        >
-                                            21 de 32
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div class="checklist-name">
-                                        <mat-card-title>CHECKLIST ESPECIAL</mat-card-title>
-                                        <mat-card-subtitle
-                                            class="label"
-                                            i18n
-                                        >
-                                            Nombre del checklist
-                                        </mat-card-subtitle>
-                                    </div>
-                                </div>  
-                                <mat-divider class="divider"></mat-divider>
-                                <div class="grid-multiple">
-                                    <div>         
-                                        <mat-card-title class="additional-info">ELVIS MONTEZUMA</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Asignado a
-                                        </mat-card-subtitle>
-                                    </div>
+                                    <mat-card-subtitle class="label">Estatus del checklist</mat-card-subtitle>
+                                    </div>                                    
                                     <div>
-                                        <mat-card-title class="additional-info">SISTEMAS</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Departamento
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title class="additional-info">AUTOMÁTICA</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Tipo de asignación
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>         
-                                        <mat-card-title class="additional-info">Miércoles, 21-Jul-2023 6:00:00 AM</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Fecha de planificación
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title class="additional-info">Viernes, 31-Jul-2023 9:11:14 AM</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Fecha de inicio
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title class="additional-info">Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
-                                        <mat-card-subtitle
-                                            i18n
-                                            class="label"
-                                        >
-                                            Fecha de vencimiento
-                                        </mat-card-subtitle>
-                                    </div>                 
-                                </div>                                
-                            </div>  
-                        </mat-card-header>
-                        <mat-accordion
-                            i18n
-                        >
-                            <mat-expansion-panel
-                                (opened)="panelOpenState[0] = true" 
-                                (closed)="panelOpenState[0] = false"
-                                hideToggle="true"
-                                [expanded]="panelOpenState[0]" 
-                            >
-                                <mat-expansion-panel-header
-                                    [collapsedHeight]="'55px'"
-                                    [ngStyle]="{ 'background-color': panelOpenState[0] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
-
-                                >                                            
-                                    <mat-panel-title>
-                                        <mat-icon 
-                                            class="svgicon accordion-icon"
-                                            svgIcon="menu"
-                                        >
-                                        </mat-icon>
-                                        <label class="accordion-label">Organización del checklist</label>                                                
-                                    </mat-panel-title>
-                                    <div class="icon-button-container">
-                                        <button
-                                            mat-icon-button
-                                            class="icon-button open"
-                                            aria-label="icon-button with menu icon"
-                                        >
-                                            <mat-icon 
-                                                class="icon-button"
+                                        <mat-card-title>
+                                            <div class="flex-col">
+                                                <mat-icon 
+                                                    class="svgicon accordion-icon"
+                                                    svgIcon="menu"
                                                 >
-                                                    {{ panelOpenState[0] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-                                            </mat-icon>
-                                        </button>
+                                                </mat-icon>
+                                                <span class="label-reference">001</span>
+                                                <span class="label-description">NORMAL</span>                                            
+                                            </div>
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Prioridad de checklist</mat-card-subtitle>
                                     </div>
-                                </mat-expansion-panel-header>                                  
-                                <div class="grid-multiple">
-                                    <div>                         
-                                        <mat-card-title class="additional-info">ELISEO PEREZ</mat-card-title>
-                                        <mat-card-subtitle class="label">
-                                            Planificado por
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title class="additional-info">DIRECCIÓN DE FINANZAS</mat-card-title>
-                                        <mat-card-subtitle class="label">
-                                            Departamento
-                                        </mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title class="additional-info">AUDITORIAS SEMANALES</mat-card-title>
-                                        <mat-card-subtitle class="label">
-                                            Proyecto
-                                        </mat-card-subtitle>
+                                    <div>                                            
+                                        <mat-card-title
+                                            class="checklist-name"
+                                        >
+                                            <app-label-ellipsis
+                                                class="label-description"
+                                                label="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga."
+                                                [lines]="3"
+                                            >
+                                            </app-label-ellipsis>                                                                                             
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Nombre del checklist</mat-card-subtitle>
                                     </div>
                                 </div>
-                            </mat-expansion-panel>
-                        </mat-accordion>
+                                <div class="checklist-progress">
+                                    <mat-card-subtitle class="label-progress">Avance</mat-card-subtitle>
+                                    <app-spinner
+                                        class="spinner"
+                                        [diameter]="50"
+                                        [value]="valueToChart"
+                                        [showBackgound]="true"
+                                        [suffix]="'%'"
+                                        [limits]="limits"
+                                        [fonts]="fonts"
+                                        [exhaustedValue]="'999'"
+                                        [prefix]="'>'"
+                                        [showPrefix]="showPrefix"
+                                        [smallFont]="smallFont"
+                                    ></app-spinner>                        
+                                    <mat-card-subtitle class="label-progress">21 de 32</mat-card-subtitle>
+                                </div>
+                            </div>
+                            <mat-divider class="divider"></mat-divider>
+                            <div class="grid-dates">
+                                <div class="grid-multiple">
+                                    <div>
+                                        <mat-card-title>
+                                            <div class="flex-col">
+                                                <mat-icon 
+                                                    class="svgicon accordion-icon"
+                                                    svgIcon="menu"
+                                                >
+                                                </mat-icon>
+                                                <app-label-ellipsis
+                                                    class="label-reference"
+                                                    label="AWEEK-CL"
+                                                >
+                                                </app-label-ellipsis>  
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="AUDITORÍAS SEMANALES"
+                                                >
+                                                </app-label-ellipsis>                                                 
+                                            </div>
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Tipo de checklist</mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title>
+                                            <div class="flex-col">
+                                                <mat-icon 
+                                                    class="svgicon accordion-icon"
+                                                    svgIcon="menu"
+                                                >
+                                                </mat-icon>
+                                                <span class="label-reference">P</span>
+                                                <span class="label-description">PROGRAMADO</span>                                                                                  
+                                            </div>
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Clase de checklist</mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title>
+                                            <div class="flex-col">
+                                                <mat-icon 
+                                                    class="svgicon accordion-icon"
+                                                    svgIcon="menu"
+                                                >
+                                                </mat-icon>
+                                                <app-label-ellipsis
+                                                    class="label-reference"
+                                                    label="Pys-P01-MEXd"
+                                                >
+                                                </app-label-ellipsis>  
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="PERSONAL DE ADMINISTRACIÓN EN PLANTA"
+                                                >
+                                                </app-label-ellipsis>  
+                                            </div>
+                                        </mat-card-title>                                        
+                                        <mat-card-subtitle class="label">Proyecto</mat-card-subtitle>
+                                    </div>
+                                </div>
+                            </div>                            
+                            <div class="grid-dates">
+                                <div class="grid-multiple">
+                                    <div>
+                                        <mat-card-title>                                        
+                                            <app-label-ellipsis
+                                                class="label-description"
+                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
+                                            >
+                                            </app-label-ellipsis>                                                 
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Fecha límite para iniciar</mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title>
+                                            <app-label-ellipsis
+                                                class="label-description"
+                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
+                                            >
+                                            </app-label-ellipsis>                                                 
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Fecha de inicio</mat-card-subtitle>
+                                    </div>
+                                    <div>
+                                        <mat-card-title>
+                                            <app-label-ellipsis
+                                                class="label-description"
+                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
+                                            >
+                                            </app-label-ellipsis>                                                 
+                                        </mat-card-title>
+                                        <mat-card-subtitle class="label">Fecha límite para terminar</mat-card-subtitle>
+                                    </div>
+                                </div>
+                            </div>
+                            <mat-divider class="divider"></mat-divider>
+                            <mat-accordion multi>
+                                <mat-expansion-panel
+                                    (opened)="panelOpenState[0] = true" 
+                                    (closed)="panelOpenState[0] = false"
+                                    hideToggle="true"
+                                    [expanded]="panelOpenState[0]" 
+                                >
+                                    <mat-expansion-panel-header
+                                        [collapsedHeight]="'55px'"
+                                        [ngStyle]="{ 'background-color': panelOpenState[0] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
+    
+                                    >                                            
+                                        <mat-panel-title>
+                                            <mat-icon 
+                                                class="svgicon accordion-icon"
+                                                svgIcon="menu"
+                                            >
+                                            </mat-icon>
+                                            <label class="accordion-label">Asignación del checklist</label>                                                
+                                        </mat-panel-title>
+                                        <div class="icon-button-container">
+                                            <button
+                                                mat-icon-button
+                                                class="icon-button open"
+                                                aria-label="icon-button with menu icon"
+                                            >
+                                                <mat-icon 
+                                                    class="icon-button"
+                                                    >
+                                                        {{ panelOpenState[0] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+                                                </mat-icon>
+                                            </button>
+                                        </div>
+                                    </mat-expansion-panel-header>                                  
+                                    <div class="grid-multiple margin-top">
+                                        <div>                         
+                                            <mat-card-title>
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="ELVIS ENRIQUE MONTEZUMA VILLEGAS"
+                                                >
+                                                </app-label-ellipsis> 
+                                            </mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Asignado a
+                                            </mat-card-subtitle>
+                                        </div>
+                                        <div>
+                                            <mat-card-title>
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="IT"
+                                                >
+                                                </app-label-ellipsis> 
+                                            </mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Departamento
+                                            </mat-card-subtitle>
+                                        </div>
+                                        <div>
+                                            <mat-card-title>
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="Jueves, 06-Ago-2023 12:00:00 PM"
+                                                >
+                                                </app-label-ellipsis> 
+                                            </mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Fecha de asignación
+                                            </mat-card-subtitle>
+                                        </div>
+                                        <div>
+                                            <mat-card-title>
+                                                <app-label-ellipsis
+                                                    class="label-description"
+                                                    label="AUTOMÁTICA"
+                                                >
+                                                </app-label-ellipsis> 
+                                            </mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Tipo de asignación
+                                            </mat-card-subtitle>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <mat-expansion-panel
+                                    (opened)="panelOpenState[1] = true" 
+                                    (closed)="panelOpenState[1] = false"
+                                    hideToggle="true"
+                                    [expanded]="panelOpenState[1]" 
+                                >
+                                    <mat-expansion-panel-header
+                                        [collapsedHeight]="'55px'"
+                                        [ngStyle]="{ 'background-color': panelOpenState[1] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
+    
+                                    >                                            
+                                        <mat-panel-title>
+                                            <mat-icon 
+                                                class="svgicon accordion-icon"
+                                                svgIcon="menu"
+                                            >
+                                            </mat-icon>
+                                            <label class="accordion-label">Planificación del checklist</label>                                                
+                                        </mat-panel-title>
+                                        <div class="icon-button-container">
+                                            <button
+                                                mat-icon-button
+                                                class="icon-button open"
+                                                aria-label="icon-button with menu icon"
+                                            >
+                                                <mat-icon 
+                                                    class="icon-button"
+                                                    >
+                                                        {{ panelOpenState[1] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+                                                </mat-icon>
+                                            </button>
+                                        </div>
+                                    </mat-expansion-panel-header>                                  
+                                    <div class="grid-multiple margin-top">
+                                        <div>                         
+                                            <mat-card-title>ELISEO PEREZ</mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Planificado por
+                                            </mat-card-subtitle>
+                                        </div>
+                                        <div>
+                                            <mat-card-title>DIRECCIÓN DE FINANZAS</mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Departamento
+                                            </mat-card-subtitle>
+                                        </div>
+                                        <div>
+                                            <mat-card-title>Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
+                                            <mat-card-subtitle class="label">
+                                                Fecha de planificación
+                                            </mat-card-subtitle>
+                                        </div>
+                                    </div>
+                                </mat-expansion-panel>
+                                <mat-expansion-panel
+                                    (opened)="panelOpenState[2] = true" 
+                                    (closed)="panelOpenState[2] = false"
+                                    hideToggle="true"
+                                    [expanded]="panelOpenState[2]" 
+                                >
+                                    <mat-expansion-panel-header
+                                        [collapsedHeight]="'55px'"
+                                        [ngStyle]="{ 'background-color': panelOpenState[2] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
+    
+                                    >                                            
+                                        <mat-panel-title>
+                                            <mat-icon 
+                                                class="svgicon accordion-icon"
+                                                svgIcon="menu"
+                                            >
+                                            </mat-icon>
+                                            <label class="accordion-label">Notas del checklist</label>                                                
+                                        </mat-panel-title>
+                                        <div class="icon-button-container">
+                                            <button
+                                                mat-icon-button
+                                                class="icon-button open"
+                                                aria-label="icon-button with menu icon"
+                                            >
+                                                <mat-icon 
+                                                    class="icon-button"
+                                                    >
+                                                        {{ panelOpenState[2] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+                                                </mat-icon>
+                                            </button>
+                                        </div>
+                                    </mat-expansion-panel-header>                                  
+                                    <div class="grid-multiple margin-top">
+                                        <div class="notes-content">
+                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.                                     
+                                        </div>                        
+                                    </div>
+                                </mat-expansion-panel>
+                            </mat-accordion>                            
+                            
+                        </div>  
                     </mat-card>
                 </div>
             </ng-template>

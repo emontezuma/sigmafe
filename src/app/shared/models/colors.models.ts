@@ -170,30 +170,33 @@ export interface SmallFont {
 }
 
 export interface StatusColors {
-    ok: string | undefined,
-    warn: string | undefined,
-    alarm: string | undefined,
-    none: string | undefined,
+    ok?: string,
+    warn?: string,
+    alarm?: string,
+    none?: string,
 }
 
 export interface PageColors {
-    fore: string | undefined,
-    foreContrast: string | undefined,
-    background: string | undefined,
-    shadow: string | undefined,
-    buttonBorderColor: string | undefined,
-    buttonDisabledBorderColor: string | undefined,
-    buttonNormalBackgroundColor: string | undefined;
-    footerFore: string | undefined,
-    footerBackground: string | undefined,
-    palettePrimaryColor: string | undefined,
-    paletteWarnColor: string | undefined,
-    paletteAccentColor: string | undefined,
-    disabled: string | undefined,
-    border: string | undefined,
-    cardBackgroundColor: string | undefined,
-    backgroundColor: string | undefined,
-    none: string | undefined,
+    fore?: string,
+    foreContrast?: string,
+    background?: string,
+    shadow?: string,
+    buttonBorderColor?: string,
+    buttonDisabledBorderColor?: string,
+    buttonNormalBackgroundColor?: string;
+    footerFore?: string,
+    footerBackground?: string,
+    palettePrimaryColor?: string,
+    paletteWarnColor?: string,
+    paletteAccentColor?: string,
+    disabled?: string,
+    border?: string,
+    cardBackgroundColor?: string,
+    backgroundColor?: string,
+    tooltipFontSize?: string,
+    tooltipForeColor?: string,
+    tooltipNackgroundColor?: string,
+    none?: string,
 }
 
 export interface ColorsData {
@@ -204,7 +207,7 @@ export interface ColorsData {
     fixed: string,
     selected: string,
     status: StatusColors,   
-    page: PageColors,
+    page?: PageColors,
 }
 
 export interface ColorsState {

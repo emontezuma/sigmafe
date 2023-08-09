@@ -1,8 +1,9 @@
 export interface ProfileData {
     animate: boolean;
-    fiestName: string;
-    lastName: string;
+    firstName: string;
+    lastName?: string;
     userProfile: string;
+    email?: string;
     id: string;
 }
 

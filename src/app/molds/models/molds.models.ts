@@ -3,17 +3,17 @@ import { LevelAlert } from "src/app/shared/models/settings.models";
 export interface NextMaintenance {
     strategy: 'hits' | 'days' | 'hours' | 'specific-date' | 'hits-or-hours' | 'hits-or-days';    
     specificDate: string;
-    hits: number;
-    days: number;
-    hours: number;
-    timeToLeft: number;
-    hitsToLeft: number;
-    alarmed: boolean;
+    hits: number | null;
+    days: number | null;
+    hours: number | null;
+    timeToLeft: number | null;
+    hitsToLeft: number | null;
+    alarmed: boolean | undefined | null;
 }
 
 export interface LastMaintenance {
-    vendorName: string;
-    date: string;
+    vendorName: string | null;
+    date: string | null;
 }
 
 export interface LastHit {
@@ -23,8 +23,8 @@ export interface LastHit {
 export interface Location {
     code: string;
     description: string;
-    locatedBy: string;
-    locatedSince: string;
+    locatedBy: string | null;
+    locatedSince: string | null;
 }
 
 export interface SimpleTable {
@@ -35,19 +35,19 @@ export interface SimpleTable {
 export interface MoldHitsQuery {
     id: string;
     name: string;
-    hits: number;
-    limit: number;
+    hits: number | null;
+    limit: number | null;
     mainImage: string;
-    location: Location;
-    lastMaintenance: LastMaintenance;
-    nextMaintenance: NextMaintenance;
-    levelAlert: LevelAlert;
+    location: Location | null;
+    lastMaintenance: LastMaintenance | null;
+    nextMaintenance: NextMaintenance | null;
+    levelAlert: LevelAlert | null | undefined;
     leftDaysWarning: number;
     leftDaysAlarmed: number;
-    lastHit: LastHit;
-    status: SimpleTable;
-    warned: boolean;
-    alarmed: boolean;
+    lastHit: LastHit | null;
+    status: SimpleTable | null;
+    warned: boolean | undefined | null;
+    alarmed: boolean | undefined | null;
 }
 
 export interface MoldsHitsQueryData {
@@ -55,7 +55,7 @@ export interface MoldsHitsQueryData {
     page: number;
     pageSize: number;
     moreData: boolean;
-    totalRecs: number;
+    totalRecords: number;
 }
 
 export interface MoldsState {

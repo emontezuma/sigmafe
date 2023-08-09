@@ -109,7 +109,7 @@
           <button
             mat-mini-fab
             class="gotop-button"
-            (click)="goToTop()"
+            (click)="gotoTop()"
           >
             <mat-icon
               class="gotop-icon"
@@ -139,11 +139,10 @@
         <div
           cdkScrollable
           class="page-content"
-          [style.height.px]="allHeight"
-          
+          [style.height.px]="allHeight"          
         >
         <!--<div class="page-content">-->
-          <router-outlet #outlet="outlet"></router-outlet>            
+          <router-outlet></router-outlet>            
         </div>
         <div
           *ngIf="loading"
@@ -164,13 +163,17 @@
     </mat-sidenav-container>
     <mat-toolbar
       class="footer"
+      @fromTop
     >
       <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
       <span class="example-spacer"></span>
     </mat-toolbar>
   </ng-template>
   <ng-template #invalid>
-    <mat-toolbar class="toolbar" color="accent">
+    <mat-toolbar
+      class="toolbar"
+      color="accent"      
+    >
     </mat-toolbar>
     <div class="error-box">
       <mat-icon class="big-icon">error_outline</mat-icon>

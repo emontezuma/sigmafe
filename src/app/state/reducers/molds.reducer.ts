@@ -9,7 +9,7 @@ export const initialState: MoldsState = {
     page: 0,
     pageSize: 0,
     moreData: false,
-    totalRecs: 0,
+    totalRecords: 0,
   }  
 };
 

@@ -21,7 +21,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
 @ViewChild('moldProgressBar') private moldProgressBar: ElementRef;
   
 // Variables ================
-  hits = 0;
+  hits: number = 0;
   valueToChart = 0;
   settingsData: SettingsData;
   digitPair: number[] = [];
@@ -36,6 +36,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   maintenanceClass: string = 'meter-30';
   elapsedTimeLabel: string = '';
   lastChartValue: number = 0;
+  lastHitDate: string = '';
   limits: SpinnerLimits[] = [{
     start: 0,
     finish: 67,
@@ -80,12 +81,13 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       this.assignSettings(); 
       this.calcData();
     });
-    this.hits = this.mold.hits;
+    this.hits = this.mold.hits ?? 0;
+    this.lastHitDate = this.mold?.lastHit?.date ?? '';
     this.numberToArray(this.hits);      
     setInterval(() => {
       this.hits = this.hits + 1;
       this.numberToArray(this.hits);    
-      this.prepareDataToChart (this.hits, this.mold.limit)
+      this.prepareDataToChart (this.hits, this.mold.limit ?? 0)
     }, 1000);    
   }
 
@@ -98,7 +100,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
 // Functions ================
   calcData() {
     this.elapsedTimeLabel = this.sharedService.labelElapsedTime(this.mold.lastHit?.date);
-    this.maintenanceClass = this.mold.nextMaintenance.alarmed ? 'meter-31' : 'meter-32'
+    this.maintenanceClass = this.mold.nextMaintenance?.alarmed ? 'meter-31' : 'meter-32'
   }
   
   assignSettings() {
@@ -106,7 +108,8 @@ export class MoldHitsCounterComponent implements AfterViewInit {
     this.progressForeColorClass = this.settingsData?.waitingColor;
   }
 
-  numberToArray(current: number) {
+  numberToArray(current: number | null) {
+    if (!current) current = 1;
     const before = current - 1;    
     for (let i = 0; i < current.toString().length; i++) {
       const base = 10 ** (current.toString().length - 1 - i);      

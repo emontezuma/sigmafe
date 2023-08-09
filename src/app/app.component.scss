@@ -1,5 +1,12 @@
 @use "src/assets/styles/mixins";
 
+.container {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .route-container {
     position:relative;
 }
@@ -151,6 +158,8 @@ mat-toolbar {
 
 .page-content {
   margin: 2px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .invalid-message {
@@ -187,11 +196,6 @@ mat-toolbar {
 
 .error {
   background-color: var(--z-colors-orangered);
-}
-
-.primary {
-  color: var(--primary-fore-color);
-  background-color: var(--primary-background-color);
 }
 
 .icon-toolbar {

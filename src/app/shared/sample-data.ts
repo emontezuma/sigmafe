@@ -8,7 +8,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
     page: 1,
     pageSize: 10,
     moreData: false,
-    totalRecs: 100,
+    totalRecords: 100,
     molds: [
         {
             id: "abgsc-173633/12345",
@@ -424,9 +424,10 @@ export const sampleSettings: SettingsData = {
 
 export const sampleProfile: ProfileData = {
     animate: true,
-    fiestName: "ADMINISTRADOR",
+    firstName: "ADMINISTRADOR",
     lastName: "DEL SISTEMA",
     userProfile: "ADMIN",
+    email: "admin@admin.com",
     id: "tetettee-ooeiiie-jjd73",
 }
 
@@ -447,10 +448,10 @@ export const sampleColors: ColorsData = {
         fore: Colors.carbon,
         background: Colors.white,
         foreContrast: Colors.white,        
-        shadow: Colors.lightgrey,
+        shadow: Colors.whitesmoke,
         buttonBorderColor: Colors.gray,
         buttonDisabledBorderColor: Colors.lightgrey,
-        buttonNormalBackgroundColor: Colors.white,
+        buttonNormalBackgroundColor: Colors.whitesmoke,
         footerFore: undefined,
         footerBackground: undefined,
         palettePrimaryColor: '#1e90ff',

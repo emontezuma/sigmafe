@@ -7,9 +7,10 @@ export const initialState: ProfileState = {
   profileData: {
     id: '',
     animate: true,
-    fiestName: '',
+    firstName: '',
     lastName: '',
     userProfile: '',
+    email: '',
   }  
 };
 

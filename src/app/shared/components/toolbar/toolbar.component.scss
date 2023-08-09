@@ -21,7 +21,6 @@
 
 .toolbar-button  {
     margin-right: 5px;
-    margin-top: 20px;
     display: flex;
     height: 56px;
     flex-direction: row;
@@ -44,13 +43,11 @@
 }
 
 .divider {
-    @include mixins.divider(22px, 0px, 0px, 5px);    
-    height: 55%
+    @include mixins.divider(0px, 0px, 0px, 5px, var(--z-colors-page-border), 50px);    
 }
 
 .divider-adjusted {
-    @include mixins.divider(20px, 35px, 0px, 5px);    
-    height: 75%
+    @include mixins.divider(20px, 35px, 0px, 5px, var(--z-colors-page-border), 70px);    
 }
 
 .button-label {

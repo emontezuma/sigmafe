@@ -8,7 +8,7 @@ import { SharedService } from './shared/services/shared.service';
 import { ColorsService } from './shared/services/colors.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
-import { appearing, dissolve, downUp, } from '../app/shared/animations/shared.animations';
+import { appearing, dissolve, downUp, fromTop } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
@@ -16,7 +16,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  animations: [ appearing, dissolve, downUp, ],
+  animations: [ appearing, dissolve, downUp, fromTop, ],
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
@@ -135,6 +135,7 @@ export class AppComponent implements AfterViewInit {
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
+      this.changeDetectorRef.detectChanges();
     });
     this.handlerScreenSizeChange(null);
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
@@ -181,7 +182,7 @@ export class AppComponent implements AfterViewInit {
     this.toolbarCurrentSize = (this.toolbarData.show && this.toolbarWidth > screen.innerWidth) ? ScreenSizes.SMALL : ScreenSizes.NORMAL;
   }
 
-  goToTop() {
+  gotoTop() {
     this.sharedService.setGoTopButton(
       ApplicationModules.GENERAL,
       'temp',

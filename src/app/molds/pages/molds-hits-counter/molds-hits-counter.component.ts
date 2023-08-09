@@ -14,6 +14,7 @@ import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ProfileData } from 'src/app/shared/models/profile.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-molds-hits-counter',
@@ -37,6 +38,14 @@ export class MoldsHitsCounterComponent implements OnInit {
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;
+  scrollSubscriber: Subscription;
+  settingDataSubscriber: Subscription;
+  profileDataSubscriber: Subscription;
+  searchBoxSubscriber: Subscription;
+  showGoTopSubscriber: Subscription;
+  animationSubscriber: Subscription;
+  moldsHitsLoadingSubscriber: Subscription;
+  moldsHitsDataSubscriber: Subscription;
     
   form = new FormGroup({
   });
@@ -49,17 +58,16 @@ export class MoldsHitsCounterComponent implements OnInit {
 
 // Hooks ====================
   ngOnInit() {
+    // Settings
     this.sharedService.setGeneralScrollBar(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
     );
-    this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData;
-    });
-    this.store.select(selectProfileData).subscribe( profileData => {
-      this.profileData = profileData;
-    });
-    this.store.select(selectLoadingMoldsHitsState).subscribe( loading => {
+    this.sharedService.setSearchBox(
+      ApplicationModules.MOLDS_HITS_VIEW,
+      true,
+    );    
+    this.moldsHitsLoadingSubscriber = this.store.select(selectLoadingMoldsHitsState).subscribe( loading => {
       this.loading = loading;
       this.sharedService.setGeneralLoading(
         ApplicationModules.MOLDS_HITS_VIEW,
@@ -71,24 +79,31 @@ export class MoldsHitsCounterComponent implements OnInit {
       );
       this.loaded = loading === false;
     });
-    this.store.select(selectMoldsHitsQueryData).subscribe( moldsHitsQueryData => { 
+    
+    // Dispatches
+    this.store.dispatch(loadMoldsHitsQueryData());  
+
+    // Subscriptions
+    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
+      this.profileData = profileData;
+    });
+    this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
+      this.settingsData = settingsData;
+    });    
+    this.moldsHitsDataSubscriber = this.store.select(selectMoldsHitsQueryData).subscribe( moldsHitsQueryData => { 
       this.moldsHitsQueryData = moldsHitsQueryData;            
     });
-    this.sharedService.setSearchBox(
-      ApplicationModules.MOLDS_HITS_VIEW,
-      true,
-    );
-    this.sharedService.search.subscribe((searchBox) => {
+    this.searchBoxSubscriber = this.sharedService.search.subscribe((searchBox) => {
       if (searchBox.from === ApplicationModules.MOLDS_HITS_VIEW) {
         this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
-    this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
+    this.animationSubscriber = this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
       if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
         // this.animationFinished(null);
       }      
     });    
-    this.sharedService.showGoTop.subscribe((goTop) => {
+    this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
         this.moldsQueryList.nativeElement.scrollIntoView({
@@ -97,13 +112,12 @@ export class MoldsHitsCounterComponent implements OnInit {
         // Ensure
       }      
     });
-    this.scrollDispatcher
+    this.scrollSubscriber = this.scrollDispatcher
     .scrolled()
     .subscribe((data: any) => {
       this.getScrolling(data);
     });
-    // this.animationFinished(null);
-    this.store.dispatch(loadMoldsHitsQueryData());    
+    // this.animationFinished(null);      
   }
 
   ngOnDestroy() : void {
@@ -118,6 +132,15 @@ export class MoldsHitsCounterComponent implements OnInit {
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
     );
+    // Turn off subscriptions
+    if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
+    if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
+    if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
+    if (this.profileDataSubscriber) this.profileDataSubscriber.unsubscribe();
+    if (this.searchBoxSubscriber) this.searchBoxSubscriber.unsubscribe();
+    if (this.moldsHitsDataSubscriber) this.moldsHitsDataSubscriber.unsubscribe();
+    if (this.moldsHitsLoadingSubscriber) this.moldsHitsLoadingSubscriber.unsubscribe();
+    if (this.animationSubscriber) this.animationSubscriber.unsubscribe();
   }
 
 // Functions ================
@@ -205,7 +228,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   }
 
   getScrolling(data: CdkScrollable) {   
-    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
+    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;
     let status = 'inactive'
     if (scrollTop < 5) {
       status = 'inactive';
