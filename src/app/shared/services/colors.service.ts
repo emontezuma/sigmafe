@@ -23,6 +23,9 @@ export class ColorsService {
 
 // Variables ===============
   primaryColor: string = '#1e90ff'
+  accentColor = '#00FF00';
+  warnColor = '#FF0000';
+      
   fakeColorsData: ColorsData = sampleColors;
   data$: BehaviorSubject<ColorsData> = new BehaviorSubject(sampleColors);
 
@@ -33,11 +36,9 @@ export class ColorsService {
 // Functions ================
   setColors() {
     this.store.select(selectColorsData).subscribe( colorsData => {
-      const accentColor = '#00FF00';
-      const warnColor = '#FF0000';
       updateTheme(computeColors(colorsData.page?.palettePrimaryColor ?? this.primaryColor), 'primary');
-      updateTheme(computeColors(colorsData.page?.paletteWarnColor ?? warnColor), 'warn');
-      updateTheme(computeColors(colorsData.page?.paletteAccentColor ?? accentColor), 'accent');
+      updateTheme(computeColors(colorsData.page?.paletteWarnColor ?? this.warnColor), 'warn');
+      updateTheme(computeColors(colorsData.page?.paletteAccentColor ?? this.accentColor), 'accent');
       this.fillVariables(colorsData);
     });
   };
@@ -88,9 +89,13 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-red', Colors.red);
     document.documentElement.style.setProperty('--z-colors-dodgerblue', Colors.dodgerblue); 
     document.documentElement.style.setProperty('--z-colors-none', Colors.none);
+    document.documentElement.style.setProperty('--z-colors-lightgrey', Colors.lightgrey);
+    document.documentElement.style.setProperty('--z-colors-gray', Colors.gray);
 
     // Colors needed in RGB to apply some alpha gradient
-    document.documentElement.style.setProperty('--z-colors-page-button-border-rgb', hexToRgb(this.primaryColor));
+    document.documentElement.style.setProperty('--z-colors-primary-rgb', hexToRgb(this.primaryColor));
+    document.documentElement.style.setProperty('--z-colors-warn-rgb', hexToRgb(this.warnColor));    
+    document.documentElement.style.setProperty('--z-colors-accent-rgb', hexToRgb(this.accentColor));    
   }    
 
   getSettingsData(): Observable<ColorsData> {

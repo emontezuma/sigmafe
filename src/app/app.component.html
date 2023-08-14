@@ -12,7 +12,7 @@
         @appearing
       >
         <mat-icon
-          class="svgicon icon-toolbar"
+          class="icon-toolbar"
           svgIcon="menu"
         >
         </mat-icon>
@@ -118,17 +118,11 @@
             </mat-icon>
           </button>
         </div>
-        <!--<div
-          *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
-          @downUp
-        >
-          <app-toolbar [toolbar]="toolbarData"></app-toolbar>
-        </div>-->
         <div
           class="toolbar-content"
+          *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
         >
-          <app-toolbar
-            *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
+          <app-toolbar            
             @downUp
             (@downUp.done)="toolbarAnimationFinished($event)"
             (@downUp.start)="toolbarAnimationStarted($event)"

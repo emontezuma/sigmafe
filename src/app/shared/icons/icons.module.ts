@@ -68,5 +68,17 @@ export class IconsModule {
       "arrow-down",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_down.svg")
     );
+    iconRegistry.addSvgIcon(
+      "check",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/check.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "warn_line",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_line.svg")
+    );  
+    iconRegistry.addSvgIcon(
+      "warn_fill",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_fill.svg")
+    );    
   }
 }

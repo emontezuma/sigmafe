@@ -12,6 +12,7 @@ import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
+import { ChecklistAnswerType, ChecklistAnswerStatus, ChecklistView } from 'src/app/shared/models/checklists.models';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -24,7 +25,6 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
   @ViewChild('checklistFilling') private moldsQueryList: ElementRef;  
   
-  valueToChart = 32;
   panelOpenState: boolean[] = [];
   limits: SpinnerLimits[] = [];
   fonts: SpinnerFonts[] = [{
@@ -58,14 +58,68 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   buttons: ToolbarButtons[] = [];
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
-  loaded: boolean = false;
-  alarmed: boolean = true;
+  loaded: boolean = false;  
   currentTabIndex: number = 0;
   scrollSubscriber: Subscription;
   settingDataSubscriber: Subscription;
   profileDataSubscriber: Subscription;
   searchBoxSubscriber: Subscription;
   showGoTopSubscriber: Subscription;
+
+  checklist = {    
+    questions: 32,
+    completed: 21,
+    valueToChart: 71,
+    alarmed: true,
+    viewType: ChecklistView.FLEXBOX,
+    icon: 'assets/images/icons/faq.svg'
+  }
+  items = [{
+    id: "aaa",
+    index: 1,
+    order: 1,
+    text: '¿La tapa del motor está bien sellada?',
+    extendedInfo: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
+    answerType: ChecklistAnswerType.YES_NO,
+    answerByDefault: 'y',
+    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
+    showExtendedInfo: true,
+    showVisualSupport: true,
+    allowNotes: true,
+    completionDate: 'Y',
+    startedDate: 'Y',
+    alarmed: true,
+    requiresAttachment: true,
+    icon: 'assets/images/icons/faq.svg',
+    helpers: [{
+      id: 'abcd',
+      icon: 'assets/icons/video_file.svg',
+    },{
+      id: 'xyz',
+      icon: 'assets/icons/excel.svg',
+    },
+  ]
+  },{
+    id: "bbb",
+    index: 2,
+    order: 2,
+    text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
+    answerType: ChecklistAnswerType.YES_NO,
+    answerByDefault: 'y',
+    showExtendedInfo: 'N',
+    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
+    icon: 'assets/images/icons/problems.svg'
+  },{
+    id: "bbb",
+    index: 3,
+    order: 2,
+    text: '¿This is a question?',
+    answerType: ChecklistAnswerType.YES_NO,
+    answerByDefault: 'y',
+    showExtendedInfo: 'N',
+    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
+    icon: 'assets/images/icons/problems.svg'
+  }];
   
   form = new FormGroup({
   });
@@ -136,6 +190,11 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     const progressBars = document.getElementsByName("active-progress-bar");
     progressBars.forEach((element) => {
       element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
+    })
+    const chip = document.getElementsByName("chip");
+    chip.forEach((element) => {
+      console.log('si');
+      element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
     })
   }
 
@@ -304,8 +363,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  setTabIndex(e: any) {
-    this.currentTabIndex = e;
+  setTabIndex(e: any) {    
+    this.currentTabIndex = e;    
   }
 
 // End ======================

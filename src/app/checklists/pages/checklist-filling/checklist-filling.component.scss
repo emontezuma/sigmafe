@@ -3,6 +3,7 @@
 .container {
     margin-bottom: 10px;
 }
+
 .progress {
     margin-top: 5px;
     margin-bottom: -9px;
@@ -22,8 +23,15 @@
     align-content: center;    
 }
 
+.tab-questions {
+    @include mixins.flexbox(column, wrap, 10px, flex-start);    
+    font-size: 1.6rem;
+    font-weight: 500;
+    align-content: center;    
+}
+
 .tabs {
-    margin: 5px 10px 0px 10px;
+    margin: 10px 10px 0px 10px;
 }
 
 mat-card-title {
@@ -40,11 +48,22 @@ mat-panel-title {
 }
 
 .card {
-    height: 100%;
-    width: 100%;
+    height: -webkit-fill-available;;
+    width: -webkit-fill-available;;
     border-radius: 10px 0px;
     margin-bottom: 10px;
     padding: 5px;
+}
+
+.question-card {    
+    width: -webkit-fill-available;;
+    border-radius: 8px 0px;    
+    padding: 5px;
+    padding-bottom: 70px;
+    flex: 1;
+    min-width: 360px;
+    min-height: 120px;
+    margin-bottom: 5px;
 }
 
 mat-card-subtitle {
@@ -55,12 +74,6 @@ mat-card-subtitle {
 .label {
     font-size: 1.3rem;    
     @include mixins.text-ellipsis();
-}
-
-.extended {
-    margin-top: 10px;
-    margin-left: 5px;
-    margin-right: 5px;
 }
 
 .border {
@@ -99,7 +112,7 @@ mat-card-subtitle {
 
 .grid-multiple {
     @include mixins.flexbox(row, wrap, 6px, flex-start, flex-start);
-    width: -webkit-fill-available;;
+    width: -webkit-fill-available;
     padding: 5px;
 }
 
@@ -162,6 +175,10 @@ mat-expansion-panel-header {
     margin: 2px;
 }
 
+.mat-mdc-card-header { 
+    padding: 4px 4px;    
+}
+
 mat-accordion {
     width: -webkit-fill-available;
 }
@@ -220,4 +237,153 @@ mat-panel-title {
     box-shadow: 0px 2px 2px 0px var(--z-colors-page-border);
     width: -webkit-fill-available;
     margin-top: 5px;
+}
+
+.mat-tab-body {
+    animation: fade-out 0.5s;
+    opacity: 0;
+}
+.mat-tab-body.mat-tab-body-active {
+    animation: fade-in 0.5s;
+    opacity: 1;
+}
+
+@keyframes fade-in {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+.item-index-container {    
+    height: 42px;
+    min-width: 43px;
+    background-color: var(--z-colors-page-shadow);
+    border-radius: 50%;
+    border: 2px solid var(--z-colors-page-primary);   
+    display: flex; 
+    align-items: center;
+}
+
+.item-index {
+    font-size: 2rem;
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+}
+
+.item-text {
+    font-size: 1.5rem;
+    text-align: start;
+    line-height: 1.9rem;    
+}
+
+.flex-box {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: stretch;
+}
+
+mat-card-footer {
+    background-color: rgb(0, 0, 0, 0.05);
+    margin-top: 15px;
+    border-radius: 0px 0px 8px 0px;    
+    padding-top: 5px;
+    padding-left: 5px;    
+    padding-bottom: 5px;    
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 5px;
+    width: -webkit-fill-available;
+    margin-right: 5px;
+}
+
+.divider-footer {
+    @include mixins.divider(0px, 5px, 0px, 0px);   
+}
+
+.with-background {    
+    background-color: var(--z-colors-white);
+    border: 1.5px solid var(--z-colors-lightgrey);
+}
+
+.question-alarmed {    
+    border: 2px solid rgba(var(--z-colors-warn-rgb), 0.8);
+}
+
+.question-pulse {
+    animation: pulse-warn 1s infinite;
+    box-shadow: 0 0 0 0.5em rgba(#fff,0);    
+}  
+
+.question-grid {
+    @include mixins.flexbox(row, nowrap, 6px, flex-start, baseline);    
+    width: -webkit-fill-available;    
+}
+
+.question-buttons {
+    @include mixins.flexbox(row, wrap, 6px, unset);    
+}
+
+.question-answer-icon {
+    position: absolute;
+    color: var(--theme-accent-500);
+    top: 0;
+    left: 0;
+}
+
+.questionnaire-items {
+    @include mixins.flexbox(row, wrap, 5px, space-between, center);    
+    font-size: 1.6rem;
+    font-weight: 700;
+    align-content: center;
+    height: 50px;
+    width: -webkit-fill-available;;
+    border-radius: 8px 0px;
+    margin: 10px;
+    background-color: var(--z-colors-lightgrey);
+    padding-left: 10px;
+}
+
+.item-right {
+    margin-right: 5px;
+}
+
+.questionnaire-alarmed {
+    font-size: 1.6rem;
+    font-weight: 600;
+    padding: 2px;
+    border-radius: 8px 0px;
+    border: 2px solid var(--z-colors-page-border);
+}
+
+.item-response {
+    align-self: flex-start;
+    margin-top: 5px;
+    display: flex;
+}
+
+.item-response-type {
+    width: max-content;
+}
+
+mat-chip-option {
+    font-size: 1.5rem;
 }

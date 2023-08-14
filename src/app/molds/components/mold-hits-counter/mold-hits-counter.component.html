@@ -157,7 +157,11 @@
           </ng-container>
         </div>
       </div>
-      <mat-card-subtitle class="last-hit" [matTooltip]="lastHitDate" matTooltipClass = "tooltip-general" matTooltipShowDelay = "100" >
+      <mat-card-subtitle
+        class="last-hit"
+        [matTooltip]="lastHitDate"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100" >
         <span i18n>Últ. golpe: </span>
         <span *ngIf="elapsedTimeLabel">
           <strong>{{ elapsedTimeLabel }}</strong>

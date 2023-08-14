@@ -1,4 +1,5 @@
 @use './assets/styles/app-color-palette.scss';
+@use "./assets/styles/mixins";
 
 html, body { 
   height: 100%; 
@@ -80,7 +81,6 @@ body {
 }
 
 mat-icon {
-    color: var(--z-colors-page-primary);
     width: 32px;
     height: 32px;
 }
@@ -210,4 +210,90 @@ mat-card {
 .footer {
     background-color: var(--z-colors-page-footer-background-color) !important;
     color: var(--z-colors-page-footer-fore-color) !important;
+}
+
+.circular-button {
+  color: var(--z-colors-page-button-normal-fore-color) !important;  
+  background-color: var(--z-colors-page-button-normal-background-color);
+  border-color: var(--z-colors-page-button-border);  
+  cursor: pointer;    
+  .mat-icon {
+    color: var(--z-colors-page-fore) !important;
+  }
+}
+
+.circular-button:hover:not(.circular-button.primary, .circular-button.warn, .circular-button.accent) {
+  animation: pulse 0.5s;
+  box-shadow: 0 0 0 3px rgba(#fff,0);
+  color: var(--theme-primary-500) !important;
+  border-color: var(--theme-primary-500) !important;  
+  mat-icon {
+    color: var(--theme-primary-500) !important;
+  }
+}
+
+.circular-button:hover:not(.circular-button.warn, .circular-button.primary, .circular-button.accent) {
+  animation: pulse 0.5s;
+  box-shadow: 0 0 0 6px rgba(#fff,0);
+}
+
+.circular-button.warn:hover {
+  animation: pulse-warn 0.5s;
+  box-shadow: 0 0 0 6px rgba(#fff,0);
+}
+
+.circular-button.primary:hover {
+  animation: pulse-primary 0.5s;
+  box-shadow: 0 0 0 6px rgba(#fff,0);
+}
+
+.circular-button.accent:hover {
+  animation: pulse-accent 0.5s;
+  box-shadow: 0 0 0 6px rgba(#fff,0);
+}
+
+.circular-button.warn:not(:disabled) {
+  background-color: var(--theme-warn-500) !important;
+  border-color: var(--theme-warn-500) !important;
+  color: var(--theme-warn-contrast-500) !important;
+  mat-icon {
+    color: var(--theme-warn-contrast-500) !important;
+  }
+}
+
+.circular-button.primary:not(:disabled) {
+  background-color: var(--theme-primary-500) !important;
+  border-color: var(--theme-primary-500) !important;
+  color: var(--theme-primary-contrast-500) !important;
+  mat-icon {
+    color: var(--theme-primary-contrast-500) !important;
+  }
+}
+
+.circular-button.accent:not(:disabled) {
+  background-color: var(--theme-accent-500) !important;
+  border-color: var(--theme-accent-500) !important;
+  color: var(--theme-accent-contrast-500) !important;
+  mat-icon {
+    color: var(--theme-accent-contrast-500) !important;
+  }
+}
+
+.simple-flex {
+  @include mixins.flexbox(row, wrap, 1px, flex-start);    
+}
+
+.legacy-alarm {
+  background-color: var(--theme-warn-500) !important;
+  color: var(--theme-warn-contrast-500) !important;
+}
+
+.legacy-accent {
+  background-color: var(--theme-warn-500) !important;
+  color: var(--theme-warn-contrast-500) !important;
+}
+
+.legacy-primary {
+  background-color: var(--theme-warn-500) !important;
+  color: var(--theme-warn-contrast-500) !important;
 }

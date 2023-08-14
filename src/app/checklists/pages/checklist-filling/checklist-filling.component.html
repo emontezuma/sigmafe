@@ -1,4 +1,5 @@
 <div
+i18n
     class="container"
     #checklistFilling
     @routingAnimation
@@ -7,27 +8,26 @@
     <mat-tab-group
         mat-stretch-tabs="false"
         mat-align-tabs="start"
-        dynamicHeight
+        animationDuration="500ms"        
         (selectedIndexChange)="setTabIndex($event)"
     >
         <mat-tab>
             <ng-template mat-tab-label>
                 <mat-icon
-                    class="svgicon tab-icon"
+                    class="tab-icon"
                     svgIcon="checklist-header"
                     [ngStyle]="{ 'fill': currentTabIndex === 0 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
                 >
                 </mat-icon>
-                <label class="tab-label" i18n>Información general</label>
+                <label class="tab-label">Información general</label>
             </ng-template>
             <ng-template matTabContent>
                 <div class="tabs tab-general-info">
                     <mat-card
-                        class="card"
-                        i18n
+                        class="card"                        
                     >
                         <mat-progress-bar
-                            *ngIf="alarmed"
+                            *ngIf="checklist.alarmed"
                             mode="indeterminate"
                             color="warn"
                             name="active-progress-bar"
@@ -49,7 +49,7 @@
                                         <mat-card-title>
                                             <div class="flex-col">
                                                 <mat-icon 
-                                                    class="svgicon accordion-icon"
+                                                    class="accordion-icon"
                                                     svgIcon="menu"
                                                 >
                                                 </mat-icon>
@@ -78,7 +78,7 @@
                                     <app-spinner
                                         class="spinner"
                                         [diameter]="50"
-                                        [value]="valueToChart"
+                                        [value]="checklist.valueToChart"
                                         [showBackgound]="true"
                                         [suffix]="'%'"
                                         [limits]="limits"
@@ -88,7 +88,7 @@
                                         [showPrefix]="showPrefix"
                                         [smallFont]="smallFont"
                                     ></app-spinner>                        
-                                    <mat-card-subtitle class="label-progress">21 de 32</mat-card-subtitle>
+                                    <mat-card-subtitle class="label-progress">{{ checklist.completed }} de {{ checklist.questions}}</mat-card-subtitle>
                                 </div>
                             </div>
                             <mat-divider class="divider"></mat-divider>
@@ -98,7 +98,7 @@
                                         <mat-card-title>
                                             <div class="flex-col">
                                                 <mat-icon 
-                                                    class="svgicon accordion-icon"
+                                                    class="accordion-icon"
                                                     svgIcon="menu"
                                                 >
                                                 </mat-icon>
@@ -120,7 +120,7 @@
                                         <mat-card-title>
                                             <div class="flex-col">
                                                 <mat-icon 
-                                                    class="svgicon accordion-icon"
+                                                    class="accordion-icon"
                                                     svgIcon="menu"
                                                 >
                                                 </mat-icon>
@@ -134,7 +134,7 @@
                                         <mat-card-title>
                                             <div class="flex-col">
                                                 <mat-icon 
-                                                    class="svgicon accordion-icon"
+                                                    class="accordion-icon"
                                                     svgIcon="menu"
                                                 >
                                                 </mat-icon>
@@ -203,7 +203,7 @@
                                     >                                            
                                         <mat-panel-title>
                                             <mat-icon 
-                                                class="svgicon accordion-icon"
+                                                class="accordion-icon"
                                                 svgIcon="menu"
                                             >
                                             </mat-icon>
@@ -287,7 +287,7 @@
                                     >                                            
                                         <mat-panel-title>
                                             <mat-icon 
-                                                class="svgicon accordion-icon"
+                                                class="accordion-icon"
                                                 svgIcon="menu"
                                             >
                                             </mat-icon>
@@ -341,7 +341,7 @@
                                     >                                            
                                         <mat-panel-title>
                                             <mat-icon 
-                                                class="svgicon accordion-icon"
+                                                class="accordion-icon"
                                                 svgIcon="menu"
                                             >
                                             </mat-icon>
@@ -377,37 +377,192 @@
         <mat-tab>
             <ng-template mat-tab-label>
                 <mat-icon
-                    class="svgicon tab-icon"
+                    class="tab-icon"
                     svgIcon="checklist"
                     [ngStyle]="{ 'fill': currentTabIndex === 1 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
                 >
                 </mat-icon>
-                <label class="tab-label" i18n>Cuestionario</label>
+                <label class="tab-label">Cuestionario</label>
             </ng-template>
             <ng-template matTabContent>
-                <mat-divider class="divider extended"></mat-divider>
-                <div class="tabs tab-general-info">
-                    Content 2
-                </div>            
+                <div
+                    class="questionnaire-items"                    
+                    [ngClass]="[ checklist.alarmed ? 'legacy-alarm' : '' ]"
+                >
+                    <div class="text">
+                        Progreso del checklist: {{ checklist.completed }} de {{ checklist.questions }} ({{checklist.valueToChart}}%)
+                    </div>
+                    <div>
+                        <mat-icon
+                            *ngIf="checklist.alarmed"
+                            class="tab-icon item-right"
+                            svgIcon="warn_fill"
+                        >
+                        </mat-icon>
+                    </div>
+                    <div
+                        *ngIf="!checklist.alarmed"
+                        class="text item-right"
+                    >
+                        Sin alarmas
+                    </div>
+                </div>
+                <div
+                    class="tabs tab-questions"
+                    [ngClass]="checklist.viewType === 'flexbox' ? 'flex-box' : ''"
+                >
+                    <mat-card *ngFor="let item of items; let i = index"
+                        class="question-card"
+                        [ngClass]="{ 
+                            'question-alarmed': item.alarmed,
+                            'question-pulse': item.alarmed,
+                            'lagacy-alarm': item.alarmed 
+                        }"                        
+                    >
+                        <mat-progress-bar
+                            *ngIf="item.index > 1000"
+                            mode="indeterminate"
+                            color="warn"
+                            name="active-progress-bar"
+                            class="progress"
+                        >
+                        </mat-progress-bar>
+                        <mat-card-header>
+                            
+                            <div class="question-grid">
+                                <div class="item-index-container">
+                                    <div class="item-index">         
+                                        {{ item.index }}
+                                    </div>
+                                </div>
+                                <div class="item-text">
+                                    <p>{{ item.text }}</p>                                    
+                                </div>
+                                <div class="item-response">
+                                    <div class="item-response-type">
+                                        <ng-container *ngIf="item.answerType === 'yesNo'">
+                                            <mat-chip-listbox>
+                                                <mat-chip-option
+                                                    color="primary"
+                                                    selected
+                                                >
+                                                    Si
+                                                </mat-chip-option>
+                                                <mat-chip-option>
+                                                    No
+                                                </mat-chip-option>                                        
+                                            </mat-chip-listbox>
+                                        </ng-container>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </mat-card-header>
+                        <mat-card-content class="maintenance">                       
+                        </mat-card-content>
+                        <mat-card-footer>
+                            <div class="question-buttons">
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Ayuda visual"
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                >
+                                    ...
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Ayuda visual"
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                >
+                                    <mat-icon
+                                        class="icon-button"
+                                        svgIcon="support"                                
+                                    >
+                                    </mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Adjuntos..."
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                    [ngClass]="[ item.requiresAttachment ? 'warn' : '' ]"
+                                >
+                                    <mat-icon
+                                        class="icon-button"
+                                        svgIcon="attachment"
+                                    >
+                                    </mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Notas"
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                >
+                                    <mat-icon
+                                        class="icon-button"
+                                        svgIcon="reload"                                
+                                    >
+                                    </mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Plan de acción"
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                >
+                                    <mat-icon
+                                        class="icon-button"
+                                        svgIcon="download"                                
+                                    >
+                                    </mat-icon>
+                                </button>
+                                <button
+                                    mat-icon-button
+                                    class="circular-button with-background"
+                                    aria-label="icon-button with menu icon"
+                                    matTooltip="Tomar evidencia (imagen o video)"
+                                    matTooltipClass="tooltip-general"
+                                    matTooltipShowDelay = "100"
+                                >
+                                    <mat-icon
+                                        class="icon-button"
+                                        svgIcon="download"                                
+                                    >
+                                    </mat-icon>
+                                </button>
+                            </div>   
+                        </mat-card-footer>
+                    </mat-card>
+                </div>
             </ng-template>
         </mat-tab>
         <mat-tab>
             <ng-template mat-tab-label>
                 <mat-icon
-                    class="svgicon tab-icon"
+                    class="tab-icon"
                     svgIcon="support"
                     [ngStyle]="{ 'fill': currentTabIndex === 2 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
                 >
                 </mat-icon>
-                <label
-                    class="tab-label"
-                    i18n
+                <label class="tab-label"
                 >
                     Soporte
                 </label>
             </ng-template>
             <ng-template matTabContent>
-                <mat-divider class="divider extended"></mat-divider>
+                <mat-divider class="divider"></mat-divider>
                 <div class="tabs tab-general-info">
                     Content 2
                 </div>            
