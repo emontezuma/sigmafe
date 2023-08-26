@@ -1,0 +1,70 @@
+.toolbar-button  {
+    margin-right: 5px;
+    display: flex;
+    height: 40px;
+    flex-direction: row;
+    border-radius: 8px 0px;
+    border: 2.5px solid rgba(var(--z-colors-primary-rgb), 0.5);
+}
+
+.mdc-button__label {
+    margin-top: -8px;
+}
+
+.button-label {
+    margin-left: 5px;
+    font-weight: 600;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.divider {
+    margin-bottom: 2px;
+}
+
+.divider-title {
+    margin-top: 2px;
+}
+
+.dialog-actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    background-color: var(--z-colors-page-shadow);
+}
+
+.title {
+    font-weight: 700;
+    background-color: var(--z-colors-page-shadow);
+}
+
+.icon-medium {
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0px !important;
+  }
+  
+.spinner-medium-button {
+    color: var(--z-colors-page-button-disabled-fore);
+    position: absolute;
+    left: 0;
+    margin-left: -24px;
+    margin-top: -2px;
+    ::ng-deep circle {
+        stroke: var(--z-colors-page-button-disabled-fore);   
+    }    
+}
+
+.in-button {
+    gap: 5px;
+    align-items: center;
+}
+
+.close-button {
+    background-color: transparent;
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 2rem;
+    margin-right: 5px;
+    margin-top: 5px;
+}

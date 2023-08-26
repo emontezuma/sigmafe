@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-
-import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, } from '../models/screen.models';
+import { BehaviorSubject, Observable, interval } from 'rxjs';
+import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, } from '../models/screen.models';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +8,9 @@ import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStat
 export class SharedService {
   private textToSearch: BehaviorSubject<SearchBox> = new BehaviorSubject<SearchBox>({ textToSearch: '', from: '' });
   search: Observable<SearchBox> = this.textToSearch.asObservable();
+
+  private actionToDo: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1 });
+  toolbarAction: Observable<ToolbarButtonClicked> = this.actionToDo.asObservable();
 
   private showSearchBox: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showSearch: Observable<ShowElement> = this.showSearchBox.asObservable();
@@ -34,11 +36,18 @@ export class SharedService {
   private routeAnimationFinished: BehaviorSubject<animationStatus> = new BehaviorSubject<animationStatus>({ toState: '', fromState: '', isFinished: false });
   isAnimationFinished: Observable<animationStatus> = this.routeAnimationFinished.asObservable();
 
+  private pulseSecond: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  pastSecond: Observable<boolean> = this.pulseSecond.asObservable();
+
   constructor() { }
 
 // Functions ================
   setText(textToSearch: string, from: string) {
     this.textToSearch.next({ textToSearch, from });
+  }
+
+  setToolbarClick(action: ButtonActions, from: string, buttonIndex: number) {
+    this.actionToDo.next({ action, from, buttonIndex });
   }
 
   setSearchBox(from: string, showSearchBox: boolean) {
@@ -49,7 +58,7 @@ export class SharedService {
     this.showGeneralLoader.next({ from, show: showLoading });
   }
 
-  setGeneralPreogressBar(from: string, showProgress: boolean) {
+  setGeneralProgressBar(from: string, showProgress: boolean) {
     this.showGeneralProgressBar.next({ from, show: showProgress });
   }
   
@@ -71,6 +80,11 @@ export class SharedService {
 
   SetAnimationFinished(fromState: string, toState: string, isFinished: boolean) {
     this.routeAnimationFinished.next({ fromState, toState, isFinished });
+  }
+
+  setTimer() {
+    const source = interval(1000);
+    const subscribe = source.subscribe(val => this.pulseSecond.next(true));    
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {
@@ -115,7 +129,7 @@ export class SharedService {
     let result = Math.round((dateTo - dateFrom) / 1000);
     if (result < 3) {
       return $localize `Justo ahora`;
-    } else if (result < 10) {
+    } else if (result < 5) {
       return $localize `Hace un momento...`;
     } else if (result < 30) {
       return $localize `Hace ${result} segundos`;
@@ -134,7 +148,6 @@ export class SharedService {
     }
     return '';
   }
-
 
 // End ======================
 }

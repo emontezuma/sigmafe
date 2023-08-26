@@ -33,29 +33,42 @@
           *ngFor="let number of [0, 1, 2, 4]"
         >
           <mat-card-content>
-            <ngx-skeleton-loader count="3"></ngx-skeleton-loader>              
+            <ngx-skeleton-loader 
+              [theme]="{
+                height: '40px',
+                marginBottom: '0px',
+                backgroundColor: 'rgba(0, 0, 0, 0.075)',                
+              }"
+              count="3"
+            >
+            </ngx-skeleton-loader>              
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>
           <mat-card-content class="image-container">
-            <ngx-skeleton-loader [theme]="{ width: '140px', height: '140px' }" count="1" appearance="circle"></ngx-skeleton-loader>
+            <ngx-skeleton-loader [theme]="{ width: '140px', height: '140px', backgroundColor: 'rgba(0, 0, 0, 0.075)' }" count="1"  appearance="circle"></ngx-skeleton-loader>            
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>       
           <mat-card-footer class="image-text">
             <ngx-skeleton-loader
               class="image"
+              [theme]="{ backgroundColor: 'rgba(0, 0, 0, 0.075)' }"
               count="1"
               appearance="circle"
             >
             </ngx-skeleton-loader>   
             <ngx-skeleton-loader
               class="text"
-              [theme]="{height: '50px'}"
+              [theme]="{height: '50px', backgroundColor: 'rgba(0, 0, 0, 0.075)' }"
               count="1"
             >
-          </ngx-skeleton-loader> 
+            </ngx-skeleton-loader> 
           </mat-card-footer>
           <mat-card-content>
-            <ngx-skeleton-loader count="1"></ngx-skeleton-loader>              
+            <ngx-skeleton-loader
+              [theme]="{ backgroundColor: 'rgba(0, 0, 0, 0.075)' }"
+              count="1"
+            >
+            </ngx-skeleton-loader>              
           </mat-card-content>
         </mat-card>
       </div>

@@ -7,9 +7,9 @@
 }
 
 .meter-0 {
-    color: var(--z-colors-page-primary);
+    color: var(--theme-primary-500);
     ::ng-deep circle {
-        stroke: var(--z-colors-page-primary);    
+        stroke: var(--theme-primary-500);    
     }
 }
 

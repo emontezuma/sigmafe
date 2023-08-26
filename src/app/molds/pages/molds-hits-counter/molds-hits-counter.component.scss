@@ -2,7 +2,7 @@
 
 mat-card {
     max-width: 400px;
-    min-width: 300px;
+    min-width: 350px;
     border-radius: 10px 0px;
 }
 .container {
@@ -15,7 +15,7 @@ mat-card {
 }
 
 .cards-container {
-    @include mixins.grid(10px, 8, space-evenly, 300px, 5px);
+    @include mixins.grid(10px, 8, space-evenly, 350px, 5px);
 }
 
 .loader {

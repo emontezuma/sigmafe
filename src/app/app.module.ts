@@ -22,6 +22,8 @@ import { MoldsEffects } from '../app/state/effects/molds.effects';
 import { SettingsEffects } from '../app/state/effects/settings.effects';
 import { ProfileEffects } from './state/effects/profile.effects';
 import { ColorsEffects } from './state/effects/colors.effects';
+import { ChecklistFillingEffects } from './state/effects/checklists.effects';
+import { GenericDialogComponent } from './shared/components/generic-dialog/generic-dialog.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +31,7 @@ import { ColorsEffects } from './state/effects/colors.effects';
     NotFoundComponent,
     SearchBoxComponent,
     ToolbarComponent,
+    GenericDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -43,7 +46,7 @@ import { ColorsEffects } from './state/effects/colors.effects';
     IconsModule,
     NgxSkeletonLoaderModule.forRoot(),
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([MoldsEffects, SettingsEffects, ProfileEffects, ColorsEffects]),
+    EffectsModule.forRoot([MoldsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects ]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true })
   ],
   providers: [],  

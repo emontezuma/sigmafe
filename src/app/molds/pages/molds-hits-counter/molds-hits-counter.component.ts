@@ -9,7 +9,7 @@ import { AppState } from '../../../state/app.state';
 import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds.actions';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ButtonActions, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
@@ -73,7 +73,7 @@ export class MoldsHitsCounterComponent implements OnInit {
         ApplicationModules.MOLDS_HITS_VIEW,
         loading,
       );
-      this.sharedService.setGeneralPreogressBar(
+      this.sharedService.setGeneralProgressBar(
         ApplicationModules.MOLDS_HITS_VIEW,
         loading,
       );
@@ -171,7 +171,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       showTooltip: true,
       locked: false,
       showCaption: true,
+      loading: false,
       disabled: false,
+      action: ButtonActions.SAVE,
     },{
       type: 'divider',
       caption: '',
@@ -183,19 +185,23 @@ export class MoldsHitsCounterComponent implements OnInit {
       showTooltip: true,
       locked: false,
       showCaption: true,
+      loading: false,
       disabled: true,
+      action: undefined,
     },{
       type: 'button',
       caption: $localize`Exportar`,
       tooltip: $localize`Exporta la vista`,
-      icon: 'download',
       class: '',
+      icon: 'download',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
       locked: false,
       showCaption: true,
+      loading: false,
       disabled: false,
+      action: ButtonActions.EXPORT_TO_EXCEL,
     },{
       type: 'divider',
       caption: '',
@@ -207,7 +213,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       showTooltip: true,
       locked: false,
       showCaption: true,
+      loading: false,
       disabled: true,
+      action: undefined,
     },{
       type: 'searchbox',
       caption: '',
@@ -219,7 +227,9 @@ export class MoldsHitsCounterComponent implements OnInit {
       showTooltip: true,
       locked: false,
       showCaption: true,
+      loading: false,
       disabled: true,
+      action: undefined,
     },];
   }
   

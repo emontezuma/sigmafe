@@ -33,7 +33,10 @@
         #menu="matMenu"
         class="menu"
       >
-        <div *ngFor="let button of toolbarData.buttons; let i = index;">
+        <div 
+          class="menu-container"
+          *ngFor="let button of toolbarData.buttons; let i = index;"
+        >
             <button
                 *ngIf="button.type === 'button'"
                 mat-menu-item
@@ -123,10 +126,10 @@
           *ngIf="toolbarData?.show && toolbarCurrentSize != 'small'"
         >
           <app-toolbar            
-            @downUp
-            (@downUp.done)="toolbarAnimationFinished($event)"
-            (@downUp.start)="toolbarAnimationStarted($event)"
-            [toolbar]="toolbarData"
+            @dissolve
+            (@dissolve.done)="toolbarAnimationFinished($event)"
+            (@dissolve.start)="toolbarAnimationStarted($event)"
+            [toolbar]="toolbarData"            
           >
           </app-toolbar>
         </div>

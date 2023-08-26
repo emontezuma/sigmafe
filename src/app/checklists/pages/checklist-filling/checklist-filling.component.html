@@ -1,572 +1,1259 @@
 <div
-i18n
-    class="container"
-    #checklistFilling
-    @routingAnimation
-    (@routingAnimation.done)="animationFinished($event)"
+  i18n
+  class="container"
+  #checklistFilling
+  @routingAnimation
+  (@routingAnimation.done)="animationFinished($event)"
 >
-    <mat-tab-group
-        mat-stretch-tabs="false"
-        mat-align-tabs="start"
-        animationDuration="500ms"        
-        (selectedIndexChange)="setTabIndex($event)"
-    >
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon
-                    class="tab-icon"
-                    svgIcon="checklist-header"
-                    [ngStyle]="{ 'fill': currentTabIndex === 0 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
-                >
-                </mat-icon>
-                <label class="tab-label">Información general</label>
-            </ng-template>
-            <ng-template matTabContent>
-                <div class="tabs tab-general-info">
-                    <mat-card
-                        class="card"                        
-                    >
-                        <mat-progress-bar
-                            *ngIf="checklist.alarmed"
-                            mode="indeterminate"
-                            color="warn"
-                            name="active-progress-bar"
-                            class="progress"
+  <mat-tab-group
+    mat-stretch-tabs="false"
+    mat-align-tabs="start"
+    animationDuration="500ms"
+    (selectedIndexChange)="setTabIndex($event)"
+    [selectedIndex]="currentTabIndex"
+  >
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon
+          class="tab-icon"
+          svgIcon="checklist-header"
+          [ngStyle]="{
+            fill:
+              currentTabIndex === 0
+                ? 'var(--theme-primary-contrast-100)'
+                : 'var(--z-colors-page-fore)'
+          }"
+        >
+        </mat-icon>
+        <label class="tab-label">Información general</label>
+      </ng-template>
+      <ng-template matTabContent>
+        <div class="tabs tab-general-info">
+          <mat-card class="card">
+            <mat-progress-bar
+              *ngIf="checklist.alarmed"
+              mode="indeterminate"
+              color="warn"
+              name="active-progress-bar"
+              class="progress"
+            >
+            </mat-progress-bar>
+            <div class="layout">
+              <div class="grid-multiple by-row">
+                <div class="grid-multiple">
+                  <div>
+                    <mat-card-title>
+                      <app-label-ellipsis
+                        @dissolve
+                        *ngIf="!loading"
+                        class="label-description"
+                        [label]="checklist.number"
+                      >
+                      </app-label-ellipsis>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Folio Número</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <app-label-ellipsis
+                        @dissolve
+                        *ngIf="!loading"
+                        class="label-description"
+                        [label]="checklist.stateDescription"
+                      >
+                      </app-label-ellipsis>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Estatus del checklist</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="priority">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-reference"
+                          [label]="checklist.priority?.code"
                         >
-                        </mat-progress-bar>
-                        <div class="layout">
-                            <div class="grid-multiple by-row">
-                                <div class="grid-multiple">
-                                    <div>         
-                                        <mat-card-title>133,030</mat-card-title>
-                                        <mat-card-subtitle class="label">Folio Número</mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                    <mat-card-title>ACTIVO / AL DIA</mat-card-title>
-                                    <mat-card-subtitle class="label">Estatus del checklist</mat-card-subtitle>
-                                    </div>                                    
-                                    <div>
-                                        <mat-card-title>
-                                            <div class="flex-col">
-                                                <mat-icon 
-                                                    class="accordion-icon"
-                                                    svgIcon="menu"
-                                                >
-                                                </mat-icon>
-                                                <span class="label-reference">001</span>
-                                                <span class="label-description">NORMAL</span>                                            
-                                            </div>
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Prioridad de checklist</mat-card-subtitle>
-                                    </div>
-                                    <div>                                            
-                                        <mat-card-title
-                                            class="checklist-name"
-                                        >
-                                            <app-label-ellipsis
-                                                class="label-description"
-                                                label="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga."
-                                                [lines]="3"
-                                            >
-                                            </app-label-ellipsis>                                                                                             
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Nombre del checklist</mat-card-subtitle>
-                                    </div>
-                                </div>
-                                <div class="checklist-progress">
-                                    <mat-card-subtitle class="label-progress">Avance</mat-card-subtitle>
-                                    <app-spinner
-                                        class="spinner"
-                                        [diameter]="50"
-                                        [value]="checklist.valueToChart"
-                                        [showBackgound]="true"
-                                        [suffix]="'%'"
-                                        [limits]="limits"
-                                        [fonts]="fonts"
-                                        [exhaustedValue]="'999'"
-                                        [prefix]="'>'"
-                                        [showPrefix]="showPrefix"
-                                        [smallFont]="smallFont"
-                                    ></app-spinner>                        
-                                    <mat-card-subtitle class="label-progress">{{ checklist.completed }} de {{ checklist.questions}}</mat-card-subtitle>
-                                </div>
-                            </div>
-                            <mat-divider class="divider"></mat-divider>
-                            <div class="grid-dates">
-                                <div class="grid-multiple">
-                                    <div>
-                                        <mat-card-title>
-                                            <div class="flex-col">
-                                                <mat-icon 
-                                                    class="accordion-icon"
-                                                    svgIcon="menu"
-                                                >
-                                                </mat-icon>
-                                                <app-label-ellipsis
-                                                    class="label-reference"
-                                                    label="AWEEK-CL"
-                                                >
-                                                </app-label-ellipsis>  
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="AUDITORÍAS SEMANALES"
-                                                >
-                                                </app-label-ellipsis>                                                 
-                                            </div>
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Tipo de checklist</mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title>
-                                            <div class="flex-col">
-                                                <mat-icon 
-                                                    class="accordion-icon"
-                                                    svgIcon="menu"
-                                                >
-                                                </mat-icon>
-                                                <span class="label-reference">P</span>
-                                                <span class="label-description">PROGRAMADO</span>                                                                                  
-                                            </div>
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Clase de checklist</mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title>
-                                            <div class="flex-col">
-                                                <mat-icon 
-                                                    class="accordion-icon"
-                                                    svgIcon="menu"
-                                                >
-                                                </mat-icon>
-                                                <app-label-ellipsis
-                                                    class="label-reference"
-                                                    label="Pys-P01-MEXd"
-                                                >
-                                                </app-label-ellipsis>  
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="PERSONAL DE ADMINISTRACIÓN EN PLANTA"
-                                                >
-                                                </app-label-ellipsis>  
-                                            </div>
-                                        </mat-card-title>                                        
-                                        <mat-card-subtitle class="label">Proyecto</mat-card-subtitle>
-                                    </div>
-                                </div>
-                            </div>                            
-                            <div class="grid-dates">
-                                <div class="grid-multiple">
-                                    <div>
-                                        <mat-card-title>                                        
-                                            <app-label-ellipsis
-                                                class="label-description"
-                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
-                                            >
-                                            </app-label-ellipsis>                                                 
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Fecha límite para iniciar</mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title>
-                                            <app-label-ellipsis
-                                                class="label-description"
-                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
-                                            >
-                                            </app-label-ellipsis>                                                 
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Fecha de inicio</mat-card-subtitle>
-                                    </div>
-                                    <div>
-                                        <mat-card-title>
-                                            <app-label-ellipsis
-                                                class="label-description"
-                                                label="Jueves, 06-Ago-2023 12:00:00 PM"
-                                            >
-                                            </app-label-ellipsis>                                                 
-                                        </mat-card-title>
-                                        <mat-card-subtitle class="label">Fecha límite para terminar</mat-card-subtitle>
-                                    </div>
-                                </div>
-                            </div>
-                            <mat-divider class="divider"></mat-divider>
-                            <mat-accordion multi>
-                                <mat-expansion-panel
-                                    (opened)="panelOpenState[0] = true" 
-                                    (closed)="panelOpenState[0] = false"
-                                    hideToggle="true"
-                                    [expanded]="panelOpenState[0]" 
-                                >
-                                    <mat-expansion-panel-header
-                                        [collapsedHeight]="'55px'"
-                                        [ngStyle]="{ 'background-color': panelOpenState[0] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
-    
-                                    >                                            
-                                        <mat-panel-title>
-                                            <mat-icon 
-                                                class="accordion-icon"
-                                                svgIcon="menu"
-                                            >
-                                            </mat-icon>
-                                            <label class="accordion-label">Asignación del checklist</label>                                                
-                                        </mat-panel-title>
-                                        <div class="icon-button-container">
-                                            <button
-                                                mat-icon-button
-                                                class="icon-button open"
-                                                aria-label="icon-button with menu icon"
-                                            >
-                                                <mat-icon 
-                                                    class="icon-button"
-                                                    >
-                                                        {{ panelOpenState[0] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-                                                </mat-icon>
-                                            </button>
-                                        </div>
-                                    </mat-expansion-panel-header>                                  
-                                    <div class="grid-multiple margin-top">
-                                        <div>                         
-                                            <mat-card-title>
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="ELVIS ENRIQUE MONTEZUMA VILLEGAS"
-                                                >
-                                                </app-label-ellipsis> 
-                                            </mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Asignado a
-                                            </mat-card-subtitle>
-                                        </div>
-                                        <div>
-                                            <mat-card-title>
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="IT"
-                                                >
-                                                </app-label-ellipsis> 
-                                            </mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Departamento
-                                            </mat-card-subtitle>
-                                        </div>
-                                        <div>
-                                            <mat-card-title>
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="Jueves, 06-Ago-2023 12:00:00 PM"
-                                                >
-                                                </app-label-ellipsis> 
-                                            </mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Fecha de asignación
-                                            </mat-card-subtitle>
-                                        </div>
-                                        <div>
-                                            <mat-card-title>
-                                                <app-label-ellipsis
-                                                    class="label-description"
-                                                    label="AUTOMÁTICA"
-                                                >
-                                                </app-label-ellipsis> 
-                                            </mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Tipo de asignación
-                                            </mat-card-subtitle>
-                                        </div>
-                                    </div>
-                                </mat-expansion-panel>
-                                <mat-expansion-panel
-                                    (opened)="panelOpenState[1] = true" 
-                                    (closed)="panelOpenState[1] = false"
-                                    hideToggle="true"
-                                    [expanded]="panelOpenState[1]" 
-                                >
-                                    <mat-expansion-panel-header
-                                        [collapsedHeight]="'55px'"
-                                        [ngStyle]="{ 'background-color': panelOpenState[1] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
-    
-                                    >                                            
-                                        <mat-panel-title>
-                                            <mat-icon 
-                                                class="accordion-icon"
-                                                svgIcon="menu"
-                                            >
-                                            </mat-icon>
-                                            <label class="accordion-label">Planificación del checklist</label>                                                
-                                        </mat-panel-title>
-                                        <div class="icon-button-container">
-                                            <button
-                                                mat-icon-button
-                                                class="icon-button open"
-                                                aria-label="icon-button with menu icon"
-                                            >
-                                                <mat-icon 
-                                                    class="icon-button"
-                                                    >
-                                                        {{ panelOpenState[1] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-                                                </mat-icon>
-                                            </button>
-                                        </div>
-                                    </mat-expansion-panel-header>                                  
-                                    <div class="grid-multiple margin-top">
-                                        <div>                         
-                                            <mat-card-title>ELISEO PEREZ</mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Planificado por
-                                            </mat-card-subtitle>
-                                        </div>
-                                        <div>
-                                            <mat-card-title>DIRECCIÓN DE FINANZAS</mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Departamento
-                                            </mat-card-subtitle>
-                                        </div>
-                                        <div>
-                                            <mat-card-title>Jueves, 06-Ago-2023 12:00:00 PM</mat-card-title>
-                                            <mat-card-subtitle class="label">
-                                                Fecha de planificación
-                                            </mat-card-subtitle>
-                                        </div>
-                                    </div>
-                                </mat-expansion-panel>
-                                <mat-expansion-panel
-                                    (opened)="panelOpenState[2] = true" 
-                                    (closed)="panelOpenState[2] = false"
-                                    hideToggle="true"
-                                    [expanded]="panelOpenState[2]" 
-                                >
-                                    <mat-expansion-panel-header
-                                        [collapsedHeight]="'55px'"
-                                        [ngStyle]="{ 'background-color': panelOpenState[2] ? 'var(--z-colors-page-shadow)' : 'var(--z-colors-page-card-background-color)' }"
-    
-                                    >                                            
-                                        <mat-panel-title>
-                                            <mat-icon 
-                                                class="accordion-icon"
-                                                svgIcon="menu"
-                                            >
-                                            </mat-icon>
-                                            <label class="accordion-label">Notas del checklist</label>                                                
-                                        </mat-panel-title>
-                                        <div class="icon-button-container">
-                                            <button
-                                                mat-icon-button
-                                                class="icon-button open"
-                                                aria-label="icon-button with menu icon"
-                                            >
-                                                <mat-icon 
-                                                    class="icon-button"
-                                                    >
-                                                        {{ panelOpenState[2] ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-                                                </mat-icon>
-                                            </button>
-                                        </div>
-                                    </mat-expansion-panel-header>                                  
-                                    <div class="grid-multiple margin-top">
-                                        <div class="notes-content">
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.                                     
-                                        </div>                        
-                                    </div>
-                                </mat-expansion-panel>
-                            </mat-accordion>                            
-                            
-                        </div>  
-                    </mat-card>
+                        </app-label-ellipsis>
+                        <app-label-ellipsis
+                          class="label-description-with-reference"
+                          [label]="checklist.priority?.description"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Prioridad de checklist</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title
+                      class="checklist-name"
+                      @dissolve
+                      *ngIf="!loading"
+                    >
+                      <app-label-ellipsis
+                        class="label-description"
+                        [label]="checklist.description"
+                        [lines]="3"
+                      >
+                      </app-label-ellipsis>
+                    </mat-card-title>
+                    <ngx-skeleton-loader
+                      *ngIf="loading"
+                      class="text"
+                      [theme]="{ height: '23px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', }"
+                      count="1"
+                    >
+                    </ngx-skeleton-loader>
+                    <mat-card-subtitle class="label">Nombre del checklist</mat-card-subtitle>
+                  </div>
                 </div>
-            </ng-template>
-        </mat-tab>
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon
-                    class="tab-icon"
-                    svgIcon="checklist"
-                    [ngStyle]="{ 'fill': currentTabIndex === 1 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
+                <div class="checklist-progress">
+                  <mat-card-subtitle
+                    *ngIf="!loading"
+                    @dissolve
+                    class="label-progress"
+                  >
+                    Avance
+                  </mat-card-subtitle>
+                  <ngx-skeleton-loader
+                    *ngIf="loading"
+                    class="text"
+                    [theme]="{ height: '12px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', }"
+                    count="1"
+                  >
+                  </ngx-skeleton-loader>
+                  <app-spinner
+                    @dissolve
+                    *ngIf="!loading"
+                    class="spinner"
+                    [diameter]="50"
+                    [value]="checklistProgress"
+                    [showBackgound]="true"
+                    [suffix]="'%'"
+                    [limits]="limits"
+                    [fonts]="fonts"
+                    [exhaustedValue]="'999'"
+                    [prefix]="'>'"
+                    [showPrefix]="showPrefix"
+                    [smallFont]="smallFont"
+                  ></app-spinner>
+                  <ngx-skeleton-loader
+                    *ngIf="loading"
+                    class="image"
+                    [theme]="{ height: '46px', width: '46px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', marginLeft: '13px', }"
+                    count="1"
+                    appearance="circle"
+                  >
+                  </ngx-skeleton-loader>
+                  <mat-card-subtitle
+                    *ngIf="!loading"
+                    @dissolve
+                    class="label-progress"
+                  >
+                    {{ checklist.completed }} de {{ checklist.questions }}
+                  </mat-card-subtitle>
+                  <ngx-skeleton-loader
+                    *ngIf="loading"
+                    class="text"
+                    [theme]="{
+                      marginTop: '5px',
+                      height: '12px',
+                      marginBottom: '0px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                    }"
+                    count="1"
+                  >
+                  </ngx-skeleton-loader>
+                </div>
+              </div>
+              <mat-divider class="divider"></mat-divider>
+              <div class="grid-dates">
+                <div class="grid-multiple">
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="gear">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-reference"
+                          [label]="checklist.equipment?.number"
+                        >
+                        </app-label-ellipsis>
+                        <app-label-ellipsis
+                          class="label-description-with-reference"
+                          [label]="checklist.equipment?.description"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px', 
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Equipo/Máquina</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="event">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-description"
+                          [label]="checklist.equipment?.lastChecklistDate"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Fecha del último checklist</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="man">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-description"
+                          [label]="checklist.equipment?.lastChecklistAuditor"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Efectuado por</mat-card-subtitle>
+                  </div>                  
+
+                  <div class="grid-multiple equipment">
+                    <mat-card-subtitle class="label">
+                      Notas del equipo/máquina
+                    </mat-card-subtitle>                    
+                  
+                    <div                       
+                      class="notes-content"
+                    >
+                      <div
+                        class="long-text"
+                        @dissolve
+                        *ngIf="!loading"
+                      >
+                        {{ checklist.equipment?.extendedInfo || 'No hay notas para éste equipo/máquina...' }}
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                        height: '16px',
+                        marginBottom: '0px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                        }"
+                        count="3"
+                      >
+                      </ngx-skeleton-loader>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-dates">
+                <div class="grid-multiple">
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="white_list">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-reference"
+                          [label]="checklist.type?.code"
+                        >
+                        </app-label-ellipsis>
+                        <app-label-ellipsis
+                          class="label-description-with-reference"
+                          [label]="checklist.type?.description"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px', 
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Tipo de checklist</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="white_list">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-reference"
+                          [label]="checklist.class?.code"
+                        >
+                        </app-label-ellipsis>
+                        <app-label-ellipsis
+                          class="label-description-with-reference"
+                          [label]="checklist.class?.description"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Clase de checklist</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="briefcase">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-reference"
+                          [label]="checklist.project?.code"
+                        >
+                        </app-label-ellipsis>
+                        <app-label-ellipsis
+                          class="label-description-with-reference"
+                          [label]="checklist.project?.description"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Proyecto</mat-card-subtitle>
+                  </div>
+                </div>
+              </div>
+              <div class="grid-dates">
+                <div class="grid-multiple">
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="event">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-description"
+                          [label]="checklist.dueDateToStart"
+                        >
+                        </app-label-ellipsis>
+                      </div>                        
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Fecha límite para iniciar</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="event">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-description"
+                          [label]="checklist.startDate"
+                        >
+                        </app-label-ellipsis>
+                      </div>                        
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Fecha de inicio</mat-card-subtitle>
+                  </div>
+                  <div>
+                    <mat-card-title>
+                      <div @dissolve *ngIf="!loading" class="flex-col">
+                        <mat-icon class="accordion-icon" svgIcon="event">
+                        </mat-icon>
+                        <app-label-ellipsis
+                          class="label-description"
+                          [label]="checklist.dueDateToFinish"
+                        >
+                        </app-label-ellipsis>
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                        }"
+                        count="1"
+                      >
+                      </ngx-skeleton-loader>
+                    </mat-card-title>
+                    <mat-card-subtitle class="label">Fecha límite para terminar</mat-card-subtitle>
+                  </div>
+                </div>
+              </div>
+              <mat-divider class="divider"></mat-divider>
+              <mat-accordion multi>
+                <mat-expansion-panel
+                  (opened)="panelOpenState[0] = true"
+                  (closed)="panelOpenState[0] = false"
+                  hideToggle="true"
+                  [expanded]="panelOpenState[0]"
                 >
-                </mat-icon>
-                <label class="tab-label">Cuestionario</label>
-            </ng-template>
-            <ng-template matTabContent>
-                <div
-                    class="questionnaire-items"                    
-                    [ngClass]="[ checklist.alarmed ? 'legacy-alarm' : '' ]"
-                >
-                    <div class="text">
-                        Progreso del checklist: {{ checklist.completed }} de {{ checklist.questions }} ({{checklist.valueToChart}}%)
+                  <mat-expansion-panel-header
+                    [collapsedHeight]="'55px'"
+                    [ngStyle]="{
+                      'background-color': panelOpenState[0]
+                        ? 'var(--z-colors-page-shadow)'
+                        : 'var(--z-colors-page-card-background-color)'
+                    }"
+                  >
+                    <mat-panel-title>
+                      <mat-icon class="accordion-icon" svgIcon="assignement">
+                      </mat-icon>
+                      <label class="accordion-label"
+                        >Asignación del checklist</label
+                      >
+                    </mat-panel-title>
+                    <div class="icon-button-container">
+                      <button
+                        mat-icon-button
+                        class="icon-button open"
+                        aria-label="icon-button with menu icon"
+                      >
+                        <mat-icon class="icon-button">
+                          {{
+                            panelOpenState[0]
+                              ? "keyboard_arrow_up"
+                              : "keyboard_arrow_down"
+                          }}
+                        </mat-icon>
+                      </button>
+                    </div>
+                  </mat-expansion-panel-header>
+                  <div class="grid-multiple margin-top">
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.assignement?.name"
+                        >
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Asignado a
+                      </mat-card-subtitle>
                     </div>
                     <div>
-                        <mat-icon
-                            *ngIf="checklist.alarmed"
-                            class="tab-icon item-right"
-                            svgIcon="warn_fill"
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.assignement?.department"
                         >
-                        </mat-icon>
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Departamento
+                      </mat-card-subtitle>
                     </div>
-                    <div
-                        *ngIf="!checklist.alarmed"
-                        class="text item-right"
-                    >
-                        Sin alarmas
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.assignement?.date"
+                        >
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Fecha de asignación
+                      </mat-card-subtitle>
                     </div>
-                </div>
-                <div
-                    class="tabs tab-questions"
-                    [ngClass]="checklist.viewType === 'flexbox' ? 'flex-box' : ''"
+                    <div>
+                      <mat-card-title>
+                        <div @dissolve *ngIf="!loading" class="flex-col">
+                          <mat-icon class="accordion-icon" svgIcon="country">
+                          </mat-icon>
+                          <app-label-ellipsis
+                            class="label-description"
+                            [label]="checklist.assignement?.countryName"
+                          >
+                          </app-label-ellipsis>
+                        </div>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        País
+                      </mat-card-subtitle>
+                    </div>
+                    <div>
+                      <mat-card-title>
+                        <div @dissolve *ngIf="!loading" class="flex-col">
+                          <mat-icon class="accordion-icon" svgIcon="company">
+                          </mat-icon>
+                          <app-label-ellipsis
+                            class="label-description"
+                            [label]="checklist.assignement?.companyName"
+                          >
+                          </app-label-ellipsis>
+                        </div>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Compañía
+                      </mat-card-subtitle>
+                    </div>
+                    <div>
+                      <mat-card-title>
+                        <div @dissolve *ngIf="!loading" class="flex-col">
+                          <mat-icon class="accordion-icon" svgIcon="industry">
+                          </mat-icon>
+                          <app-label-ellipsis
+                            class="label-description"
+                            [label]="checklist.assignement?.plantName"
+                          >
+                          </app-label-ellipsis>
+                        </div>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Planta
+                      </mat-card-subtitle>
+                    </div>
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.assignement?.type"
+                        >
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Tipo de asignación
+                      </mat-card-subtitle>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+                <mat-expansion-panel
+                  (opened)="panelOpenState[1] = true"
+                  (closed)="panelOpenState[1] = false"
+                  hideToggle="true"
+                  [expanded]="panelOpenState[1]"
                 >
-                    <mat-card *ngFor="let item of items; let i = index"
-                        class="question-card"
-                        [ngClass]="{ 
-                            'question-alarmed': item.alarmed,
-                            'question-pulse': item.alarmed,
-                            'lagacy-alarm': item.alarmed 
-                        }"                        
-                    >
-                        <mat-progress-bar
-                            *ngIf="item.index > 1000"
-                            mode="indeterminate"
-                            color="warn"
-                            name="active-progress-bar"
-                            class="progress"
+                  <mat-expansion-panel-header
+                    [collapsedHeight]="'55px'"
+                    [ngStyle]="{
+                      'background-color': panelOpenState[1]
+                        ? 'var(--z-colors-page-shadow)'
+                        : 'var(--z-colors-page-card-background-color)'
+                    }"
+                  >
+                    <mat-panel-title>
+                      <mat-icon class="accordion-icon" svgIcon="time">
+                      </mat-icon>
+                      <label class="accordion-label"
+                        >Planificación del checklist</label
+                      >
+                    </mat-panel-title>
+                    <div class="icon-button-container">
+                      <button
+                        mat-icon-button
+                        class="icon-button open"
+                        aria-label="icon-button with menu icon"
+                      >
+                        <mat-icon class="icon-button">
+                          {{
+                            panelOpenState[1]
+                              ? "keyboard_arrow_up"
+                              : "keyboard_arrow_down"
+                          }}
+                        </mat-icon>
+                      </button>
+                    </div>
+                  </mat-expansion-panel-header>
+                  <div class="grid-multiple margin-top">
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.planning?.name"
                         >
-                        </mat-progress-bar>
-                        <mat-card-header>
-                            
-                            <div class="question-grid">
-                                <div class="item-index-container">
-                                    <div class="item-index">         
-                                        {{ item.index }}
-                                    </div>
-                                </div>
-                                <div class="item-text">
-                                    <p>{{ item.text }}</p>                                    
-                                </div>
-                                <div class="item-response">
-                                    <div class="item-response-type">
-                                        <ng-container *ngIf="item.answerType === 'yesNo'">
-                                            <mat-chip-listbox>
-                                                <mat-chip-option
-                                                    color="primary"
-                                                    selected
-                                                >
-                                                    Si
-                                                </mat-chip-option>
-                                                <mat-chip-option>
-                                                    No
-                                                </mat-chip-option>                                        
-                                            </mat-chip-listbox>
-                                        </ng-container>
-                                    </div>
-                                </div>
-                            </div>                            
-                        </mat-card-header>
-                        <mat-card-content class="maintenance">                       
-                        </mat-card-content>
-                        <mat-card-footer>
-                            <div class="question-buttons">
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Ayuda visual"
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                >
-                                    ...
-                                </button>
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Ayuda visual"
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                >
-                                    <mat-icon
-                                        class="icon-button"
-                                        svgIcon="support"                                
-                                    >
-                                    </mat-icon>
-                                </button>
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Adjuntos..."
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                    [ngClass]="[ item.requiresAttachment ? 'warn' : '' ]"
-                                >
-                                    <mat-icon
-                                        class="icon-button"
-                                        svgIcon="attachment"
-                                    >
-                                    </mat-icon>
-                                </button>
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Notas"
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                >
-                                    <mat-icon
-                                        class="icon-button"
-                                        svgIcon="reload"                                
-                                    >
-                                    </mat-icon>
-                                </button>
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Plan de acción"
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                >
-                                    <mat-icon
-                                        class="icon-button"
-                                        svgIcon="download"                                
-                                    >
-                                    </mat-icon>
-                                </button>
-                                <button
-                                    mat-icon-button
-                                    class="circular-button with-background"
-                                    aria-label="icon-button with menu icon"
-                                    matTooltip="Tomar evidencia (imagen o video)"
-                                    matTooltipClass="tooltip-general"
-                                    matTooltipShowDelay = "100"
-                                >
-                                    <mat-icon
-                                        class="icon-button"
-                                        svgIcon="download"                                
-                                    >
-                                    </mat-icon>
-                                </button>
-                            </div>   
-                        </mat-card-footer>
-                    </mat-card>
-                </div>
-            </ng-template>
-        </mat-tab>
-        <mat-tab>
-            <ng-template mat-tab-label>
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Planificado por
+                      </mat-card-subtitle>
+                    </div>
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.planning?.department"
+                        >
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Departamento
+                      </mat-card-subtitle>
+                    </div>
+                    <div>
+                      <mat-card-title>
+                        <app-label-ellipsis
+                          @dissolve
+                          *ngIf="!loading"
+                          class="label-description"
+                          [label]="checklist.planning?.date | date : 'long'"
+                        >
+                        </app-label-ellipsis>
+                        <ngx-skeleton-loader
+                          *ngIf="loading"
+                          class="text"
+                          [theme]="{
+                          height: '23px',
+                          marginBottom: '0px',
+                          backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                          width: '90%'
+                          }"
+                          count="1"
+                        >
+                        </ngx-skeleton-loader>
+                      </mat-card-title>
+                      <mat-card-subtitle class="label">
+                        Fecha de planificación
+                      </mat-card-subtitle>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+                <mat-expansion-panel
+                  (opened)="panelOpenState[2] = true"
+                  (closed)="panelOpenState[2] = false"
+                  hideToggle="true"
+                  [expanded]="panelOpenState[2]"
+                >
+                  <mat-expansion-panel-header
+                    [collapsedHeight]="'55px'"
+                    [ngStyle]="{
+                      'background-color': panelOpenState[2]
+                        ? 'var(--z-colors-page-shadow)'
+                        : 'var(--z-colors-page-card-background-color)'
+                    }"
+                  >
+                    <mat-panel-title>
+                      <mat-icon class="accordion-icon" svgIcon="task_notes">
+                      </mat-icon>
+                      <label class="accordion-label">Notas del checklist</label>
+                    </mat-panel-title>
+                    <div class="icon-button-container">
+                      <button
+                        mat-icon-button
+                        class="icon-button open"
+                        aria-label="icon-button with menu icon"
+                      >
+                        <mat-icon class="icon-button">
+                          {{
+                            panelOpenState[2]
+                              ? "keyboard_arrow_up"
+                              : "keyboard_arrow_down"
+                          }}
+                        </mat-icon>
+                      </button>
+                    </div>
+                  </mat-expansion-panel-header>
+                  <div class="grid-multiple margin-top">
+                    <div                       
+                      class="notes-content"
+                    >
+                      <div
+                        @dissolve
+                        *ngIf="!loading"
+                      >
+                        {{ checklist.extendedInfo }}
+                      </div>
+                      <ngx-skeleton-loader
+                        *ngIf="loading"
+                        class="text"
+                        [theme]="{
+                        height: '16px',
+                        marginBottom: '0px',
+                        backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                        }"
+                        count="5"
+                      >
+                      </ngx-skeleton-loader>
+                    </div>
+                  </div>
+                </mat-expansion-panel>
+              </mat-accordion>
+            </div>
+          </mat-card>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon
+          class="tab-icon"
+          svgIcon="checklist"
+          [ngStyle]="{
+            fill:
+              currentTabIndex === 1
+                ? 'var(--theme-primary-contrast-100)'
+                : 'var(--z-colors-page-fore)'
+          }"
+        >
+        </mat-icon>
+        <label class="tab-label">Cuestionario</label>
+      </ng-template>
+      <ng-template matTabContent>
+        <div class="flex-box checklist-toolbar">
+          <div
+            class="flex-box progress-border"
+            [ngClass]="{ 'pulse': checklist.alarmed, 'border-primary': !checklist.alarmed }"
+            matTooltip="Avance: {{ checklist.completed }} de {{
+              checklist.questions
+            }}  {{ checklist.itemsAlarmedText }}"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+          >
+            <div
+              class="flex-box progress-spinner"
+              [ngClass]="[checklist.alarmed ? 'legacy-alarm' : 'legacy-primary']"
+            >
+              {{ checklistProgress }}%
+            </div>
+          </div>
+          <div class="questionnaire-progress">
+            Avance: {{ checklist.completed }} de {{ checklist.questions }}
+            <strong>{{ checklist.itemsAlarmedText }}</strong>
+          </div>
+          <div class="margined"></div>
+          <button
+            mat-button
+            class="toolbar-menu"
+            aria-label="icon-button with menu icon"
+            matTooltip="Cambiar el layoout del checklist"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+            [matMenuTriggerFor]="menuLayouts"
+          >
+            <div class="flex-box in-button">
+              <span class="top-text">Layout</span>
+              <mat-icon
+                class="icon-medium"
+                [svgIcon]="selectedLayout ? selectedLayout.icon : ''"
+              >
+              </mat-icon>
+              <label class="button-label">{{ selectedLayout?.caption }}</label>
+              <mat-divider class="divider-vertical" vertical> </mat-divider>
+              <mat-icon class="icon-button small-icon">
+                keyboard_arrow_down
+              </mat-icon>
+            </div>
+          </button>
+          <mat-menu #menuLayouts="matMenu" class="menu">
+            <div
+              class="menu-container"
+              *ngFor="let button of layouts; let i = index"
+            >
+              <button
+                mat-menu-item
+                class="toolbar-button-small"
+                [ngClass]="{
+                  'selected-view': button.value === selectedLayout?.value
+                }"
+                aria-label="icon-button with menu icon"
+                i18n-placeHolder
+                (click)="selectLayout(button.value)"
+              >
+                <mat-icon [svgIcon]="button.icon" class="menu-button">
+                </mat-icon>
+                <span class="menu-text">{{ button.caption }}</span>
                 <mat-icon
-                    class="tab-icon"
-                    svgIcon="support"
-                    [ngStyle]="{ 'fill': currentTabIndex === 2 ? 'var(--z-colors-page-primary)' : 'var(--z-colors-page-fore)' }"
+                  *ngIf="button.value === selectedLayout?.value"
+                  class="icon-button small-icon menu-button checkmark"
+                >
+                  check
+                </mat-icon>
+              </button>
+            </div>
+          </mat-menu>
+          <button
+            mat-button
+            class="toolbar-menu"
+            [ngClass]="{ 'pulse-menu': animatingQuestion }"
+            pulse-menu
+            aria-label="icon-button with menu icon"
+            matTooltip="Cambiar el formato del checklist"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+            [matMenuTriggerFor]="menuView"
+          >
+            <div class="flex-box in-button">
+              <span class="top-text">Respuestas</span>
+              <mat-icon
+                class="icon-medium"
+                [svgIcon]="selectedView ? selectedView.icon : ''"
+              >
+              </mat-icon>
+              <label class="button-label">{{ selectedView?.caption }}</label>
+              <mat-divider class="divider-vertical" vertical> </mat-divider>
+              <mat-icon class="icon-button small-icon">
+                keyboard_arrow_down
+              </mat-icon>
+            </div>
+          </button>
+          <mat-menu #menuView="matMenu" class="menu">
+            <div
+              class="menu-container"
+              *ngFor="let button of views; let i = index"
+            >
+              <button
+                mat-menu-item
+                class="toolbar-button-small"
+                [ngClass]="{
+                  'selected-view': button.value === selectedView?.value
+                }"
+                aria-label="icon-button with menu icon"
+                i18n-placeHolder
+                (click)="selectView(button.value)"
+              >
+                <mat-icon [svgIcon]="button.icon" class="menu-button">
+                </mat-icon>
+                <span class="menu-text">{{ button.caption }}</span>
+                <mat-icon
+                  *ngIf="button.value === selectedView?.value"
+                  class="icon-button small-icon menu-button checkmark"
+                >
+                  check
+                </mat-icon>
+              </button>
+            </div>
+          </mat-menu>
+        </div>
+        <div          
+          class="tabs tab-questions"
+          [ngClass]="
+            selectedLayout?.value === 'flexbox'
+              ? 'flex-box-view'
+              : selectedLayout?.value === 'checklist'
+              ? 'checklist-view'
+              : ''
+          "
+        >
+          <ng-container *ngFor="let item of checklist.items; let i = index">
+            <ng-container 
+              *ngIf="selectedView.value === 'all' || 
+              (selectedView.value === 'answered' && item.status === 'completed') ||
+              (selectedView.value === 'unanswered' && item.status !== 'completed' && item.status !== 'cancelled')">
+              <mat-card                         
+                class="question-card"
+                [ngClass]="{
+                  'question-alarmed': item.alarmed,
+                  'lagacy-alarm': item.alarmed,
+                  'question-cancelled': item.status === 'cancelled',
+                }"
+              >
+              <div
+                @dissolve
+                *ngIf="item.status === 'cancelled' || item.status === 'completed' || item.status === 'attachmentMissing' || item.actionRequired"
+                class="corner"
+                [ngStyle]="{
+                  backgroundColor:
+                  item.status === 'completed' 
+                      ? 'var(--theme-accent-500)'
+                      : 'var(--theme-warn-500)'
+                }"
+              >
+                <mat-icon
+                  *ngIf="item.status === 'attachmentMissing' || item.actionRequired || item.status === 'cancelled'"
+                  class="over-icon"
+                  [svgIcon]="item.status === 'attachmentMissing' ? 'attachment_file' : item.status === 'cancelled' ? 'block' : 'warn_fill'"
+                  [matTooltip]="item.status === 'attachmentMissing' ? 'Se requiere agregar un adjunto' : item.status === 'cancelled' ? 'La pregunta fue cancelada y no necesita respuesta' : 'Se requiere una acción'"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"        
                 >
                 </mat-icon>
-                <label class="tab-label"
+                <mat-icon
+                  *ngIf="item.status === 'completed'"
+                  class="over-icon"
+                  svgIcon="check"              
                 >
-                    Soporte
-                </label>
-            </ng-template>
-            <ng-template matTabContent>
-                <mat-divider class="divider"></mat-divider>
-                <div class="tabs tab-general-info">
-                    Content 2
-                </div>            
-            </ng-template>
-        </mat-tab>
-    </mat-tab-group>
+                </mat-icon>
+              </div>
+                <mat-progress-bar
+                  *ngIf="(item.index || 0) > 1000"
+                  mode="indeterminate"
+                  color="warn"
+                  name="active-progress-bar"
+                  class="progress"
+                >          
+                </mat-progress-bar>
+                <mat-card-header>
+                  <ng-container *ngIf="item.answerType === 'yesNo'">
+                    <div class="question-grid">
+                      <div class="item-index-container">
+                        <div class="item-index">
+                          {{ item.index }}
+                        </div>
+                      </div>                  
+                      <div class="item-response">
+                        <div class="item-response-type">
+                          <mat-chip-listbox
+                            (change)="setAnswer(item.index, $event)"
+                            [disabled]="item.status === 'cancelled'"
+                          >
+                            <mat-chip-option
+                              value="y"
+                              [selected]="item.answer === 'y'"
+                            >
+                              Si
+                            </mat-chip-option>
+                            <mat-chip-option
+                              value="n"
+                              [selected]="item.answer === 'n'"
+                            >
+                              No
+                            </mat-chip-option>
+                          </mat-chip-listbox>
+                        </div>
+                        <button
+                          mat-icon-button
+                          class="circular-button with-background small"
+                          aria-label="icon-button with menu icon"
+                          matTooltip="Reiniciar respuesta"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          (click)="setAnswer(item.index, undefined)"
+                          [disabled]="item.status === 'cancelled'"
+                        >
+                          <mat-icon class="icon-button" svgIcon="cancel">
+                          </mat-icon>
+                        </button>
+                      </div>
+                      <div class="item-text">
+                        <p>{{ item.text }}</p>
+                      </div>
+                    </div>
+                  </ng-container>
+                </mat-card-header>
+                <mat-card-content class="maintenance"> </mat-card-content>
+                <mat-card-footer *ngIf="item.status !== 'cancelled'">
+                  <div class="question-buttons">
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Información adicional..."
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                    >
+                      <mat-icon class="icon-button" svgIcon="more_info"> </mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Ayuda visual"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"                  
+                    >
+                      <mat-icon class="icon-button" svgIcon="support"> </mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Adjuntos..."
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [ngClass]="{ 'warn': item.attachmentRequired, 'pulse': item.attachmentRequired }"
+                      [disabled]="!item.allowAttachments"
+                    >
+                      <mat-icon class="icon-button" svgIcon="attachment">
+                      </mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Notas"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="!item.allowNotes"
+                    >
+                      <mat-icon class="icon-button" svgIcon="reload"> </mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Plan de acción"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="!item.allowActionPlans"
+                    >
+                      <mat-icon class="icon-button" svgIcon="download"> </mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      class="circular-button with-background"
+                      aria-label="icon-button with menu icon"
+                      matTooltip="Tomar evidencia (imagen o video)"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="!item.allowVisualEvidence"
+                    >
+                      <mat-icon class="icon-button" svgIcon="download"> </mat-icon>
+                    </button>
+                  </div>
+                </mat-card-footer>
+              </mat-card>
+            </ng-container>
+          </ng-container>
+        </div>
+      </ng-template>
+    </mat-tab>
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon
+          class="tab-icon"
+          svgIcon="support"
+          [ngStyle]="{
+            fill:
+              currentTabIndex === 2
+                ? 'var(--theme-primary-contrast-100)'
+                : 'var(--z-colors-page-fore)'
+          }"
+        >
+        </mat-icon>
+        <label class="tab-label"> Soporte </label>
+      </ng-template>
+      <ng-template matTabContent>
+        <mat-divider class="divider"></mat-divider>
+        <div class="tabs tab-general-info">Content 2</div>
+      </ng-template>
+    </mat-tab>
+  </mat-tab-group>
 </div>

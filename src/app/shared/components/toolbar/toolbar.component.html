@@ -15,14 +15,23 @@
                     [matTooltip]="button.tooltip"
                     matTooltipClass = "tooltip-general"
                     matTooltipShowDelay = "100"
-                    [disabled]="button.disabled"
+                    [disabled]="button.disabled || button.loading"
+                    (click)="handleClick(i, button.action)"
                 >
                     <mat-icon
                         *ngIf="button.showIcon"
-                        class="icon-toolbar medium"
+                        class="svgicon icon-medium"
+                        [ngStyle]="{ 'visibility': button.loading ? 'hidden' : 'visible' }"
                         [svgIcon]="button.icon"
                     >                            
                     </mat-icon>
+                    <mat-progress-spinner
+                        *ngIf="button.loading"
+                        class="spinner-regular-button"
+                        diameter="32"      
+                        mode="indeterminate"                        
+                    >
+                    </mat-progress-spinner>                    
                     <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
                 </button>
                 <mat-divider
@@ -44,7 +53,7 @@
                     class="button-locked"
                 >
                     <mat-icon                        
-                        class="icon-toolbar small-locked"
+                        class="svgicon small-locked"
                         svgIcon="small-locked"                        
                         matTooltip="Puede requerir clave"
                         matTooltipClass = "tooltip-general"

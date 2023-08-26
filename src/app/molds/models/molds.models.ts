@@ -1,3 +1,4 @@
+import { SimpleTable } from "src/app/shared/models/helpers.models";
 import { LevelAlert } from "src/app/shared/models/settings.models";
 
 export interface NextMaintenance {
@@ -25,11 +26,6 @@ export interface Location {
     description: string;
     locatedBy: string | null;
     locatedSince: string | null;
-}
-
-export interface SimpleTable {
-    code: string;
-    description: string;
 }
 
 export interface MoldHitsQuery {

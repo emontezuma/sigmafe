@@ -22,7 +22,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   
 // Variables ================
   hits: number = 0;
-  valueToChart = 0;
+  valueToPrint = 0;
   settingsData: SettingsData;
   digitPair: number[] = [];
   digitOdd: number[] = [];
@@ -94,7 +94,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     const progressBars = document.getElementsByName("active-progress-bar");
     progressBars.forEach((element) => {
-      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
+      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
     })
   }
 // Functions ================
@@ -140,12 +140,12 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   }
 
   prepareDataToChart(current: number, limit: number) {
-    this.valueToChart = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
-    if (this.lastChartValue !== this.valueToChart) {
-      this.showPrefix = this.valueToChart > 999;
-      this.valueToChart = this.showPrefix ? 999 : this.valueToChart;
-      this.lastChartValue = this.valueToChart;
-      const fontSize = this.valueToChart < 100 ? 30 : this.valueToChart < 999 ? 22 : 16;
+    this.valueToPrint = +(limit > 0 ? (current / limit * 100) : 0).toFixed(0);
+    if (this.lastChartValue !== this.valueToPrint) {
+      this.showPrefix = this.valueToPrint > 999;
+      this.valueToPrint = this.showPrefix ? 999 : this.valueToPrint;
+      this.lastChartValue = this.valueToPrint;
+      const fontSize = this.valueToPrint < 100 ? 30 : this.valueToPrint < 999 ? 22 : 16;
       this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
       
       this.chartData = {
@@ -226,7 +226,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
             },
             data: [
               {
-                value: this.valueToChart,
+                value: this.valueToPrint,
               }
             ]
           }

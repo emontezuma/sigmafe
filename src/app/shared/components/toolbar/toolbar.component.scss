@@ -1,11 +1,12 @@
 @use "../../../../assets/styles/mixins";
 
 .toolbar {    
-    height: 64px
+    height: 64px;
+    background-color: var(--z-colors-page-shadow) !important;
 }
 
 .toolbar-grid {
-    @include mixins.flexbox(row, wrap, 1px, end); 
+    @include mixins.flexbox(row, nowrap, 1px, end); 
     margin-left: auto;
     width: max-content;
     padding-left: 10px;
@@ -32,16 +33,6 @@
     margin-top: -8px;
 }
 
-.icon-toolbar {
-    margin-top: 12px;
-}
-
-.medium {
-    width: 32px !important;
-    height: 32px !important;
-    margin: 0px !important;
-}
-
 .divider {
     @include mixins.divider(0px, 0px, 0px, 5px, var(--z-colors-page-border), 50px);    
 }
@@ -64,11 +55,22 @@
 .button-locked {        
     height: 25px;
     width: 25px;
-    background-color: var(--z-colors-white);
+    background-color: var(--z-colors-page-button-normal-fore-color);
     border-radius: 50%;
-    border: 2px solid var(--z-colors-page-primary);
+    border: 2px solid var(--z-colors-page-button-normal-background-color);
 }
 
 .small-locked {
     margin-top: 0px;
+}
+
+  
+.spinner-regular-button {
+    color: var(--z-colors-page-button-disabled-fore);
+    position: absolute;
+    left: 0;
+    margin-left: -32px;  
+    ::ng-deep circle {
+        stroke: var(--z-colors-page-button-disabled-fore);   
+    }    
 }

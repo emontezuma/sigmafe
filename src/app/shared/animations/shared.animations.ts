@@ -35,7 +35,7 @@ export const fromTop = trigger('fromTop', [
   transition('* => void', [ animate('0.6s ease-out'), style({ opacity: 0, transform: 'translateY(10px)', }) ]),
 ]);
 
-export const downUp = trigger('downUp', [
+export const dissolve = trigger('dissolve', [
   state(
     'in',
     style({
@@ -65,16 +65,6 @@ export const numbers = trigger('numbers', [
   ),
   transition('void => *', [ style({ opacity: 0, transform: 'scale(2)' }), animate('0.1s ease-in') ]),
   transition('* => void', [ animate('0.1s ease-out'), style({ opacity: 0, transform: 'scale(2)' }) ]),
-]);
-
-export const dissolve = trigger('dissolve', [
-  transition('void => *', [
-    style({ opacity: 0.3 }),
-    animate('0.3s ease-in', style({ opacity: 1 })),
-  ]),
-  transition('* => void', [
-    animate('0.3s ease-out', style({ opacity: 0.3 })),
-  ]),
 ]);
 
 export const fader2 = trigger('routeAnimations', [

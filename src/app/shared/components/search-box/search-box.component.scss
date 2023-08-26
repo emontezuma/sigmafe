@@ -2,3 +2,7 @@
     margin-top: 20px;
     width: 180px;
 }
+
+::ng-deep .mat-mdc-text-field-wrapper {
+    background-color: var(--z-colors-page-shadow) !important;
+}

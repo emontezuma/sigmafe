@@ -53,6 +53,7 @@ mat-sidenav {
 mat-toolbar {
   border: 1px solid var(--z-colors-page-border);
   border-radius: 6px 6px 0px 0px;
+  height: 48px;
 }
 
 mat-panel-title {
@@ -103,10 +104,6 @@ mat-panel-title {
   border-top: 1px solid #808080;
   justify-content: flex-end;
   background-color: rgba(0, 0, 0, 0.25);
-}
-
-mat-toolbar {
-  height: 48px;
 }
 
 .button-normal-small {
@@ -160,6 +157,7 @@ mat-toolbar {
   margin: 2px;
   overflow-x: hidden;
   overflow-y: auto;
+  background-color: var(--z-colors-page-background-color);
 }
 
 .invalid-message {
@@ -202,11 +200,6 @@ mat-toolbar {
   color: var(--z-colors-white) !important;
 }
 
-.menu-button {
-  width: 32px;
-  height: 32px;
-}
-
 .divider {
   @include mixins.divider();    
 }
@@ -218,6 +211,7 @@ mat-toolbar {
 .toolbar-content {
   height: 64px;
   border-bottom: 1px solid var(--z-colors-page-border);
+  background-color: var(--z-colors-page-background-color);
 }
 
 .panel-main {

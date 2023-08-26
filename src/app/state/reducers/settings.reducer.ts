@@ -15,7 +15,8 @@ export const initialState: SettingsState = {
       alarm: 0,
     },
     animate: false,
-  }  
+    timeOutFortDialog: 0,
+  },  
 };
 
 export const settingsReducer = createReducer(

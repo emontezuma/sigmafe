@@ -20,18 +20,28 @@ export interface Screen  {
     outerWidth: number;
 }
 
+export enum ButtonActions {
+    SAVE = 'save',
+    CANCEL = 'cancel',
+    EXPORT_TO_EXCEL = 'exportToExcel',
+    EXPORT_TO_CSV = 'exportToCsv',
+    RELOAD = 'reload',
+    UPLOAD_FILE = 'uploadFile',
+}
 export interface ToolbarButtons  {
     type: 'button' | 'divider' | 'searchbox';
-    caption: string;
-    tooltip: string;
-    icon: string;
-    iconSize: string;
-    class: string;
-    disabled: boolean;
-    locked: boolean;
-    showCaption: boolean;
-    showIcon: boolean;
-    showTooltip: boolean;
+    caption?: string;
+    tooltip?: string;
+    icon?: string;
+    iconSize?: string;
+    class?: string;
+    disabled?: boolean;
+    locked?: boolean;
+    showCaption?: boolean;
+    showIcon?: boolean;
+    showTooltip?: boolean;
+    action?: ButtonActions;
+    loading?: boolean;
 }
 export interface SharedState {
     screen: Screen;
@@ -40,6 +50,12 @@ export interface SharedState {
 export interface SearchBox {
     textToSearch: string;
     from: string;
+}
+
+export interface ToolbarButtonClicked {
+    action: ButtonActions | undefined;
+    from: string;
+    buttonIndex: number,
 }
 
 export interface ShowElement {
@@ -76,3 +92,10 @@ export enum ScreenSizes {
     NORMAL = 'normal',
     SMALL = 'small',
 }
+
+export interface SimpleMenuOption {
+    icon: string;
+    caption: string;
+    value: string;
+}
+

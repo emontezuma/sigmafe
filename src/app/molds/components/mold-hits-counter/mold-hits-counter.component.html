@@ -1,7 +1,7 @@
 <div class="container">
   <mat-card class="card">
     <mat-progress-bar
-      *ngIf="this.mold.alarmed"
+      *ngIf="mold.alarmed"
       mode="indeterminate"
       color="warn"
       name="active-progress-bar"
@@ -120,7 +120,7 @@
         <app-spinner
           class="spinner"
           [diameter]="70"
-          [value]="valueToChart"
+          [value]="valueToPrint"
           [showBackgound]="true"
           [suffix]="'%'"
           [limits]="limits"

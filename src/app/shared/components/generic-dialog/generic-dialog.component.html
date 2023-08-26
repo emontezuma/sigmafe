@@ -1,0 +1,61 @@
+<div i18n class="container">
+  <div
+    mat-dialog-title
+    class="simple-flex title"
+  >
+    <span>{{ data.title }}</span>
+    <button
+      *ngIf="data.showCloseButton"
+      mat-icon-button
+      class="close-button open"
+      aria-label="icon-button with menu icon"
+      (click)="handleCloseButtonClick()"
+    >
+      <mat-icon class="icon-button">close</mat-icon>
+    </button>
+  </div>
+  <mat-divider class="divider-title"></mat-divider>
+  <div
+    mat-dialog-content
+    [innerHTML]="data.body.message"
+  >
+  </div>
+  <mat-divider class="divider"></mat-divider>
+  <div
+    class="simple-flex dialog-actions"
+    mat-dialog-actions
+    >
+    <div class="toolbar-button-container" *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn">
+      <button
+          mat-button                    
+          class="toolbar-button"    
+          aria-label="icon-button with menu icon"
+          [ngClass]="[ button.class ]"
+          [matTooltipDisabled]="!button.showTooltip"
+          [matTooltip]="button.tooltip"
+          matTooltipClass = "tooltip-general"
+          matTooltipShowDelay = "100"
+          [disabled]="button.disabled || button.loading"
+          (click)="handleClick(i, button.action)"
+      >
+          <mat-icon
+              *ngIf="button.showIcon"
+              class="svgicon icon-medium"
+              [ngStyle]="{ 'visibility': button.loading ? 'hidden' : 'visible' }"
+              [svgIcon]="button.icon"
+          >                            
+          </mat-icon>
+          <mat-progress-spinner
+              *ngIf="button.loading"
+              class="spinner-medium-button"
+              diameter="24"      
+              mode="indeterminate"                        
+          >
+          </mat-progress-spinner>                    
+          <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
+      </button>      
+    </div>
+  </div>
+</div> 
+    
+  

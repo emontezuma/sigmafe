@@ -1,9 +1,7 @@
 import { Component, ElementRef, Input, ViewChild, AfterViewInit } from '@angular/core';
-import { Store } from '@ngrx/store';
 
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ShowElement, ToolbarElement } from 'src/app/shared/models/screen.models';
-import { AppState } from 'src/app/state/app.state';
+import { ButtonActions, ShowElement, ToolbarElement } from 'src/app/shared/models/screen.models';
 
 @Component({
   selector: 'app-toolbar',
@@ -20,7 +18,6 @@ export class ToolbarComponent implements AfterViewInit {
 
   constructor(
     private sharedService: SharedService,
-    private store: Store<AppState>,  
     ) { }
 
 // Hooks ====================
@@ -51,6 +48,15 @@ export class ToolbarComponent implements AfterViewInit {
 
   trackByFn(index: any, item: any) { 
     return index; 
+  }
+
+  handleClick(index: number, action: ButtonActions) {
+    this.toolbar.buttons[index].loading = true;
+    setTimeout(() => {
+      this.toolbar.buttons[index].loading = false;
+      // TODO que hacer en tiempos muy largos
+    }, 5000);
+    this.sharedService.setToolbarClick(action, this.toolbar.from, index);
   }
 
 // End ======================

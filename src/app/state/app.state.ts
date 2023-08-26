@@ -9,6 +9,8 @@ import { ProfileState } from "../shared/models/profile.models";
 import { profileReducer } from "./reducers/profile.reducer";
 import { ColorsState } from "../shared/models/colors.models"
 import { colorsReducer } from "./reducers/colors.reducer";
+import { ChecklistFillingState } from "../checklists/models/checklists.models";
+import { checklistFillingReducer } from "./reducers/checklists.reducer";
 
 export interface AppState {
     shared: SharedState,
@@ -16,6 +18,7 @@ export interface AppState {
     settings: SettingsState,
     profile: ProfileState,
     colors: ColorsState,
+    checklistFilling: ChecklistFillingState,
 }
 
 export const reducers: ActionReducerMap<AppState> = {
@@ -24,4 +27,5 @@ export const reducers: ActionReducerMap<AppState> = {
     settings: settingsReducer,
     profile: profileReducer,
     colors: colorsReducer,
+    checklistFilling: checklistFillingReducer,
 }

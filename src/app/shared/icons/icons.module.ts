@@ -79,6 +79,66 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "warn_fill",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_fill.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "block",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/block.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "attachment_file",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/attachment_file.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "more_info",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/more_info.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "event",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/event.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "man",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/man.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "briefcase",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/briefcase.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "gear",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/gear.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "industry",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/industry.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "country",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/country.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "company",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/company.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "priority",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/priority.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "assignement",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/assignement.svg")
+    );    
+    iconRegistry.addSvgIcon(
+      "time",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/time.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "task_notes",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/task_notes.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "white_list",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/white_list.svg")
     );    
   }
 }

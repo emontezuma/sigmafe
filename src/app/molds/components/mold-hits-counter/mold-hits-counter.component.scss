@@ -3,6 +3,7 @@
 .container {
     border-radius: 5px;
     border-top: 3px solid transparent;    
+    counter-reset: counter;
 }
 
 .meter-0 {
@@ -30,7 +31,7 @@
 }
 
 .meter-20 {
-    color: var(--z-colors-page-fore-contrast);    
+    color: var(--z-colors-page-general-background);    
 }
 
 .meter-21 {
@@ -58,11 +59,11 @@
 }
 
 .border {
-    background-color: #eeeeee;
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 5px;
+    padding-right: 5px;
     border-radius: 8px 0px;
-    border: 2px solid #dddddd;
+    outline: 2px solid var(--z-colors-page-card-border);
+    background-color: var(--z-colors-page-shadow);
 }
 
 .title:hover {
@@ -70,8 +71,13 @@
 }
 
 .subtitle {
+    color: unset;   
     font-size: 1.5rem;
     @include mixins.text-ellipsis();
+}
+
+mat-card-subtitle {
+    color: unset;   
 }
 
 mat-card-title {
@@ -82,7 +88,7 @@ mat-card-title {
     height: 100%;
     width: 100%;
     max-width: 400px;
-    min-width: 300px;
+    min-width: 350px;
     border-radius: 10px 0px;
 }
 
@@ -120,7 +126,7 @@ mat-card-title {
     position: relative;
     width: 45px;
     height: 55px;
-    border: 0.5px solid #dddddd;
+    border: 0.5px solid var(--z-colors-page-border);
     border-radius: 3px;
 }
 
@@ -181,4 +187,14 @@ mat-card-title {
 .spinner {
     align-self: center;
     margin-left: 10px;
+}
+
+.label {
+    font-size: 1.3rem;
+    @include mixins.text-ellipsis();
+}
+
+.label::before { 
+    counter-increment: counter;
+    content: "(" counter(counter) ") ";
 }

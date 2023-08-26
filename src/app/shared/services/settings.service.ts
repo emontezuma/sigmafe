@@ -14,7 +14,6 @@ export class SettingsService {
   fakeSettingsData: SettingsData = sampleSettings;
   data$: BehaviorSubject<SettingsData> = new BehaviorSubject(sampleSettings);
 
-
   constructor() { }
 
 // Functions ================  

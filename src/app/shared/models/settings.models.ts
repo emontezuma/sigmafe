@@ -11,6 +11,7 @@ export interface SettingsData {
     alarmedColor: string;
     levelAlert: LevelAlert;
     animate: boolean;
+    timeOutFortDialog: number;
 }
 
 export interface SettingsState {

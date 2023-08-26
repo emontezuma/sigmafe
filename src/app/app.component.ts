@@ -8,7 +8,7 @@ import { SharedService } from './shared/services/shared.service';
 import { ColorsService } from './shared/services/colors.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
-import { appearing, dissolve, downUp, fromTop } from '../app/shared/animations/shared.animations';
+import { appearing, dissolve, fromTop } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
@@ -16,7 +16,7 @@ import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  animations: [ appearing, dissolve, downUp, fromTop, ],
+  animations: [ appearing, dissolve, fromTop, ],
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
@@ -104,7 +104,7 @@ export class AppComponent implements AfterViewInit {
     .subscribe((result: any) => {
       for (const query of Object.keys(result.breakpoints)) {
         if (result.breakpoints[query]) {
-          this.size = this.displayNameMap.get(query) ?? 'Unknown';;
+          this.size = this.displayNameMap.get(query) ?? 'Unknown';
         }
       }
     });
@@ -137,6 +137,7 @@ export class AppComponent implements AfterViewInit {
       this.onTopStatus = goTop.status;
       this.changeDetectorRef.detectChanges();
     });
+    this.sharedService.setTimer();
     this.handlerScreenSizeChange(null);
     this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
   }

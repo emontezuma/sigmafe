@@ -2,29 +2,34 @@ import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } fr
 import { Store } from '@ngrx/store';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
+import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 
-import { routingAnimation } from '../../../shared/animations/shared.animations';
+import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
-import { ApplicationModules, ScreenSizes, ToolbarButtons } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { ChecklistAnswerType, ChecklistAnswerStatus, ChecklistView } from 'src/app/shared/models/checklists.models';
+import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistView, ChecklistFillingData, ChecklistFillingItem } from 'src/app/checklists/models/checklists.models';
 import { Subscription } from 'rxjs';
+import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
+import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
+import { GenericDialogComponent } from 'src/app/shared/components/generic-dialog/generic-dialog.component';
 
 @Component({
   selector: 'app-checklist-filling',
   templateUrl: './checklist-filling.component.html',
-  animations: [ routingAnimation ],
+  animations: [ routingAnimation, dissolve ],
   styleUrls: ['./checklist-filling.component.scss']
 })
 export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
   @ViewChild('checklistFilling') private moldsQueryList: ElementRef;  
   
+// Variables ===============
   panelOpenState: boolean[] = [];
   limits: SpinnerLimits[] = [];
   fonts: SpinnerFonts[] = [{
@@ -48,78 +53,69 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     weight: 300,
   }
   showPrefix = false;
-  // Variables ===============
   settingsData: SettingsData;
   profileData: ProfileData;
   colsBySize: number = 2;
   currentSize: ScreenSizes = ScreenSizes.NORMAL;
   loading: boolean = true;
   animate: boolean = true;
+  animatingQuestion: boolean = true;
   buttons: ToolbarButtons[] = [];
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;  
   currentTabIndex: number = 0;
+  checklistProgress: number = 0;
+  animationTimeout: any;
   scrollSubscriber: Subscription;
   settingDataSubscriber: Subscription;
   profileDataSubscriber: Subscription;
-  searchBoxSubscriber: Subscription;
+  toolbarClickSubscriber: Subscription;
   showGoTopSubscriber: Subscription;
+  checklistFillingLoadingSubscriber: Subscription;
+  checklistFillingDataSubscriber: Subscription;
+  unsavedChanges: boolean = false;
+  loadFromButton: number = -1;
+  checklist: ChecklistFillingData = {};
+  layouts: SimpleMenuOption[] = [{
+    caption: $localize`Flexbox`,
+    icon: 'attachment',
+    value: 'flexbox',
+  },
+  {
+    caption: $localize`Checklist`,
+    icon: 'checklist',
+    value: 'checklist',
+  },
+  {
+    caption: $localize`Pregunta por página`,
+    icon: 'reload',
+    value: 'questionByPage',
+  },];
 
-  checklist = {    
-    questions: 32,
-    completed: 21,
-    valueToChart: 71,
-    alarmed: true,
-    viewType: ChecklistView.FLEXBOX,
-    icon: 'assets/images/icons/faq.svg'
-  }
-  items = [{
-    id: "aaa",
-    index: 1,
-    order: 1,
-    text: '¿La tapa del motor está bien sellada?',
-    extendedInfo: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-    answerType: ChecklistAnswerType.YES_NO,
-    answerByDefault: 'y',
-    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
-    showExtendedInfo: true,
-    showVisualSupport: true,
-    allowNotes: true,
-    completionDate: 'Y',
-    startedDate: 'Y',
-    alarmed: true,
-    requiresAttachment: true,
-    icon: 'assets/images/icons/faq.svg',
-    helpers: [{
-      id: 'abcd',
-      icon: 'assets/icons/video_file.svg',
-    },{
-      id: 'xyz',
-      icon: 'assets/icons/excel.svg',
-    },
-  ]
-  },{
-    id: "bbb",
-    index: 2,
-    order: 2,
-    text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-    answerType: ChecklistAnswerType.YES_NO,
-    answerByDefault: 'y',
-    showExtendedInfo: 'N',
-    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
-    icon: 'assets/images/icons/problems.svg'
-  },{
-    id: "bbb",
-    index: 3,
-    order: 2,
-    text: '¿This is a question?',
-    answerType: ChecklistAnswerType.YES_NO,
-    answerByDefault: 'y',
-    showExtendedInfo: 'N',
-    answerStatus: ChecklistAnswerStatus.NOT_INITIATED,
-    icon: 'assets/images/icons/problems.svg'
-  }];
+  views: SimpleMenuOption[] = [{
+    caption: $localize`Ver respondidas (${this.answered})`,
+    icon: 'attachment',
+    value: 'answered',
+  },
+  {
+    caption: $localize`Ver sin responder (${this.unanswered})`,
+    icon: 'checklist',
+    value: 'unanswered',
+  },
+  {
+    caption: $localize`Ver todas (${this.checklist.questions})`,
+    icon: 'reload',
+    value: 'all',
+  },
+  {
+    caption: $localize`Ver en dos columnas`,
+    icon: 'save',
+    value: 'twoColumns',
+  },];
+
+  selectedLayout: SimpleMenuOption = this.layouts[0];
+  selectedView: SimpleMenuOption = this.views[2];  
   
   form = new FormGroup({
   });
@@ -128,31 +124,33 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     private store: Store<AppState>,
     public sharedService: SharedService,
     public scrollDispatcher: ScrollDispatcher,
+    public dialog: MatDialog,
   ) { }
 
 // Hooks ====================
   ngOnInit(): void {
-    // Settings
-    setTimeout(() => {
-      this.sharedService.setGeneralPreogressBar(
-        ApplicationModules.CHECKLIST_FILLING,
-        false,
-      );
-    }, 1000)
-    this.sharedService.setGeneralPreogressBar(
-      ApplicationModules.CHECKLIST_FILLING,
-      true,
-    );
-    this.sharedService.setSearchBox(
-      ApplicationModules.CHECKLIST_FILLING,
-      true,
-    );
-    this.sharedService.setGeneralLoading(
-      ApplicationModules.CHECKLIST_FILLING,
-      true,
-    );
-    
+    // Dispatches
+    this.store.dispatch(loadChecklistFillingData());
+
     // Subscriptions
+    this.checklistFillingLoadingSubscriber = this.store.select(selectLoadingChecklistFillingState).subscribe( loading => {
+      this.loading = loading;
+      this.sharedService.setGeneralLoading(
+        ApplicationModules.CHECKLIST_FILLING,
+        loading,
+      );
+      this.sharedService.setGeneralProgressBar(
+        ApplicationModules.CHECKLIST_FILLING,
+        loading,
+      );      
+      this.loading = loading;
+    });    
+    this.toolbarClickSubscriber = this.sharedService.toolbarAction.subscribe((buttonClicked: ToolbarButtonClicked) => {
+      if (buttonClicked.from !== ApplicationModules.CHECKLIST_FILLING) {
+          return
+      }
+      this.toolbarAction(buttonClicked);
+    });
     this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
       this.settingsData = settingsData;
     });    
@@ -164,11 +162,19 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         // this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
-    this.searchBoxSubscriber = this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
-      if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
-        // this.animateToolbar(null);
-      }      
-    }); 
+    this.checklistFillingDataSubscriber = this.store.select(selectChecklistFillingData).subscribe((checklistFillingData: ChecklistFillingData) => {        
+      this.loadChecklist(checklistFillingData, !this.loading && !this.loaded);      
+      if (!this.loading && !this.loaded) {
+        this.loaded = true;
+      }
+      if (!this.loading) {
+        if (this.loadFromButton > -1) {          
+          this.buttons[this.loadFromButton].loading = false;
+          this.loadFromButton = -1;          
+        }
+        this.checklistTotalization();
+      }
+    });
     this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
@@ -183,17 +189,18 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     .subscribe((data: any) => {      
       this.getScrolling(data);
     });        
-    // this.store.dispatch(loadMoldsHitsQueryData());    
+
+    // Settings
+    this.selectLayout(this.checklist?.viewType);
   }
 
   ngAfterViewInit(): void {
     const progressBars = document.getElementsByName("active-progress-bar");
     progressBars.forEach((element) => {
-      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--theme-warn-100)');     
+      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
     })
     const chip = document.getElementsByName("chip");
     chip.forEach((element) => {
-      console.log('si');
       element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
     })
   }
@@ -214,11 +221,20 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
     if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
     if (this.profileDataSubscriber) this.profileDataSubscriber.unsubscribe();
-    if (this.searchBoxSubscriber) this.searchBoxSubscriber.unsubscribe();
+    if (this.toolbarClickSubscriber) this.toolbarClickSubscriber.unsubscribe();
     if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
+    if (this.checklistFillingLoadingSubscriber) this.checklistFillingLoadingSubscriber.unsubscribe();
   }
 
 // Functions ================
+
+  get answered() {
+    return (this.checklist.completed || 0);
+  }
+
+  get unanswered() {
+    return (this.checklist.questions || 0) - (this.checklist?.completed  || 0);
+  }
 
   animationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
@@ -256,30 +272,36 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       locked: false,
       showCaption: true,
       disabled: true,
+      loading: false,
+      action: ButtonActions.SAVE,
     },{
       type: 'button',
       caption: $localize`Cancelar`,
       tooltip:  $localize`Cancela la edición éste checklist`,
       icon: 'cancel',
-      class: 'accent',
+      class: '',
       iconSize: '24px',
       showIcon: true,
       showTooltip: true,
       locked: false,
       showCaption: true,
       disabled: true,
+      loading: false,
+      action: ButtonActions.CANCEL,
     },{
       type: 'divider',
       caption: '',
       tooltip: '',
-      icon: "",
+      icon: '',
       class: '',
-      iconSize: "",
+      iconSize: '',
       showIcon: true,
       showTooltip: true,
       locked: false,
       showCaption: true,
-      disabled: true,
+      disabled: false,
+      action: undefined,
+      loading: false,
     },{
       type: 'button',
       caption: $localize`Adjuntos`,
@@ -292,32 +314,10 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       locked: true,
       showCaption: true,
       disabled: false,
+      action: ButtonActions.UPLOAD_FILE,
+      loading: false,
     },{
       type: 'divider',
-      caption: '',
-      tooltip: '',
-      icon: "",
-      class: '',
-      iconSize: "",
-      showIcon: true,
-      showTooltip: true,
-      locked: false,
-      showCaption: true,
-      disabled: true,
-    },{
-      type: 'button',
-      caption: $localize`Exportar`,
-      tooltip: $localize`Exporta la vista`,
-      icon: 'download',
-      class: 'accent',
-      iconSize: '24px',
-      showIcon: true,
-      showTooltip: true,
-      locked: false,
-      showCaption: true,
-      disabled: false,
-    },{
-      type: 'searchbox',
       caption: '',
       tooltip: '',
       icon: '',
@@ -327,8 +327,24 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       showTooltip: true,
       locked: false,
       showCaption: true,
-      disabled: true,
-    },];
+      disabled: false,
+      action: undefined,
+      loading: false,
+    },{
+      type: 'button',
+      caption: $localize`Exportar`,
+      tooltip: $localize`Exporta la vista`,
+      icon: 'download',
+      class: '',
+      iconSize: '24px',
+      showIcon: true,
+      showTooltip: true,
+      locked: false,
+      showCaption: true,
+      disabled: false,
+      action: ButtonActions.EXPORT_TO_EXCEL,
+      loading: false,
+    }];
   }
 
   trackByFn(index: any, item: any) { 
@@ -363,8 +379,189 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  setTabIndex(e: any) {    
-    this.currentTabIndex = e;    
+  setTabIndex(tab: any) {    
+    this.currentTabIndex = tab;
+  }
+
+  selectView(value: string) {
+    if (!value) {
+      this.selectedView = this.views[0];
+    }
+    this.selectedView = this.views.find((view) =>
+      view.value === value
+    )
+  }
+
+  selectLayout(value: string) {
+    if (!value) {
+      this.selectedLayout = this.layouts[0];
+    }
+    this.selectedLayout = this.layouts.find((layout) =>
+      layout.value === value
+    )
+  }
+
+  getAnswerByIndex(index: number): any {
+    return this.checklist?.items?.findIndex(answer => answer.index === index);
+  }
+
+  setAnswer(index: number, e: any) {    
+    const answerIndex = this.getAnswerByIndex(index);
+    if (answerIndex > -1) {
+      const question = this.checklist.items[answerIndex];
+      if(question.answerType === ChecklistAnswerType.YES_NO) {
+        let answer = undefined;
+        let status = ChecklistQuestionStatus.COMPLETED;
+        let actionRequired = false;
+        if (e !== undefined) {
+          answer = e.hasOwnProperty('value') ? e.value : e;
+          if (answer !== undefined) {
+            if (question.attachmentRequired && !question.attachmentCompleted) {
+              status = ChecklistQuestionStatus.ATTACHMENT_MISSING;
+              actionRequired = true;
+            }
+          } else {
+            status = ChecklistQuestionStatus.READY;
+          }
+        } else {
+          status = ChecklistQuestionStatus.READY;
+        }
+        if (
+          answer !== question.answer ||
+          status !== question.status ||
+          actionRequired !== question.actionRequired
+        ) {
+          const item: ChecklistFillingItem = { 
+            ...question, 
+            ...(answer !== question.answer && { answer }),
+            ...(status !== question.status && { status }),
+            ...(actionRequired !== question.actionRequired && { actionRequired }),
+          };          
+          this.store.dispatch(updateChecklistQuestion({ item }));
+          if (this.selectedView.value !== 'all') {
+            this.checklistAnimation();
+          }          
+          if (this.loaded) {
+            this.unsavedChanges = true;
+            this.evaluateButtons();
+          }
+          this.reviewForAlarms();
+        }        
+      }      
+    }
+  }
+
+  reviewForAlarms() {
+    // Review all the questions looking for any alarm
+
+  }
+
+  checklistAnimation() {
+    if (this.animationTimeout) {
+      clearTimeout(this.animationTimeout);
+    }
+    this.animatingQuestion = true;
+    this.animationTimeout = setTimeout(() => {
+      this.animatingQuestion = false;
+    }, 2000);
+
+  }
+
+  checklistTotalization() {
+    if (this.checklist.questions === 0) {
+      this.checklistProgress = 0;
+    } else {
+      this.checklistProgress = Math.round(this.checklist.completed / this.checklist.questions * 100);
+    }
+  }
+
+  loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
+    this.checklist = checklistFillingData;
+    if (firstTime) {
+      this.autoCompletion();
+    }    
+  }
+
+  autoCompletion() {
+    // This function runs every time the checklist is initiated to set the answers by default
+    let responsesByDefault = 0;    
+    this.checklist.items.forEach((item) => {
+      if (item.answerByDefault && !item.answer) {
+        this.setAnswer(item.index, item.answerByDefault);
+        responsesByDefault++;
+      }
+    });
+    if (responsesByDefault > 0) {
+      this.showCompletionMessage(responsesByDefault);
+    }
+
+  }
+
+  evaluateButtons() {
+    if (this.unsavedChanges && this.buttons[0].disabled) {
+      this.buttons[0].disabled = false;
+      this.buttons[1].disabled = false;
+    } else if (!this.unsavedChanges && !this.buttons[0].disabled) {
+      this.buttons[0].disabled = true;
+      this.buttons[1].disabled = true;
+    }    
+  }
+
+  saveDataToLocal() {
+
+  }
+
+  retrieveDataFromLocal() {
+    
+  }
+
+  toolbarAction(action: ToolbarButtonClicked) {
+    if (action.action === ButtonActions.SAVE) {
+
+    } else if (action.action === ButtonActions.CANCEL) {
+      this.loadFromButton = action.buttonIndex;
+      this.setTabIndex(0);
+      this.loaded = false;
+      this.unsavedChanges = false;
+      this.evaluateButtons();
+      this.store.dispatch(loadChecklistFillingData());   
+    } else {
+      this.buttons[action.buttonIndex].loading = false;
+    }    
+  }
+
+  cancelled() {
+    // TODO: winsock message to cancel the current checklist
+
+  }
+
+  inactivated() {
+    // TODO: winsock message to inactivate the current checklist
+
+  }
+
+  getInactivate() {
+    // TODO: winsock message to inactivate the current checklist
+
+  }
+
+  showCompletionMessage(responsesByDefault: number): void {
+    const answers = responsesByDefault === 1 ? $localize` una respuesta ` : responsesByDefault + $localize` respuesta `
+    const dialogResponse = this.dialog.open(GenericDialogComponent, {
+      width: '350px',
+      disableClose: false,
+      data: {
+        title: $localize`Respuestas por defecto`,
+        buttons: [],
+        body: {
+          message: $localize`El checklist fue configurado para aplicar <strong>${answers}</strong> por defecto.`,
+        },
+        showCloseButton: false,
+      },
+    });
+    dialogResponse.afterClosed().subscribe((response) => {
+      alert(response);
+    });    
   }
 
 // End ======================
