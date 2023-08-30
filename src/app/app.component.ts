@@ -10,8 +10,11 @@ import { AppState } from './state/app.state';
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve, fromTop } from '../app/shared/animations/shared.animations';
 import { loadProfileData } from './state/actions/profile.action';
+import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { ProfileData } from './shared/models/profile.models';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +23,7 @@ import { RouterOutlet } from '@angular/router';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements AfterViewInit {
-  @ViewChildren('mainProgressBar') mainProgressBar: QueryList<ElementRef>;  
+  @ViewChildren('mainProgressBar') mainProgressBar: QueryList<ElementRef>;
 
   @HostListener('window:resize', ['$event'])
   onResize({ target } : any) {
@@ -56,6 +59,9 @@ export class AppComponent implements AfterViewInit {
   toolbarAnimated: boolean = false;
   goTopButtonTimer: any;
   lotsOfTabs = new Array(6).fill(0).map((_, index) => `Tab ${index}`);
+  profileDataSubscriber: Subscription;
+  profileData: ProfileData;
+  avatar: string = '';
   // allHeight: number = 300;
   allHeight = window.innerHeight - 50;
   displayNameMap = new Map([
@@ -112,6 +118,9 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
+    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
+      this.profileData = profileData;
+    });    
     this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       setTimeout(() => {
         this.loading = showLoader.show;        

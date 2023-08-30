@@ -39,7 +39,7 @@ export class SharedService {
   private pulseSecond: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
   pastSecond: Observable<boolean> = this.pulseSecond.asObservable();
 
-  constructor() { }
+  constructor() {}
 
 // Functions ================
   setText(textToSearch: string, from: string) {

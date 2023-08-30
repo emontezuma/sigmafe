@@ -1,6 +1,7 @@
 export interface ProfileData {
-    animate: boolean;
-    firstName: string;
+    animate?: boolean;
+    firstName?: string;
+    avatar?: string;
     lastName?: string;
     userProfile: string;
     email?: string;

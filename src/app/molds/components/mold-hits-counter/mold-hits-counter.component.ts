@@ -238,10 +238,6 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   trackByFn(index: any, item: any) { 
     return index; 
   }
-
-  errorLoadingImage(event: any) {
-    
-  }
-
+  
 // End ======================
 }

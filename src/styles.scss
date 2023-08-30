@@ -17,7 +17,7 @@ body {
         --mdc-plain-tooltip-container-color: var(--z-colors-white); 
         --mdc-plain-tooltip-supporting-text-color: var(--z-colors-fore);
         --mdc-plain-tooltip-supporting-text-weight: 400;
-        --mdc-plain-tooltip-supporting-text-tracking: 0.0333333333em;
+        --mdc-plain-tooltip-supporting-text-tracking: 0.0333333333em;        
 
         line-height: 16px;
     }
@@ -213,6 +213,7 @@ button:disabled {
 mat-card {
   background-color: var(--z-colors-page-card-background-color) !important;
   border: 1px solid var(--z-colors-page-card-border) !important;
+  color: var(--z-colors-page-card-fore) !important;
 }
 
 .footer {
@@ -291,7 +292,7 @@ mat-card {
   @include mixins.flexbox(row, wrap, 1px, flex-start);    
 }
 
-.legacy-alarm {
+.legacy-warn {
   background-color: var(--theme-warn-500) !important;
   color: var(--theme-warn-contrast-500) !important;
 }
@@ -324,7 +325,7 @@ mat-card {
   border-radius: 3px;
 }
 
-.legacy-icon-alarm {
+.legacy-icon-warn {
   color: var(--theme-warn-500) !important;
 }
 
@@ -336,6 +337,21 @@ mat-card {
   color: var(--theme-primary-500) !important;
 }
 
+.legacy-border-warn {
+  border-color: var(--theme-warn-500) !important;
+}
+
+.legacy-border-accent {
+  border-color: var(--theme-accent-500) !important;
+}
+
+.legacy-border-primary {
+  border-color: var(--theme-primary-500) !important;
+}
+
 mat-tab-group {
-  background-color: var(--z-colors-page-tab-background-color) !important; 
+  background-color: var(--z-colors-page-tab-background-color) !important;
+  border: 1px solid var(--z-colors-page-tab-border-color) !important;  
+  margin: 2px;
+  border-radius: 8px 0px;
 }

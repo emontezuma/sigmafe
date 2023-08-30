@@ -10,7 +10,6 @@ import {
 } from '../checklists/models/checklists.models';
 import { ColorsData, Colors } from './models/colors.models';
 import { ProfileData } from './models/profile.models';
-import { ColorsService } from './services/colors.service';
 import { RecordStatus } from './models/helpers.models';
 
 export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
@@ -24,7 +23,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1 ESTE TIITULO PASA A DOS LINEAS',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImage: 'assets/images/molds/ab01001-999abc2366731-elvis.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -437,6 +436,7 @@ export const sampleProfile: ProfileData = {
   firstName: 'ADMINISTRADOR',
   lastName: 'DEL SISTEMA',
   userProfile: 'ADMIN',
+  avatar: 'assets/images/bydefault/avatar.png',
   email: 'admin@admin.com',
   id: 'tetettee-ooeiiie-jjd73',
 };
@@ -455,9 +455,10 @@ export const sampleColors: ColorsData = {
     none: Colors.none,
   },
   page: {
-    fore: Colors.carbon,
+    
     shadow: 'rgba(0, 0, 0, 0.05)',
     /*
+    foreColor: Colors.carbon,
     buttonBorderColor: Colors.gray,
     buttonDisabledBorderColor: Colors.lightgrey,
     buttonDisabledFore: Colors.lightgrey,
@@ -465,15 +466,19 @@ export const sampleColors: ColorsData = {
     buttonNormalBackgroundColor: Colors.lightgrey,
     buttonNormalFore: Colors.darkgray,
     buttonNormalBorderColor: Colors.gray, 
-    cardBackgroundColor: Colors.whitesmoke,
-    cardBorderColor: Colors.silver,
+    cardBackgroundColor: Colors.yellow,
+    cardForeColor: Colors.red,
+    cardBorderColor: Colors.green,
+    cardDisabledBackgoundColor: Colors.magenta,
+    cardDisabledBorderColor: Colors.pink,
+    cardDisabledForeColor: Colors.gray,
     tabBackgroundColor: Colors.whitesmoke,
     tabBorderColor: Colors.silver,
-    backgroundColor: Colors.white,
-    */
-    footerFore: undefined,
+    backgroundColor: Colors.white,    
+    footerForeColor: undefined,
     footerBackground: undefined,
-    palettePrimaryColor: '#BCC6CC',
+    */
+    palettePrimaryColor: Colors.dodgerblue,
     paletteWarnColor: Colors.orangered,
     paletteAccentColor: '#4ACF32',
     // border: Colors.silver,
@@ -526,9 +531,10 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   dueDateToFinish: 'Sábado, 23-Ago-2023 03:14:52 PM',
   questions: 3,
   completed: 0,
+  cancelled: 1,
   valueToPrint: 0,
-  itemsAlarmedText: '\n(7 alarmadas)',
   alarmed: false,
+  canAlarm: true,
   equipment: {
     id: 'abbdgd-999383-agaga',
     number: 'AB4334',
@@ -537,6 +543,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
     lastChecklistAuditor: 'Jose Gil A.',
     extendedInfo:
       'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
+      canAlarm: true,
   },
   viewType: ChecklistView.FLEXBOX,
   icon: 'assets/images/icons/faq.svg',
@@ -561,7 +568,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       allowActionPlans: false,
       allowAttachments: true,
       allowVisualEvidence: false,
-      icon: 'assets/images/icons/faq.svg',
+      icon: 'assets/images/icons/faq2.svg',
       helpers: [
         {
           index: 1,
@@ -596,7 +603,11 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       answer: undefined,
       showExtendedInfo: false,
       status: ChecklistQuestionStatus.READY,
-      icon: 'assets/images/icons/problems.svg',
+      icon: '',
+      canAlarm: true,
+      alarms:[{
+        value: 'y',
+    }],      
     },
   ],
 };

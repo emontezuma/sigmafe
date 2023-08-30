@@ -7,7 +7,7 @@
 
 .progress {
     margin-top: 5px;
-    margin-bottom: -9px;    
+    margin-bottom: -9px;
 }
 
 .tab-label {
@@ -51,9 +51,9 @@ mat-panel-title {
 .card {
     height: -webkit-fill-available;
     width: -webkit-fill-available;
-    border-radius: 10px 0px;
-    margin-bottom: 10px;
+    border-radius: 0px 10px 10px 10px;
     padding: 5px;
+    margin-bottom: 10px;
 }
 
 .question-card {    
@@ -70,6 +70,7 @@ mat-panel-title {
 mat-card-subtitle {
     font-size: 1.5rem;
     @include mixins.text-ellipsis();
+    color: var(--z-colors-page-card-fore) !important;
 }
 
 .label {
@@ -96,7 +97,7 @@ mat-card-subtitle {
 }
 
 .checklist-progress {    
-    border: 2px solid var(--z-colors-page-border);
+    border: 2px solid var(--z-colors-page-card-fore);
     border-radius: 8px 0px;
     padding-left: 5px;
     padding-right: 5px;
@@ -106,7 +107,7 @@ mat-card-subtitle {
 }
 
 .flex {
-    @include mixins.flexbox(row, wrap, 5px, flex-start);    
+    @include mixins.flexbox(row, wrap, 5px, flex-start);
     flex: 1;
     justify-content: space-between;
     margin: 5px;
@@ -114,7 +115,7 @@ mat-card-subtitle {
     
 .layout {
     @include mixins.flexbox(column, wrap, 5px, flex-start);
-    margin: 20px 10px 10px 10px
+    margin: 5px 10px 10px 10px
 }
 
 .grid-multiple {
@@ -138,10 +139,10 @@ mat-card-subtitle {
 }
 
 ::ng-deep .mat-mdc-tab-labels {
-    background-color: var(--theme-primary-100);
-    color: var(--theme-primary-contrast-100) !important;
+    background-color: var(--z-checklist-tabs-background-color);
+    color: var(--z-checklist-tabs-fore) !important;
     border-radius: 8px 8px 0px 0px;
-    border: 2px solid var(--theme-primary-500) !important;
+    border: 2px solid var(--z-checklist-tabs-border) !important;
     margin-left: 10px;
     margin-right: 3px;
     margin-top: 5px;
@@ -153,7 +154,7 @@ mat-card-subtitle {
 
 ::ng-deep .mat-mdc-tab-body {
     border-radius: 4px;
-    background-color: var(--z-colors-page-tab-background-color); 
+    background-color: var(--z-checklist-status-300); 
     margin: 2px;
 }
 
@@ -174,13 +175,13 @@ mat-card-subtitle {
 
 .over-icon {
     position: absolute;
-    color: var(--theme-primary-contrast-500) !important;
+    color: var(--theme-primary-contrast-500);
     left: 0;
     top: 0;
-    width: 32px;
-    height: 32px;
-    margin-top: 2px;
-    margin-left: 1px;
+    width: 24px;
+    height: 24px;
+    margin-top: 5px;
+    margin-left: 2px;
 }
 
 mat-expansion-panel {
@@ -188,6 +189,7 @@ mat-expansion-panel {
     box-shadow: unset;
     margin-top: 5px;
     background-color: var(--z-colors-page-card-background-color);
+    color: var(--z-colors-page-card-fore);
 }
 
 mat-expansion-panel-header {
@@ -195,6 +197,7 @@ mat-expansion-panel-header {
     display: flex;
     align-items: center;
     margin: 2px;
+    
 }
 
 .mat-mdc-card-header { 
@@ -210,13 +213,14 @@ mat-accordion {
 }
 
 .accordion-icon {
-    width: 32px;
-    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     margin-right: 5px;
 }
 
 mat-panel-title {
     display: flex;
+    color: var(--z-colors-page-card-fore);
 }
 
 .icon-button {
@@ -228,7 +232,7 @@ mat-panel-title {
 }
 
 .divider-vertical {
-    @include mixins.divider(0px, 0px, 5px, -5px, var(--z-colors-page-border), 30px, 1px);   
+    @include mixins.divider(0px, 0px, 5px, -5px, var(--z-colors-page-card-fore), 30px, 1px);   
 }
 
 .label-reference {
@@ -236,11 +240,11 @@ mat-panel-title {
     padding: 0px 5px;
     border-radius: 4px;
     font-weight: 300;
-    max-width: calc(100% - 67% - 40px)
+    max-width: calc(100% - 40px)
 }
 
 .label-description-with-reference {
-    max-width: calc(100% - 33% - 40px);
+    max-width: calc(100% - 40px);
 }
 
 .label-description {
@@ -255,13 +259,13 @@ mat-panel-title {
     overflow-y: auto;
     align-self: flex-start;
     padding: 5px;
-    width: -webkit-fill-available;    
+    width: -webkit-fill-available;
 }
 
 .long-text {
     background-color: var(--z-colors-page-shadow);
     border-radius: 4px;
-    padding: 5px;    
+    padding: 5px;
 }
 
 
@@ -292,6 +296,7 @@ mat-panel-title {
     animation: fade-out 0.5s;
     opacity: 0;
 }
+
 .mat-tab-body.mat-tab-body-active {
     animation: fade-in 0.5s;
     opacity: 1;
@@ -326,9 +331,9 @@ mat-panel-title {
     min-width: 43px;
     background-color: var(--z-colors-page-card-background-color);
     border-radius: 50%;
-    border: 2px solid var(--theme-primary-500);       
+    border: 2px solid var(--z-colors-page-card-fore);
     display: flex; 
-    align-items: center;    
+    align-items: center;
     float: left;
     margin: 5px;
 }
@@ -336,7 +341,7 @@ mat-panel-title {
 .item-index {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--theme-primary-500);
+    color: var(--z-colors-page-card-fore);
     text-align: center;
     flex: 1;
 }
@@ -360,12 +365,12 @@ mat-panel-title {
 
 .flex-box-view {
     @include mixins.flexbox(row, wrap, 10px, flex-start, stretch);
-    margin: 10px;    
+    margin: 10px;
 }
 
 .checklist-view {
     @include mixins.flexbox(column, wrap, 10px, flex-start, stretch);
-    margin: 10px;    
+    margin: 10px;
 }
 
 .in-button {
@@ -393,18 +398,14 @@ mat-panel-title {
     cursor: pointer;
 }
 
-.border-primary {
-    border-color: var(--theme-primary-500); 
-}
-
 .checklist-toolbar {
     align-items: center;
     gap: 5px;
-    border: 2px solid var(--theme-primary-200);
+    border: 2px solid var(--z-colors-page-card-border);
     background-color: var(--z-colors-page-card-background-color);
-    border-radius: 8px 0px;
+    border-radius: 0px 8px 0px 0px;
     padding: 5px;
-    margin: 10px;    
+    margin: 5px 10px 10px 10px;
     padding-right: 10px;
 }
 
@@ -427,13 +428,17 @@ mat-card-footer {
 }
 
 .with-background {    
-    background-color: var(--z-colors-page-button-normal-background-color);
-    outline: 1.5px solid var(--z-colors-page-button-normal-border-color);
+    background-color: var(--z-colors-page-card-background-color);
+    outline: 1px solid var(--theme-primary-500);
+}
+
+.with-background:disabled {    
+    outline: 1px solid var(--theme-primary-400);
 }
 
 .question-alarmed {    
-    border: 3px solid rgba(var(--z-colors-warn-rgb), 0.8);
-    box-shadow: 0px 2px 1px -1px rgba(var(--z-colors-warn-rgb), 0.2), 0px 1px 1px 0px rgba(var(--z-colors-warn-rgb), 0.14), 0px 1px 3px 0px rgba(var(--z-colors-warn-rgb), 0.12);
+    outline: 2px solid var(--theme-warn-500) !important;
+    box-shadow: 0px 2px 1px -1px rgba(var(--z-colors-warn-rgb), 0.2), 0px 1px 1px 0px rgba(var(--z-colors-warn-rgb), 0.14), 0px 1px 3px 0px rgba(var(--z-colors-warn-rgb), 0.12) !important;
 }
 
 .pulse {
@@ -443,7 +448,7 @@ mat-card-footer {
 
 .pulse-menu {
     animation: pulse 1s infinite;
-    box-shadow: 0 0 0 1em rgba(#fff,0);    
+    box-shadow: 0 0 0 1em rgba(#fff,0);
 }
 
 .question-grid {    
@@ -530,7 +535,8 @@ mat-chip-option {
     background-color: var(--z-colors-page-shadow);
     white-space: pre-wrap;
     text-align: center;
-    border: 1px solid var(--theme-primary-400);
+    border: 1px solid var(--z-colors-page-card-fore);
+    color: var(--z-colors-page-card-fore);
 }
 
 .button-label {
@@ -594,15 +600,15 @@ mat-chip-option {
 }
 
 .toolbar-menu {
-  // color: var(--theme-primary-700) !important;
+  color: var(--z-colors-page-card-fore) !important;
   background-color: var(--z-colors-page-card-background-color);
-  border-color: var(--theme-primary-700) !important;  
+  border-color: var(--z-colors-page-card-fore) !important;  
   border: unset;
-  border: 1.5px solid var(--theme-primary-700);
+  border: 1.5px solid var(--z-colors-page-card-fore);
   height: 47px;
-  cursor: pointer;    
+  cursor: pointer;
   .mat-icon {
-      // color: var(--theme-primary-700) !important;
+      color: var(--z-colors-page-card-fore) !important;
   }
   margin-top: 10px;
 }
@@ -631,25 +637,60 @@ mat-chip-option {
   font-size: 10px !important;
 }
 
-::ng-deep .mat-tab-header {
-  top: 0;
-  z-index: 1000; 
-  position: sticky;
-  position: -webkit-sticky;
+::ng-deep .mat-mdc-tab-header {
+    position: sticky !important;
+    top: 0;
+    z-index: 999;
+    padding-bottom: 5px;
+    background-color: var(--z-colors-page-tab-background-color);
+    border-radius: 8px 0px 0px;
+    margin-top: -3px;
 }
-  
+
 .corner {
-  height: 2.3em;
-  width: 2.3em;		
-  border-radius: 8px 4px 100% 4px;
-  top: 0;
-  left: 0;		
-  position: absolute;
-  margin-top: -5px;
-  margin-left: -5px;
-  z-index: 9999;
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 8px 0px 0px;
+    top: 0;
+    left: 0;
+    position: absolute;
+    margin-top: -5px;
+    margin-left: -8px;
+    border: 2px solid var(--z-colors-page-card-border);
 }
 
 .question-cancelled {
-  background-color: var(--z-colors-page-button-disabled-background-color) !important;
+  background-color: var(--z-colors-page-card-disabled-background-color) !important;
+  color: var(--z-colors-page-card-disabled-fore) !important;
+  border: 1px solid var(--z-colors-page-card-disabled-border-color) !important;
+}
+
+.no-questions {
+    align-items: center;
+    flex-direction: column;
+}
+
+.no-questions-container {
+    width: 100%;
+    justify-content: center;
+    height: 100px;
+}
+
+.message-icon {
+    width: 64px;
+    height: 64px;
+}
+
+.item-image {
+    position: relative !important;
+    width: 39px !important;
+    height: 38px !important;
+    border-radius: 50%;
+    inset: 0px;
+    float: left;
+    border-radius: 50%;
+    border: 2px solid var(--theme-primary-contrast-500);
+    margin: 5px 5px 0px 0px;
+    padding: 2px;
+    object-fit: cover;
 }

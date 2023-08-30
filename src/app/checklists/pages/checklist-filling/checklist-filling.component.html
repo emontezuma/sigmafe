@@ -1,11 +1,10 @@
 <div
-  i18n
   class="container"
   #checklistFilling
   @routingAnimation
   (@routingAnimation.done)="animationFinished($event)"
 >
-  <mat-tab-group
+  <mat-tab-group    
     mat-stretch-tabs="false"
     mat-align-tabs="start"
     animationDuration="500ms"
@@ -21,7 +20,7 @@
             fill:
               currentTabIndex === 0
                 ? 'var(--theme-primary-contrast-100)'
-                : 'var(--z-colors-page-fore)'
+                : 'var(--z-colors-page-tab-fore)'
           }"
         >
         </mat-icon>
@@ -30,14 +29,14 @@
       <ng-template matTabContent>
         <div class="tabs tab-general-info">
           <mat-card class="card">
-            <mat-progress-bar
+            <!--<mat-progress-bar
               *ngIf="checklist.alarmed"
               mode="indeterminate"
               color="warn"
               name="active-progress-bar"
               class="progress"
             >
-            </mat-progress-bar>
+            </mat-progress-bar>-->
             <div class="layout">
               <div class="grid-multiple by-row">
                 <div class="grid-multiple">
@@ -143,7 +142,10 @@
                     <mat-card-subtitle class="label">Nombre del checklist</mat-card-subtitle>
                   </div>
                 </div>
-                <div class="checklist-progress">
+                <div
+                  class="checklist-progress"
+                  [ngClass]="{ 'legacy-border-warn': checklist.alarmed }"
+                >
                   <mat-card-subtitle
                     *ngIf="!loading"
                     @dissolve
@@ -160,8 +162,8 @@
                   </ngx-skeleton-loader>
                   <app-spinner
                     @dissolve
+                    [legacy]="classLegacy"
                     *ngIf="!loading"
-                    class="spinner"
                     [diameter]="50"
                     [value]="checklistProgress"
                     [showBackgound]="true"
@@ -186,7 +188,7 @@
                     @dissolve
                     class="label-progress"
                   >
-                    {{ checklist.completed }} de {{ checklist.questions }}
+                    {{ checklist.completed }} de {{ checklistValidQuestions }}
                   </mat-card-subtitle>
                   <ngx-skeleton-loader
                     *ngIf="loading"
@@ -920,7 +922,7 @@
             fill:
               currentTabIndex === 1
                 ? 'var(--theme-primary-contrast-100)'
-                : 'var(--z-colors-page-fore)'
+                : 'var(--z-colors-page-tab-fore)'
           }"
         >
         </mat-icon>
@@ -930,23 +932,22 @@
         <div class="flex-box checklist-toolbar">
           <div
             class="flex-box progress-border"
-            [ngClass]="{ 'pulse': checklist.alarmed, 'border-primary': !checklist.alarmed }"
-            matTooltip="Avance: {{ checklist.completed }} de {{
-              checklist.questions
-            }}  {{ checklist.itemsAlarmedText }}"
+            [ngClass]="{ 'pulse': checklist.alarmed, 'legacy-border-primary': !checklist.alarmed }"
+            [matTooltip]="alarmedToolTip"
             matTooltipClass="tooltip-general"
             matTooltipShowDelay="100"
           >
             <div
               class="flex-box progress-spinner"
-              [ngClass]="[checklist.alarmed ? 'legacy-alarm' : 'legacy-primary']"
+              [ngClass]="[checklist.alarmed ? 'legacy-warn' : 'legacy-primary']"
             >
               {{ checklistProgress }}%
             </div>
           </div>
-          <div class="questionnaire-progress">
-            Avance: {{ checklist.completed }} de {{ checklist.questions }}
-            <strong>{{ checklist.itemsAlarmedText }}</strong>
+          <div
+            class="questionnaire-progress"
+            [innerHTML]="progressText"
+          >            
           </div>
           <div class="margined"></div>
           <button
@@ -985,7 +986,7 @@
                 }"
                 aria-label="icon-button with menu icon"
                 i18n-placeHolder
-                (click)="selectLayout(button.value)"
+                (click)="setLayout(button.value)"
               >
                 <mat-icon [svgIcon]="button.icon" class="menu-button">
                 </mat-icon>
@@ -1003,7 +1004,6 @@
             mat-button
             class="toolbar-menu"
             [ngClass]="{ 'pulse-menu': animatingQuestion }"
-            pulse-menu
             aria-label="icon-button with menu icon"
             matTooltip="Cambiar el formato del checklist"
             matTooltipClass="tooltip-general"
@@ -1037,7 +1037,7 @@
                 }"
                 aria-label="icon-button with menu icon"
                 i18n-placeHolder
-                (click)="selectView(button.value)"
+                (click)="setView(button.value)"
               >
                 <mat-icon [svgIcon]="button.icon" class="menu-button">
                 </mat-icon>
@@ -1052,7 +1052,9 @@
             </div>
           </mat-menu>
         </div>
-        <div          
+        <div
+          *ngIf="showQuestions"
+          @fastDissolve
           class="tabs tab-questions"
           [ngClass]="
             selectedLayout?.value === 'flexbox'
@@ -1060,14 +1062,15 @@
               : selectedLayout?.value === 'checklist'
               ? 'checklist-view'
               : ''
-          "
-        >
+          "        
+        >          
           <ng-container *ngFor="let item of checklist.items; let i = index">
-            <ng-container 
+            <ng-container              
+              #questions
               *ngIf="selectedView.value === 'all' || 
               (selectedView.value === 'answered' && item.status === 'completed') ||
               (selectedView.value === 'unanswered' && item.status !== 'completed' && item.status !== 'cancelled')">
-              <mat-card                         
+              <mat-card  
                 class="question-card"
                 [ngClass]="{
                   'question-alarmed': item.alarmed,
@@ -1076,29 +1079,33 @@
                 }"
               >
               <div
-                @dissolve
+                @fastDissolve
                 *ngIf="item.status === 'cancelled' || item.status === 'completed' || item.status === 'attachmentMissing' || item.actionRequired"
                 class="corner"
                 [ngStyle]="{
                   backgroundColor:
-                  item.status === 'completed' 
+                  item.status === 'completed' && !item.alarmed
                       ? 'var(--theme-accent-500)'
-                      : 'var(--theme-warn-500)'
+                      : item.status === 'cancelled'
+                        ? 'var(--z-colors-page-card-disabled-background-color)'
+                        : 'var(--theme-warn-500)'
                 }"
               >
                 <mat-icon
-                  *ngIf="item.status === 'attachmentMissing' || item.actionRequired || item.status === 'cancelled'"
                   class="over-icon"
-                  [svgIcon]="item.status === 'attachmentMissing' ? 'attachment_file' : item.status === 'cancelled' ? 'block' : 'warn_fill'"
-                  [matTooltip]="item.status === 'attachmentMissing' ? 'Se requiere agregar un adjunto' : item.status === 'cancelled' ? 'La pregunta fue cancelada y no necesita respuesta' : 'Se requiere una acción'"
+                  [ngStyle]="{
+                    color:
+                    item.status === 'completed' && !item.alarmed
+                        ? 'var(--theme-accent-contrast-500)'
+                        : item.status === 'cancelled'
+                          ? 'var(--z-colors-page-fore)'
+                          : 'var(--theme-warn-contrast-500)'
+                  }"
+                  [svgIcon]="item.status === 'completed' ? 'check' : item.status === 'attachmentMissing' ? 'attachment_file' : item.status === 'cancelled' ? 'block' : 'warn_fill'"
+                  [matTooltipDisabled]="item.status === 'completed'"
+                  [matTooltip]="item.status === 'attachmentMissing' ? 'Se requiere agregar un adjunto' : item.status === 'cancelled' ? 'La pregunta fue cancelada y no se requiere una respuesta' : 'Se requiere una acción'"
                   matTooltipClass="tooltip-general"
-                  matTooltipShowDelay="100"        
-                >
-                </mat-icon>
-                <mat-icon
-                  *ngIf="item.status === 'completed'"
-                  class="over-icon"
-                  svgIcon="check"              
+                  matTooltipShowDelay="100"
                 >
                 </mat-icon>
               </div>
@@ -1152,6 +1159,13 @@
                           </mat-icon>
                         </button>
                       </div>
+                      <img 
+                        *ngIf="item.icon"
+                        appImageNotFound
+                        class="item-image"                        
+                        [ngSrc]="item.icon"                            
+                        fill
+                      >          
                       <div class="item-text">
                         <p>{{ item.text }}</p>
                       </div>
@@ -1232,6 +1246,20 @@
               </mat-card>
             </ng-container>
           </ng-container>
+          <div
+            @fastDissolve
+            class="simple-flex no-questions-container"
+            *ngIf="noQuestions"
+          >
+            <div class="simple-flex no-questions">
+              <mat-icon
+                class="message-icon"
+                svgIcon="problems"
+              >
+              </mat-icon>
+              <span>No hay items a mostrar...</span>
+            </div>
+          </div>
         </div>
       </ng-template>
     </mat-tab>
@@ -1244,7 +1272,7 @@
             fill:
               currentTabIndex === 2
                 ? 'var(--theme-primary-contrast-100)'
-                : 'var(--z-colors-page-fore)'
+                : 'var(--z-colors-page-tab-fore)'
           }"
         >
         </mat-icon>

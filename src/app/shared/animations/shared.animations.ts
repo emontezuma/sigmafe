@@ -46,6 +46,17 @@ export const dissolve = trigger('dissolve', [
   transition('* => void', [ animate('0.5s ease-out'), style({ opacity: 0, }) ]),
 ]);
 
+export const fastDissolve = trigger('fastDissolve', [
+  state(
+    'in',
+    style({
+      opacity: 1,
+    })
+  ),
+  transition('void => *', [ style({ opacity: 0, }), animate('0.1s ease-in') ]),
+  transition('* => void', [ animate('0.1s ease-out'), style({ opacity: 0, }) ]),
+]);
+
 export const appearing = trigger('appearing', [
   transition('void => *', [
     style({ opacity: 0.3, transform: 'scale(0.3)' }),

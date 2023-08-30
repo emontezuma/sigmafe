@@ -9,11 +9,16 @@ import { ChecklistsRoutingModule } from './checklists-routing.module';
 import { SpinnerModule } from '../shared/components/spinner/spinner.module';
 import { LabelEllipsisModule } from '../shared/components/label-ellipsis/label-ellipsis.module';
 import { IconsModule } from '../shared/icons/icons.module';
+import { ImageNotFoundModule } from '../shared/directives/image-not-found.module';
+import { ChecklistFillingItemsComponent } from './components/checklist-filling-items/checklist-filling-items.component';
+import { ToolbarComponent } from './components/toolbar/toolbar.component';
 
 @NgModule({
   declarations: [  
     ChecklistFillingComponent,
     HomeComponent,
+    ChecklistFillingItemsComponent,
+    ToolbarComponent,
   ],
   imports: [
     CommonModule,
@@ -24,6 +29,7 @@ import { IconsModule } from '../shared/icons/icons.module';
     SpinnerModule,
     IconsModule,
     LabelEllipsisModule,
+    ImageNotFoundModule,
   ]
 })
 export class ChecklistsModule { }

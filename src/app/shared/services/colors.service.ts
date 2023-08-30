@@ -51,8 +51,7 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-status-warn', colorsData?.status.warn ?? Colors.orange);
     document.documentElement.style.setProperty('--z-colors-status-alarm', colorsData?.status.alarm ?? Colors.orangered);
     document.documentElement.style.setProperty('--z-colors-status-none', colorsData?.status.none ?? Colors.none);
-    // TODO la sombra debe calcularse
-    document.documentElement.style.setProperty('--z-colors-page-fore', colorsData?.page?.fore ?? Colors.carbon);        
+    // TODO la sombra debe calcularse    
     document.documentElement.style.setProperty('--theme-primary-500', colorsData?.page?.palettePrimaryColor ?? Colors.primary);    
     document.documentElement.style.setProperty('--z-colors-page-disabled-color', colorsData?.page?.disabled ?? Colors.gray);        
         
@@ -60,27 +59,35 @@ export class ColorsService {
     let colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-A200');
     document.documentElement.style.setProperty('--z-colors-page-card-background-color', colorsData?.page?.cardBackgroundColor ?? colorToUse);    
 
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-contrast-A200');
+    document.documentElement.style.setProperty('--z-colors-page-card-fore', colorsData?.page?.cardForeColor ?? colorToUse);
+
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-contrast-500');
+    document.documentElement.style.setProperty('--z-colors-page-fore', colorsData?.page?.foreColor ?? colorToUse);                        
+    
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
     document.documentElement.style.setProperty('--z-colors-page-button-border', colorsData?.page?.buttonBorderColor ?? colorToUse);
-
+    document.documentElement.style.setProperty('--z-colors-page-card-disabled-background-color', colorsData?.page?.cardDisabledBackgoundColor ?? colorToUse);
+    
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-400');
     document.documentElement.style.setProperty('--z-colors-page-card-border', colorsData?.page?.cardBorderColor ?? colorToUse);
     document.documentElement.style.setProperty('--z-colors-page-border', colorsData?.page?.border ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-card-disabled-border-color', colorsData?.page?.cardDisabledBorderColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-card-disabled-fore', colorsData?.page?.cardDisabledForeColor ?? colorToUse);
     
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
     document.documentElement.style.setProperty('--z-colors-page-background-color', colorsData?.page?.backgroundColor ?? colorToUse);
     
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-300');
-    document.documentElement.style.setProperty('--z-colors-page-tab-background-color', colorsData?.page?.tabBackgroundColor ?? colorToUse);    
+    document.documentElement.style.setProperty('--z-colors-page-tab-background-color', colorsData?.page?.tabBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page?.buttonDisabledBorderColor ?? colorToUse);    
+    document.documentElement.style.setProperty('--z-colors-page-button-disabled-fore', colorsData?.page?.buttonDisabledFore ?? colorToUse);        
+
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-500');
     document.documentElement.style.setProperty('--z-colors-page-tab-border-color', colorsData?.page?.tabBorderColor ?? colorToUse);    
-
+    
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-700');
     document.documentElement.style.setProperty('--z-colors-page-shadow', colorsData?.page?.shadow ?? colorToUse);
-    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-300');
-    document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page?.buttonDisabledBorderColor ?? colorToUse);    
-    document.documentElement.style.setProperty('--z-colors-page-button-disabled-fore', colorsData?.page?.buttonDisabledFore ?? colorToUse);    
-    
     
     // Buttons
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
@@ -92,9 +99,12 @@ export class ColorsService {
     
     //Footer
     colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-contrast-500');
-    document.documentElement.style.setProperty('--z-colors-page-footer-fore-color', colorsData.page?.footerFore ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-page-footer-fore-color', colorsData.page?.footerForeColor ?? colorToUse);
     colorToUse = document.documentElement.style.getPropertyValue('--theme-accent-500');
     document.documentElement.style.setProperty('--z-colors-page-footer-background-color', colorsData.page?.footerBackground ?? colorToUse);
+
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-contrast-300');
+    document.documentElement.style.setProperty('--z-colors-page-tab-fore', colorsData?.page?.tabForeColor ?? colorToUse);    
 
     // Custom colors
     document.documentElement.style.setProperty('--z-colors-white', Colors.white);    

@@ -127,7 +127,7 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "assignement",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/assignement.svg")
-    );    
+    );
     iconRegistry.addSvgIcon(
       "time",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/time.svg")
@@ -139,6 +139,10 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "white_list",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/white_list.svg")
-    );    
+    );
+    iconRegistry.addSvgIcon(
+      "problems",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/problems.svg")
+    );
   }
 }

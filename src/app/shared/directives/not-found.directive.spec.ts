@@ -1,9 +1,10 @@
 import { ElementRef } from '@angular/core';
-import { NotFoundDirective } from './image-not-found.directive';
+import { ImageNotFoundDirective } from './image-not-found.directive';
 
-describe('NotFoundDirective', () => {
+describe('ImageNotFoundDirective', () => {
   it('should create an instance', () => {
-    const directive = new NotFoundDirective();
+    const directive = new ImageNotFoundDirective();
     expect(directive).toBeTruthy();
   });
 });
+s

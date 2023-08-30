@@ -107,9 +107,15 @@ export interface ChecklistFillingItem {
     actionRequired?: boolean;
     attachmentCompleted?: boolean;
     icon?: string;
+    alarms?: ChecklistAlarms[],
     helpers?: Attachment[];
 }
 
+export interface ChecklistAlarms {
+    comparison?: undefined | '==' | '!=' | '>' | '>=' | '<' | '<=';
+    value: string;
+
+}
 export interface ChecklistAssignement {
     name?: string;
     department?: string;
@@ -118,6 +124,12 @@ export interface ChecklistAssignement {
     plantName?: string;    
     countryName?: string;    
     companyName?: string;    
+}
+
+export interface ChecklistPeriod {
+    type?: undefined | 'count' | 'no-count';
+    from?: string;
+    to?: string;
 }
 
 export interface ChecklistPlanning {
@@ -134,7 +146,7 @@ export interface ChecklistEquipment {
     extendedInfo?: string;
     lastChecklistDate?: string;
     lastChecklistAuditor?: string;
-    CanAlarm?: boolean;
+    canAlarm?: boolean;
 }
 
 export interface VariablesEquipmentsValue {
@@ -152,9 +164,10 @@ export interface ChecklistFillingData {
     extendedInfo?: string;
     questions?: number;
     completed?: number;
+    cancelled?: number;
+    alarmedItems?: number;
     valueToPrint?: number;
-    itemsAlarmedText?: string;
-    CanAlarm?: boolean;
+    canAlarm?: boolean;
     alarmed?: boolean;
     dueDateToStart?: string;
     startDate?: string;
@@ -176,6 +189,7 @@ export interface ChecklistFillingData {
     actionRequired?: boolean;
     attachmentCompleted?: boolean;
     equipment?: ChecklistEquipment;
+    periods?: ChecklistPeriod[];
 }
 
 export interface ChecklistFillingState {

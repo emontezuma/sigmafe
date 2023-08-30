@@ -8,14 +8,13 @@ import { MoldHitsCounterComponent } from './components/mold-hits-counter/mold-hi
 import { SpinnerModule } from '../shared/components/spinner/spinner.module';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { FilterPipe } from '../shared/pipes/filter.pipe';
-import { NotFoundDirective } from '../shared/directives/image-not-found.directive';
+import { ImageNotFoundModule } from '../shared/directives/image-not-found.module';
 
 @NgModule({
   declarations: [
     MoldsHitsCounterComponent,
     MoldHitsCounterComponent,
-    FilterPipe,
-    NotFoundDirective,
+    FilterPipe,    
   ],
   imports: [
     CommonModule,
@@ -24,6 +23,7 @@ import { NotFoundDirective } from '../shared/directives/image-not-found.directiv
     NgOptimizedImage,
     NgxSkeletonLoaderModule.forRoot(),
     SpinnerModule,
+    ImageNotFoundModule,
   ]
 })
 export class MoldsModule { }

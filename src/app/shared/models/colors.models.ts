@@ -177,7 +177,7 @@ export interface StatusColors {
 }
 
 export interface PageColors {
-    fore?: string,
+    foreColor?: string,
     shadow?: string,
     buttonBorderColor?: string,
     buttonNormalBackgroundColor?: string;
@@ -186,7 +186,7 @@ export interface PageColors {
     buttonDisabledBorderColor?: string,
     buttonDisabledBackgroundColor?: string,
     buttonDisabledFore?: string,
-    footerFore?: string,
+    footerForeColor?: string,
     footerBackground?: string,
     palettePrimaryColor?: string,
     paletteWarnColor?: string,
@@ -195,8 +195,13 @@ export interface PageColors {
     border?: string,
     cardBackgroundColor?: string,
     cardBorderColor?: string,
-    tabBackgroundColor?: string,    
+    cardForeColor?: string,
+    cardDisabledBackgoundColor?: string,
+    cardDisabledBorderColor?: string,
+    cardDisabledForeColor?: string,
+    tabBackgroundColor?: string,
     tabBorderColor?: string,
+    tabForeColor?: string,
     backgroundColor?: string,
     tooltipFontSize?: string,
     tooltipForeColor?: string,

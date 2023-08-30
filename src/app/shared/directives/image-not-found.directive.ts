@@ -5,7 +5,7 @@ import { environment } from '../../../environments/environment';
 @Directive({
   selector: '[appImageNotFound]'
 })
-export class NotFoundDirective {
+export class ImageNotFoundDirective {
   @Input() imageByDefault: string;
   
   @HostListener('error')

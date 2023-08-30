@@ -17,6 +17,7 @@ export class SpinnerComponent implements OnChanges {
   @Input() fonts: SpinnerFonts[];
   @Input() exhaustedValue: string;
   @Input() smallFont: SmallFont;
+  @Input() legacy: string;
 
 // Variables ================
   metterClass: string = '';
@@ -47,8 +48,10 @@ export class SpinnerComponent implements OnChanges {
           break;
         }  
       }
-    } else {
+    } else if (!this.legacy) {
       this.metterClass = 'meter-0';      
+    } else {
+      this.metterClass = this.legacy;      
     }
     this.progressBarColor = selectedBarColor;
     let printExhaustedValue = false;

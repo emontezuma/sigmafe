@@ -66,3 +66,31 @@
 .chart-value {
     transform: scale(1, 2);
 }
+
+.spinner-primary {
+    color: var(--theme-primary-500);
+    ::ng-deep circle {
+        stroke: var(--theme-primary-500);
+    }
+}
+
+.spinner-warn {
+    color: var(--theme-warn-500);
+    ::ng-deep circle {
+        stroke: var(--theme-warn-500);
+    }
+}
+
+.spinner-accent {
+    color: var(--theme-accent-500);
+    ::ng-deep circle {
+        stroke: var(--theme-accent-500);
+    }
+}
+
+.spinner-card-font {
+    color: var(--z-colors-page-card-fore) !important;
+    ::ng-deep circle {
+        stroke: var(--z-colors-page-card-fore) !important;
+    }
+}

@@ -1,13 +1,15 @@
-<ng-container class="container">
+<ng-container i18n class="container">
   <ng-container *ngTemplateOutlet="invalidSize ? invalid : valid">
   </ng-container>
   <ng-template #valid>
     <mat-toolbar class="toolbar" color="primary">
       <button
         mat-mini-fab
-        class="button"
-        color="warn"
+        class="button circular-button"
         aria-label="icon-button with menu icon"
+        matTooltip="Abrir el menú principal"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
         (click)="sidenav.open()"
         @appearing
       >
@@ -17,11 +19,14 @@
         >
         </mat-icon>
       </button>
-      <h1 i18n>APLICACION TOYOTA <strong>{{ toolbarCurrentSize }}</strong></h1>      
+      <h1 class="company-name">APLICACION TOYOTA <strong>{{ toolbarCurrentSize }}</strong></h1>      
       <button
         mat-mini-fab
         class="button toolbar-menu"
         aria-label="icon-button with menu icon"
+        matTooltip="Abrir el toolbar de opciones"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
         (click)="sidenav.close()"
         *ngIf="toolbarData?.show && toolbarCurrentSize == 'small'"
         [matMenuTriggerFor]="menu"
@@ -42,8 +47,57 @@
                 mat-menu-item
                 class="toolbar-button-small"
                 aria-label="icon-button with menu icon"
-                [disabled]="button.disabled"
-                i18n-placeHolder
+                [disabled]="button.disabled"               
+            >
+              <mat-icon
+                  *ngIf="button.showIcon"
+                  [svgIcon]="button.icon"
+                  class="menu-button"
+              >
+              </mat-icon>
+              <span>{{ button.showCaption ? button.caption : '' }}</span>
+            </button>
+            <mat-divider
+                *ngIf="button.type === 'divider'"
+                class="divider"
+            >
+            </mat-divider>
+        </div>
+      </mat-menu>
+      <button
+        *ngIf="!!profileData.avatar"
+        mat-mini-fab
+        class="button avatar-button"
+        matTooltip="Opciones del usuario"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
+        aria-label="avatar"
+        (click)="sidenav.close()"        
+        [matMenuTriggerFor]="menuAvatar"
+        @appearing
+      >      
+      <img       
+        appImageNotFound
+        [imageByDefault]="'assets/icons/man.svg'"
+        class="item-image"                        
+        [ngSrc]="profileData.avatar"
+        fill
+      > 
+      </button>
+      <mat-menu
+        #menuAvatar="matMenu"
+        class="menu"
+      >
+        <div 
+          class="menu-container"
+          *ngFor="let button of toolbarData.buttons; let i = index;"
+        >
+            <button
+                *ngIf="button.type === 'button'"
+                mat-menu-item
+                class="toolbar-button-small"
+                aria-label="icon-button with menu icon"
+                [disabled]="button.disabled"               
             >
               <mat-icon
                   *ngIf="button.showIcon"
@@ -84,20 +138,20 @@
             <mat-expansion-panel class="panel-main" hideToggle expanded="true">
               <mat-expansion-panel-header>
                 <mat-icon>published_with_changes</mat-icon>
-                <mat-panel-title class="accordion" i18n>OPERACIONES</mat-panel-title>
+                <mat-panel-title class="accordion">OPERACIONES</mat-panel-title>
               </mat-expansion-panel-header>
                 <a routerLink="molds"
                   mat-list-item
                   (click)="sidenav.close()">
                   <mat-icon>backup_table</mat-icon>
-                  <span i18n>Moldes</span>
+                  <span>Moldes</span>
                 </a>
                 <mat-divider></mat-divider>
                 <a routerLink="checklists"
                   mat-list-item
                   (click)="sidenav.close()">
                   <mat-icon>checklist</mat-icon>
-                  <span i18n>Checklist específico</span>
+                  <span>Checklist específico</span>
                 </a>
               </mat-expansion-panel>
           </cdk-accordion>
@@ -162,7 +216,7 @@
       class="footer"
       @fromTop
     >
-      <span i18n>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
+      <span>APLICACION TOYOTA <strong>{{ allHeight }}</strong></span>
       <span class="example-spacer"></span>
     </mat-toolbar>
   </ng-template>
@@ -173,11 +227,15 @@
     >
     </mat-toolbar>
     <div class="error-box">
-      <mat-icon class="big-icon">error_outline</mat-icon>
+      <mat-icon
+        class="big-icon"
+        svgIcon="problems"
+        >
+      </mat-icon>
       <div class class="invalid-message">
-        <div i18n>La resolución mínima para ejecutar la aplicaición es de:</div>
-        <div i18n>Ancho: <strong>350 pixeles</strong></div>
-        <div i18n>Alto: <strong>400 pixeles</strong></div>
+        <div>La resolución mínima para ejecutar la aplicaición es de:</div>
+        <div>Ancho: <strong>350 pixeles</strong></div>
+        <div>Alto: <strong>400 pixeles</strong></div>
       </div>
     </div>
     <mat-toolbar

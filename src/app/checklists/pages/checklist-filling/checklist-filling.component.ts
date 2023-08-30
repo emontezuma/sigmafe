@@ -1,10 +1,10 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
-import { MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
-import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
+import { routingAnimation, dissolve, fastDissolve } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
 import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
@@ -13,7 +13,7 @@ import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistView, ChecklistFillingData, ChecklistFillingItem } from 'src/app/checklists/models/checklists.models';
+import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistFillingData, ChecklistFillingItem } from 'src/app/checklists/models/checklists.models';
 import { Subscription } from 'rxjs';
 import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
 import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
@@ -22,12 +22,13 @@ import { GenericDialogComponent } from 'src/app/shared/components/generic-dialog
 @Component({
   selector: 'app-checklist-filling',
   templateUrl: './checklist-filling.component.html',
-  animations: [ routingAnimation, dissolve ],
+  animations: [ routingAnimation, dissolve, fastDissolve ],
   styleUrls: ['./checklist-filling.component.scss']
 })
 export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
-  @ViewChild('checklistFilling') private moldsQueryList: ElementRef;  
+  @ViewChild('checklistFilling') private moldsQueryList: ElementRef;
+  @ViewChildren('questions') private questions: QueryList<ElementRef>;
   
 // Variables ===============
   panelOpenState: boolean[] = [];
@@ -59,7 +60,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   currentSize: ScreenSizes = ScreenSizes.NORMAL;
   loading: boolean = true;
   animate: boolean = true;
-  animatingQuestion: boolean = true;
+  animatingQuestion: boolean = false;
   buttons: ToolbarButtons[] = [];
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
@@ -75,8 +76,13 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   checklistFillingLoadingSubscriber: Subscription;
   checklistFillingDataSubscriber: Subscription;
   unsavedChanges: boolean = false;
+  noQuestions: boolean = false;
+  showQuestions: boolean = true;
   loadFromButton: number = -1;
   checklist: ChecklistFillingData = {};
+  progressText: string = '';
+  alarmedToolTip: string = '';
+  classLegacy: string = 'spinner-card-font';
   layouts: SimpleMenuOption[] = [{
     caption: $localize`Flexbox`,
     icon: 'attachment',
@@ -89,22 +95,26 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   },
   {
     caption: $localize`Pregunta por página`,
+    template: $localize`Pregunta por página`,
     icon: 'reload',
     value: 'questionByPage',
   },];
 
   views: SimpleMenuOption[] = [{
-    caption: $localize`Ver respondidas (${this.answered})`,
+    caption: $localize`Ver respondidas`,
+    template: $localize`Ver respondidas`,
     icon: 'attachment',
     value: 'answered',
   },
   {
-    caption: $localize`Ver sin responder (${this.unanswered})`,
+    caption: $localize`Ver sin responder`,
+    template: $localize`Ver sin responder`,
     icon: 'checklist',
     value: 'unanswered',
   },
   {
-    caption: $localize`Ver todas (${this.checklist.questions})`,
+    caption: $localize`Ver todas`,
+    template: $localize`Ver todas`,
     icon: 'reload',
     value: 'all',
   },
@@ -173,6 +183,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
           this.loadFromButton = -1;          
         }
         this.checklistTotalization();
+        this.updateSelectedViewArray();
       }
     });
     this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
@@ -191,18 +202,23 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     });        
 
     // Settings
-    this.selectLayout(this.checklist?.viewType);
+    this.setLayout(this.checklist?.viewType);
   }
 
   ngAfterViewInit(): void {
-    const progressBars = document.getElementsByName("active-progress-bar");
-    progressBars.forEach((element) => {
-      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
-    })
-    const chip = document.getElementsByName("chip");
+    // const progressBars = document.getElementsByName("active-progress-bar");
+    // progressBars.forEach((element) => {
+    //   element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
+    // });
+    const chip = document.getElementsByName("chip");    
     chip.forEach((element) => {
-      element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
-    })
+      // element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
+    });
+    this.questions.changes.subscribe((components: QueryList<ElementRef>) => {
+      setTimeout(() => {
+        this.noQuestions = components.length === 0;
+      }, 50);      
+    });    
   }
 
   ngOnDestroy(): void {
@@ -227,14 +243,6 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
 // Functions ================
-
-  get answered() {
-    return (this.checklist.completed || 0);
-  }
-
-  get unanswered() {
-    return (this.checklist.questions || 0) - (this.checklist?.completed  || 0);
-  }
 
   animationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
@@ -383,16 +391,24 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     this.currentTabIndex = tab;
   }
 
-  selectView(value: string) {
+  setView(value: string) {
     if (!value) {
       this.selectedView = this.views[0];
     }
+    this.showQuestions = false;
     this.selectedView = this.views.find((view) =>
       view.value === value
-    )
+    );
+    if (this.noQuestions) {
+      this.noQuestions = false;
+    }
+    console.log(this.selectedView);
+    setTimeout(() => {
+      this.showQuestions = true;
+    }, 300);    
   }
 
-  selectLayout(value: string) {
+  setLayout(value: string) {
     if (!value) {
       this.selectedLayout = this.layouts[0];
     }
@@ -433,9 +449,9 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         ) {
           const item: ChecklistFillingItem = { 
             ...question, 
-            ...(answer !== question.answer && { answer }),
-            ...(status !== question.status && { status }),
-            ...(actionRequired !== question.actionRequired && { actionRequired }),
+            answer,
+            status,
+            actionRequired,
           };          
           this.store.dispatch(updateChecklistQuestion({ item }));
           if (this.selectedView.value !== 'all') {
@@ -462,17 +478,37 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
     this.animatingQuestion = true;
     this.animationTimeout = setTimeout(() => {
-      this.animatingQuestion = false;
-    }, 2000);
+      this.animatingQuestion = false;    
+    }, 1000);
 
   }
 
   checklistTotalization() {
-    if (this.checklist.questions === 0) {
+    if (this.checklistValidQuestions === 0) {
       this.checklistProgress = 0;
     } else {
-      this.checklistProgress = Math.round(this.checklist.completed / this.checklist.questions * 100);
+      this.checklistProgress = Math.round(this.checklist.completed / this.checklistValidQuestions * 100);
     }
+    const alarmedItemsText = !this.checklist.alarmed ? '' : this.checklist.alarmedItems === 1 ? $localize` una alarmada` : ' ' + this.checklist.alarmedItems + $localize`alarmadas`;
+    this.classLegacy = !!alarmedItemsText ? 'spinner-warn' : 'spinner-card-font';
+    this.progressText = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.checklistValidQuestions + (!!alarmedItemsText ? `<strong>${alarmedItemsText}</strong>`: '');
+    this.alarmedToolTip = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.checklistValidQuestions + (!!alarmedItemsText ? alarmedItemsText : '');
+    this.setChecklistColors(!!alarmedItemsText);    
+  }
+
+  setChecklistColors(isAlarmed: boolean) {
+    // Change the tab bar color based on checklist status
+    let colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-500') : document.documentElement.style.getPropertyValue('--theme-primary-500');
+    document.documentElement.style.setProperty('--z-checklist-status', colorToUse);
+    document.documentElement.style.setProperty('--z-checklist-tabs-border', colorToUse);
+
+    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--z-colors-page-tab-background-color');
+    document.documentElement.style.setProperty('--z-checklist-status-300', colorToUse);        
+
+    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--theme-primary-100');
+    document.documentElement.style.setProperty('--z-checklist-tabs-background-color', colorToUse);
+    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-contrast-200') : document.documentElement.style.getPropertyValue('--theme-primary-contrast-100');
+    document.documentElement.style.setProperty('--z-checklist-tabs-fore', colorToUse);
   }
 
   loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
@@ -492,7 +528,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       }
     });
     if (responsesByDefault > 0) {
-      this.showCompletionMessage(responsesByDefault);
+      // this.showCompletionMessage(responsesByDefault);
     }
 
   }
@@ -560,8 +596,17 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       },
     });
     dialogResponse.afterClosed().subscribe((response) => {
-      alert(response);
     });    
+  }
+
+  get checklistValidQuestions() : number {
+    return this.checklist.questions - this.checklist.cancelled;
+  }
+
+  updateSelectedViewArray() {
+    this.views[0].caption = this.views[0].template + ` (${this.checklist.completed})`;
+    this.views[1].caption = this.views[1].template + ` (${this.checklistValidQuestions - this.checklist.completed})`;    
+    this.views[2].caption = this.views[2].template + ` (${this.checklist.questions})`;        
   }
 
 // End ======================

@@ -1,4 +1,4 @@
-<div class="container">
+<div i18n class="container">
   <mat-card class="card">
     <mat-progress-bar
       *ngIf="mold.alarmed"
@@ -11,47 +11,47 @@
     <mat-card-header>
       <mat-card-title-group class="border">
         <mat-card-title class="title">{{ mold.name }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Nombre del molde</mat-card-subtitle>
+        <mat-card-subtitle class="label">Nombre del molde</mat-card-subtitle>
       </mat-card-title-group>
     </mat-card-header>
     <mat-card-content>
       <mat-card-title>{{ mold.id }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Id del molde</mat-card-subtitle>
+        <mat-card-subtitle class="label">Id del molde</mat-card-subtitle>
     </mat-card-content>
     <mat-card-content class="maintenance">
       <div class="column">
         <mat-card-title class="subtitle">{{ mold.lastMaintenance?.date | date }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Últ. mantto.</mat-card-subtitle>
+        <mat-card-subtitle class="label">Últ. mantto.</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'specific-date'">
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.specificDate | date }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Sig. mantto.</mat-card-subtitle>
+        <mat-card-subtitle class="label">Sig. mantto.</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'days'">
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.days | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Total (d)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Total (d)</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'hours'">
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.hours | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Total (hr)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Total (hr)</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'hits'">
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.hits | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Total (g)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Total (g)</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'hits-or-hours'">
         <mat-card-title class="subtitle">
           <span>{{ mold.nextMaintenance?.hits | number }}</span> / 
           <span>{{ mold.nextMaintenance?.hours | number }}</span>
         </mat-card-title>
-        <mat-card-subtitle class="label" i18n>Total (g/hr)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Total (g/hr)</mat-card-subtitle>
       </div>
       <div class="column" *ngIf="mold.nextMaintenance?.strategy === 'hits-or-days'">
         <mat-card-title class="subtitle">
           <span>{{ mold.nextMaintenance?.hits | number }}</span> / 
           <span>{{ mold.nextMaintenance?.days | number }}</span>
         </mat-card-title>
-        <mat-card-subtitle class="label" i18n>Total (g/d)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Total (g/d)</mat-card-subtitle>
       </div>
       
       <div
@@ -60,7 +60,7 @@
         [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.timeToLeft | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan (d)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Faltan (d)</mat-card-subtitle>
       </div>
       <div
         class="column border-days"
@@ -68,7 +68,7 @@
         [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.timeToLeft | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan (hr)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Faltan (hr)</mat-card-subtitle>
       </div>
       <div
         class="column border-days"
@@ -76,7 +76,7 @@
         [ngClass]="[ maintenanceClass ]"
       >
         <mat-card-title class="subtitle">{{ mold.nextMaintenance?.hitsToLeft | number }}</mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan (g)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Faltan (g)</mat-card-subtitle>
       </div>
       <div
         class="column border-days"
@@ -87,7 +87,7 @@
           <span>{{ mold.nextMaintenance?.hitsToLeft | number }}</span>/
           <span>{{ mold.nextMaintenance?.timeToLeft | number }}</span>
         </mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan (g/hr)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Faltan (g/hr)</mat-card-subtitle>
       </div>
       <div
         class="column border-days"
@@ -98,7 +98,7 @@
           <span>{{ mold.nextMaintenance?.hitsToLeft | number }}</span>/
           <span>{{ mold.nextMaintenance?.timeToLeft | number }}</span>
         </mat-card-title>
-        <mat-card-subtitle class="label" i18n>Faltan (g/d)</mat-card-subtitle>
+        <mat-card-subtitle class="label">Faltan (g/d)</mat-card-subtitle>
       </div>
     </mat-card-content>
     <mat-divider class="divider extended"></mat-divider>
@@ -162,7 +162,7 @@
         [matTooltip]="lastHitDate"
         matTooltipClass="tooltip-general"
         matTooltipShowDelay="100" >
-        <span i18n>Últ. golpe: </span>
+        <span>Últ. golpe: </span>
         <span *ngIf="elapsedTimeLabel">
           <strong>{{ elapsedTimeLabel }}</strong>
         </span>
@@ -171,7 +171,7 @@
         </span>
         <span
           *ngIf="!mold.lastHit?.date"
-          i18n>
+         >
           <strong>Indeterminado...</strong>
         </span>
       </mat-card-subtitle>

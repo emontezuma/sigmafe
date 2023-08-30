@@ -96,6 +96,7 @@ export enum ScreenSizes {
 export interface SimpleMenuOption {
     icon: string;
     caption: string;
+    template?: string;
     value: string;
 }
 
