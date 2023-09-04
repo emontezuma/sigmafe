@@ -19,6 +19,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   exports: [
@@ -42,6 +43,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatChipsModule,
     MatSelectModule,
     MatDialogModule,
+    MatSnackBarModule,
   ]
 })
 

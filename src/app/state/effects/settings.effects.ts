@@ -18,7 +18,7 @@ export class SettingsEffects {
     )
   );
  
-  constructor(
+  constructor (
     private actions$: Actions,
     private settingsService: SettingsService,
   ) { }

@@ -14,7 +14,7 @@ export class MoldsService {
   data$: BehaviorSubject<MoldsHitsQueryData> = new BehaviorSubject(sampleMoldsHitsQueryData);
 
 
-  constructor() { }
+  constructor () { }
 
   // Functions ================  
   getMoldsHitsQueryData(): Observable<MoldsHitsQueryData> {

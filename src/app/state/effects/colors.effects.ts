@@ -18,7 +18,7 @@ export class ColorsEffects {
     )
   );
  
-  constructor(
+  constructor (
     private actions$: Actions,
     private colorsService: ColorsService,
   ) { }

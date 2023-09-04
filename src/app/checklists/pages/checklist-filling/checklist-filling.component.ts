@@ -18,6 +18,7 @@ import { Subscription } from 'rxjs';
 import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
 import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
 import { GenericDialogComponent } from 'src/app/shared/components/generic-dialog/generic-dialog.component';
+import { RecordStatus } from 'src/app/shared/models/helpers.models';
 
 @Component({
   selector: 'app-checklist-filling',
@@ -77,7 +78,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   checklistFillingDataSubscriber: Subscription;
   unsavedChanges: boolean = false;
   noQuestions: boolean = false;
-  showQuestions: boolean = true;
+  showSpinner: boolean = false;
   loadFromButton: number = -1;
   checklist: ChecklistFillingData = {};
   progressText: string = '';
@@ -130,11 +131,11 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   form = new FormGroup({
   });
 
-  constructor(
+  constructor (
     private store: Store<AppState>,
     public sharedService: SharedService,
     public scrollDispatcher: ScrollDispatcher,
-    public dialog: MatDialog,
+    public dialog: MatDialog,    
   ) { }
 
 // Hooks ====================
@@ -215,9 +216,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       // element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
     });
     this.questions.changes.subscribe((components: QueryList<ElementRef>) => {
-      setTimeout(() => {
-        this.noQuestions = components.length === 0;
-      }, 50);      
+      
     });    
   }
 
@@ -236,7 +235,6 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     // Turn off the subscriptions
     if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
     if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
-    if (this.profileDataSubscriber) this.profileDataSubscriber.unsubscribe();
     if (this.toolbarClickSubscriber) this.toolbarClickSubscriber.unsubscribe();
     if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
     if (this.checklistFillingLoadingSubscriber) this.checklistFillingLoadingSubscriber.unsubscribe();
@@ -269,6 +267,20 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   calcButtons() {    
     this.buttons = [{
+      type: 'button',
+      caption: $localize`Iniciar`,
+      tooltip:  $localize`Inicia éste checklist`,
+      icon: 'time',
+      class: 'accent',
+      iconSize: '24px',
+      showIcon: true,
+      showTooltip: true,
+      locked: false,
+      showCaption: true,
+      disabled: false,
+      loading: false,
+      action: ButtonActions.START,
+    },{
       type: 'button',
       caption: $localize`Guardar`,
       tooltip:  $localize`Guarda éste checklist`,
@@ -321,7 +333,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       showTooltip: true,
       locked: true,
       showCaption: true,
-      disabled: false,
+      disabled: true,
       action: ButtonActions.UPLOAD_FILE,
       loading: false,
     },{
@@ -395,17 +407,23 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     if (!value) {
       this.selectedView = this.views[0];
     }
-    this.showQuestions = false;
+    //Init the spinner
+    this.showSpinner = true;
     this.selectedView = this.views.find((view) =>
       view.value === value
     );
-    if (this.noQuestions) {
-      this.noQuestions = false;
-    }
-    console.log(this.selectedView);
+    let noQuestions = false;    
+    if (this.selectedView.value === 'answered') {
+      noQuestions = this.checklist.completed === 0;
+    } else if (this.selectedView.value === 'unanswered') {
+      noQuestions = (this.pendingQuestions + this.attachmentMissingQuestions) === 0;
+    } else {
+      noQuestions = this.checklist.items.length === 0;
+    } 
     setTimeout(() => {
-      this.showQuestions = true;
-    }, 300);    
+      this.noQuestions = noQuestions;
+      this.showSpinner = false;
+    }, 300);      
   }
 
   setLayout(value: string) {
@@ -428,17 +446,13 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       if(question.answerType === ChecklistAnswerType.YES_NO) {
         let answer = undefined;
         let status = ChecklistQuestionStatus.COMPLETED;
-        let actionRequired = false;
+        let actionRequired = false;        
         if (e !== undefined) {
-          answer = e.hasOwnProperty('value') ? e.value : e;
-          if (answer !== undefined) {
-            if (question.attachmentRequired && !question.attachmentCompleted) {
-              status = ChecklistQuestionStatus.ATTACHMENT_MISSING;
-              actionRequired = true;
-            }
-          } else {
-            status = ChecklistQuestionStatus.READY;
-          }
+          answer = e;
+          if (question.attachmentRequired && !question.attachmentCompleted) {
+            status = ChecklistQuestionStatus.ATTACHMENT_MISSING;
+            actionRequired = true;
+          }          
         } else {
           status = ChecklistQuestionStatus.READY;
         }
@@ -456,12 +470,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
           this.store.dispatch(updateChecklistQuestion({ item }));
           if (this.selectedView.value !== 'all') {
             this.checklistAnimation();
-          }          
-          if (this.loaded) {
-            this.unsavedChanges = true;
-            this.evaluateButtons();
-          }
-          this.reviewForAlarms();
+          }                    
         }        
       }      
     }
@@ -469,7 +478,6 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   reviewForAlarms() {
     // Review all the questions looking for any alarm
-
   }
 
   checklistAnimation() {
@@ -484,15 +492,15 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   checklistTotalization() {
-    if (this.checklistValidQuestions === 0) {
+    if (this.validQuestions === 0) {
       this.checklistProgress = 0;
     } else {
-      this.checklistProgress = Math.round(this.checklist.completed / this.checklistValidQuestions * 100);
+      this.checklistProgress = Math.round(this.checklist.completed / this.validQuestions * 100);
     }
-    const alarmedItemsText = !this.checklist.alarmed ? '' : this.checklist.alarmedItems === 1 ? $localize` una alarmada` : ' ' + this.checklist.alarmedItems + $localize`alarmadas`;
+    const alarmedItemsText = !this.checklist.alarmed ? '' : this.checklist.alarmedItems === 1 ? $localize`una alarmada` : ' ' + this.checklist.alarmedItems + $localize`alarmadas`;
     this.classLegacy = !!alarmedItemsText ? 'spinner-warn' : 'spinner-card-font';
-    this.progressText = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.checklistValidQuestions + (!!alarmedItemsText ? `<strong>${alarmedItemsText}</strong>`: '');
-    this.alarmedToolTip = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.checklistValidQuestions + (!!alarmedItemsText ? alarmedItemsText : '');
+    this.progressText = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.validQuestions + (!!alarmedItemsText ? `\n<strong>${alarmedItemsText}</strong>`: '');
+    this.alarmedToolTip = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.validQuestions + (!!alarmedItemsText ? ' ' + alarmedItemsText : '');
     this.setChecklistColors(!!alarmedItemsText);    
   }
 
@@ -513,8 +521,19 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
     this.checklist = checklistFillingData;
-    if (firstTime) {
-      this.autoCompletion();
+    if (firstTime && this.checklist.status !== RecordStatus.ACTIVE) {
+      this.sharedService.setButtonState(ButtonActions.START, false);      
+      this.sharedService.setButtonState(ButtonActions.UPLOAD_FILE, false);
+      this.showInactiveMessage();
+    } else {
+      if (firstTime) {
+        this.autoCompletion();
+      } else {      
+        this.unsavedChanges = true;
+      }
+      if (this.checklist.status === RecordStatus.ACTIVE) {
+        this.evaluateButtons();
+      }      
     }    
   }
 
@@ -524,23 +543,18 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     this.checklist.items.forEach((item) => {
       if (item.answerByDefault && !item.answer) {
         this.setAnswer(item.index, item.answerByDefault);
-        responsesByDefault++;
+        responsesByDefault++;        
       }
     });
     if (responsesByDefault > 0) {
-      // this.showCompletionMessage(responsesByDefault);
+      this.unsavedChanges = true;
+      this.showCompletionMessage(responsesByDefault);
     }
-
   }
 
   evaluateButtons() {
-    if (this.unsavedChanges && this.buttons[0].disabled) {
-      this.buttons[0].disabled = false;
-      this.buttons[1].disabled = false;
-    } else if (!this.unsavedChanges && !this.buttons[0].disabled) {
-      this.buttons[0].disabled = true;
-      this.buttons[1].disabled = true;
-    }    
+    this.sharedService.setButtonState(ButtonActions.SAVE, this.unsavedChanges);
+    this.sharedService.setButtonState(ButtonActions.CANCEL, this.unsavedChanges);
   }
 
   saveDataToLocal() {
@@ -592,22 +606,68 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
         body: {
           message: $localize`El checklist fue configurado para aplicar <strong>${answers}</strong> por defecto.`,
         },
-        showCloseButton: false,
+        showCloseButton: true,
       },
     });
     dialogResponse.afterClosed().subscribe((response) => {
     });    
   }
 
-  get checklistValidQuestions() : number {
-    return this.checklist.questions - this.checklist.cancelled;
+  showInactiveMessage() : void {
+    const message = $localize`El checklist <strong>está inactivo</strong> debe comunicarse con el administrador del sistema`;
+    this.sharedService.showSnackMessage(message);
+  }
+
+  showInactiveMessage2(): void {
+    const dialogResponse = this.dialog.open(GenericDialogComponent, {
+      width: '350px',
+      disableClose: false,
+      panelClass: "warn-dialog",
+      data: {
+        title: $localize`Checklist inactivo`,
+        buttons: [{
+          showIcon: true,
+          icon: 'check',
+          showCaption: true,
+          caption: $localize`Aceptar`,
+          showTooltip: true,
+          class: 'warn',
+          tooltip: $localize`Cierra esta ventana`,
+          default: true,
+        }],
+        body: {
+          message: $localize`Éste checklist esta <strong>INACTIVO</strong> y no se puede actualizar.`,
+        },
+        showCloseButton: true,
+      },
+    });
+    dialogResponse.afterClosed().subscribe((response) => {
+    });    
   }
 
   updateSelectedViewArray() {
     this.views[0].caption = this.views[0].template + ` (${this.checklist.completed})`;
-    this.views[1].caption = this.views[1].template + ` (${this.checklistValidQuestions - this.checklist.completed})`;    
+    this.views[1].caption = this.views[1].template + ` (${this.validQuestions - this.checklist.completed})`;    
     this.views[2].caption = this.views[2].template + ` (${this.checklist.questions})`;        
   }
+  
+// Getters ==================
 
-// End ======================
+  get validQuestions() : number {
+    return this.checklist.items.length - this.cancelledQuestions;
+  }
+
+  get pendingQuestions(): number {
+    return this.checklist.items.reduce((acc, item) => acc + (item.status === ChecklistQuestionStatus.READY ? 1 : 0), 0);
+  }
+
+  get attachmentMissingQuestions(): number {
+    return this.checklist.items.reduce((acc, item) => acc + (item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING ? 1 : 0), 0);
+  }
+
+  get cancelledQuestions(): number {
+    return this.checklist.items.reduce((acc, item) => acc + (item.status === ChecklistQuestionStatus.CANCELLED ? 1 : 0), 0);
+  }
+  
+// End ======================   
 }

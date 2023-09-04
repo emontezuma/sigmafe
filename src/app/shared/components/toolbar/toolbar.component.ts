@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, ViewChild, AfterViewInit } from '@angular
 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { ButtonActions, ShowElement, ToolbarElement } from 'src/app/shared/models/screen.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-toolbar',
@@ -15,16 +16,26 @@ export class ToolbarComponent implements AfterViewInit {
 // Variables ================
   showSearchBox: ShowElement;
   toolbarHeight: number = 64;
+  changeStateSubscriber: Subscription;
+  showSearchSubscriber: Subscription;
 
-  constructor(
+  constructor (
     private sharedService: SharedService,
     ) { }
 
 // Hooks ====================
   ngOnInit(): void {
-    this.sharedService.showSearch.subscribe((searchBox) => {
+    this.showSearchSubscriber = this.sharedService.showSearch.subscribe((searchBox) => {
       this.showSearchBox = searchBox;
-    });    
+    });
+    this.showSearchSubscriber = this.sharedService.buttonStateChange.subscribe((buttonState) => {
+      const button = this.toolbar.buttons.find((button) => {
+        return button.action === buttonState.action
+      });
+      if (button) {
+        button.disabled = !buttonState.enabled;
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -35,6 +46,11 @@ export class ToolbarComponent implements AfterViewInit {
     else {
       this.getElementWidth();
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.showSearchSubscriber) this.showSearchSubscriber.unsubscribe();
+    if (this.showSearchSubscriber) this.showSearchSubscriber.unsubscribe();
   }
 
 // Functions ================

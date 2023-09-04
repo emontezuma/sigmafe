@@ -2,6 +2,7 @@ import { Component, HostListener, ChangeDetectorRef, AfterViewInit, ElementRef, 
 import { Store } from '@ngrx/store';
 import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 import { Screen, ScreenSizes, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
 import { SharedService } from './shared/services/shared.service'; 
@@ -15,6 +16,7 @@ import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
+import { SnackComponent } from "./shared/components/snack/snack.component";
 
 @Component({
   selector: 'app-root',
@@ -81,12 +83,12 @@ export class AppComponent implements AfterViewInit {
     [Breakpoints.XSmall, 'XSmall'],
   ]);
   
-  constructor(
+  constructor (
     private store: Store<AppState>,
     public platform: Platform,
     private breakpointObserver: BreakpointObserver,
     private sharedService: SharedService,
-    private colorsService: ColorsService,
+    private snackBar: MatSnackBar,
     private changeDetectorRef: ChangeDetectorRef,
     ) { 
     breakpointObserver
@@ -145,6 +147,17 @@ export class AppComponent implements AfterViewInit {
     this.sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
       this.changeDetectorRef.detectChanges();
+    });
+    this.sharedService.snackMessage.subscribe((snackBar) => {
+      let validDuration = snackBar.duration;      
+      if (!snackBar.buttonIcon && !snackBar.buttonText && !validDuration) {
+        validDuration = 4000;
+      }
+      this.snackBar.openFromComponent(SnackComponent, {
+        data: snackBar,
+        panelClass: [snackBar.snackClass],
+        duration: validDuration
+      });
     });
     this.sharedService.setTimer();
     this.handlerScreenSizeChange(null);
@@ -211,6 +224,7 @@ export class AppComponent implements AfterViewInit {
   toolbarAnimationStarted(e: any) {
     this.toolbarAnimated = false;
   }
+  
 
 // End ======================
 }

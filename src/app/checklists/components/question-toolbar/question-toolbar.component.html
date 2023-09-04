@@ -1,0 +1,24 @@
+<div class="question-buttons">        
+    <ng-container *ngFor="let button of buttons; let i = index">
+        <button
+            mat-icon-button
+            class="circular-button with-background"
+            aria-label="icon-button with menu icon"
+            [matTooltip]="button.tooltip"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+            [disabled]="button.disabled"
+            (click)="handleClick(button.action)"
+            [ngClass]="{
+                'warn': button.alarmed,
+                'pulse-with-warn': button.alarmed
+            }"
+        >
+            <mat-icon
+                class="icon-button"
+                [svgIcon]="button.icon"
+            >
+            </mat-icon>
+        </button>        
+    </ng-container>
+</div>

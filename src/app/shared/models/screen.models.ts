@@ -21,6 +21,7 @@ export interface Screen  {
 }
 
 export enum ButtonActions {
+    START = 'start',
     SAVE = 'save',
     CANCEL = 'cancel',
     EXPORT_TO_EXCEL = 'exportToExcel',
@@ -50,6 +51,15 @@ export interface SharedState {
 export interface SearchBox {
     textToSearch: string;
     from: string;
+}
+
+export interface SnackMessage {
+    message: string;
+    duration: number;
+    snackClass: string;
+    icon: string;
+    buttonText: string;
+    buttonIcon: string;
 }
 
 export interface ToolbarButtonClicked {

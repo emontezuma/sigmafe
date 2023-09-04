@@ -14,7 +14,7 @@ export class SettingsService {
   fakeSettingsData: SettingsData = sampleSettings;
   data$: BehaviorSubject<SettingsData> = new BehaviorSubject(sampleSettings);
 
-  constructor() { }
+  constructor () { }
 
 // Functions ================  
   getSettingsData(): Observable<SettingsData> {

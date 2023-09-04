@@ -27,7 +27,7 @@ settingsData: SettingsData;
 timeOutforDefaultButton: number = 0;
 defaultAction: string = 'cancel';
 
-constructor(
+constructor (
   private store: Store<AppState>,
   public dialogRef: MatDialogRef<GenericDialogComponent>,
   public sharedService: SharedService,

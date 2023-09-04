@@ -77,6 +77,12 @@ export enum ChecklistView {
     FLEXBOX = 'flexbox',
 }
 
+export enum ChecklistStartingMode {
+    ANYTIME = 'anytime',
+    STARTING_DATE = 'startingDate',
+    APPROVE = 'approve',    
+}
+
 export enum CountdownType {
     REGRESSIVE_FROM_DUEDATE = 'regressiveFromDueDate',
     PROGRESSIVE_FROM_START_DATE = 'progressiveFromStartDate',
@@ -107,8 +113,9 @@ export interface ChecklistFillingItem {
     actionRequired?: boolean;
     attachmentCompleted?: boolean;
     icon?: string;
-    alarms?: ChecklistAlarms[],
+    alarms?: ChecklistAlarms[];
     helpers?: Attachment[];
+    buttons?: any[]; // TODO define the intreface
 }
 
 export interface ChecklistAlarms {
@@ -190,6 +197,7 @@ export interface ChecklistFillingData {
     attachmentCompleted?: boolean;
     equipment?: ChecklistEquipment;
     periods?: ChecklistPeriod[];
+    startingMode?: ChecklistStartingMode;
 }
 
 export interface ChecklistFillingState {

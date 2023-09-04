@@ -23,23 +23,31 @@ export const checklistFillingReducer = createReducer(
   on(checklistFillingActions.loadedChecklistFillingData, (state, { checklistFillingData } ) => ({ ...state, loading: false, checklistFillingData })),
   
   on(checklistFillingActions.updateChecklistQuestion, (state, { item }) => {
-
     const checkForAlrmedQuestion = (answer: string, alarms: ChecklistAlarms[]): boolean => {
       return alarms.some((alarmedValues) => {
         const sign = alarmedValues.comparison || '==';
-        console.log(`'${alarmedValues.value}'${sign}'${answer}'`);
         return eval(`'${alarmedValues.value}'${sign}'${answer}'`);
       });
     }
 
     const updatedQuestionnaire = state.checklistFillingData.items.map((stateItem) => {
        if(item.index === stateItem.index) {
-        const alarmed =  state.checklistFillingData.canAlarm && state.checklistFillingData.equipment.canAlarm && item.canAlarm && checkForAlrmedQuestion(item.answer, item.alarms);
-     
-        // const alarmed = reviewAlarm(item.answer)
-        return { ...item, alarmed };
+        const alarmed =  state.checklistFillingData.canAlarm && state.checklistFillingData.equipment.canAlarm && item.canAlarm && item.alarms && checkForAlrmedQuestion(item.answer, item.alarms);
+        const actionRequired = item.attachmentRequired && !item.attachmentCompleted && item.status !== ChecklistQuestionStatus.CANCELLED;        
+        const buttons = item.buttons.map((button) => {
+          if (button.action === 'attachments') {
+            return {
+              ...button,
+              alarmed: actionRequired,
+            }            
+          } else {
+            return button;
+          }
+        })
+        console.log(buttons);
+        return { ...item, alarmed, actionRequired, buttons };
       }
-      return stateItem;            
+      return stateItem;
     });
 
     // Calculate header statuses based on questions

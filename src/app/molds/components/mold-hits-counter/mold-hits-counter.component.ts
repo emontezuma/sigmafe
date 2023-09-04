@@ -69,7 +69,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   }
   showPrefix = false;
 
-  constructor(
+  constructor (
     private store: Store<AppState>,
     private sharedService: SharedService,
   ) { }

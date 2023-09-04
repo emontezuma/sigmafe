@@ -1,17 +1,30 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, } from '../models/screen.models';
+import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, } from '../models/screen.models';
+import { MatSnackBar } from "@angular/material/snack-bar";
+import { SnackComponent } from "../components/snack/snack.component";
 
+interface buttonState {
+  action?: ButtonActions;
+  enabled: boolean;
+}
 @Injectable({
   providedIn: 'root'
 })
+
 export class SharedService {
   private textToSearch: BehaviorSubject<SearchBox> = new BehaviorSubject<SearchBox>({ textToSearch: '', from: '' });
   search: Observable<SearchBox> = this.textToSearch.asObservable();
 
-  private actionToDo: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1 });
-  toolbarAction: Observable<ToolbarButtonClicked> = this.actionToDo.asObservable();
+  private buttonActionToDo: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1 });
+  toolbarAction: Observable<ToolbarButtonClicked> = this.buttonActionToDo.asObservable();
 
+  private handleButtonState: BehaviorSubject<buttonState> = new BehaviorSubject<buttonState>({ action: undefined, enabled: true });
+  buttonStateChange: Observable<buttonState> = this.handleButtonState.asObservable();
+
+  private handleSnackMessage: BehaviorSubject<SnackMessage> = new BehaviorSubject<SnackMessage>({ message: '', duration: 0, buttonText: '', icon: '', snackClass: '', buttonIcon: '' });
+  snackMessage: Observable<SnackMessage> = this.handleSnackMessage.asObservable();
+  
   private showSearchBox: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showSearch: Observable<ShowElement> = this.showSearchBox.asObservable();
 
@@ -39,15 +52,21 @@ export class SharedService {
   private pulseSecond: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
   pastSecond: Observable<boolean> = this.pulseSecond.asObservable();
 
-  constructor() {}
+  constructor (
+    public snackBar: MatSnackBar,
+  ) {}
 
 // Functions ================
   setText(textToSearch: string, from: string) {
     this.textToSearch.next({ textToSearch, from });
   }
 
+  setButtonState(action: ButtonActions, enabled: boolean) {
+    this.handleButtonState.next({ action, enabled });
+  }
+
   setToolbarClick(action: ButtonActions, from: string, buttonIndex: number) {
-    this.actionToDo.next({ action, from, buttonIndex });
+    this.buttonActionToDo.next({ action, from, buttonIndex });
   }
 
   setSearchBox(from: string, showSearchBox: boolean) {
@@ -85,6 +104,17 @@ export class SharedService {
   setTimer() {
     const source = interval(1000);
     const subscribe = source.subscribe(val => this.pulseSecond.next(true));    
+  }
+
+  showSnackMessage(message: string, duration: number = 0, snackClass: string = 'snack-primary', buttonText: string = '', icon: string = '', buttonIcon: string = '') {
+    this.handleSnackMessage.next({
+      message,
+      duration,
+      snackClass,
+      buttonText,
+      icon,
+      buttonIcon,
+    })      
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {

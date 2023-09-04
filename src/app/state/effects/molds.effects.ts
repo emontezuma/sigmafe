@@ -18,7 +18,7 @@ export class MoldsEffects {
     )
   );
  
-  constructor(
+  constructor (
     private actions$: Actions,
     private moldsService: MoldsService,
   ) { }

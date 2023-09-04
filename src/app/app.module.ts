@@ -25,6 +25,7 @@ import { ColorsEffects } from './state/effects/colors.effects';
 import { ChecklistFillingEffects } from './state/effects/checklists.effects';
 import { GenericDialogComponent } from './shared/components/generic-dialog/generic-dialog.component';
 import { ImageNotFoundModule } from './shared/directives/image-not-found.module';
+import { SnackComponent } from './shared/components/snack/snack.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { ImageNotFoundModule } from './shared/directives/image-not-found.module'
     NotFoundComponent,
     SearchBoxComponent,
     ToolbarComponent,
-    GenericDialogComponent,    
+    GenericDialogComponent,
+    SnackComponent,    
   ],
   imports: [
     BrowserModule,

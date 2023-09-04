@@ -1,0 +1,180 @@
+@use "../../../../assets/styles/mixins";
+
+.container {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.question-card {    
+    display: flex;
+    flex-direction: column;
+    width: -webkit-fill-available;
+    border-radius: 8px 0px;
+    padding: 5px;
+    height: 100%;
+}
+
+.question-alarmed {    
+    outline: 2px solid var(--theme-warn-500) !important;
+    box-shadow: 0px 2px 1px -1px rgba(var(--z-colors-warn-rgb), 0.2), 0px 1px 1px 0px rgba(var(--z-colors-warn-rgb), 0.14), 0px 1px 3px 0px rgba(var(--z-colors-warn-rgb), 0.12) !important;
+}
+
+.question-cancelled {
+    background-color: var(--z-colors-page-card-disabled-background-color) !important;
+    color: var(--z-colors-page-card-disabled-fore) !important;
+    border: 1px solid var(--z-colors-page-card-disabled-border-color) !important;
+}
+
+.corner {
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 8px 0px 0px;
+    top: 0;
+    left: 0;
+    position: absolute;
+    margin-top: -5px;
+    margin-left: -8px;
+    border: 2px solid var(--z-colors-page-card-border);
+}
+
+.over-icon {
+    position: absolute;
+    color: var(--theme-primary-contrast-500);
+    left: 0;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    margin-top: 5px;
+    margin-left: 2px;
+}
+
+.progress {
+    margin-top: 5px;
+    margin-bottom: -9px;
+}
+
+.question-grid {    
+    width: -webkit-fill-available;
+    z-index: 1;
+}
+
+.item-index-container {    
+    height: 42px;
+    min-width: 43px;
+    background-color: var(--z-colors-page-card-background-color);
+    border-radius: 50%;
+    border: 2px solid var(--z-colors-page-card-fore);
+    display: flex; 
+    align-items: center;
+    float: left;
+    margin: 0px 5px;             
+    position: sticky;
+    top: 0;
+}
+
+.item-index {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--z-colors-page-card-fore);
+    text-align: center;
+    flex: 1;
+}
+
+.item-text {
+    font-size: 1.5rem;
+    text-align: start;
+    line-height: 2rem;
+    margin: 5px;
+    margin-top: 12px;
+}
+
+.item-response {
+    align-self: flex-start;
+    float: right;
+    display: flex;
+    margin-right: 5px;
+    position: sticky;
+    top: 0;
+    margin-top: -3px;
+}
+
+.item-response-type {    
+    
+}
+
+.small {
+    width: 32px !important;
+    height: 32px !important;
+    margin-left: 10px;
+    margin-top: 2px;
+}
+
+.small > .icon-button {    
+    margin-left: -10px;
+    margin-top: -8px;
+}
+
+.icon-button {
+    background-color: transparent;
+}
+
+.item-image {
+    position: relative !important;
+    width: 39px !important;
+    height: 38px !important;
+    border-radius: 50%;
+    inset: 0px;
+    float: left;
+    border-radius: 50%;
+    border: 2px solid var(--theme-primary-contrast-500);
+    margin: 0px 5px 0px 0px;
+    padding: 2px;
+    object-fit: cover;
+}
+
+mat-card-header {
+    max-height: 300px;
+    overflow-x: hidden;
+    flex: 1;
+}
+
+mat-card-footer {
+    background-color: var(--z-colors-page-shadow);
+    border-radius: 0px 0px 8px 0px;
+    padding-top: 5px;
+    padding-left: 10px;
+    padding-bottom: 5px;
+    width: -webkit-fill-available;
+    margin-top: 5px   
+}
+
+.divider-footer {
+    @include mixins.divider(0px, 5px, 0px, 0px);   
+}
+
+::ng-deep .mdc-evolution-chip-set .mdc-evolution-chip-set__chips {
+    margin-left: 0px !important;
+}
+
+mat-chip-option {
+    font-size: 1.7rem;
+}
+
+.mat-mdc-card-header { 
+    padding: 4px 4px;
+}
+
+.with-background {    
+    background-color: var(--z-colors-page-card-background-color);
+    outline: 1px solid var(--theme-primary-500);
+}
+
+.with-background:disabled {    
+    outline: 1px solid var(--theme-primary-400);
+}
+
+.icon-button {
+    background-color: transparent;
+}

@@ -1,0 +1,118 @@
+<mat-card
+  class="question-card"
+  [ngClass]="{
+        'question-alarmed': item.alarmed,
+        'lagacy-alarm': item.alarmed,
+        'question-cancelled': item.status === 'cancelled' || inactive,
+    }"
+>
+  <div
+    @dissolve
+    *ngIf="
+      item.status === 'cancelled' ||
+      item.status === 'completed' ||
+      item.status === 'attachmentMissing' ||
+      item.actionRequired
+    "
+    class="corner"
+    [ngStyle]="{
+      backgroundColor:
+        item.status === 'completed' && !item.alarmed
+          ? 'var(--theme-accent-500)'
+          : item.status === 'cancelled'
+          ? 'var(--z-colors-page-card-disabled-background-color)'
+          : 'var(--theme-warn-500)'
+    }"
+  >
+    <mat-icon
+      class="over-icon"
+      [ngStyle]="{
+        color:
+          item.status === 'completed' && !item.alarmed
+            ? 'var(--theme-accent-contrast-500)'
+            : item.status === 'cancelled'
+            ? 'var(--z-colors-page-fore)'
+            : 'var(--theme-warn-contrast-500)'
+      }"
+      [svgIcon]="
+        item.status === 'completed'
+          ? 'check'
+          : item.status === 'attachmentMissing'
+          ? 'attachment_file'
+          : item.status === 'cancelled'
+          ? 'block'
+          : 'warn_fill'
+      "
+      [matTooltipDisabled]="item.status === 'completed'"
+      [matTooltip]="
+        item.status === 'attachmentMissing'
+          ? 'Se requiere agregar un adjunto'
+          : item.status === 'cancelled'
+          ? 'La pregunta fue cancelada y no se requiere una respuesta'
+          : 'Se requiere una acción'
+      "
+      matTooltipClass="tooltip-general"
+      matTooltipShowDelay="100"
+    >
+    </mat-icon>
+  </div>
+  <mat-progress-bar
+    *ngIf="(item.index || 0) > 1000"
+    mode="indeterminate"
+    color="warn"
+    name="active-progress-bar"
+    class="progress"
+  >
+  </mat-progress-bar>
+  <mat-card-header>
+    <ng-container *ngIf="item.answerType === 'yesNo'">
+      <div class="question-grid">
+        <div class="item-index-container">
+          <div class="item-index">
+            {{ item.index }}
+          </div>
+        </div>
+        <div class="item-response">
+          <div class="item-response-type">
+            <mat-chip-listbox
+              (change)="setAnswer($event)"
+              [disabled]="item.status === 'cancelled' || inactive"
+            >
+              <mat-chip-option value="y" [selected]="item.answer === 'y'">
+                Si
+              </mat-chip-option>
+              <mat-chip-option value="n" [selected]="item.answer === 'n'">
+                No
+              </mat-chip-option>
+            </mat-chip-listbox>
+          </div>
+          <button
+            mat-icon-button
+            class="circular-button with-background small"
+            aria-label="icon-button with menu icon"
+            matTooltip="Reiniciar respuesta"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+            (click)="setAnswer(undefined)"
+            [disabled]="item.status === 'cancelled' || inactive"
+          >
+            <mat-icon class="icon-button" svgIcon="cancel"> </mat-icon>
+          </button>
+        </div>
+        <img
+          *ngIf="item.icon"
+          appImageNotFound
+          class="item-image"
+          [ngSrc]="item.icon"
+          fill
+        />
+        <div class="item-text">
+          <p>{{ item.text }}</p>
+        </div>
+      </div>
+    </ng-container>
+  </mat-card-header>    
+  <mat-card-footer *ngIf="item.status !== 'cancelled' && !inactive">
+    <app-question-toolbar [buttons]="item.buttons"></app-question-toolbar>      
+  </mat-card-footer>
+</mat-card>

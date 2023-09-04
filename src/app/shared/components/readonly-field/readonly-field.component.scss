@@ -1,0 +1,42 @@
+@use "../../../../assets/styles/mixins";
+
+.label-description-with-reference {
+  max-width: calc(100% - 40px);
+}
+
+.label-description {
+  max-width: calc(100% - 40px);
+}
+
+mat-card-title {
+  font-weight: 900;
+  line-height: 24px;
+}
+
+.flex-col {
+    @include mixins.flexbox(row, nowrap, 5px, flex-start);
+}
+
+.accordion-icon {
+  min-width: 32px;
+  min-height: 32px;
+  margin-right: 5px;
+}
+
+.label-reference {
+  background-color: var(--z-colors-page-shadow);
+  padding: 0px 5px;
+  border-radius: 4px;
+  font-weight: 300;
+  max-width: calc(100% - 40px)
+}
+
+.label-description-with-reference {
+  max-width: calc(100% - 40px);
+}
+
+.label-description {
+  max-width: calc(100% - 40px);
+}
+
+

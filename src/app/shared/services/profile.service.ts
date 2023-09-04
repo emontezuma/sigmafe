@@ -14,7 +14,7 @@ export class ProfileService {
   data$: BehaviorSubject<ProfileData> = new BehaviorSubject(sampleProfile);
 
 
-  constructor() { }
+  constructor () { }
 
 // Functions ================  
   getSettingsData(): Observable<ProfileData> {

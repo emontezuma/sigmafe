@@ -16,7 +16,7 @@ export class ConfigService {
   controlTimer: any;
   processesFinished: number = 0;
  
-  constructor(
+  constructor (
     private store: Store<AppState>,
     private colorsService: ColorsService,
   ) { }

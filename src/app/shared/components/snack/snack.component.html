@@ -1,0 +1,40 @@
+<div
+    class="container"
+    [style.maxWidth.px]="maxWidth"
+>
+    <div
+        class="message"        
+    >        
+        <span 
+            class="snack-text"
+            [innerHTML]="data.message"             
+        >
+        </span> 
+        <span 
+            *ngIf="!!data.buttonText"
+            class="button-text"        
+            (click)="handleClick()"
+        >
+            {{ data.buttonText }}
+        </span>
+        <button
+            mat-icon-button
+            class="circular-button only-button"        
+            *ngIf="!data.buttonText && !data.icon && !!data.buttonIcon"
+            (click)="handleClick()"
+        >
+            <mat-icon            
+                class="svgicon icon-medium"            
+                [svgIcon]="data.buttonIcon"            
+            >                            
+            </mat-icon>
+        </button>    
+        <mat-icon
+            *ngIf="!data.buttonText && !!data.icon && !data.buttonIcon"
+            class="svgicon only-icon"            
+            [svgIcon]="data.icon"            
+        >                            
+        </mat-icon>
+    </div>
+</div>
+

@@ -1,0 +1,36 @@
+<div>
+  <mat-card-title>
+    <div *ngIf="!loading">
+        <div *ngIf="icon || reference" @dissolve class="flex-col">
+            <mat-icon *ngIf="icon" class="accordion-icon" [svgIcon]="icon">
+            </mat-icon>
+            <app-label-ellipsis
+                *ngIf="reference"
+                [class]="referenceClass"
+                [label]="reference"
+            >
+            </app-label-ellipsis>
+            <app-label-ellipsis
+                [class]="labelClass"
+                [label]="label"
+            >
+            </app-label-ellipsis>
+        </div>
+        <app-label-ellipsis        
+            @dissolve
+            *ngIf="!reference && !icon"
+            [class]="labelClass"
+            [label]="label"
+            >
+        </app-label-ellipsis>
+    </div>
+    <ngx-skeleton-loader
+      *ngIf="loading"
+      class="text"
+      [theme]="skeletonTheme"
+      [count]="skeletonCount"
+    >
+    </ngx-skeleton-loader>
+  </mat-card-title>
+  
+</div>

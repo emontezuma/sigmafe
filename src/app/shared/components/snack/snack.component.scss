@@ -1,0 +1,85 @@
+.message {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.button-text {
+  font-weight: 700;
+  font-size: 1.2rem !important;
+  cursor: pointer;  
+  text-align: right;
+}
+
+.button-text:hover {
+  color: var(--theme-primary-500);
+}
+
+.only-icon {
+  width: 48px !important;
+  height: 48px !important;    
+}
+
+.only-button {
+  width: 32px;
+  height: 32px;
+  background-color: var(--z-colors-page-shadow);
+} 
+
+.icon-medium {
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0px !important;
+  margin-left: -7px !important;
+  margin-top: -7px !important;
+}
+
+::ng-deep .mat-mdc-snack-bar-container {
+  margin-bottom: 45px !important;
+}
+
+::ng-deep .mat-mdc-snack-bar-label {
+  overflow-wrap: break-word !important;
+  font-size: 1.6rem !important;
+  text-align: center !important;
+  justify-content: center !important;
+  white-space: normal !important;
+  line-height: 1.6rem !important;
+  border-radius: 5px;
+}
+
+::ng-deep .snack-primary .mdc-snackbar__surface {
+  background-color: var(--theme-primary-A200) !important;
+  border: 2px solid var(--theme-primary-800) !important;
+}
+
+::ng-deep .snack-primary .mdc-snackbar__label {
+  color: var(--theme-primary-contrast-A200) !important;
+  .only-icon {
+    color: var(--theme-primary-contrast-A200) !important;
+  }  
+}
+
+::ng-deep .snack-warn .mdc-snackbar__surface {
+  background-color: var(--theme-warn-A200) !important;
+  border: 2px solid var(--theme-warn-800) !important;
+}
+
+::ng-deep .snack-warn .mdc-snackbar__label {
+  color: var(--theme-warn-contrast-A200) !important;
+  .only-icon {
+    color: var(--theme-warn-contrast-A200) !important;
+  }  
+}
+
+::ng-deep .snack-accent .mdc-snackbar__surface {
+  background-color: var(--theme-accent-A200) !important;
+  border: 2px solid var(--theme-accent-800) !important;  
+}
+
+::ng-deep .snack-accent .mdc-snackbar__label {
+  color: var(--theme-accent-contrast-A200) !important;
+  .only-icon {
+    color: var(--theme-accent-contrast-A200) !important;
+  }  
+}

@@ -1,0 +1,26 @@
+@use "../../../../assets/styles/mixins";
+
+.question-buttons {
+    @include mixins.flexbox(row, wrap, 9px, unset);
+}
+
+.with-background {    
+    background-color: var(--z-colors-page-card-background-color);
+    outline: 1px solid var(--theme-primary-500);
+}
+
+.with-background:disabled {    
+    outline: 1px solid var(--theme-primary-400);
+}
+
+.icon-button {
+    background-color: transparent;
+}
+
+
+.pulse-with-warn {
+    animation: pulse-warn 1s infinite;
+    box-shadow: 0 0 0 0.5em rgba(#fff,0);
+}
+
+

@@ -18,7 +18,7 @@ export class ProfileEffects {
     )
   );
  
-  constructor(
+  constructor (
     private actions$: Actions,
     private profileService: ProfileService,
   ) { }

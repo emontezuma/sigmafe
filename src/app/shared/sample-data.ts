@@ -7,6 +7,7 @@ import {
   ChecklistView,
   ChecklistFillingData,
   ChecklistState,
+  ChecklistStartingMode,
 } from '../checklists/models/checklists.models';
 import { ColorsData, Colors } from './models/colors.models';
 import { ProfileData } from './models/profile.models';
@@ -478,7 +479,7 @@ export const sampleColors: ColorsData = {
     footerForeColor: undefined,
     footerBackground: undefined,
     */
-    palettePrimaryColor: Colors.dodgerblue,
+    palettePrimaryColor: '#808080',
     paletteWarnColor: Colors.orangered,
     paletteAccentColor: '#4ACF32',
     // border: Colors.silver,
@@ -531,10 +532,11 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   dueDateToFinish: 'Sábado, 23-Ago-2023 03:14:52 PM',
   questions: 3,
   completed: 0,
-  cancelled: 1,
+  cancelled: 0,
   valueToPrint: 0,
   alarmed: false,
   canAlarm: true,
+  startingMode: ChecklistStartingMode.ANYTIME,
   equipment: {
     id: 'abbdgd-999383-agaga',
     number: 'AB4334',
@@ -580,6 +582,43 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
           icon: 'assets/icons/excel.svg',
         },
       ],
+      buttons: [{
+        tooltip: 'Información adicional...',
+        icon: 'more_info',
+        action: 'moreinfo',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Ayuda visual...',
+        icon: 'support',
+        action: 'support',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Adjuntos...',
+        icon: 'attachment',
+        action: 'attachments',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Notas',
+        icon: 'reload',
+        action: 'notes',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Plan de acción',
+        icon: 'more_info',
+        action: 'actionPlan',
+        disabled: true,
+        alarmed: false,
+      },{
+        tooltip: 'Tomar evidencia (imagen o video)...',
+        icon: 'more_info',
+        action: 'visualEvidence',
+        disabled: true,
+        alarmed: false,
+      },]
     },{
       id: 'bbb',
       index: 2,
@@ -589,10 +628,47 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       answerByDefault: undefined,
       answer: undefined,
       showExtendedInfo: false,
-      status: ChecklistQuestionStatus.CANCELLED,
+      status: ChecklistQuestionStatus.READY,
       icon: 'assets/images/icons/problems.svg',
       canAlarm: true,
       yesyNoAlarm: 'y',
+      buttons: [{
+        tooltip: 'Información adicional...',
+        icon: 'more_info',
+        action: 'moreinfo',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Ayuda visual...',
+        icon: 'support',
+        action: 'support',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Adjuntos...',
+        icon: 'attachment',
+        action: 'attachments',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Notas',
+        icon: 'reload',
+        action: 'notes',
+        disabled: false,
+        alarmed: false,
+      },{
+        tooltip: 'Plan de acción',
+        icon: 'more_info',
+        action: 'actionPlan',
+        disabled: true,
+        alarmed: false,
+      },{
+        tooltip: 'Tomar evidencia (imagen o video)...',
+        icon: 'more_info',
+        action: 'visualEvidence',
+        disabled: true,
+        alarmed: false,
+      },]
     },{
       id: 'bbb',
       index: 3,
@@ -607,7 +683,44 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       canAlarm: true,
       alarms:[{
         value: 'y',
-    }],      
+    }],
+    buttons: [{
+      tooltip: 'Información adicional...',
+      icon: 'more_info',
+      action: 'moreinfo',
+      disabled: false,
+      alarmed: false,
+    },{
+      tooltip: 'Ayuda visual...',
+      icon: 'support',
+      action: 'support',
+      disabled: false,
+      alarmed: false,
+    },{
+      tooltip: 'Adjuntos...',
+      icon: 'attachment',
+      action: 'attachments',
+      disabled: false,
+      alarmed: false,
+    },{
+      tooltip: 'Notas',
+      icon: 'reload',
+      action: 'notes',
+      disabled: false,
+      alarmed: false,
+    },{
+      tooltip: 'Plan de acción',
+      icon: 'more_info',
+      action: 'actionPlan',
+      disabled: true,
+      alarmed: false,
+    },{
+      tooltip: 'Tomar evidencia (imagen o video)...',
+      icon: 'more_info',
+      action: 'visualEvidence',
+      disabled: true,
+      alarmed: false,
+    },]
     },
   ],
 };

@@ -49,7 +49,7 @@
                 >
                 </app-search-box>                
                 <div
-                    *ngIf="button.locked"
+                    *ngIf="button.locked && !button.disabled"
                     class="button-locked"
                 >
                     <mat-icon                        

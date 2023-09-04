@@ -14,7 +14,7 @@ export class ChecklistsService {
   data$: BehaviorSubject<ChecklistFillingData> = new BehaviorSubject(sampleChecklistFillingData);
 
 
-  constructor() { }
+  constructor () { }
 
   // Functions ================  
   getChecklistFillingData(): Observable<ChecklistFillingData> {

@@ -18,7 +18,7 @@ export class ChecklistFillingEffects {
     )
   );
  
-  constructor(
+  constructor (
     private actions$: Actions,
     private checklistsService: ChecklistsService,
   ) { }

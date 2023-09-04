@@ -14,7 +14,7 @@ export class ImageNotFoundDirective {
     img.src = this.imageByDefault || environment.imageByDefault; 
   }
 
-  constructor(
+  constructor (
     private elementRef: ElementRef
   ) { }
   

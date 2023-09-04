@@ -28,7 +28,7 @@ export class SpinnerComponent implements OnChanges {
   fontSize: string = '';
   fontWeight: string = '';
 
-  constructor() {};
+  constructor () {};
 
   // Hooks ====================
   ngOnInit() { 

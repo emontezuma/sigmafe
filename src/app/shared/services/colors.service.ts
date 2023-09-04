@@ -28,7 +28,7 @@ export class ColorsService {
   fakeColorsData: ColorsData = sampleColors;
   data$: BehaviorSubject<ColorsData> = new BehaviorSubject(sampleColors);
 
-  constructor(
+  constructor (
     private store: Store<AppState>,
   ) {}
 

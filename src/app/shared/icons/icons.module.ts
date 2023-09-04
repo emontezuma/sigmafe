@@ -12,7 +12,7 @@ import { MatIconRegistry } from '@angular/material/icon';
 })
 export class IconsModule { 
 
-  constructor(
+  constructor (
     iconRegistry: MatIconRegistry,
     sanitizer: DomSanitizer,
   ) {
@@ -143,6 +143,10 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "problems",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/problems.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "organizational_chart",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/organizational_chart.svg")
     );
   }
 }
