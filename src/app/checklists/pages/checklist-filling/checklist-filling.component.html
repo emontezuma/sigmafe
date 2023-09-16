@@ -1,4 +1,5 @@
 <div
+  i18n
   class="container"
   #checklistFilling
   @routingAnimation
@@ -10,7 +11,30 @@
     animationDuration="500ms"
     (selectedIndexChange)="setTabIndex($event)"
     [selectedIndex]="currentTabIndex"
-  >
+  >    
+    <mat-tab disabled> 
+      <ng-template mat-tab-label>
+        <div
+          class="tab-spinner"
+          [ngClass]="{ 'pulse-with-warn': checklist.alarmed }"
+        >
+          <app-spinner            
+            [legacy]="classLegacy"
+            [diameter]="45"
+            [value]="checklistProgress"
+            [showBackgound]="true"
+            [suffix]="'%'"
+            [limits]="limits"
+            [fonts]="fontsSmall"
+            [exhaustedValue]="'999'"
+            [prefix]="'>'"
+            [showPrefix]="showPrefix"
+            [smallFont]="smallestFont"
+          >
+          </app-spinner> 
+        </div>
+      </ng-template>
+    </mat-tab> 
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon
@@ -18,13 +42,23 @@
           svgIcon="checklist-header"
           [ngStyle]="{
             fill:
-              currentTabIndex === 0
-                ? 'var(--theme-primary-contrast-100)'
-                : 'var(--z-colors-page-tab-fore)'
+              currentTabIndex === 1
+                ? 'var(--theme-primary-600)'
+                : 'unset'
           }"
         >
         </mat-icon>
-        <label class="tab-label">Información general</label>
+        <label        
+          class="tab-label"
+          [ngStyle]="{
+            color:
+              currentTabIndex === 1
+                ? 'var(--theme-primary-600)'
+                : 'var(--z-colors-page-tab-fore)'
+          }"
+        >
+          General
+        </label>
       </ng-template>
       <ng-template matTabContent>
         <div class="tabs tab-general-info">
@@ -168,7 +202,7 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.equipment?.lastChecklistDate"
+                      [label]="convertedDates.equipment.lastChecklistDate"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -185,7 +219,7 @@
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Efectuado por</mat-card-subtitle>
-                  </div>                  
+                  </div>         
 
                   <div class="grid-multiple equipment">
                     <div                       
@@ -257,7 +291,7 @@
                 <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="checklist.dueDateToStart"
+                      [label]="convertedDates.dueDateToStart"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -267,7 +301,7 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.startDate"
+                      [label]="convertedDates.startDate"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -277,7 +311,7 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.dueDateToFinish"
+                      [label]="convertedDates.dueDateToFinish"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -332,7 +366,7 @@
                         [loading]="loading"
                         icon="man"
                       >
-                      </app-readonly-field>                        
+                      </app-readonly-field>               
                       <mat-card-subtitle class="label">
                         Asignado a
                       </mat-card-subtitle>
@@ -350,11 +384,11 @@
                     </div>
                     <div>
                       <app-readonly-field
-                        [label]="checklist.assignement?.date"
+                        [label]="convertedDates.assignement.date"
                         [loading]="loading"
                         icon="event"
                       >
-                      </app-readonly-field>                      
+                      </app-readonly-field>             
                       <mat-card-subtitle class="label">
                         Fecha de asignación
                       </mat-card-subtitle>
@@ -365,7 +399,7 @@
                         [loading]="loading"
                         icon="country"
                       >
-                      </app-readonly-field>                      
+                      </app-readonly-field>             
                       <mat-card-subtitle class="label">
                         País
                       </mat-card-subtitle>
@@ -398,7 +432,7 @@
                         [loading]="loading"
                         icon="white_list"                
                       >
-                      </app-readonly-field>                              
+                      </app-readonly-field>                     
                       <mat-card-subtitle class="label">
                         Tipo de asignación
                       </mat-card-subtitle>
@@ -449,7 +483,7 @@
                         [loading]="loading"
                         icon="man"
                       >
-                      </app-readonly-field>                      
+                      </app-readonly-field>             
                       <mat-card-subtitle class="label">
                         Planificado por
                       </mat-card-subtitle>
@@ -467,11 +501,11 @@
                     </div>
                     <div>
                       <app-readonly-field
-                        [label]="checklist.planning?.date | date : 'long'"
+                        [label]="convertedDates.planning.date"
                         [loading]="loading"
                         icon="event"
                       >
-                      </app-readonly-field>                      
+                      </app-readonly-field>             
                       <mat-card-subtitle class="label">
                         Fecha de planificación
                       </mat-card-subtitle>
@@ -547,38 +581,23 @@
       <ng-template mat-tab-label>
         <mat-icon
           class="tab-icon"
-          svgIcon="checklist"
+          svgIcon="checklist"          
+        >
+        </mat-icon>
+        <label
+          class="tab-label"
           [ngStyle]="{
-            fill:
-              currentTabIndex === 1
-                ? 'var(--theme-primary-contrast-100)'
+            color:
+              currentTabIndex === 2
+                ? 'var(--theme-primary-600)'
                 : 'var(--z-colors-page-tab-fore)'
           }"
         >
-        </mat-icon>
-        <label class="tab-label">Cuestionario</label>
+          Cuestionario
+        </label>        
       </ng-template>
       <ng-template matTabContent>
-        <div class="flex-box checklist-toolbar">
-          <div
-            class="flex-box progress-border"
-            [ngClass]="{ 'pulse-with-warn': checklist.alarmed, 'legacy-border-primary': !checklist.alarmed }"
-            [matTooltip]="alarmedToolTip"
-            matTooltipClass="tooltip-general"
-            matTooltipShowDelay="100"
-          >
-            <div
-              class="flex-box progress-spinner"
-              [ngClass]="[checklist.alarmed ? 'legacy-warn' : 'legacy-primary']"
-            >
-              {{ checklistProgress }}%
-            </div>
-          </div>
-          <div
-            class="questionnaire-progress"
-            [innerHTML]="progressText"
-          >            
-          </div>
+        <div class="flex-box checklist-toolbar">          
           <div class="margined"></div>
           <button
             mat-button
@@ -692,16 +711,16 @@
               ? 'checklist-view'
               : ''
           "   
-        >          
+        > 
           <ng-container *ngFor="let item of checklist.items; let i = index">
             <ng-container              
               #questions
               *ngIf="selectedView.value === 'all' || 
-              (selectedView.value === 'answered' && item.status === 'completed') ||
-              (selectedView.value === 'unanswered' && item.status !== 'completed' && item.status !== 'cancelled')">
-              <app-checklist-filling-item [item]="item" [inactive]="checklist.status === 'inactive'"></app-checklist-filling-item>
+              (selectedView.value === 'answered' && item.status === ChecklistQuestionStatus.COMPLETED) ||
+              (selectedView.value === 'unanswered' && item.status !== ChecklistQuestionStatus.COMPLETED && item.status !== ChecklistQuestionStatus.CANCELLED)">
+              <app-checklist-filling-item [item]="item" [inactive]="checklist.status === RecordStatus.INACTIVE"></app-checklist-filling-item>
             </ng-container>
-          </ng-container>                    
+          </ng-container>           
         </div>
         <div
           class="spinner-container"
@@ -713,7 +732,7 @@
             mode="indeterminate"
             color="primary"
           >
-          </mat-progress-spinner>          
+          </mat-progress-spinner> 
         </div>
         <div
           *ngIf="!showSpinner && noQuestions"
@@ -735,18 +754,62 @@
           svgIcon="support"
           [ngStyle]="{
             fill:
-              currentTabIndex === 2
-                ? 'var(--theme-primary-contrast-100)'
-                : 'var(--z-colors-page-tab-fore)'
+              currentTabIndex === 3
+                ? 'var(--theme-primary-600)'
+                : 'unset'
           }"
         >
         </mat-icon>
-        <label class="tab-label"> Soporte </label>
+        <label 
+          class="tab-label"
+          [ngStyle]="{
+            color:
+              currentTabIndex === 3
+                ? 'var(--theme-primary-600)'
+                : 'var(--z-colors-page-tab-fore)'
+          }"
+        >
+          Soporte
+        </label>
       </ng-template>
       <ng-template matTabContent>
         <mat-divider class="divider"></mat-divider>
         <div class="tabs tab-general-info">Content 2</div>
       </ng-template>
     </mat-tab>
+    <div>
+    <mat-tab
+      disabled
+      *ngIf="checklist.canExpire && checklist.status === RecordStatus.ACTIVE && checklist.state === ChecklistState.IN_PROGRESS && showElapsedTime !== 'noShow'"      
+      >
+      <ng-template
+        class="tab-disabled"
+        mat-tab-label
+        [matTooltip]="countdownToolTip"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"        
+      >
+        <mat-icon
+          class="accordion-icon icon-border"
+          svgIcon="time"
+          [ngClass]="{ 'elapsed-alarmed': showElapsedTime === 'showExpired' || showElapsedTime === 'showError' }"
+          [ngClass]="{ 'pulse-with-warn': showElapsedTime === 'showAlert' }"
+        >
+        </mat-icon>        
+        <label
+          class="tab-label"
+          [ngClass]="{ 'elapsed-alarmed': showElapsedTime === 'showExpired' || showElapsedTime === 'showError' }"          
+        >
+          {{ elapsedTime }}
+        </label>
+        <div
+          *ngIf="showElapsedTime === 'showExpired' || showElapsedTime === 'showAlert'"
+          class="expired-label"
+        >
+          {{ showElapsedTime === 'showExpired' ? 'Vencido' : 'Prox. vencer' }}
+        </div>
+      </ng-template>
+    </mat-tab>     
+  </div>
   </mat-tab-group>
 </div>

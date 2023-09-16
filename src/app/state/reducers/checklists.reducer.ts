@@ -5,10 +5,10 @@ import { ChecklistAlarms, ChecklistFillingItem, ChecklistFillingState, Checklist
 export const initialState: ChecklistFillingState = {
   loading: false,
   checklistFillingData: {
-    questions: 3,
+    questions: 0,
     completed: 0,
     valueToPrint: 0,
-    alarmed: true,
+    alarmed: false,
     viewType: ChecklistView.FLEXBOX,
     icon: 'assets/images/icons/faq.svg',
     items: [],
@@ -31,7 +31,7 @@ export const checklistFillingReducer = createReducer(
     }
 
     const updatedQuestionnaire = state.checklistFillingData.items.map((stateItem) => {
-       if(item.index === stateItem.index) {
+       if (item.index === stateItem.index) {
         const alarmed =  state.checklistFillingData.canAlarm && state.checklistFillingData.equipment.canAlarm && item.canAlarm && item.alarms && checkForAlrmedQuestion(item.answer, item.alarms);
         const actionRequired = item.attachmentRequired && !item.attachmentCompleted && item.status !== ChecklistQuestionStatus.CANCELLED;        
         const buttons = item.buttons.map((button) => {
@@ -44,7 +44,6 @@ export const checklistFillingReducer = createReducer(
             return button;
           }
         })
-        console.log(buttons);
         return { ...item, alarmed, actionRequired, buttons };
       }
       return stateItem;

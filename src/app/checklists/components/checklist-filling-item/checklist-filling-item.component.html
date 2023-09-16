@@ -3,23 +3,23 @@
   [ngClass]="{
         'question-alarmed': item.alarmed,
         'lagacy-alarm': item.alarmed,
-        'question-cancelled': item.status === 'cancelled' || inactive,
+        'question-cancelled': item.status === ChecklistQuestionStatus.CANCELLED || inactive,
     }"
 >
   <div
     @dissolve
     *ngIf="
-      item.status === 'cancelled' ||
-      item.status === 'completed' ||
-      item.status === 'attachmentMissing' ||
+      item.status === ChecklistQuestionStatus.CANCELLED ||
+      item.status === ChecklistQuestionStatus.COMPLETED ||
+      item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING ||
       item.actionRequired
     "
     class="corner"
     [ngStyle]="{
       backgroundColor:
-        item.status === 'completed' && !item.alarmed
+        item.status === ChecklistQuestionStatus.COMPLETED && !item.alarmed
           ? 'var(--theme-accent-500)'
-          : item.status === 'cancelled'
+          : item.status === ChecklistQuestionStatus.CANCELLED
           ? 'var(--z-colors-page-card-disabled-background-color)'
           : 'var(--theme-warn-500)'
     }"
@@ -28,29 +28,23 @@
       class="over-icon"
       [ngStyle]="{
         color:
-          item.status === 'completed' && !item.alarmed
+          item.status === ChecklistQuestionStatus.COMPLETED && !item.alarmed
             ? 'var(--theme-accent-contrast-500)'
-            : item.status === 'cancelled'
+            : item.status === ChecklistQuestionStatus.CANCELLED
             ? 'var(--z-colors-page-fore)'
             : 'var(--theme-warn-contrast-500)'
       }"
       [svgIcon]="
-        item.status === 'completed'
+        item.status === ChecklistQuestionStatus.COMPLETED
           ? 'check'
-          : item.status === 'attachmentMissing'
+          : item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING
           ? 'attachment_file'
-          : item.status === 'cancelled'
+          : item.status === ChecklistQuestionStatus.CANCELLED
           ? 'block'
           : 'warn_fill'
       "
-      [matTooltipDisabled]="item.status === 'completed'"
-      [matTooltip]="
-        item.status === 'attachmentMissing'
-          ? 'Se requiere agregar un adjunto'
-          : item.status === 'cancelled'
-          ? 'La pregunta fue cancelada y no se requiere una respuesta'
-          : 'Se requiere una acción'
-      "
+      [matTooltipDisabled]="item.status === ChecklistQuestionStatus.COMPLETED"
+      [matTooltip]="cornerTooltip"       
       matTooltipClass="tooltip-general"
       matTooltipShowDelay="100"
     >
@@ -64,6 +58,15 @@
     class="progress"
   >
   </mat-progress-bar>
+  <mat-icon
+    *ngIf="item.required && !inactive && item.status !== ChecklistQuestionStatus.COMPLETED"
+    class="required"
+    matTooltip="Respuesta requerida"
+    matTooltipClass="tooltip-general"
+    matTooltipShowDelay="100"
+  >
+    done_outline
+  </mat-icon>  
   <mat-card-header>
     <ng-container *ngIf="item.answerType === 'yesNo'">
       <div class="question-grid">
@@ -76,7 +79,7 @@
           <div class="item-response-type">
             <mat-chip-listbox
               (change)="setAnswer($event)"
-              [disabled]="item.status === 'cancelled' || inactive"
+              [disabled]="item.status === ChecklistQuestionStatus.CANCELLED || inactive"
             >
               <mat-chip-option value="y" [selected]="item.answer === 'y'">
                 Si
@@ -94,7 +97,7 @@
             matTooltipClass="tooltip-general"
             matTooltipShowDelay="100"
             (click)="setAnswer(undefined)"
-            [disabled]="item.status === 'cancelled' || inactive"
+            [disabled]="item.status === ChecklistQuestionStatus.CANCELLED || inactive"
           >
             <mat-icon class="icon-button" svgIcon="cancel"> </mat-icon>
           </button>
@@ -109,10 +112,13 @@
         <div class="item-text">
           <p>{{ item.text }}</p>
         </div>
+        <div class="item-text">
+          <p>{{ item.text }}</p>
+        </div>
       </div>
     </ng-container>
   </mat-card-header>    
-  <mat-card-footer *ngIf="item.status !== 'cancelled' && !inactive">
+  <mat-card-footer *ngIf="item.status !== ChecklistQuestionStatus.CANCELLED && !inactive">
     <app-question-toolbar [buttons]="item.buttons"></app-question-toolbar>      
   </mat-card-footer>
 </mat-card>

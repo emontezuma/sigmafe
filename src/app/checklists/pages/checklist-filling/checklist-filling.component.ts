@@ -4,7 +4,7 @@ import { FormGroup } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
 import { MatDialog } from '@angular/material/dialog';
 
-import { routingAnimation, dissolve, fastDissolve } from '../../../shared/animations/shared.animations';
+import { routingAnimation, dissolve, fastDissolve, fromTop } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
 import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarButtons } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
@@ -13,17 +13,17 @@ import { SettingsData } from 'src/app/shared/models/settings.models';
 import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistFillingData, ChecklistFillingItem } from 'src/app/checklists/models/checklists.models';
+import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistFillingData, ChecklistFillingItem, ChecklistState } from 'src/app/checklists/models/checklists.models';
 import { Subscription } from 'rxjs';
 import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
 import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
 import { GenericDialogComponent } from 'src/app/shared/components/generic-dialog/generic-dialog.component';
-import { RecordStatus } from 'src/app/shared/models/helpers.models';
+import { DatesDifference, RecordStatus, CapitalizationMethod } from 'src/app/shared/models/helpers.models';
 
 @Component({
   selector: 'app-checklist-filling',
   templateUrl: './checklist-filling.component.html',
-  animations: [ routingAnimation, dissolve, fastDissolve ],
+  animations: [ routingAnimation, dissolve, fastDissolve, fromTop ],
   styleUrls: ['./checklist-filling.component.scss']
 })
 export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
@@ -37,7 +37,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   fonts: SpinnerFonts[] = [{
     start: 0,
     finish: 100,
-    size: 1.7,
+    size: 1.5,
     weight: 700,
   },{
     start: 100,
@@ -50,10 +50,25 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     size: 1,
     weight: 300,
   }];
-  smallFont: SmallFont = {
+  fontsSmall: SpinnerFonts[] = [{
+    start: 0,
+    finish: 100,
+    size: 1.3,
+    weight: 700,
+  },{
+    start: 100,
+    finish: 999,
     size: 1,
+    weight: 500,
+  }];
+  smallFont: SmallFont = {
+    size: 0.9,
     weight: 300,
-  }
+  }  
+  smallestFont: SmallFont = {
+    size: 0.9,
+    weight: 300,
+  }  
   showPrefix = false;
   settingsData: SettingsData;
   profileData: ProfileData;
@@ -66,7 +81,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;  
-  currentTabIndex: number = 0;
+  currentTabIndex: number = 1;
   checklistProgress: number = 0;
   animationTimeout: any;
   scrollSubscriber: Subscription;
@@ -76,6 +91,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   showGoTopSubscriber: Subscription;
   checklistFillingLoadingSubscriber: Subscription;
   checklistFillingDataSubscriber: Subscription;
+  everySecondSubscriber: Subscription;
   unsavedChanges: boolean = false;
   noQuestions: boolean = false;
   showSpinner: boolean = false;
@@ -83,6 +99,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   checklist: ChecklistFillingData = {};
   progressText: string = '';
   alarmedToolTip: string = '';
+  countdownToolTip: string = '';
   classLegacy: string = 'spinner-card-font';
   layouts: SimpleMenuOption[] = [{
     caption: $localize`Flexbox`,
@@ -126,7 +143,23 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   },];
 
   selectedLayout: SimpleMenuOption = this.layouts[0];
-  selectedView: SimpleMenuOption = this.views[2];  
+  selectedView: SimpleMenuOption = this.views[2];
+  elapsedTime: string;
+  showElapsedTime: string = 'noShow';  
+  convertedDates = { 
+    dueDateToFinish: '',
+    equipment: {
+      lastChecklistDate: '',
+    },
+    assignement: {
+      date: '',
+    },
+    planning: {
+      date: '',
+    },
+    dueDateToStart: '',
+    startDate: '',    
+  };
   
   form = new FormGroup({
   });
@@ -144,6 +177,28 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     this.store.dispatch(loadChecklistFillingData());
 
     // Subscriptions
+    this.everySecondSubscriber = this.sharedService.pastSecond.subscribe((pulse) => {
+      const elapsedTime = this.sharedService.datesDifferenceInSeconds(this.checklist.dueDateToFinish);
+      if (elapsedTime.message.substring(0, 5) !== 'error') {
+        if (elapsedTime.totalSeconds < 0) {          
+          if (elapsedTime.totalSeconds * -1 < this.checklist.secondsToAlert) {
+            this.countdownToolTip = $localize`Falta poco para completar el checklist`;
+            this.showElapsedTime = 'showAlert';
+          } else {
+            this.showElapsedTime = 'showNormal';
+            this.countdownToolTip = $localize`Cuenta regresiva...`;
+          }
+        } else {
+          this.showElapsedTime = 'showExpired';
+          this.countdownToolTip = $localize`Checklist expirado...`;
+        }
+        this.elapsedTime = (elapsedTime.days !== '0' ? (elapsedTime.days + 'd ') : '') + elapsedTime.hours + ':' + elapsedTime.minutes + ':' + elapsedTime.seconds;
+      } else {
+        this.showElapsedTime = 'showError';
+        this.elapsedTime = 'Error/Fecha';
+        this.countdownToolTip = $localize`Error en la fecha`;
+      }
+    });
     this.checklistFillingLoadingSubscriber = this.store.select(selectLoadingChecklistFillingState).subscribe( loading => {
       this.loading = loading;
       this.sharedService.setGeneralLoading(
@@ -238,6 +293,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     if (this.toolbarClickSubscriber) this.toolbarClickSubscriber.unsubscribe();
     if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
     if (this.checklistFillingLoadingSubscriber) this.checklistFillingLoadingSubscriber.unsubscribe();
+    if (this.everySecondSubscriber) this.everySecondSubscriber.unsubscribe();
   }
 
 // Functions ================
@@ -399,7 +455,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  setTabIndex(tab: any) {    
+  setTabIndex(tab: any) { 
     this.currentTabIndex = tab;
   }
 
@@ -443,7 +499,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     const answerIndex = this.getAnswerByIndex(index);
     if (answerIndex > -1) {
       const question = this.checklist.items[answerIndex];
-      if(question.answerType === ChecklistAnswerType.YES_NO) {
+      if (question.answerType === ChecklistAnswerType.YES_NO) {
         let answer = undefined;
         let status = ChecklistQuestionStatus.COMPLETED;
         let actionRequired = false;        
@@ -499,6 +555,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
     const alarmedItemsText = !this.checklist.alarmed ? '' : this.checklist.alarmedItems === 1 ? $localize`una alarmada` : ' ' + this.checklist.alarmedItems + $localize`alarmadas`;
     this.classLegacy = !!alarmedItemsText ? 'spinner-warn' : 'spinner-card-font';
+    
     this.progressText = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.validQuestions + (!!alarmedItemsText ? `\n<strong>${alarmedItemsText}</strong>`: '');
     this.alarmedToolTip = $localize`Avance` + ': ' + this.checklist.completed + $localize` de ` + this.validQuestions + (!!alarmedItemsText ? ' ' + alarmedItemsText : '');
     this.setChecklistColors(!!alarmedItemsText);    
@@ -506,21 +563,31 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   setChecklistColors(isAlarmed: boolean) {
     // Change the tab bar color based on checklist status
-    let colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-500') : document.documentElement.style.getPropertyValue('--theme-primary-500');
-    document.documentElement.style.setProperty('--z-checklist-status', colorToUse);
-    document.documentElement.style.setProperty('--z-checklist-tabs-border', colorToUse);
+    // let colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-500') : document.documentElement.style.getPropertyValue('--theme-primary-500');
+    // document.documentElement.style.setProperty('--z-checklist-status', colorToUse);
+    // document.documentElement.style.setProperty('--z-checklist-tabs-border', colorToUse);
 
-    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--z-colors-page-tab-background-color');
+    let colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--z-colors-page-tab-background-color');
     document.documentElement.style.setProperty('--z-checklist-status-300', colorToUse);        
 
-    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--theme-primary-100');
-    document.documentElement.style.setProperty('--z-checklist-tabs-background-color', colorToUse);
-    colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-contrast-200') : document.documentElement.style.getPropertyValue('--theme-primary-contrast-100');
-    document.documentElement.style.setProperty('--z-checklist-tabs-fore', colorToUse);
+    // colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-200') : document.documentElement.style.getPropertyValue('--theme-primary-100');
+    // document.documentElement.style.setProperty('--z-checklist-tabs-background-color', colorToUse);
+    // colorToUse = isAlarmed ? document.documentElement.style.getPropertyValue('--theme-warn-contrast-200') : document.documentElement.style.getPropertyValue('--theme-primary-contrast-100');
+    // document.documentElement.style.setProperty('--z-checklist-tabs-fore', colorToUse);
+  }
+
+  convertDates() {
+    this.convertedDates.dueDateToFinish = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.dueDateToFinish, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);
+    this.convertedDates.equipment.lastChecklistDate = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.equipment?.lastChecklistDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);    
+    this.convertedDates.dueDateToStart = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.dueDateToStart, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.startDate = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.startDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.assignement.date = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.assignement?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.planning.date = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.planning?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
   }
 
   loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
     this.checklist = checklistFillingData;
+    this.convertDates();
     if (firstTime && this.checklist.status !== RecordStatus.ACTIVE) {
       this.sharedService.setButtonState(ButtonActions.START, false);      
       this.sharedService.setButtonState(ButtonActions.UPLOAD_FILE, false);
@@ -528,12 +595,16 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     } else {
       if (firstTime) {
         this.autoCompletion();
+        setTimeout(() => {
+          this.showElapsedTime = 'showNormal';
+        }, 1000);
       } else {      
         this.unsavedChanges = true;
       }
       if (this.checklist.status === RecordStatus.ACTIVE) {
         this.evaluateButtons();
       }      
+      
     }    
   }
 
@@ -615,7 +686,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   showInactiveMessage() : void {
     const message = $localize`El checklist <strong>está inactivo</strong> debe comunicarse con el administrador del sistema`;
-    this.sharedService.showSnackMessage(message);
+    this.sharedService.showSnackMessage(message, 0, 'snack-primary', '', '', 'delete');
   }
 
   showInactiveMessage2(): void {
@@ -626,6 +697,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       data: {
         title: $localize`Checklist inactivo`,
         buttons: [{
+          action: 'cancel',
           showIcon: true,
           icon: 'check',
           showCaption: true,
@@ -667,6 +739,22 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   get cancelledQuestions(): number {
     return this.checklist.items.reduce((acc, item) => acc + (item.status === ChecklistQuestionStatus.CANCELLED ? 1 : 0), 0);
+  }
+
+  get CapitalizationMethod() {
+    return CapitalizationMethod;
+  }
+
+  get RecordStatus() {
+    return RecordStatus;
+  }
+
+  get ChecklistQuestionStatus() {
+    return ChecklistQuestionStatus;
+  }
+
+  get ChecklistState() {
+    return ChecklistState;
   }
   
 // End ======================   

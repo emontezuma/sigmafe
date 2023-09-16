@@ -128,7 +128,7 @@
     inset: 0px;
     float: left;
     border-radius: 50%;
-    border: 2px solid var(--theme-primary-contrast-500);
+    border: 2px solid var(--theme-primary-200);
     margin: 0px 5px 0px 0px;
     padding: 2px;
     object-fit: cover;
@@ -158,8 +158,8 @@ mat-card-footer {
     margin-left: 0px !important;
 }
 
-mat-chip-option {
-    font-size: 1.7rem;
+::ng-deep .mat-mdc-standard-chip .mdc-evolution-chip__text-label {
+    font-size: 1.6rem !important;
 }
 
 .mat-mdc-card-header { 
@@ -177,4 +177,18 @@ mat-chip-option {
 
 .icon-button {
     background-color: transparent;
+}
+
+.required {
+    font-size: 2.4rem;
+    -webkit-text-stroke: 1px var(--theme-warn-800);
+    color: var(--theme-warn-500);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    margin-bottom: 8px;
+    margin-right: 10px;
+    cursor: pointer;
+    height: 30px;
+    width: 30px;
 }

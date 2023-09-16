@@ -1,7 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
-import { EChartsOption } from 'echarts';
 
 import { MoldHitsQuery } from '../../models/molds.models';
 import { numbers } from '../../../shared/animations/shared.animations';
@@ -26,8 +25,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   settingsData: SettingsData;
   digitPair: number[] = [];
   digitOdd: number[] = [];
-  showNumber: string[] = [];
-  chartData: EChartsOption = { };
+  showNumber: string[] = [];  
   progressBackgroundColorClass: string = 'meter-10';
   borderColorClass: string = 'meter-0';
   progressForeColorClass: string = 'meter-20';
@@ -35,8 +33,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   alarmLevel = 0;
   maintenanceClass: string = 'meter-30';
   elapsedTimeLabel: string = '';
-  lastChartValue: number = 0;
-  lastHitDate: string = '';
+  lastChartValue: number = 0;  
   limits: SpinnerLimits[] = [{
     start: 0,
     finish: 67,
@@ -81,8 +78,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       this.assignSettings(); 
       this.calcData();
     });
-    this.hits = this.mold.hits ?? 0;
-    this.lastHitDate = this.mold?.lastHit?.date ?? '';
+    this.hits = this.mold.hits ?? 0;    
     this.numberToArray(this.hits);      
     setInterval(() => {
       this.hits = this.hits + 1;
@@ -147,96 +143,17 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       this.lastChartValue = this.valueToPrint;
       const fontSize = this.valueToPrint < 100 ? 30 : this.valueToPrint < 999 ? 22 : 16;
       this.setProgressColors(); // Cambiar de lugar para cuando se reciba el backend
-      
-      this.chartData = {
-        series: [
-          {
-            type: 'gauge',
-            startAngle: 0,
-            endAngle: 360,
-            min: 0,
-            max: 100,
-            splitNumber: 4,
-            itemStyle: {
-              color: this.borderColorClass,
-              shadowColor: 'rgba(0,138,255,0.5)',
-              shadowBlur: 10,
-              shadowOffsetX: 2,
-              shadowOffsetY: 2
-            },
-            progress: {
-              show: true,
-              roundCap: false,
-              width: 6
-            },
-            pointer: {
-              show: false,
-            },
-            axisLine: {
-              roundCap: false,
-              lineStyle: {
-                width: 6
-              }
-            },
-            axisTick: {
-              show: false,
-            },
-            splitLine: {
-              show: false,
-              length: 15,
-              distance: 1,
-              lineStyle: {
-                width: 2,
-                color: '#aaaaaa'
-              }
-            },
-            axisLabel: {
-              show: false,            
-            },
-            title: {
-              show: false,
-            },
-            detail: {
-              backgroundColor: 'none',
-              width: '70%',
-              lineHeight: 35,
-              height: 30,
-              offsetCenter: [0, '0%'],
-              valueAnimation: true,
-              formatter: function (value) {
-                if (value > 999) {
-                  return '{value|>' + 999 + '}{unit|%}';
-                } else {
-                  return '{value|' + value.toFixed(0) + '}{unit|%}';
-                }                
-              },
-              rich: {
-                value: {
-                  fontSize: fontSize,
-                  fontWeight: 'bolder',
-                  color: this.borderColorClass,
-                  
-                },
-                unit: {                
-                  fontSize: 12,
-                  fontWeight: 'bolder',
-                  color: this.borderColorClass,
-                }
-              }
-            },
-            data: [
-              {
-                value: this.valueToPrint,
-              }
-            ]
-          }
-        ]
-      };
     }    
   }
 
   trackByFn(index: any, item: any) { 
     return index; 
+  }
+
+// Getters ==================
+
+  get lastHitDate() {
+    return this.mold?.lastHit?.date ?? '';
   }
   
 // End ======================

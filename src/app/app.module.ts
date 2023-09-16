@@ -1,4 +1,5 @@
 import { NgModule, isDevMode } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -26,6 +27,7 @@ import { ChecklistFillingEffects } from './state/effects/checklists.effects';
 import { GenericDialogComponent } from './shared/components/generic-dialog/generic-dialog.component';
 import { ImageNotFoundModule } from './shared/directives/image-not-found.module';
 import { SnackComponent } from './shared/components/snack/snack.component';
+import { SpinnerModule } from './shared/components/spinner/spinner.module';
 
 @NgModule({
   declarations: [
@@ -34,7 +36,7 @@ import { SnackComponent } from './shared/components/snack/snack.component';
     SearchBoxComponent,
     ToolbarComponent,
     GenericDialogComponent,
-    SnackComponent,    
+    SnackComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,8 +54,9 @@ import { SnackComponent } from './shared/components/snack/snack.component';
     StoreModule.forRoot(reducers),
     EffectsModule.forRoot([MoldsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects ]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true }),
+    SpinnerModule,
   ],
-  providers: [],  
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

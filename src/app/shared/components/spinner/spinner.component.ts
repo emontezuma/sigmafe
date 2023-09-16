@@ -9,6 +9,7 @@ import { Colors, SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/col
 export class SpinnerComponent implements OnChanges {
   @Input() diameter: number;
   @Input() value: number;
+  @Input() countdown: number;
   @Input() showBackgound: boolean;
   @Input() suffix: string;
   @Input() showPrefix: boolean;
@@ -72,9 +73,9 @@ export class SpinnerComponent implements OnChanges {
         }  
       }
     }
-    this.valueToShow = printExhaustedValue ? this.exhaustedValue : this.value.toString();
+    this.valueToShow = this.countdown ? this.countdown + '' : printExhaustedValue ? this.exhaustedValue : this.value.toString();
     this.previousValue = this.value + '';
-  }    
+  }
 
 // End ======================
 }

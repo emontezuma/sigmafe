@@ -35,17 +35,17 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
 // Functions ================
 
   setAnswer(e: any) {    
-    if(this.item.answerType === ChecklistAnswerType.YES_NO) {
+    if (this.item.answerType === ChecklistAnswerType.YES_NO) {
       let answer = undefined;
       let status = ChecklistQuestionStatus.COMPLETED;
       let actionRequired = false;
-      if (e !== undefined) {
+      if (e && e.value !== undefined) {
         answer = e.value;
         if (this.item.attachmentRequired && !this.item.attachmentCompleted) {
           status = ChecklistQuestionStatus.ATTACHMENT_MISSING;
           actionRequired = true;
         }        
-      } else {        
+      } else {                
         status = ChecklistQuestionStatus.READY;
       }
       if (
@@ -62,6 +62,19 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
         this.store.dispatch(updateChecklistQuestion({ item: newItem }));        
       }        
     }      
+  }
+  
+// Getters ==================
+  get ChecklistQuestionStatus() {
+    return ChecklistQuestionStatus;
+  }
+
+  get cornerTooltip () {
+    return this.item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING
+    ? 'Se requiere agregar un adjunto'
+    : this.item.status === ChecklistQuestionStatus.CANCELLED
+    ? 'La pregunta fue cancelada y no se requiere una respuesta'
+    : 'Se requiere una acción';
   }
 
 // End ======================

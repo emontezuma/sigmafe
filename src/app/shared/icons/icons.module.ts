@@ -148,5 +148,13 @@ export class IconsModule {
       "organizational_chart",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/organizational_chart.svg")
     );
+    iconRegistry.addSvgIcon(
+      "solution",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/solution.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "delete",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/delete.svg")
+    );
   }
 }

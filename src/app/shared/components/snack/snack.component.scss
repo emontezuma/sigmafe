@@ -2,17 +2,23 @@
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
+  align-items: center;
 }
 
 .button-text {
-  font-weight: 700;
-  font-size: 1.2rem !important;
-  cursor: pointer;  
-  text-align: right;
+  font-weight: 600;
+  font-size: 1.4rem !important;
+  cursor: pointer;
+  flex: 1;  
+  padding: 3px;
+  border-radius: 8px 0px;
+  text-align: center;
+  color: var(--theme-primary-contrast-A400);
 }
 
 .button-text:hover {
-  color: var(--theme-primary-500);
+  color: var(--theme-primary-contrast-A500);
+  background-color: var(--z-colors-page-shadow);
 }
 
 .only-icon {
@@ -24,14 +30,19 @@
   width: 32px;
   height: 32px;
   background-color: var(--z-colors-page-shadow);
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin-top: 2px;
+  margin-right: 2px;
 } 
 
 .icon-medium {
   width: 24px !important;
   height: 24px !important;
   margin: 0px !important;
-  margin-left: -7px !important;
-  margin-top: -7px !important;
+  margin-left: -8px !important;
+  margin-top: -8px !important;
 }
 
 ::ng-deep .mat-mdc-snack-bar-container {
@@ -82,4 +93,8 @@
   .only-icon {
     color: var(--theme-accent-contrast-A200) !important;
   }  
+}
+
+.snack-text {
+  flex: 3;
 }

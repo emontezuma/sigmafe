@@ -9,7 +9,7 @@
     font-size: 1.6rem;
     font-weight: 600;
     cursor: pointer;
-    color: black;
+    color: var(--z-colors-page-fore);
 }
 
 .tab-general-info {
@@ -123,10 +123,10 @@ mat-card-subtitle {
 }
 
 ::ng-deep .mat-mdc-tab-labels {
-    background-color: var(--z-checklist-tabs-background-color);
-    color: var(--z-checklist-tabs-fore) !important;
+    background-color: var(--theme-primary-100);
+    color: var(--theme-primary-contrast-100) !important;
     border-radius: 8px 8px 0px 0px;
-    border: 2px solid var(--z-checklist-tabs-border) !important;
+    border: 2px solid var(--theme-primary-500) !important;
     margin-left: 10px;
     margin-right: 3px;
     margin-top: 5px;
@@ -134,6 +134,11 @@ mat-card-subtitle {
     padding-right: 4px;
     padding-bottom: 2px;
     width: max-content;
+    height: 55px;
+}
+
+::ng-deep .mat-mdc-tab-labels:nth-child(0) {
+    width: 40px !important;
 }
 
 ::ng-deep .mat-mdc-tab-body {
@@ -315,7 +320,7 @@ mat-panel-title {
 }
 
 .checklist-view {
-    @include mixins.flexbox(column, wrap, 10px, flex-start, stretch);
+    @include mixins.flexbox(column, wrap, 20px, flex-start, stretch);
     margin: 10px;
 }
 
@@ -325,10 +330,10 @@ mat-panel-title {
 }
 
 .progress-spinner {
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
-    height: 42px;
-    min-width: 42px;
+    height: 28px;
+    min-width: 28px;
     border-radius: 50%;
     margin: auto;
     align-items: center;
@@ -339,8 +344,8 @@ mat-panel-title {
     border-radius: 50%;
     border: 2px solid var(--theme-warn-500); 
     display: flex;
-    height: 46px;
-    width: 46px;
+    height: 32px;
+    width: 32px;
     cursor: pointer;
 }
 
@@ -545,4 +550,54 @@ app-checklist-filling-item {
     flex-direction: column;
     align-items: center;
     width: unset;
+}
+
+.time-elapsed {
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+    align-items: center;
+    gap: 5px;
+}
+
+.expired-label {
+    position: absolute;
+    font-size: 1.1rem;
+    bottom: 0;
+    right: 0;
+    margin-bottom: -7px;
+    font-weight: 700;
+    color: var(--theme-warn-contrast-500) !important;
+    fill: var(--theme-warn-500) !important;
+    background-color: var(--theme-warn-500) !important;
+    padding: 1px 3px 1px 5px;
+    border-radius: 7px;   
+}
+
+
+::ng-deep .mat-mdc-tab.mat-mdc-tab-disabled {
+    opacity: 1 !important;
+}
+
+.elapsed-alarmed {
+    color: var(--theme-warn-500) !important;    
+    fill: var(--theme-warn-500) !important;    
+}
+
+.icon-border {
+    border-radius: 50%;
+}
+
+.tab-spinner {
+    border-radius: 50%;
+    margin-left: -35px;
+    margin-top: 10px;
+}
+
+.first-tab {
+    margin-left: -100px;
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab:nth-child(2) {    
+    margin-left: -30px;
 }

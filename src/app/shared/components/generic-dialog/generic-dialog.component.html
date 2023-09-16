@@ -26,6 +26,25 @@
     class="simple-flex dialog-actions"
     mat-dialog-actions
     >
+    <div
+      *ngIf="timeOutforDefaultButton > 0 && !closed"
+      class="tab-spinner"
+      [ngClass]="{ 'pulse-with-warn': timeOutforDefaultButton < 10 }"
+    >
+      <app-spinner            
+        [legacy]="classLegacy"
+        [diameter]="40"
+        [value]="timeOutforDefaultButton / settingsData.timeOutFortDialog * 100"
+        [countdown]="timeOutforDefaultButton"
+        [showBackgound]="true"
+        [suffix]="'s'"
+        [limits]="limits"
+        [fonts]="fonts"        
+        [showPrefix]="true"
+        [smallFont]="smallFont"
+      >
+      </app-spinner> 
+    </div>    
     <div class="toolbar-button-container" *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn">
       <button
           mat-button                    

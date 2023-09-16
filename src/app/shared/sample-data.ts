@@ -8,6 +8,7 @@ import {
   ChecklistFillingData,
   ChecklistState,
   ChecklistStartingMode,
+  variableValueStatus,
 } from '../checklists/models/checklists.models';
 import { ColorsData, Colors } from './models/colors.models';
 import { ProfileData } from './models/profile.models';
@@ -429,7 +430,7 @@ export const sampleSettings: SettingsData = {
     alarm: 75,
   },
   animate: false,
-  timeOutFortDialog: 10,
+  timeOutFortDialog: 15,
 };
 
 export const sampleProfile: ProfileData = {
@@ -458,28 +459,26 @@ export const sampleColors: ColorsData = {
   page: {
     
     shadow: 'rgba(0, 0, 0, 0.05)',
-    /*
     foreColor: Colors.carbon,
     buttonBorderColor: Colors.gray,
     buttonDisabledBorderColor: Colors.lightgrey,
     buttonDisabledFore: Colors.lightgrey,
     buttonDisabledBackgroundColor: Colors.none,
     buttonNormalBackgroundColor: Colors.lightgrey,
-    buttonNormalFore: Colors.darkgray,
+    buttonNormalFore: Colors.darkslateblue,
     buttonNormalBorderColor: Colors.gray, 
-    cardBackgroundColor: Colors.yellow,
-    cardForeColor: Colors.red,
+    cardBackgroundColor: Colors.white,
+    cardForeColor: Colors.carbon,
     cardBorderColor: Colors.green,
     cardDisabledBackgoundColor: Colors.magenta,
     cardDisabledBorderColor: Colors.pink,
     cardDisabledForeColor: Colors.gray,
-    tabBackgroundColor: Colors.whitesmoke,
+    tabBackgroundColor: Colors.gainsboro,
     tabBorderColor: Colors.silver,
     backgroundColor: Colors.white,    
     footerForeColor: undefined,
     footerBackground: undefined,
-    */
-    palettePrimaryColor: '#808080',
+    palettePrimaryColor: Colors.dodgerblue,
     paletteWarnColor: Colors.orangered,
     paletteAccentColor: '#4ACF32',
     // border: Colors.silver,
@@ -492,7 +491,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   id: 'aaaddd-1923883-999deede',
   number: 'AB-12345653',
   status: RecordStatus.ACTIVE,
-  state: ChecklistState.READY,
+  state: ChecklistState.IN_PROGRESS,
   stateDescription: 'LISTO PARA SER LLENADO',
   project: {
     code: 'PR-010',
@@ -513,7 +512,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   assignement: {
     name: 'Juan Carlos Pérez',
     department: 'IT',
-    date: 'Jueves, 21-Sep-2023 13:11:22 PM',
+    date: '2022/01/01 16:29:45',
     type: 'AUTOMATICA',
     plantName: 'TOYOTA CELAYA',
     countryName: 'MEXICO',
@@ -527,25 +526,27 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   description: 'Este checklist es de pruebas',
   extendedInfo:
     'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-  dueDateToStart: 'Jueves, 06-Ago-2023 12:00:00 PM',
-  startDate: 'Jueves, 21-Sep-2023 13:11:22 PM',
-  dueDateToFinish: 'Sábado, 23-Ago-2023 03:14:52 PM',
+  dueDateToStart: '2023/09/03 12:00:00',
+  startDate: '2023/09/03 11:30:00',
+  dueDateToFinish: '2023/09/08 21:30:00',
   questions: 3,
   completed: 0,
   cancelled: 0,
-  valueToPrint: 0,
+  warnedItems: 0,
+  valueToPrint: 0,  
+  secondsToAlert: 7200,
   alarmed: false,
   canAlarm: true,
+  canExpire: true,
   startingMode: ChecklistStartingMode.ANYTIME,
   equipment: {
     id: 'abbdgd-999383-agaga',
     number: 'AB4334',
     description: 'MAQUINA PAPELERA AF-1465-23SF',
-    lastChecklistDate: 'Jueves, 21-Sep-2023 13:11:22 PM',
+    lastChecklistDate: '2022/09/21 13:11:22',
     lastChecklistAuditor: 'Jose Gil A.',
-    extendedInfo:
-      'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-      canAlarm: true,
+    extendedInfo: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
+    canAlarm: true,
   },
   viewType: ChecklistView.FLEXBOX,
   icon: 'assets/images/icons/faq.svg',
@@ -565,7 +566,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       completionDate: 'Y',
       startedDate: 'Y',
       alarmed: false,
-      attachmentRequired: true,
+      attachmentRequired: false,
       allowNotes: true,
       allowActionPlans: false,
       allowAttachments: true,
@@ -618,7 +619,30 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
         action: 'visualEvidence',
         disabled: true,
         alarmed: false,
-      },]
+      },],
+      component: {
+        id: 'aaa-bb-10010',
+        number: 'SN:219982',
+        description: 'BRAZO MECANICO',
+        lastChecklistDate: '2022/09/21 13:11:22',
+        lastChecklistAuditor: 'Jose Gil A.',
+        extendedInfo: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
+        canAlarm: true,
+      },
+      warned: false,
+      previousValues: [{
+        value: '100',
+        date: '2023/02/23 19:30:00',
+        status: variableValueStatus.WARNED,
+      },{
+        value: '130',
+        date: '2023/02/22 19:30:00',
+        status: variableValueStatus.WARNED,
+      },{
+        value: '190',
+        date: '2023/02/22 19:30:00',
+        status: variableValueStatus.REGULAR,
+      }],
     },{
       id: 'bbb',
       index: 2,
@@ -681,6 +705,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       status: ChecklistQuestionStatus.READY,
       icon: '',
       canAlarm: true,
+      required: true,
       alarms:[{
         value: 'y',
     }],

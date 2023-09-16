@@ -70,6 +70,14 @@ export enum ChecklistQuestionStatus {
     COMPLETED = 'completed',
 }
 
+export enum variableValueStatus {
+    REGULAR = 'regular',
+    WARNED = 'warned',
+    ALARMED = 'alarmed',
+    RESETED = 'reseted',
+    OVERFLOW = 'overflow',
+}
+
 export enum ChecklistView {
     ONE_QUESTION_PER_PAGE = 'oneQuestionByPage',
     INFINITE_LIST = 'infiniteList',
@@ -108,7 +116,9 @@ export interface ChecklistFillingItem {
     yesyNoAlarm?: string;
     completionDate?: string;
     startedDate?: string;
+    warned?: boolean;
     alarmed?: boolean;
+    required?: boolean;
     attachmentRequired?: boolean;
     actionRequired?: boolean;
     attachmentCompleted?: boolean;
@@ -116,6 +126,8 @@ export interface ChecklistFillingItem {
     alarms?: ChecklistAlarms[];
     helpers?: Attachment[];
     buttons?: any[]; // TODO define the intreface
+    component?: ChecklistEquipment;
+    previousValues?: previousVariableValue[];
 }
 
 export interface ChecklistAlarms {
@@ -164,17 +176,27 @@ export interface VariablesEquipmentsValue {
     isAlarm?: boolean;
 }
 
+export interface previousVariableValue {
+    value?: string;
+    date?: string;    
+    status?: variableValueStatus;    
+}
+
 export interface ChecklistFillingData {
     id?: string;
     number?: string;
+    parentId?: string;
+    sequence?: number;
     description?: string;
     extendedInfo?: string;
     questions?: number;
+    warnedItems?: number;
     completed?: number;
     cancelled?: number;
     alarmedItems?: number;
     valueToPrint?: number;
     canAlarm?: boolean;
+    canExpire?: boolean;
     alarmed?: boolean;
     dueDateToStart?: string;
     startDate?: string;
@@ -198,6 +220,7 @@ export interface ChecklistFillingData {
     equipment?: ChecklistEquipment;
     periods?: ChecklistPeriod[];
     startingMode?: ChecklistStartingMode;
+    secondsToAlert?: number,
 }
 
 export interface ChecklistFillingState {

@@ -2,14 +2,16 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, } from '../models/screen.models';
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { SnackComponent } from "../components/snack/snack.component";
+import { DatePipe } from '@angular/common';
+import { CapitalizationMethod, DatesDifference } from '../models/helpers.models';
 
 interface buttonState {
   action?: ButtonActions;
   enabled: boolean;
 }
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 
 export class SharedService {
@@ -54,6 +56,7 @@ export class SharedService {
 
   constructor (
     public snackBar: MatSnackBar,
+    public datePipe: DatePipe,
   ) {}
 
 // Functions ================
@@ -124,7 +127,7 @@ export class SharedService {
       try {
         dateFrom = new Date(dateFrom.replace(/-/g,'/'));
       } catch (error) {
-        return "error df";
+        return 'error df';
       }      
     }
     if (!dateTo) {
@@ -152,7 +155,7 @@ export class SharedService {
     try {
       dateFrom = new Date(dateFrom.replace(/-/g,'/'));
     } catch (error) {
-      return "error df";
+      return 'error df';
     }      
 
     const dateTo: any = new Date();
@@ -177,6 +180,119 @@ export class SharedService {
       return $localize `Hace ${Math.round(result / 3600)} horas`;
     }
     return '';
+  }
+
+  datesDifferenceInSeconds(dateFrom: any, dateTo: any = '', type: string = 'elapsed'): DatesDifference {
+    if (!dateFrom && !dateTo) {
+      return {
+        message: 'noDates',
+        totalSeconds: 0,
+        seconds: '',
+        minutes: '',
+        hours: '',
+        days: '',
+      };
+    }
+    
+    if (!dateFrom) {
+        dateFrom = new Date();
+    } else {
+      if (!this.isDateValid(dateFrom as any)) {
+        return {
+          message: 'errorInDateFrom',
+          totalSeconds: 0,
+          seconds: '',
+          minutes: '',
+          hours: '',
+          days: '',
+        };
+      } else {
+        dateFrom = new Date(dateFrom);
+      }
+    }
+    
+    if (!dateTo) {
+      dateTo = new Date();
+    } else {
+      if (!this.isDateValid(dateTo as any)) {
+        return {
+          message: 'errorInDateTo',
+          totalSeconds: 0,
+          seconds: '',
+          minutes: '',
+          hours: '',
+          days: '',
+        };
+      } else {
+        dateTo = new Date(dateTo);
+      }
+    }
+
+    let totalSeconds = Math.round((dateTo - dateFrom) / 1000);
+    let days = Math.floor(Math.abs(totalSeconds / 86400)).toString();
+
+    let time = Math.floor(Math.abs((totalSeconds % 86400) / 3600));
+    const hours = time < 10 ? '0' + time.toString() : time.toString();
+
+    time = Math.floor(Math.abs((totalSeconds % 3600) / 60));
+    const minutes = time < 10 ? '0' + time.toString() : time.toString();
+
+    time = Math.abs(totalSeconds % 60);
+    const seconds = time < 10 ? '0' + time.toString() : time.toString();
+
+    return {
+      message: 'ok',
+      totalSeconds,
+      seconds,
+      minutes,
+      hours,
+      days,
+    };
+  }
+
+  isDateValid(date: any): boolean {
+    if (!date) {
+      return false;
+    }
+
+    if (isNaN(Date.parse(date))) {
+      return false;
+    }
+
+    try {
+      date = new Date(date.replace(/-/g,'/'));
+    } catch (error) {      
+      return false
+    }
+
+    return true;
+  }
+
+  capitalization(text: string, method: CapitalizationMethod = CapitalizationMethod.UPPERCASE): string {
+    if (!text) {
+      return '';
+    }
+
+    if (method === CapitalizationMethod.LOWERCASE) {
+      return text.toLowerCase();
+    } else if (method === CapitalizationMethod.FIRST_LETTER_WORD) {
+      return text
+      .split(' ')
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join(' ');      
+    } else if (method === CapitalizationMethod.FIRST_LETTER_PHRASE) {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    } else {
+      return text.toUpperCase();
+    }    
+  }
+
+  formatDate(date: string, format: string = 'yyyy/MM/dd HH:mm:ss'): string {
+    if (!date || !this.isDateValid(date as any)) {
+      return '';
+    }
+
+    return this.datePipe.transform(new Date(date), format).replace(/p. m./gi, 'PM').replace(/a. m./gi, 'AM');
   }
 
 // End ======================
