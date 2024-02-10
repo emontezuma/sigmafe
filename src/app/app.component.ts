@@ -90,32 +90,32 @@ export class AppComponent implements AfterViewInit {
     private sharedService: SharedService,
     private snackBar: MatSnackBar,
     private changeDetectorRef: ChangeDetectorRef,
-    ) { 
-    breakpointObserver
-    .observe([
-      Breakpoints.Handset,
-      Breakpoints.HandsetLandscape,
-      Breakpoints.HandsetPortrait,
-      Breakpoints.Large,
-      Breakpoints.Medium,
-      Breakpoints.Small,
-      Breakpoints.Tablet,
-      Breakpoints.TabletLandscape,
-      Breakpoints.TabletPortrait,
-      Breakpoints.Web,
-      Breakpoints.WebLandscape,
-      Breakpoints.WebPortrait,
-      Breakpoints.XLarge,
-      Breakpoints.XSmall,
-    ])
-    .pipe()
-    .subscribe((result: any) => {
-      for (const query of Object.keys(result.breakpoints)) {
-        if (result.breakpoints[query]) {
-          this.size = this.displayNameMap.get(query) ?? 'Unknown';
+    ) {
+      breakpointObserver
+      .observe([
+        Breakpoints.Handset,
+        Breakpoints.HandsetLandscape,
+        Breakpoints.HandsetPortrait,
+        Breakpoints.Large,
+        Breakpoints.Medium,
+        Breakpoints.Small,
+        Breakpoints.Tablet,
+        Breakpoints.TabletLandscape,
+        Breakpoints.TabletPortrait,
+        Breakpoints.Web,
+        Breakpoints.WebLandscape,
+        Breakpoints.WebPortrait,
+        Breakpoints.XLarge,
+        Breakpoints.XSmall,
+      ])
+      .pipe()
+      .subscribe((result: any) => {      
+        for (const query of Object.keys(result.breakpoints)) {
+          if (result.breakpoints[query]) {          
+            this.size = this.displayNameMap.get(query) ?? 'Unknown';
+          }
         }
-      }
-    });
+      });
   }
 
 // Hooks ====================

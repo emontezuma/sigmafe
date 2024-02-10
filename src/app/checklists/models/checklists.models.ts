@@ -127,6 +127,7 @@ export interface ChecklistFillingItem {
     helpers?: Attachment[];
     buttons?: any[]; // TODO define the intreface
     component?: ChecklistEquipment;
+    showChart?: boolean;
     previousValues?: previousVariableValue[];
 }
 

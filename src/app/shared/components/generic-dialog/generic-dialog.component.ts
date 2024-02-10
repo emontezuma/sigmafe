@@ -8,6 +8,7 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../models/settings.models';
 import { SharedService } from '../../services/shared.service';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models';
+import { ButtonActions } from '../../models/screen.models';
 
 @Component({
   selector: 'app-generic-dialog',
@@ -81,11 +82,11 @@ constructor (
         tooltip: $localize`Cierra esta ventana`,
         disabled: false,
         loading: false,
-        action: 'cancel',
+        action: ButtonActions.CANCEL,
         default: true,
       });      
     } else {
-      this.defaultAction = this.data.buttons.find((button) => button.default).action;
+      this.defaultAction = this.data.buttons.find((button : any) => button.default).action;
     }
   }
 

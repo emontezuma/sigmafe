@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
 
 import { MaterialModule } from '../material/material.module';
 import { ChecklistFillingComponent } from './pages/checklist-filling/checklist-filling.component';
@@ -28,10 +29,19 @@ import { ReadonlyFieldComponent } from '../shared/components/readonly-field/read
     ChecklistsRoutingModule,
     NgOptimizedImage,
     NgxSkeletonLoaderModule.forRoot(),
+    NgxEchartsModule.forRoot({
+      echarts: () => import('echarts'),
+    }),
     SpinnerModule,
     IconsModule,
     LabelEllipsisModule,
     ImageNotFoundModule,
+  ],
+  providers: [
+    {
+      provide: NGX_ECHARTS_CONFIG,
+      useFactory: () => ({ echarts: () => import('echarts') })
+    },
   ]
 })
 export class ChecklistsModule { }

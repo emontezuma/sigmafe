@@ -28,6 +28,7 @@ export enum ButtonActions {
     EXPORT_TO_CSV = 'exportToCsv',
     RELOAD = 'reload',
     UPLOAD_FILE = 'uploadFile',
+    RESET = 'reset',
 }
 export interface ToolbarButtons  {
     type: 'button' | 'divider' | 'searchbox';

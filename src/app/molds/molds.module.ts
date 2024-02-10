@@ -24,6 +24,6 @@ import { ImageNotFoundModule } from '../shared/directives/image-not-found.module
     NgxSkeletonLoaderModule.forRoot(),
     SpinnerModule,
     ImageNotFoundModule,
-  ]
+  ],  
 })
 export class MoldsModule { }

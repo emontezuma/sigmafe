@@ -23,4 +23,6 @@
     box-shadow: 0 0 0 0.5em rgba(#fff,0);
 }
 
-
+.divider {
+    @include mixins.divider(0px, 0px, 0px, 5px, var(--z-colors-page-border), 50px, 2px);    
+}

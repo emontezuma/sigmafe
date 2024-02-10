@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-question-toolbar',
@@ -7,6 +7,7 @@ import { Component, Input } from '@angular/core';
 })
 export class ToolbarComponent {
   @Input() buttons: any[];
+  @Output() buttonAction = new EventEmitter<string>();;
 
   constructor (    
   ) { }
@@ -14,8 +15,8 @@ export class ToolbarComponent {
 // Hooks ====================
 
 // Functions ================
-  handleClick(id: number) {
-    
+  handleClick(action: string) {
+    this.buttonAction.emit(action);
   }
 
 // End ======================

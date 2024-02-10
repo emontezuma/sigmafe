@@ -21,14 +21,14 @@ export class ToolbarComponent implements AfterViewInit {
 
   constructor (
     private sharedService: SharedService,
-    ) { }
+  ) { }
 
 // Hooks ====================
   ngOnInit(): void {
     this.showSearchSubscriber = this.sharedService.showSearch.subscribe((searchBox) => {
       this.showSearchBox = searchBox;
     });
-    this.showSearchSubscriber = this.sharedService.buttonStateChange.subscribe((buttonState) => {
+    this.changeStateSubscriber = this.sharedService.buttonStateChange.subscribe((buttonState) => {
       const button = this.toolbar.buttons.find((button) => {
         return button.action === buttonState.action
       });
@@ -50,7 +50,7 @@ export class ToolbarComponent implements AfterViewInit {
 
   ngOnDestroy(): void {
     if (this.showSearchSubscriber) this.showSearchSubscriber.unsubscribe();
-    if (this.showSearchSubscriber) this.showSearchSubscriber.unsubscribe();
+    if (this.changeStateSubscriber) this.changeStateSubscriber.unsubscribe();
   }
 
 // Functions ================

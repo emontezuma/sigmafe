@@ -1,6 +1,7 @@
 <div class="question-buttons">        
     <ng-container *ngFor="let button of buttons; let i = index">
         <button
+            *ngIf="button.type === 'button'"
             mat-icon-button
             class="circular-button with-background"
             aria-label="icon-button with menu icon"
@@ -19,6 +20,12 @@
                 [svgIcon]="button.icon"
             >
             </mat-icon>
-        </button>        
+        </button>
+        <mat-divider
+            *ngIf="button.type === 'divider'"
+            vertical class="divider"
+        >
+        </mat-divider>
+        
     </ng-container>
 </div>

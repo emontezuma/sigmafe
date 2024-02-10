@@ -15,6 +15,22 @@
                 [label]="label"
             >
             </app-label-ellipsis>
+            <button
+              *ngIf="showGoToRecord"
+              mat-icon-button
+              class="button-on-new-tab"
+              aria-label="icon-button with menu icon"
+              [matTooltip]="openNewTabMessage"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+              (click)="openRecordInNewTab()"
+            >
+              <mat-icon
+                class="accordion-icon in-button"
+                svgIcon="external_link"                
+              >
+              </mat-icon>
+            </button>            
         </div>
         <app-label-ellipsis        
             @dissolve
@@ -22,7 +38,7 @@
             [class]="labelClass"
             [label]="label"
             >
-        </app-label-ellipsis>
+        </app-label-ellipsis>        
     </div>
     <ngx-skeleton-loader
       *ngIf="loading"
@@ -31,6 +47,5 @@
       [count]="skeletonCount"
     >
     </ngx-skeleton-loader>
-  </mat-card-title>
-  
+  </mat-card-title>  
 </div>

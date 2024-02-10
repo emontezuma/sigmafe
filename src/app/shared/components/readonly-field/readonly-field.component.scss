@@ -39,4 +39,17 @@ mat-card-title {
   max-width: calc(100% - 40px);
 }
 
+.button-on-new-tab {
+  background-color: transparent;
+  &:hover {
+    color: var(--theme-primary-500);
+    fill: var(--theme-primary-500);
+  }
+}
 
+.in-button {
+  margin-left: -5px;
+  &:hover {
+    color: var(--theme-primary-500);
+  }
+}

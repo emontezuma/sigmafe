@@ -196,6 +196,8 @@
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="gear"
+                      [showGoToRecord]="true"
+                      [recordId]="checklist.equipment?.id"
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Equipo/Máquina</mat-card-subtitle>
@@ -259,6 +261,8 @@
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="white_list"
+                      [showGoToRecord]="true"
+                      [recordId]="checklist.type?.id"
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Tipo de checklist</mat-card-subtitle>
@@ -270,6 +274,8 @@
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="white_list"
+                      [showGoToRecord]="true"
+                      [recordId]="checklist.class?.id"
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Clase de checklist</mat-card-subtitle>
@@ -281,6 +287,8 @@
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="briefcase"
+                      [showGoToRecord]="true"
+                      [recordId]="checklist.project?.id"
                     >
                     </app-readonly-field>   
                     <mat-card-subtitle class="label">Proyecto</mat-card-subtitle>
@@ -714,7 +722,6 @@
         > 
           <ng-container *ngFor="let item of checklist.items; let i = index">
             <ng-container              
-              #questions
               *ngIf="selectedView.value === 'all' || 
               (selectedView.value === 'answered' && item.status === ChecklistQuestionStatus.COMPLETED) ||
               (selectedView.value === 'unanswered' && item.status !== ChecklistQuestionStatus.COMPLETED && item.status !== ChecklistQuestionStatus.CANCELLED)">

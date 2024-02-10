@@ -5,12 +5,14 @@ export interface Attachment {
 }
 
 export interface SimpleTable {
-    code: string;
+    id?: string;
+    code?: string;
     description?: string;
 }
 
 export interface Priority {
-    code: string;
+    id?: string;
+    code?: string;
     number?: number;
     order?: string;
     description?: string;

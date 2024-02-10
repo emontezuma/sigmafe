@@ -156,5 +156,9 @@ export class IconsModule {
       "delete",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/delete.svg")
     );
+    iconRegistry.addSvgIcon(
+      "external_link",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/external_link.svg")
+    );    
   }
 }

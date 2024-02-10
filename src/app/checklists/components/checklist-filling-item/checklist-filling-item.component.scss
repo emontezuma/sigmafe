@@ -55,7 +55,7 @@
     margin-bottom: -9px;
 }
 
-.question-grid {    
+.question-container {
     width: -webkit-fill-available;
     z-index: 1;
 }
@@ -112,7 +112,7 @@
 }
 
 .small > .icon-button {    
-    margin-left: -10px;
+    margin-left: -9px;
     margin-top: -8px;
 }
 
@@ -191,4 +191,12 @@ mat-card-footer {
     cursor: pointer;
     height: 30px;
     width: 30px;
+}
+
+.mini-chart {
+    float: right;
+    border-radius: 3px;
+    border: 1px solid var(--theme-primary-200);
+    width: 90px;
+    height: 50px;
 }

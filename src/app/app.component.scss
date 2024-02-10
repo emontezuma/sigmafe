@@ -1,4 +1,4 @@
-@use "src/assets/styles/mixins";
+@use "../assets/styles/mixins";
 
 .container {
   margin: 0;
@@ -8,11 +8,11 @@
 }
 
 .route-container {
-    position:relative;
+    position: relative;
 }
 
-.route-container>* {
-    display:block;
+.route-container > * {
+    display: block;
 }
 
 .progress {

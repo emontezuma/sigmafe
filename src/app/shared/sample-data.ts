@@ -13,6 +13,7 @@ import {
 import { ColorsData, Colors } from './models/colors.models';
 import { ProfileData } from './models/profile.models';
 import { RecordStatus } from './models/helpers.models';
+import { ButtonActions } from './models/screen.models';
 
 export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
   page: 1,
@@ -498,14 +499,17 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
     description: 'MOVIMIENTO DE PLANTA',
   },
   class: {
+    id: 'aaabb-assd73-0psoa1',
     code: 'AUT-PR',
     description: 'AUTOMÁTICO (SEMANAL)',
   },
   type: {
+    id: 'aaabb-assd73-0psoa1',
     code: 'A-INTE',
     description: 'Auditorías internas',
   },
   priority: {
+    id: 'aaabb-assd73-0psoa1',
     code: 'N01',
     description: 'NORMAL',
   },
@@ -584,36 +588,51 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
         },
       ],
       buttons: [{
+        type: 'button',
+        tooltip: 'Reiniciar pregunta',
+        icon: 'cancel',
+        action: ButtonActions.RESET,
+        disabled: false,
+        alarmed: false,
+      },{
+        type: 'divider',
+      },{
+        type: 'button',
         tooltip: 'Información adicional...',
         icon: 'more_info',
         action: 'moreinfo',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Ayuda visual...',
         icon: 'support',
         action: 'support',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Adjuntos...',
         icon: 'attachment',
         action: 'attachments',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Notas',
         icon: 'reload',
         action: 'notes',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Plan de acción',
         icon: 'more_info',
         action: 'actionPlan',
         disabled: true,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Tomar evidencia (imagen o video)...',
         icon: 'more_info',
         action: 'visualEvidence',
@@ -643,6 +662,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
         date: '2023/02/22 19:30:00',
         status: variableValueStatus.REGULAR,
       }],
+      showChart: true,
     },{
       id: 'bbb',
       index: 2,
@@ -657,42 +677,49 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       canAlarm: true,
       yesyNoAlarm: 'y',
       buttons: [{
+        type: 'button',
         tooltip: 'Información adicional...',
         icon: 'more_info',
         action: 'moreinfo',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Ayuda visual...',
         icon: 'support',
         action: 'support',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Adjuntos...',
         icon: 'attachment',
         action: 'attachments',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Notas',
         icon: 'reload',
         action: 'notes',
         disabled: false,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Plan de acción',
         icon: 'more_info',
         action: 'actionPlan',
         disabled: true,
         alarmed: false,
       },{
+        type: 'button',
         tooltip: 'Tomar evidencia (imagen o video)...',
         icon: 'more_info',
         action: 'visualEvidence',
         disabled: true,
         alarmed: false,
-      },]
+      },],
+      showChart: true,
     },{
       id: 'bbb',
       index: 3,
@@ -710,42 +737,48 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
         value: 'y',
     }],
     buttons: [{
+      type: 'button',
       tooltip: 'Información adicional...',
       icon: 'more_info',
       action: 'moreinfo',
       disabled: false,
       alarmed: false,
     },{
+      type: 'button',
       tooltip: 'Ayuda visual...',
       icon: 'support',
       action: 'support',
       disabled: false,
       alarmed: false,
     },{
+      type: 'button',
       tooltip: 'Adjuntos...',
       icon: 'attachment',
       action: 'attachments',
       disabled: false,
       alarmed: false,
     },{
+      type: 'button',
       tooltip: 'Notas',
       icon: 'reload',
       action: 'notes',
       disabled: false,
       alarmed: false,
     },{
+      type: 'button',
       tooltip: 'Plan de acción',
       icon: 'more_info',
       action: 'actionPlan',
       disabled: true,
       alarmed: false,
     },{
+      type: 'button',
       tooltip: 'Tomar evidencia (imagen o video)...',
       icon: 'more_info',
       action: 'visualEvidence',
       disabled: true,
       alarmed: false,
-    },]
-    },
-  ],
+    },],
+    showChart: true,
+  }],
 };
