@@ -33,6 +33,7 @@ mat-sidenav-container {
   position: absolute;
   left: 0;
   right: 0;
+  top: 55px;
 }
 
 mat-sidenav-content {
@@ -68,7 +69,7 @@ mat-panel-title {
 .footer {
   position: absolute;
   bottom: 0;
-  height: 40px;
+  height: 48px;
   border-radius: 0px 0px 6px 6px;
 }
 
@@ -126,9 +127,8 @@ mat-panel-title {
   text-align: center;
   height: 100%;
   width: 100%;
-  bottom: 0;
-  left: 0;
-  align-content: center;
+  top: 0;
+  left: 0;  
   background-size: cover;
   z-index: 1;
   background-color: rgba(0, 0, 0, 0.1);
@@ -151,7 +151,7 @@ mat-panel-title {
   position: fixed;
   bottom: 0;
   right: 0;
-  margin-bottom: 45px;
+  margin-bottom: 55px;
   margin-right: 25px;
   z-index: 999;
 }
@@ -165,6 +165,7 @@ mat-panel-title {
 }
 
 .page-content {
+  position: relative;
   margin: 2px;
   overflow-x: hidden;
   overflow-y: auto;
@@ -221,7 +222,8 @@ mat-panel-title {
 
 .toolbar-content {
   height: 64px;
-  border-bottom: 1px solid var(--z-colors-page-border);
+  // border-bottom: 1px solid var(--z-colors-page-border);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   background-color: var(--z-colors-page-background-color);
 }
 
@@ -235,4 +237,13 @@ mat-panel-title {
   height: 32px;
   border-radius: 50%;
   outline: 2px solid var(--z-colors-page-background-color);
+}
+
+form {
+  display: flex;
+  flex-direction: row;
+  height: 75px;
+  align-items: normal;
+  gap: 10px;
+  margin-top: 20px;
 }

@@ -50,6 +50,9 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-status-ok', colorsData?.status.ok ?? Colors.green);
     document.documentElement.style.setProperty('--z-colors-status-warn', colorsData?.status.warn ?? Colors.orange);
     document.documentElement.style.setProperty('--z-colors-status-alarm', colorsData?.status.alarm ?? Colors.orangered);
+    document.documentElement.style.setProperty('--z-colors-status-ok-fore', colorsData?.status.okFore ?? Colors.white);
+    document.documentElement.style.setProperty('--z-colors-status-warn-fore', colorsData?.status.warnFore ?? Colors.white);
+    document.documentElement.style.setProperty('--z-colors-status-alarm-fore', colorsData?.status.alarmFore ?? Colors.white);
     document.documentElement.style.setProperty('--z-colors-status-none', colorsData?.status.none ?? Colors.none);
     // TODO la sombra debe calcularse    
     document.documentElement.style.setProperty('--theme-primary-500', colorsData?.page?.palettePrimaryColor ?? Colors.primary);    
@@ -82,7 +85,7 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-page-tab-background-color', colorsData?.page?.tabBackgroundColor ?? colorToUse);
     document.documentElement.style.setProperty('--z-colors-page-button-disabled-border', colorsData?.page?.buttonDisabledBorderColor ?? colorToUse);    
     document.documentElement.style.setProperty('--z-colors-page-button-disabled-fore', colorsData?.page?.buttonDisabledFore ?? colorToUse);        
-
+    
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-500');
     document.documentElement.style.setProperty('--z-colors-page-tab-border-color', colorsData?.page?.tabBorderColor ?? colorToUse);    
     
@@ -104,7 +107,28 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-page-footer-background-color', colorsData.page?.footerBackground ?? colorToUse);
 
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-contrast-300');
-    document.documentElement.style.setProperty('--z-colors-page-tab-fore', colorsData?.page?.tabForeColor ?? colorToUse);    
+    document.documentElement.style.setProperty('--z-colors-page-tab-fore', colorsData?.page?.tabForeColor ?? colorToUse);
+    
+    //Tables
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-700');    
+    document.documentElement.style.setProperty('--z-colors-table-header-background-color', colorsData?.page?.tableHeaderBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-paginator-background-color', colorsData?.page?.tablePaginatorBackgroundColor ?? colorToUse);
+
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
+    document.documentElement.style.setProperty('--z-colors-table-header-fore-color', colorsData?.page?.tableHeaderForeColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-paginator-fore-color', colorsData?.page?.tablePaginatorBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-table-even-background-color', colorsData?.page?.tableRowEvenBackgroundColor ?? colorToUse);
+
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-50');
+    document.documentElement.style.setProperty('--z-colors-table-odd-background-color', colorsData?.page?.tableRowOddBackgroundColor ?? colorToUse);
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-900');
+    document.documentElement.style.setProperty('--z-colors-table-row-fore-color', colorsData?.page?.tableRowForeColor ?? colorToUse);
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-400');
+    document.documentElement.style.setProperty('--z-colors-table-border-color', colorsData?.page?.tableBorderColor ?? colorToUse);
+    
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
+    document.documentElement.style.setProperty('--z-colors-table-hover-background-color', colorsData?.page?.tableHoverBackgroundColor ?? colorToUse);
+    
 
     // Custom colors
     document.documentElement.style.setProperty('--z-colors-white', Colors.white);    

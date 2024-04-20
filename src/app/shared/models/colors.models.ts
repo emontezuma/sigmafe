@@ -173,6 +173,9 @@ export interface StatusColors {
     ok?: string,
     warn?: string,
     alarm?: string,
+    okFore?: string,
+    warnFore?: string,
+    alarmFore?: string,
     none?: string,
 }
 
@@ -205,8 +208,17 @@ export interface PageColors {
     backgroundColor?: string,
     tooltipFontSize?: string,
     tooltipForeColor?: string,
-    tooltipNackgroundColor?: string,
+    tooltipBackgroundColor?: string,
     none?: string,
+    tableHeaderBackgroundColor?: string,
+    tableHeaderForeColor?: string,
+    tableRowOddBackgroundColor?: string,
+    tableRowEvenBackgroundColor?: string,
+    tableRowForeColor?: string,
+    tableBorderColor?: string,
+    tablePaginatorBackgroundColor?: string,
+    tablePaginatorForeColor?: string,
+    tableHoverBackgroundColor?: string,
 }
 
 export interface ColorsData {

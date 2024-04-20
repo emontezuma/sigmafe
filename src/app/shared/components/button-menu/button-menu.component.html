@@ -1,0 +1,56 @@
+<div class="container">
+  <button
+    mat-button
+    class="toolbar-menu"
+    [ngClass]="{ 'pulse-menu': animatingQuestion }"
+    aria-label="icon-button with menu icon"
+    [matTooltip]="tooltip"
+    matTooltipClass="tooltip-general"
+    matTooltipShowDelay="100"
+    [matMenuTriggerFor]="menuView"
+  >
+    <div class="flex-box in-button">
+      <span class="top-text">{{ caption }}</span>
+      <mat-icon
+        class="icon-medium"
+        [svgIcon]="selectedOption ? selectedOption.icon : ''"
+      >
+      </mat-icon>
+      <label class="button-label">{{ selectedOption?.caption }}</label>
+      <mat-divider class="divider-vertical" vertical> </mat-divider>
+      <mat-icon class="icon-button small-icon"> keyboard_arrow_down </mat-icon>
+    </div>
+  </button>
+  <mat-menu #menuView="matMenu" class="menu">
+    <div class="menu-container" *ngFor="let button of options; let i = index">
+      <button
+        mat-menu-item
+        class="toolbar-button-small"
+        [ngClass]="{
+          'selected-view': button.value === selectedOption?.value
+        }"        
+        aria-label="icon-button with menu icon"
+        i18n-placeHolder
+        (click)="setOption(i, button.value)"
+      >
+        <mat-icon
+          [svgIcon]="button.icon" class="menu-button"
+          [ngStyle]="{
+            'color': button.value === ButtonActions.RED ? 'red' 
+            : button.value === ButtonActions.DODGERBLUE ? 'dodgerblue'
+            : button.value === ButtonActions.YELLOW ? 'yellow'  
+            : button.value === ButtonActions.ORANGE ? 'orange'
+            : button.value === ButtonActions.GREEN ? 'orange' : ''
+          }"
+        > </mat-icon>
+        <span class="menu-text">{{ button.caption }}</span>
+        <mat-icon
+          *ngIf="button.value === selectedOption?.value"
+          class="icon-button small-icon menu-button checkmark"
+        >
+          check
+        </mat-icon>
+      </button>
+    </div>
+  </mat-menu>
+</div>

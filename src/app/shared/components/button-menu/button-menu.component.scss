@@ -1,0 +1,115 @@
+@use "../../../../assets/styles/mixins";
+
+.container {
+    margin-right: 2px;
+    margin-bottom: 6px;
+}
+
+.divider-vertical {
+    @include mixins.divider(0px, 0px, 5px, -5px, var(--z-colors-page-card-fore), 30px, 1px);   
+}
+
+.pulse-menu {
+    animation: pulse 1s infinite;
+    box-shadow: 0 0 0 1em rgba(#fff,0);
+}
+
+.toolbar-menu {
+    color: var(--z-colors-page-card-fore) !important;
+    background-color: var(--z-colors-page-card-background-color);
+    border-color: var(--z-colors-page-card-fore) !important;  
+    border: unset;
+    border: 1.5px solid var(--z-colors-page-card-fore);
+    height: 47px;
+    cursor: pointer;
+    .mat-icon {
+        color: var(--z-colors-page-card-fore) !important;
+    }
+    margin-top: 10px;
+  }
+
+.flex-box {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    margin: 5px;
+    gap: 10px;
+}
+
+.in-button {
+    gap: 5px;
+    align-items: center;
+}
+
+.button-label {
+    max-width: calc(100% - 60px);
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 5px;
+    font-weight: 600;
+    font-size: 1.3rem;
+    cursor: pointer;
+}
+
+.toolbar-button  {
+    margin-right: 5px;
+    display: flex;
+    height: 46px;
+    flex-direction: row;
+    border-radius: 8px 0px;
+    border: 2.5px solid rgba(var(--z-colors-primary-rgb), 0.5);
+}
+
+.small-icon {
+    font-size: 2rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    margin-right: -8px !important;
+}
+
+.menu-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.menu-text {
+    margin-right: 25px;
+}
+
+.checkmark {
+    right: 0;
+    position: absolute;
+    margin-right: 10px !important;
+}
+
+.selected-view {
+    background-color: var(--z-colors-lightgrey);
+}
+
+.top-text {
+    position: absolute;
+    font-size: 1.2rem;
+    line-height: 1.2rem;
+    font-weight: 500;
+    top: 0;
+    left: 0;
+    margin-top: -9px;
+    margin-left: 0px;
+    color: var(--theme-primar-700) !important;
+    background-color: var(--z-colors-page-card-background-color);
+    padding: 0px 2px;
+    border-radius: 4px;
+    max-width: calc(100% - 2.2em);
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.icon-medium {
+    width: 24px !important;
+    height: 24px !important;
+}

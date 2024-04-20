@@ -48,7 +48,7 @@
           }"
         >
         </mat-icon>
-        <label        
+        <mat-label        
           class="tab-label"
           [ngStyle]="{
             color:
@@ -58,7 +58,7 @@
           }"
         >
           General
-        </label>
+        </mat-label>
       </ng-template>
       <ng-template matTabContent>
         <div class="tabs tab-general-info">
@@ -708,7 +708,7 @@
               </button>
             </div>
           </mat-menu>
-        </div>
+        </div>        
         <div
           *ngIf="!noQuestions && !showSpinner"
           class="tabs tab-questions"
@@ -725,9 +725,15 @@
               *ngIf="selectedView.value === 'all' || 
               (selectedView.value === 'answered' && item.status === ChecklistQuestionStatus.COMPLETED) ||
               (selectedView.value === 'unanswered' && item.status !== ChecklistQuestionStatus.COMPLETED && item.status !== ChecklistQuestionStatus.CANCELLED)">
-              <app-checklist-filling-item [item]="item" [inactive]="checklist.status === RecordStatus.INACTIVE"></app-checklist-filling-item>
+              <app-checklist-filling-item
+                #questionCards
+                [view]="selectedLayout?.value" 
+                [item]="item" 
+                [inactive]="checklist.status === RecordStatus.INACTIVE"                
+              >
+              </app-checklist-filling-item>
             </ng-container>
-          </ng-container>           
+          </ng-container>
         </div>
         <div
           class="spinner-container"

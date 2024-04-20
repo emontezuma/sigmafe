@@ -6,7 +6,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./question-toolbar.component.scss']
 })
 export class ToolbarComponent {
-  @Input() buttons: any[];
+  @Input() elements: any[];
   @Output() buttonAction = new EventEmitter<string>();;
 
   constructor (    

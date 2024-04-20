@@ -1,21 +1,24 @@
 import { createReducer, on } from '@ngrx/store';
 import * as moldsActions from '../actions/molds.actions';
-import { MoldsState } from '../../molds/models/molds.models';
+import { MoldsState } from '../../molds/models';
 
 export const initialState: MoldsState = {
   loading: false,
-  moldsHitsQueryData: {
-    molds: [],
-    page: 0,
-    pageSize: 0,
-    moreData: false,
-    totalRecords: 0,
+  moldsData: {
+    molds: {
+      items: [],      
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+      totalCount: 0,
+    }
   }  
 };
 
 export const moldsReducer = createReducer(
   initialState,
-  on(moldsActions.loadMoldsHitsQueryData, ( state ) => ({ ...state, loading: true })),
-  on(moldsActions.loadedMoldsHitsQueryData, (state, { moldsHitsQueryData } ) => ({ ...state, loading: false, moldsHitsQueryData })),
+  on(moldsActions.loadMoldsData, ( state, { skipRecords, takeRecords} ) => ({ ...state, loading: true, skipRecords, takeRecords })),
+  on(moldsActions.loadedMoldsData, (state, { moldsData } ) => ({ ...state, loading: false, moldsData })),
 );
   

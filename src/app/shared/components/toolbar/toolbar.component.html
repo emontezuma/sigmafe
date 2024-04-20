@@ -1,67 +1,117 @@
 <div class="container">
-    <mat-toolbar class="toolbar">
-        <div 
-            #toolbarBox
-            [ngClass]="toolbar.toolbarClass"
+  <mat-toolbar 
+    class="toolbar" 
+    #scrollbar
+    [ngStyle]="{ 'height': scrollbarActivated ? '80px' : '64px' }"
+  >
+    <div 
+      #toolbarBox 
+      [ngClass]="toolbar.toolbarClass"
+      [ngStyle]="{ 'margin-left': toolbar.alignment === 'right' ? 'auto' : 'unset', 'margin-right': toolbar.alignment === 'left' ? 'auto' : 'unset' }"
+    >
+      <div
+        *ngIf="toolbar.showSpinner"
+        class="tab-spinner"
+        [ngClass]="{ 'pulse-with-accent': stopTimer }"
+      >
+        <app-spinner          
+          [matTooltip]="stopTimer ? 'Reanudar' : 'Detener'"
+          matTooltipClass="tooltip-general"
+          matTooltipShowDelay="100"          
+          [legacy]="stopTimer ? classWarm : classLegacy"
+          [spinnerMode]="stopTimer ? 'indeterminate' : 'determinate'"
+          [diameter]="50"
+          [value]="(timeOutCountdown / timeOutforTimer) * 100"
+          [countdown]="timeOutCountdown"
+          [showBackgound]="true"
+          [suffix]="'s'"
+          [limits]="limits"
+          [fonts]="fonts"
+          [showPrefix]="true"
+          [smallFont]="smallFont"
+          (click)="handleStopTimer()"
         >
-            <div class="toolbar-button-container" *ngFor="let button of toolbar.buttons; let i = index; trackBy: trackByFn">
-                <button
-                    *ngIf="button.type === 'button'"
-                    mat-button                    
-                    class="toolbar-button"    
-                    [ngClass]="[ button.class ]"
-                    aria-label="icon-button with menu icon"
-                    [matTooltipDisabled]="!button.showTooltip"
-                    [matTooltip]="button.tooltip"
-                    matTooltipClass = "tooltip-general"
-                    matTooltipShowDelay = "100"
-                    [disabled]="button.disabled || button.loading"
-                    (click)="handleClick(i, button.action)"
-                >
-                    <mat-icon
-                        *ngIf="button.showIcon"
-                        class="svgicon icon-medium"
-                        [ngStyle]="{ 'visibility': button.loading ? 'hidden' : 'visible' }"
-                        [svgIcon]="button.icon"
-                    >                            
-                    </mat-icon>
-                    <mat-progress-spinner
-                        *ngIf="button.loading"
-                        class="spinner-regular-button"
-                        diameter="32"      
-                        mode="indeterminate"                        
-                    >
-                    </mat-progress-spinner>                    
-                    <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
-                </button>
-                <mat-divider
-                    *ngIf="button.type === 'divider'"
-                    vertical [ngClass]="toolbar.dividerClass"
-                >
-                </mat-divider>
-                <app-search-box
-                    *ngIf="button.type === 'searchbox'"
-                    textToSearch="hello"
-                    i18n-placeHolder
-                    placeHolder="Filtrar"
-                    maxLength="50"
-                    (searchBy)="sendSearchText($event)"
-                >
-                </app-search-box>                
-                <div
-                    *ngIf="button.locked && !button.disabled"
-                    class="button-locked"
-                >
-                    <mat-icon                        
-                        class="svgicon small-locked"
-                        svgIcon="small-locked"                        
-                        matTooltip="Puede requerir clave"
-                        matTooltipClass = "tooltip-general"
-                        matTooltipShowDelay = "100"
-                    >                            
-                    </mat-icon>                      
-                </div>
-            </div>
+        </app-spinner>        
+      </div>
+      <div
+        class="toolbar-button-container"
+        *ngFor="
+          let button of toolbar.elements;
+          let i = index;
+          trackBy: trackByFn
+        "
+      >
+        <div *ngIf="button.type === 'label' && button.caption"
+          class="tab-spinner-text"
+          [ngClass]="[button.class]"
+          [innerHTML]="button.caption"
+        >
         </div>
-    </mat-toolbar>
+        <button
+          *ngIf="button.type === 'button'"
+          mat-button
+          class="toolbar-button"
+          [ngClass]="[button.class]"
+          aria-label="icon-button with menu icon"
+          [matTooltipDisabled]="!button.showTooltip"
+          [matTooltip]="button.tooltip"
+          matTooltipClass="tooltip-general"
+          matTooltipShowDelay="100"
+          [disabled]="button.disabled || button.loading"
+          (click)="handleClick(i, button.action, button.field)"
+        >
+          <mat-icon
+            *ngIf="button.showIcon"
+            class="svgicon icon-medium"
+            [ngStyle]="{ visibility: button.loading ? 'hidden' : 'visible' }"
+            [svgIcon]="button.icon"
+          >
+          </mat-icon>
+          <mat-progress-spinner
+            *ngIf="button.loading"
+            class="spinner-regular-button"
+            diameter="32"
+            mode="indeterminate"
+          >
+          </mat-progress-spinner>
+          <label class="button-label">{{
+            button.showCaption ? button.caption : ""
+          }}</label>
+        </button>
+        <mat-divider
+          *ngIf="button.type === 'divider'"
+          vertical
+          [ngClass]="toolbar.dividerClass"
+        >
+        </mat-divider>
+        <app-search-box
+          *ngIf="button.type === 'searchbox'"
+          textToSearch=""
+          i18n-placeHolder
+          placeHolder="Filtrar"
+          maxLength="50"
+          (searchBy)="sendSearchText($event)"
+        >
+        </app-search-box>
+        <app-button-menu
+          *ngIf="button.type === 'button-menu'"
+          [caption]="button.caption"
+          [options]="button.options"
+          [tooltip]="button.tooltip"
+          (selection)="handleSelection($event, button.field)"
+        >
+        </app-button-menu>
+        <div *ngIf="button.locked && !button.disabled" class="button-locked">
+          <mat-icon
+            class="svgicon small-locked"
+            svgIcon="small-locked"
+            matTooltip="Puede requerir clave"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+          >
+          </mat-icon>
+        </div>
+      </div>
+    </div>    
+  </mat-toolbar>
 </div>

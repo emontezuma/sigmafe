@@ -1,0 +1,1 @@
+export * from './molds-hits-counter.component';

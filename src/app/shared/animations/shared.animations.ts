@@ -5,6 +5,7 @@ import {
   transition,
   state,
   query,
+  stagger,
 } from '@angular/animations';
 
 export const routingAnimation = trigger('routingAnimation', [
@@ -33,6 +34,34 @@ export const fromTop = trigger('fromTop', [
   ),
   transition('void => *', [ style({ opacity: 0.3, transform: 'translateY(10px)' }), animate('0.6s ease-in') ]),
   transition('* => void', [ animate('0.6s ease-out'), style({ opacity: 0, transform: 'translateY(10px)', }) ]),
+]);
+
+export const fromLeft = trigger('fromLeft', [
+  state(
+    'in',
+    style({
+      opacity: 1,
+      transform: 'translateX(0px)',
+    })
+  ),
+  transition('void => *', [ style({ opacity: 0.5, transform: 'translateX(30px)' }), animate('0.25s ease-in') ]),
+  transition('* => void', [ animate('0.25s ease-out'), style({ opacity: 0.5, transform: 'translateX(30px)', }) ]),
+]);
+
+export const listAnimation = trigger('listAnimation', [
+  transition('* => *', [  
+    query(':leave', [
+     stagger(150, [
+       animate(125, style({ opacity: 0, transform: 'translateY(-10%)' }))
+     ])
+    ], { optional: true }),
+    query(':enter', [
+      style({ opacity: 0, transform: 'translateY(-10%)' }),
+      stagger(150, [
+       animate(125, style({ opacity: 1, transform: 'translateY(0px)' }))
+     ])
+    ], { optional: true })
+  ])
 ]);
 
 export const dissolve = trigger('dissolve', [

@@ -25,12 +25,12 @@ export enum RecordStatus {
 }
 
 export interface DatesDifference {
-    message: string,
-    totalSeconds: number,
-    seconds: string,
-    minutes: string,
-    hours: string,
-    days: string,
+    message: string;
+    totalSeconds: number;
+    seconds: string;
+    minutes: string;
+    hours: string;
+    days: string;
 }
 
 export enum CapitalizationMethod {
@@ -38,4 +38,14 @@ export enum CapitalizationMethod {
     LOWERCASE = 'lowercase',
     FIRST_LETTER_PHRASE = 'firstLetterPhrase',  
     FIRST_LETTER_WORD = 'firstLetterWord',  
-}  
+}
+
+export interface PageInfo {
+    hasNextPage?: boolean;
+    hasPreviousPage?: boolean;
+    currentPage?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+  }
+  

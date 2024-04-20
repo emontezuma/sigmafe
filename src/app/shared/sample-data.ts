@@ -1,4 +1,4 @@
-import { MoldsHitsQueryData } from '../molds/models/molds.models';
+import { MoldsHitsQueryData } from '../molds/models/molds-hits.models';
 import { SettingsData } from '../shared/models/settings.models';
 import { colorsReducer } from '../state/reducers/colors.reducer';
 import {
@@ -15,6 +15,7 @@ import { ProfileData } from './models/profile.models';
 import { RecordStatus } from './models/helpers.models';
 import { ButtonActions } from './models/screen.models';
 
+/*
 export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
   page: 1,
   pageSize: 10,
@@ -26,7 +27,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1 ESTE TIITULO PASA A DOS LINEAS',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731-elvis.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731-elvis.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -70,7 +71,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'MOLD RO PRESS 2112',
       hits: 192,
       limit: 200,
-      mainImage: 'assets/images/molds/logistica1.png',
+      mainImagePath: 'assets/images/molds/logistica1.png',
       location: {
         code: 'SAAA-8838745ttdtd-093t3',
         description: 'BAHIA 1',
@@ -114,7 +115,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -158,7 +159,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1 ESTE TIITULO PASA A DOS LINEAS',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -202,7 +203,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'MOLD RO PRESS 2112',
       hits: 192,
       limit: 200,
-      mainImage: 'assets/images/molds/logistica1.png',
+      mainImagePath: 'assets/images/molds/logistica1.png',
       location: {
         code: 'SAAA-8838745ttdtd-093t3',
         description: 'BAHIA 1',
@@ -246,7 +247,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -290,7 +291,8 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1 ESTE TIITULO PASA A DOS LINEAS',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
+      assets/images/molds/ab01001-999abc2366731-elvis.png
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -334,7 +336,9 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'MOLD RO PRESS 2112',
       hits: 192,
       limit: 200,
-      mainImage: 'assets/images/molds/logistica1.png',
+      mainImagePath: 'assets/images/molds/logistica1.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
+      assets/images/molds/ab01001-999abc2366731-elvis.png
       location: {
         code: 'SAAA-8838745ttdtd-093t3',
         description: 'BAHIA 1',
@@ -378,7 +382,7 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
       name: 'PRENSA 1',
       hits: 0,
       limit: 20,
-      mainImage: 'assets/images/molds/ab01001-999abc2366731.png',
+      mainImagePath: 'assets/images/molds/ab01001-999abc2366731.png',
       location: {
         code: 'jjdsss-88656ttdtd-00202',
         description: 'PRODUCCION',
@@ -419,9 +423,10 @@ export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
     },
   ],
 };
+*/
 
 export const sampleSettings: SettingsData = {
-  waitingColor: '.lightgrey',
+  waitingColor: 'meter-20',
   okColor: '#229954',
   warningColor: '#F5B041',
   alarmedColor: '#E74C3C',
@@ -432,6 +437,9 @@ export const sampleSettings: SettingsData = {
   },
   animate: false,
   timeOutFortDialog: 15,
+  catalog: {
+    pageSize: 50,
+  }
 };
 
 export const sampleProfile: ProfileData = {
@@ -455,6 +463,9 @@ export const sampleColors: ColorsData = {
     ok: Colors.green,
     warn: Colors.orange,
     alarm: '#E42217', // Colors.orangered,
+    warnFore: Colors.white,
+    okFore: Colors.white,
+    alarmFore: Colors.white,
     none: Colors.none,
   },
   page: {

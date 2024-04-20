@@ -200,6 +200,7 @@ mat-icon {
 
 button:disabled {
   color: var(--z-colors-page-button-disabled-fore) !important;
+  fill: var(--z-colors-page-button-disabled-fore) !important;
   background-color: var(
     --z-colors-page-button-disabled-background-color
   ) !important;
@@ -325,6 +326,10 @@ mat-card {
   @include mixins.flexbox(row, wrap, 1px, flex-start);
 }
 
+.simple-flex-columns {
+  @include mixins.flexbox(column, wrap, 1px, flex-start);
+}
+
 .legacy-warn {
   background-color: var(--theme-warn-500) !important;
   color: var(--theme-warn-contrast-500) !important;
@@ -347,7 +352,7 @@ mat-card {
 }
 
 .menu-button {
-  color: var(--z-colors-page-button-normal-fore-color) !important;
+  color: var(--z-colors-page-button-normal-fore-color);
 }
 
 .menu-container {
@@ -395,4 +400,19 @@ mat-tab-group {
 .pulse-with-warn {
   animation: pulse-warn 1s infinite;
   box-shadow: 0 0 0 0.5em rgba(#fff, 0);
+}
+
+
+.pulse-with-accent {
+  animation: pulse-accent 1s infinite;
+  box-shadow: 0 0 0 0.5em rgba(#fff, 0);
+}
+
+.no-data-message {
+  font-size: 24px;
+  font-weight: 500;
+  margin: 25px;
+  padding: 15px;
+  border: 2px solid var(--z-colors-page-tab-border-color) !important;
+  border-radius: 8px;
 }

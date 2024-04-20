@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { SearchBox, ShowElement, ToolbarElement, ToolbarButtons, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, } from '../models/screen.models';
+import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, } from '../models/screen.models';
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { DatePipe } from '@angular/common';
 import { CapitalizationMethod, DatesDifference } from '../models/helpers.models';
-
 interface buttonState {
   action?: ButtonActions;
   enabled: boolean;
@@ -15,109 +14,145 @@ interface buttonState {
 })
 
 export class SharedService {
-  private textToSearch: BehaviorSubject<SearchBox> = new BehaviorSubject<SearchBox>({ textToSearch: '', from: '' });
-  search: Observable<SearchBox> = this.textToSearch.asObservable();
+  private searchBehaviorSubject: BehaviorSubject<SearchBox> = new BehaviorSubject<SearchBox>({ textToSearch: '', from: '' });
+  search: Observable<SearchBox> = this.searchBehaviorSubject.asObservable();
 
-  private buttonActionToDo: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1 });
-  toolbarAction: Observable<ToolbarButtonClicked> = this.buttonActionToDo.asObservable();
+  private toolbarActionBehaviorSubject: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1, field: '' });
+  toolbarAction: Observable<ToolbarButtonClicked> = this.toolbarActionBehaviorSubject.asObservable();
 
-  private handleButtonState: BehaviorSubject<buttonState> = new BehaviorSubject<buttonState>({ action: undefined, enabled: true });
-  buttonStateChange: Observable<buttonState> = this.handleButtonState.asObservable();
+  private buttonStateChangeBehaviorSubject: BehaviorSubject<buttonState> = new BehaviorSubject<buttonState>({ action: undefined, enabled: true });
+  buttonStateChange: Observable<buttonState> = this.buttonStateChangeBehaviorSubject.asObservable();
 
-  private handleSnackMessage: BehaviorSubject<SnackMessage> = new BehaviorSubject<SnackMessage>({ message: '', duration: 0, buttonText: '', icon: '', snackClass: '', buttonIcon: '' });
-  snackMessage: Observable<SnackMessage> = this.handleSnackMessage.asObservable();
+  private snackMessageBehaviorSubject: BehaviorSubject<SnackMessage> = new BehaviorSubject<SnackMessage>({ 
+    message: '',
+    duration: 0,
+    buttonText: '',
+    icon: '',
+    snackClass: '',
+    buttonIcon: '',
+  });
+  snackMessage: Observable<SnackMessage> = this.snackMessageBehaviorSubject.asObservable();
   
-  private showSearchBox: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
-  showSearch: Observable<ShowElement> = this.showSearchBox.asObservable();
+  private showSearchBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showSearch: Observable<ShowElement> = this.showSearchBehaviorSubject.asObservable();
 
-  private showGeneralLoader: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
-  showLoader: Observable<ShowElement> = this.showGeneralLoader.asObservable();
+  private showLoaderBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showLoader: Observable<ShowElement> = this.showLoaderBehaviorSubject.asObservable();
 
-  private toolbar: BehaviorSubject<ToolbarElement> = new BehaviorSubject<ToolbarElement>({ from: '', toolbarClass: 'toolbar-grid', dividerClass: 'divider', show: false, buttons: [] });
-  showToolbar: Observable<ToolbarElement> = this.toolbar.asObservable();
+  private toolbarBehaviorSubject: BehaviorSubject<ToolbarControl> = new BehaviorSubject<ToolbarControl>({ 
+    from: '',
+    toolbarClass: 'toolbar-grid',
+    dividerClass: 'divider',
+    show: false,
+    showSpinner: false,
+    elements: [],
+    alignment: 'right',
+   });
+  showToolbar: Observable<ToolbarControl> = this.toolbarBehaviorSubject.asObservable();
 
-  private toolbarWidth: BehaviorSubject<number> = new BehaviorSubject<number>(0);
-  showToolbarWidth: Observable<number> = this.toolbarWidth.asObservable();
+  private showToolbarWidthBehaviorSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  showToolbarWidth: Observable<number> = this.showToolbarWidthBehaviorSubject.asObservable();
 
-  private showGeneralProgressBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
-  showProgressBar: Observable<ShowElement> = this.showGeneralProgressBar.asObservable();
+  private showProgressBarBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showProgressBar: Observable<ShowElement> = this.showProgressBarBehaviorSubject.asObservable();
 
-  private showGeneralScrollBar: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
-  showScrollBar: Observable<ShowElement> = this.showGeneralScrollBar.asObservable();
+  private showScrollBarBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
+  showScrollBar: Observable<ShowElement> = this.showScrollBarBehaviorSubject.asObservable();
 
-  private showGoTopButton: BehaviorSubject<GoTopButtonStatus> = new BehaviorSubject<GoTopButtonStatus>({ from: '', status: 'inactive' });
-  showGoTop: Observable<GoTopButtonStatus> = this.showGoTopButton.asObservable();
+  private showGoTopBehaviorSubject: BehaviorSubject<GoTopButtonStatus> = new BehaviorSubject<GoTopButtonStatus>({ from: '', status: 'inactive' });
+  showGoTop: Observable<GoTopButtonStatus> = this.showGoTopBehaviorSubject.asObservable();
 
-  private routeAnimationFinished: BehaviorSubject<animationStatus> = new BehaviorSubject<animationStatus>({ toState: '', fromState: '', isFinished: false });
-  isAnimationFinished: Observable<animationStatus> = this.routeAnimationFinished.asObservable();
+  private isAnimationFinishedBehaviorSubject: BehaviorSubject<animationStatus> = new BehaviorSubject<animationStatus>({ toState: '', fromState: '', isFinished: false });
+  isAnimationFinished: Observable<animationStatus> = this.isAnimationFinishedBehaviorSubject.asObservable();
 
-  private pulseSecond: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
-  pastSecond: Observable<boolean> = this.pulseSecond.asObservable();
+  private pastSecondBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  pastSecond: Observable<boolean> = this.pastSecondBehaviorSubject.asObservable();
+
+  private timeBehaviorSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  timeInterval: Observable<number> = this.timeBehaviorSubject.asObservable();
+
+  private stopTimerBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  stopTimer: Observable<boolean> = this.stopTimerBehaviorSubject.asObservable();
+
+  private timeCompletedBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  timeCompleted: Observable<boolean> = this.timeCompletedBehaviorSubject.asObservable();
+  
+  private scrollbarInToolbarBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  scrollbarInToolbar: Observable<boolean> = this.scrollbarInToolbarBehaviorSubject.asObservable();
 
   constructor (
     public snackBar: MatSnackBar,
-    public datePipe: DatePipe,
+    public datePipe: DatePipe,    
   ) {}
 
 // Functions ================
   setText(textToSearch: string, from: string) {
-    this.textToSearch.next({ textToSearch, from });
+    this.searchBehaviorSubject.next({ textToSearch, from });
   }
 
   setButtonState(action: ButtonActions, enabled: boolean) {
-    this.handleButtonState.next({ action, enabled });
+    this.buttonStateChangeBehaviorSubject.next({ action, enabled });
   }
 
-  setToolbarClick(action: ButtonActions, from: string, buttonIndex: number) {
-    this.buttonActionToDo.next({ action, from, buttonIndex });
+  setToolbarClick(action: ButtonActions, from: string, buttonIndex: number, field: string, ) {
+    this.toolbarActionBehaviorSubject.next({ action, from, buttonIndex, field });
   }
 
   setSearchBox(from: string, showSearchBox: boolean) {
-    this.showSearchBox.next({ from, show: showSearchBox });
+    this.showSearchBehaviorSubject.next({ from, show: showSearchBox });
   }
 
   setGeneralLoading(from: string, showLoading: boolean) {
-    this.showGeneralLoader.next({ from, show: showLoading });
+    this.showLoaderBehaviorSubject.next({ from, show: showLoading });
   }
 
   setGeneralProgressBar(from: string, showProgress: boolean) {
-    this.showGeneralProgressBar.next({ from, show: showProgress });
+    this.showProgressBarBehaviorSubject.next({ from, show: showProgress });
   }
   
-  setToolbar(from: string, showToolbar: boolean, toolbarClass: string, dividerClass: string, buttons: ToolbarButtons[]) {
-    this.toolbar.next({ from, show: showToolbar, toolbarClass, dividerClass, buttons });
+  setToolbar(toolbarControl: ToolbarControl) {
+    this.toolbarBehaviorSubject.next(toolbarControl);
   }
 
   setToolbarWidth(width: number) {
-    this.toolbarWidth.next(width);
+    this.showToolbarWidthBehaviorSubject.next(width);
   }
   
   setGeneralScrollBar(from: string, showScrollBar: boolean) {
-    this.showGeneralScrollBar.next({ from, show: showScrollBar });
+    this.showScrollBarBehaviorSubject.next({ from, show: showScrollBar });
   }
 
   setGoTopButton(from: string, status: string) {
-    this.showGoTopButton.next({ from, status });
+    this.showGoTopBehaviorSubject.next({ from, status });
   }
 
   SetAnimationFinished(fromState: string, toState: string, isFinished: boolean) {
-    this.routeAnimationFinished.next({ fromState, toState, isFinished });
+    this.isAnimationFinishedBehaviorSubject.next({ fromState, toState, isFinished });
   }
 
   setTimer() {
     const source = interval(1000);
-    const subscribe = source.subscribe(val => this.pulseSecond.next(true));    
+    const subscribe = source.subscribe(val => this.pastSecondBehaviorSubject.next(true));    
   }
 
-  showSnackMessage(message: string, duration: number = 0, snackClass: string = 'snack-primary', buttonText: string = '', icon: string = '', buttonIcon: string = '') {
-    this.handleSnackMessage.next({
-      message,
-      duration,
-      snackClass,
-      buttonText,
-      icon,
-      buttonIcon,
-    })      
+  setToolbarTime(interval: number) {
+    this.timeBehaviorSubject.next(interval);
+  }
+
+  setToolbarStopTimer(stopTimer: boolean) {
+    this.stopTimerBehaviorSubject.next(stopTimer);
+  }
+
+  setTimeCompleted(timeCompleted: boolean) {
+    this.timeCompletedBehaviorSubject.next(timeCompleted);
+  }
+
+  setScrollbarInToolbar(showScrollBar: boolean) {
+    this.scrollbarInToolbarBehaviorSubject.next(showScrollBar);
+  }
+
+  showSnackMessage(snackMessage: SnackMessage) {
+    this.snackMessageBehaviorSubject.next(snackMessage)      
   }
 
   substractDates(dateFrom: any, dateTo: any, format: string): any {
@@ -147,24 +182,30 @@ export class SharedService {
     return result;
   }
 
-  labelElapsedTime(dateFrom: any): string {
-    if (!dateFrom) {
+  labelElapsedTime(date: any): string {
+    if (!date) {
       return '';
     }
     
+    let dateFrom: number = 0; 
     try {
-      dateFrom = new Date(dateFrom.replace(/-/g,'/'));
+      dateFrom = Date.parse(date);
     } catch (error) {
-      return 'error df';
+      try {
+
+      } catch (error) {
+        dateFrom = Date.parse(new Date(date.replace(/-/g,'/')).toString());
+        return 'error df';
+      }      
     }      
 
-    const dateTo: any = new Date();
+    const dateTo: number = Date.parse(new Date().toString());
     let result = Math.round((dateTo - dateFrom) / 1000);
     if (result < 3) {
       return $localize `Justo ahora`;
     } else if (result < 5) {
       return $localize `Hace un momento...`;
-    } else if (result < 30) {
+    } else if (result < 45) {
       return $localize `Hace ${result} segundos`;
     } else if (result < 60) {
       return $localize `Hace menos de un minuto`;
@@ -295,5 +336,29 @@ export class SharedService {
     return this.datePipe.transform(new Date(date), format).replace(/p. m./gi, 'PM').replace(/a. m./gi, 'AM');
   }
 
+  lookIntoObject(object: any, cad: string): boolean {
+    for (let key in object) {
+      if (object[key]) {
+        if (typeof object[key] === 'object') {
+          const objectMatch = this.lookIntoObject(object[key], cad);
+          if (objectMatch) return true;
+        } else {
+          const value = object[key]?.toString();
+          if (value?.toLowerCase().includes(cad.toLowerCase())) {
+            return true;
+          }        
+        }
+      }
+    }
+    return false;
+  }
+
+  filter(dataToFilter: any[], cad: string): any[] {    
+    if (!cad) {
+      return dataToFilter;
+    }
+    return dataToFilter.filter(item => this.lookIntoObject(item, cad));    
+  }
+  
 // End ======================
 }

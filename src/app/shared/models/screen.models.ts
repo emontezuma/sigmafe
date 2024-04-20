@@ -22,6 +22,7 @@ export interface Screen  {
 
 export enum ButtonActions {
     START = 'start',
+    NEW = 'new',
     SAVE = 'save',
     CANCEL = 'cancel',
     EXPORT_TO_EXCEL = 'exportToExcel',
@@ -29,14 +30,31 @@ export enum ButtonActions {
     RELOAD = 'reload',
     UPLOAD_FILE = 'uploadFile',
     RESET = 'reset',
+    ALL = 'all',
+    WARNED = 'warned',
+    ALARMED = 'alarmed',
+    YELLOW = 'yellow',
+    RED = 'red',
+    DODGERBLUE = 'dodgerblue',
+    ORANGE = 'orange',
+    GREEN = 'green',
 }
-export interface ToolbarButtons  {
-    type: 'button' | 'divider' | 'searchbox';
+
+export enum MoldStates {
+    IN_PRODUCTION = 'in-production',
+    IN_WAREHOUSE = 'in-warehouse',
+    IN_REPAIRING = 'in-reparing',
+    OUT_OF_SERVICE = 'out-of-service',
+}
+export interface ToolbarElement  {
+    type: 'button' | 'divider' | 'searchbox' | 'button-menu' | 'label' | 'spinner' ;
+    field?: string; 
     caption?: string;
     tooltip?: string;
     icon?: string;
     iconSize?: string;
     class?: string;
+    classAlarmed?: string;
     disabled?: boolean;
     locked?: boolean;
     showCaption?: boolean;
@@ -44,6 +62,7 @@ export interface ToolbarButtons  {
     showTooltip?: boolean;
     action?: ButtonActions;
     loading?: boolean;
+    options?: SimpleMenuOption[];
 }
 export interface SharedState {
     screen: Screen;
@@ -66,7 +85,8 @@ export interface SnackMessage {
 export interface ToolbarButtonClicked {
     action: ButtonActions | undefined;
     from: string;
-    buttonIndex: number,
+    buttonIndex: number;
+    field: string;
 }
 
 export interface ShowElement {
@@ -85,18 +105,21 @@ export interface GoTopButtonStatus {
     status: string;
 }
 
-export interface ToolbarElement {
+export interface ToolbarControl {
     from: string;
-    show: boolean;
-    toolbarClass: string;
-    dividerClass: string;
-    buttons: ToolbarButtons[];
+    show: boolean;    
+    showSpinner?: boolean;    
+    toolbarClass?: string;
+    dividerClass?: string;
+    elements: ToolbarElement[];
+    alignment?: string;
 }
 
 export enum ApplicationModules {
     MOLDS_HITS_VIEW = 'molds-hits-view',
     CHECKLIST_FILLING = 'checklist-filling',
     GENERAL = 'general',
+    MOLDS_CATALOG = 'molds-catalog',
 }
 
 export enum ScreenSizes {
@@ -105,9 +128,10 @@ export enum ScreenSizes {
 }
 
 export interface SimpleMenuOption {
-    icon: string;
-    caption: string;
+    icon?: string;    
+    caption?: string;
     template?: string;
     value: string;
+    default?: boolean;
 }
 

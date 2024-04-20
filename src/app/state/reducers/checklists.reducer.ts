@@ -22,7 +22,7 @@ export const checklistFillingReducer = createReducer(
   
   on(checklistFillingActions.loadedChecklistFillingData, (state, { checklistFillingData } ) => ({ ...state, loading: false, checklistFillingData })),
   
-  on(checklistFillingActions.updateChecklistQuestion, (state, { item }) => {
+  on(checklistFillingActions.updateChecklistQuestion, (state, { item } ) => {
     const checkForAlrmedQuestion = (answer: string, alarms: ChecklistAlarms[]): boolean => {
       return alarms.some((alarmedValues) => {
         const sign = alarmedValues.comparison || '==';

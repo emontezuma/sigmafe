@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef, DoCheck, AfterContentInit, NgZone } from '@angular/core';
+import { Component, Input, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { Store } from '@ngrx/store';
 
 import { ChecklistAnswerType, ChecklistFillingItem, ChecklistQuestionStatus } from '../../models/checklists.models';
@@ -19,6 +19,7 @@ import { ButtonActions } from 'src/app/shared/models/screen.models';
 export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('questionCard') questionCard: ElementRef;
   @Input() item: ChecklistFillingItem;
+  @Input() view: string;
   @Input() inactive: boolean;
 
   chartOption: EChartsOption = {

@@ -4,6 +4,7 @@
     border-radius: 5px;
     border-top: 3px solid transparent;    
     counter-reset: counter;
+    margin-bottom: 5px
 }
 
 .meter-0 {
@@ -30,12 +31,20 @@
     background-color: var(--z-colors-status-alarm);    
 }
 
+.meter-12 {
+    background-color: var(--z-colors-status-warn);    
+}
+
 .meter-20 {
-    color: var(--z-colors-page-general-background);    
+    color: var(--z-colors-page-fore);    
 }
 
 .meter-21 {
-    color: var(--z-colors-page-fore);    
+    color: var(--z-colors-status-alarm-fore) !important;    
+}
+
+.meter-22 {
+    color: var(--z-colors-status-warn-fore) !important;    
 }
 
 .meter-30 {
@@ -87,9 +96,19 @@ mat-card-title {
 .card {
     height: 100%;
     width: 100%;
-    max-width: 400px;
-    min-width: 350px;
-    border-radius: 10px 0px;
+    // max-width: 400px;
+    // min-width: 350px;
+    border-radius: 10px 0px;    
+    flex: 1;
+}
+
+.card-wide {    
+    height: 100%;
+    border-radius: 10px 0px;    
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    margin: 0px 5px;
 }
 
 .card-image {
@@ -97,16 +116,16 @@ mat-card-title {
 }
 
 .mold-hits {
-    @include mixins.flexbox(row, wrap, 1px, end);    
+    @include mixins.flexbox(row, wrap, 5px, end);    
     font-size: 5rem;
     font-weight: 700;
-    border: 3px solid;
-    border-radius: 8px 0px;
+    border: 5px solid;
+    border-radius: 5px;
     width: fit-content;
     margin: 10px;
     margin-left: auto;
     align-content: center;
-    padding: 2px;
+    padding: 4px;
 }
 
 .divider {
@@ -141,13 +160,27 @@ mat-card-title {
 
 .mold-image {
     width: inherit;
-    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+    margin: auto;
+    border: 3px solid rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    padding: 3px;
 }
 
 .image-container {    
     height: 140px;    
     position: relative;
     padding: 10px;
+    display: flex
+}
+
+.image-container-wide {    
+    height: 140px;    
+    width: 140px;    
+    position: relative;
+    padding: 10px;
+    display: flex
 }
 
 .molds-hits-data {
@@ -155,7 +188,8 @@ mat-card-title {
 }
 
 .maintenance {
-    @include mixins.flexbox(row, nowrap, 1px, space-between);   
+    margin-top: 10px;
+    @include mixins.flexbox(row, nowrap, 5px, space-between);   
 }
 
 .column {
@@ -174,8 +208,7 @@ mat-card-title {
 }
 
 .progress {
-    margin-top: 5px;
-    margin-bottom: -9px;
+    margin-top: -7px;
 }
 
 .last-hit {
@@ -187,6 +220,8 @@ mat-card-title {
 .spinner {
     align-self: center;
     margin-left: 10px;
+    margin-top: 10px;
+
 }
 
 .label {
@@ -197,4 +232,214 @@ mat-card-title {
 .label::before { 
     counter-increment: counter;
     content: "(" counter(counter) ") ";
+}
+
+.corner {
+    width: 0;
+    height: 0;
+    margin-left: -20px;
+    border-bottom: 35px solid transparent;
+    border-left: 35px solid;
+    border-radius: 8px;
+    top: -3px;
+    left: 17px;
+    position: absolute;    
+}
+
+.border-yellow {
+    border: 6px solid yellow !important;
+}
+
+.border-blue {
+    border: 6px solid dodgerblue !important;
+}
+
+.border-red {
+    border: 6px solid red !important;
+}
+
+.border-orange {
+    border: 6px solid orange !important;
+}
+
+.border-green {
+    border: 6px solid green !important;
+}
+
+.text-wide {
+    flex: 2;    
+}
+
+.title-wide {
+    font-size: 4.6rem;
+    @include mixins.text-ellipsis();
+    line-height: 46px;
+}
+
+.label-wide {
+    font-size: 20px !important;
+}
+
+.square-wide {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    flex: 2;
+}
+
+.right-wide {
+    margin-left: auto;
+    padding: 10px;
+    flex: 1;
+}
+
+.last-hit-wide {
+    text-align: right;    
+    margin-bottom: 5px;
+    margin-top: 10px;    
+    font-size: 2rem !important;
+}
+
+.number-container-wide {
+    display: flex;
+    position: relative;
+    width: 65px;
+    height: 80px;
+    border: 0.5px solid var(--z-colors-page-border);
+    border-radius: 3px;
+}
+
+.number-wide {        
+    flex: 1;
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: 6px;
+    margin-top: 25px;
+}
+
+.mold-hits-wide {
+    @include mixins.flexbox(row, wrap, 5px, end);    
+    font-size: 8rem;
+    font-weight: 700;
+    border: 5px solid;
+    border-radius: 5px;
+    width: fit-content;
+    margin: 10px 0px;
+    margin-left: auto;
+    align-content: center;
+    padding: 4px;
+}
+
+.molds-hits-data-wide {
+    @include mixins.flexbox(row, wrap, 1px, end, normal);    
+}
+
+.subtitle-wide {
+    color: unset;   
+    font-size: 3rem !important;
+    @include mixins.text-ellipsis();
+    line-height: 50px;
+    padding: 0px 10px;
+}
+
+.bold {
+    font-weight: 900;
+}
+
+.shadow {    
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.label-sub-wide {
+    font-size: 1.7rem;
+    line-height: 2.4rem;
+    @include mixins.text-ellipsis();
+}
+
+.label-sub-wide::before { 
+    counter-increment: counter;
+    content: "(" counter(counter) ") ";
+}
+
+.mold-hits-box-wide {
+    display: flex;
+    flex-direction: column;
+}
+
+.hits-label-wide {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.mold-hits-spinner-wide {
+    margin-top: 8px;
+    line-height: 0px;
+}
+
+.mold-hits-pct-box-wide {
+    margin-left: 10px;
+}
+
+.item-number-wide {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin-left: 5px;
+    font-size: 36px;
+    margin-bottom: 5px;
+    background-color: rgb(112, 112, 112);
+    color: white;
+    padding: 0px 3px;
+    border-radius: 6px;
+    line-height: 36px;
+    text-align: center;
+}
+
+.odd-color {
+    background-color: rgba(0, 0, 0, 0.075) !important;
+}
+
+.simple-flex-columns {
+    align-items: flex-start !important;    
+}
+
+.simple-flex {
+    width: 100%;
+}
+
+.burble {
+    font-size: 2.1rem;
+    @include mixins.text-ellipsis();
+    line-height: 22px;
+    border-radius: 8px 0px;
+    padding: 5px;
+    margin-left: auto;
+    color: var(--z-colors-white);
+}
+
+.state-green {
+    border: 2px solid var(--z-colors-green);
+    background-color: var(--z-colors-green);    
+}
+    
+.state-black {
+    border: 2px solid var(--z-colors-black);
+    background-color: var(--z-colors-black);
+}
+
+.state-orangered {
+    border: 2px solid var(--z-colors-orangered);
+    background-color: var(--z-colors-orangered);
+}
+
+.state-dodgerblue {
+    border: 2px solid var(--z-colors-dodgerblue);
+    background-color: var(--z-colors-dodgerblue);
+}
+
+.state-null {
+    border: none;
+    background-color: transparent;
 }

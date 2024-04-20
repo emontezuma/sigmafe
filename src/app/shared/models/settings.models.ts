@@ -12,9 +12,14 @@ export interface SettingsData {
     levelAlert: LevelAlert;
     animate: boolean;
     timeOutFortDialog: number;
+    catalog: SettingsCatalog;
 }
 
 export interface SettingsState {
     loading: boolean;
     settingsData: SettingsData;
+}
+
+export interface SettingsCatalog {
+    pageSize?: number;    
 }

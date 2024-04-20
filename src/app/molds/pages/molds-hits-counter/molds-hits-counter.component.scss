@@ -15,7 +15,12 @@ mat-card {
 }
 
 .cards-container {
-    @include mixins.grid(10px, 8, space-evenly, 350px, 5px);
+    // @include mixins.grid(10px, 8, space-evenly, 350px, 5px);    
+    @include mixins.flexbox(column, wrap, 0px, flex-start);
+}
+
+.mold-container {
+    width: 100%;
 }
 
 .loader {

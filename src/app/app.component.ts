@@ -4,9 +4,8 @@ import { Platform } from '@angular/cdk/platform';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatSnackBar } from "@angular/material/snack-bar";
 
-import { Screen, ScreenSizes, ShowElement, ToolbarElement } from './shared/models/screen.models'; 
+import { Screen, ScreenSizes, ShowElement, ToolbarControl } from './shared/models/screen.models'; 
 import { SharedService } from './shared/services/shared.service'; 
-import { ColorsService } from './shared/services/colors.service'; 
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve, fromTop } from '../app/shared/animations/shared.animations';
@@ -16,7 +15,8 @@ import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
-import { SnackComponent } from "./shared/components/snack/snack.component";
+import { SnackComponent } from "./shared/components";
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -50,11 +50,12 @@ export class AppComponent implements AfterViewInit {
   withToolbar = true;
   toggleSlider = false;
   loading = false;
-  toolbarData: ToolbarElement;
+  toolbarData: ToolbarControl;
   progressBarData: ShowElement;
-  scrollBarData: ShowElement;
+  scrollbarData: ShowElement;
+  scrollbarInToobar: boolean = false;
   onTopStatus: string  = 'inactive';
-  outletPosition =  '48px';
+  outletHeight = '100%';
   invalidSize = false;
   toolbarWidth: number = 0;
   toolbarCurrentSize: ScreenSizes = ScreenSizes.SMALL;
@@ -64,8 +65,11 @@ export class AppComponent implements AfterViewInit {
   profileDataSubscriber: Subscription;
   profileData: ProfileData;
   avatar: string = '';
-  // allHeight: number = 300;
-  allHeight = window.innerHeight - 50;
+  tmpUpdateHits: any;
+  
+  allHeight: number = 300;
+  toolbarHeight: number = 0;
+  // allHeight = window.innerHeight - 190;
   displayNameMap = new Map([
     [Breakpoints.Handset, 'Handset'],
     [Breakpoints.HandsetLandscape, 'HandsetLandscape'],
@@ -91,7 +95,7 @@ export class AppComponent implements AfterViewInit {
     private snackBar: MatSnackBar,
     private changeDetectorRef: ChangeDetectorRef,
     ) {
-      breakpointObserver
+      this.breakpointObserver
       .observe([
         Breakpoints.Handset,
         Breakpoints.HandsetLandscape,
@@ -120,6 +124,10 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
+    this.tmpUpdateHits = new FormGroup({
+      id: new FormControl(null, Validators.required),
+      hits: new FormControl(null, Validators.required),
+    })
     this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
       this.profileData = profileData;
     });    
@@ -132,17 +140,17 @@ export class AppComponent implements AfterViewInit {
       this.toolbarData = toolbar;
       this.calculateOutletPosition();   
     });
-    this.sharedService.showScrollBar.subscribe((scrollBarData) => {
-      this.scrollBarData = scrollBarData;        
+    this.sharedService.showScrollBar.subscribe((scrollbarData) => {
+      this.scrollbarData = scrollbarData;        
+    });
+    this.sharedService.scrollbarInToolbar.subscribe((scrollbarData) => {
+      this.scrollbarInToobar = scrollbarData;        
     });
     this.sharedService.showToolbarWidth.subscribe((width) => {
       this.toolbarWidth = width + 60;
     });
     this.sharedService.showProgressBar.subscribe((progressBar) => {
-      setTimeout(() => {
-        this.progressBarData = progressBar;
-        this.calculateOutletPosition();  
-      }, 1000);      
+      this.progressBarData = progressBar;      
     });
     this.sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
@@ -165,11 +173,16 @@ export class AppComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.mainProgressBar.changes.subscribe((components: QueryList<ElementRef>) => {
-      components.forEach((component: any) => {
-        component._elementRef.nativeElement.style.setProperty('--mdc-linear-progress-track-color', 'white');     
-      })
-    });
+    // this.mainProgressBar.changes.subscribe((components: QueryList<ElementRef>) => {
+    //   components.forEach((component: any) => {
+    //     component._elementRef.nativeElement.style.setProperty('--mdc-linear-progress-track-color', 'white');     
+    //   })
+    // });
+
+    const progressBars = document.getElementsByName("active-progress-bar");
+    progressBars.forEach((element) => {
+      element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
+    })
   }
  
 // Functions ================
@@ -179,9 +192,11 @@ export class AppComponent implements AfterViewInit {
     }  
   }
 
-  calculateOutletPosition() {
-    this.outletPosition = (48  + (this.progressBarData?.show ? 5 : 0)).toString() + 'px';
-    this.allHeight = window.innerHeight - 92  - (this.progressBarData?.show ? 5 : 0) - (this.toolbarData.show && this.toolbarCurrentSize !== ScreenSizes.SMALL ? 64 : 0);
+  calculateOutletPosition() {        
+    const toolbarHeight = this.scrollbarInToobar ? 80 : 61;
+    this.toolbarHeight = toolbarHeight - 61;
+    this.allHeight = (window.innerHeight - 98)  - (this.toolbarData.show ? (toolbarHeight + 15) : 0);
+    this.outletHeight = (window.innerHeight - 106) + 'px';
   }
 
   handlerScreenSizeChange(screen: Screen | null) {
@@ -224,7 +239,10 @@ export class AppComponent implements AfterViewInit {
   toolbarAnimationStarted(e: any) {
     this.toolbarAnimated = false;
   }
-  
+
+  updateHit() {
+    this.tmpUpdateHits.reset();
+   }  
 
 // End ======================
 }

@@ -159,6 +159,22 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "external_link",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/external_link.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "record",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/record.svg")
+    );  
+    iconRegistry.addSvgIcon(
+      "flash",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/flash.svg")
+    );  
+    iconRegistry.addSvgIcon(
+      "palette",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/palette.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "document",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/document.svg")
     );    
   }
 }

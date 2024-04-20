@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { routingAnimation, dissolve, fastDissolve, fromTop } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
-import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarButtons } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarElement } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { SettingsData } from 'src/app/shared/models/settings.models';
@@ -17,7 +17,7 @@ import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistFillingData, Che
 import { Subscription } from 'rxjs';
 import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
 import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
-import { GenericDialogComponent } from 'src/app/shared/components/generic-dialog/generic-dialog.component';
+import { GenericDialogComponent } from 'src/app/shared/components';
 import { DatesDifference, RecordStatus, CapitalizationMethod } from 'src/app/shared/models/helpers.models';
 
 @Component({
@@ -28,8 +28,8 @@ import { DatesDifference, RecordStatus, CapitalizationMethod } from 'src/app/sha
 })
 export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
-  @ViewChild('checklistFilling') private moldsQueryList: ElementRef;
-  @ViewChildren('questions') private questions: QueryList<ElementRef>;
+  @ViewChild('checklistFilling') private checklistFilling: ElementRef;
+  @ViewChildren('questionCards') private questionCards: QueryList<ElementRef>;
   
 // Variables ===============
   panelOpenState: boolean[] = [];
@@ -77,7 +77,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   loading: boolean = true;
   animate: boolean = true;
   animatingQuestion: boolean = false;
-  buttons: ToolbarButtons[] = [];
+  elements: ToolbarElement[] = [];
   onTopStatus: string  = 'inactive';
   goTopButtonTimer: any;
   loaded: boolean = false;  
@@ -235,7 +235,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       }
       if (!this.loading) {
         if (this.loadFromButton > -1) {          
-          this.buttons[this.loadFromButton].loading = false;
+          this.elements[this.loadFromButton].loading = false;
           this.loadFromButton = -1;          
         }
         this.checklistTotalization();
@@ -245,8 +245,9 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
       if (goTop.status === 'temp') {
         this.onTopStatus = 'active';
-        this.moldsQueryList.nativeElement.scrollIntoView({
+        this.checklistFilling.nativeElement.scrollIntoView({
           behavior: 'smooth',
+          block: 'start',
         });
         // Ensure
       }      
@@ -270,19 +271,21 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     chip.forEach((element) => {
       // element?.style.setProperty('--mdc-chip-label-text-color', 'var(--theme-warn-contrast-500)');     
     });
-    this.questions.changes.subscribe((components: QueryList<ElementRef>) => {
-      
+    this.questionCards.changes.subscribe((components: QueryList<ElementRef>) => {
+      console.log(components);
     });    
   }
 
   ngOnDestroy(): void {
-    this.sharedService.setToolbar(
-      ApplicationModules.CHECKLIST_FILLING,
-      false,
-      '',
-      '',
-      this.buttons,
-    );
+    this.sharedService.setToolbar({
+      from: ApplicationModules.CHECKLIST_FILLING,
+      show: false,
+      showSpinner: false,
+      toolbarClass: '',
+      dividerClass: '',
+      elements: [],
+      alignment: 'right',
+    });
     this.sharedService.setGeneralScrollBar(
       ApplicationModules.CHECKLIST_FILLING,
       false,
@@ -301,14 +304,16 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   animationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
-        this.calcButtons();
-        this.sharedService.setToolbar(
-          ApplicationModules.CHECKLIST_FILLING,
-          true,
-          'toolbar-grid',
-          'divider',
-          this.buttons,
-        );
+        this.calcElements();
+        this.sharedService.setToolbar({
+          from: ApplicationModules.CHECKLIST_FILLING,
+          show: true,
+          showSpinner: true,
+          toolbarClass: 'toolbar-grid',
+          dividerClass: 'divider',
+          elements: this.elements,
+          alignment: 'left',
+        });
         this.sharedService.setGeneralScrollBar(
           ApplicationModules.CHECKLIST_FILLING,
           true,
@@ -321,8 +326,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  calcButtons() {    
-    this.buttons = [{
+  calcElements() {    
+    this.elements = [{
       type: 'button',
       caption: $localize`Iniciar`,
       tooltip:  $localize`Inicia éste checklist`,
@@ -647,7 +652,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       this.evaluateButtons();
       this.store.dispatch(loadChecklistFillingData());   
     } else {
-      this.buttons[action.buttonIndex].loading = false;
+      this.elements[action.buttonIndex].loading = false;
     }    
   }
 
@@ -686,7 +691,14 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   showInactiveMessage() : void {
     const message = $localize`El checklist <strong>está inactivo</strong> debe comunicarse con el administrador del sistema`;
-    this.sharedService.showSnackMessage(message, 0, 'snack-primary', '', '', 'delete');
+    this.sharedService.showSnackMessage({
+      message,      
+      duration: 0,
+      snackClass: 'snack-primary',
+      icon: '',
+      buttonText: '',
+      buttonIcon: '',
+  });
   }
 
   showInactiveMessage2(): void {

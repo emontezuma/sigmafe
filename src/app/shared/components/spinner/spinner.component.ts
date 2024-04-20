@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { Colors, SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models'
+import { ProgressSpinnerMode } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-spinner',
@@ -19,6 +20,7 @@ export class SpinnerComponent implements OnChanges {
   @Input() exhaustedValue: string;
   @Input() smallFont: SmallFont;
   @Input() legacy: string;
+  @Input() spinnerMode: ProgressSpinnerMode = 'determinate';
 
 // Variables ================
   metterClass: string = '';
@@ -37,9 +39,6 @@ export class SpinnerComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    if (+this.previousValue === this.value && this.previousValue !== '') {
-      return;
-    }
     let selectedFontColor:string = Colors.carbon;
     let selectedBarColor:string = Colors.green;
     if (this.limits.length > 0) {
@@ -52,9 +51,12 @@ export class SpinnerComponent implements OnChanges {
     } else if (!this.legacy) {
       this.metterClass = 'meter-0';      
     } else {
-      this.metterClass = this.legacy;      
+      this.metterClass = this.legacy;
     }
     this.progressBarColor = selectedBarColor;
+    if (+this.previousValue === this.value && this.previousValue !== '') {
+      return;
+    }    
     let printExhaustedValue = false;
     if (this.fonts.length === 0) {
       this.fontSize = '1.5rem';

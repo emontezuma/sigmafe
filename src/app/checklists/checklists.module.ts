@@ -2,23 +2,20 @@ import { NgModule } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
 
-import { MaterialModule } from '../material/material.module';
-import { ChecklistFillingComponent } from './pages/checklist-filling/checklist-filling.component';
-import { HomeComponent } from './pages/home/home.component';
+import { MaterialModule } from '../material';
+import { ChecklistFillingComponent, ChecklistsHomeComponent } from './pages';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ChecklistsRoutingModule } from './checklists-routing.module';
-import { SpinnerModule } from '../shared/components/spinner/spinner.module';
-import { LabelEllipsisModule } from '../shared/components/label-ellipsis/label-ellipsis.module';
-import { IconsModule } from '../shared/icons/icons.module';
-import { ImageNotFoundModule } from '../shared/directives/image-not-found.module';
-import { ChecklistFillingItemsComponent } from './components/checklist-filling-item/checklist-filling-item.component';
-import { ToolbarComponent } from './components/question-toolbar/question-toolbar.component';
-import { ReadonlyFieldComponent } from '../shared/components/readonly-field/readonly-field.component';
+import { SpinnerModule, ReadonlyFieldComponent } from '../shared/components';
+import { LabelEllipsisModule } from '../shared/components/label-ellipsis';
+import { IconsModule } from '../shared/icons';
+import { ImageNotFoundModule } from '../shared/directives';
+import { ChecklistFillingItemsComponent, ToolbarComponent } from './components';
 
 @NgModule({
   declarations: [  
     ChecklistFillingComponent,
-    HomeComponent,
+    ChecklistsHomeComponent,
     ChecklistFillingItemsComponent,
     ToolbarComponent,
     ReadonlyFieldComponent,

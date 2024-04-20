@@ -1,19 +1,27 @@
 @use "../../../../assets/styles/mixins";
 
+.container {
+    position: relative;
+}
+
 .toolbar {    
     height: 64px;
     background-color: var(--z-colors-page-shadow) !important;
+    overflow-y: hidden;
+    overflow-x: auto;
 }
 
 .toolbar-grid {
-    @include mixins.flexbox(row, nowrap, 1px, end); 
-    margin-left: auto;
-    width: max-content;
-    padding-left: 10px;
+    @include mixins.flexbox(row, nowrap, 5px, end);     
+    width: max-content;    
+}
+
+.toolbar-left-side {
+    margin-right: auto; 
 }
 
 .toolbar-grid-adjusted {
-    @include mixins.flexbox(row, wrap, 1px, end); 
+    @include mixins.flexbox(row, wrap, 5px, end); 
     margin-left: auto;
     width: max-content;
     padding-left: 10px;
@@ -48,8 +56,9 @@
     cursor: pointer;
 }
 
-.toolbar-button-container {
-    position: relative;
+.toolbar-right-side {
+    @include mixins.flexbox(row, nowrap, 5px, end);
+    margin-left: auto;
 }
 
 .button-locked {        
@@ -73,4 +82,38 @@
     ::ng-deep circle {
         stroke: var(--z-colors-page-button-disabled-fore);   
     }    
+}
+
+.tab-spinner {
+    border-radius: 50%;
+    margin-left: -10px;
+    cursor: pointer;
+}
+
+.tab-spinner-text {
+    font-size: 28px;
+    font-weight: 500 !important;
+    margin-left: 10px;
+    padding: 10px;
+    background-color: lightgray;
+    border: 2px solig rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    color: black;
+}
+
+.overlap-container {
+    height: 56px; 
+}
+
+#scrollbar::-webkit-scrollbar {
+    height: 0.5px;
+    width: 0.5em;
+}
+
+#scrollbar::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.6) !important;
+}
+
+#scrollbar::-webkit-scrollbar-thumb {
+    background-color: #060b9a !important;
 }

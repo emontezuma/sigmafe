@@ -181,16 +181,18 @@ mat-card-footer {
 
 .required {
     font-size: 2.4rem;
-    -webkit-text-stroke: 1px var(--theme-warn-800);
     color: var(--theme-warn-500);
     position: absolute;
     bottom: 0;
     right: 0;
     margin-bottom: 8px;
     margin-right: 10px;
-    cursor: pointer;
-    height: 30px;
-    width: 30px;
+    cursor: help;
+    height: 28px;
+    width: 28px;
+    font-weight: 900;
+    text-align: center;
+    transform: scale(1.7, 1);
 }
 
 .mini-chart {
@@ -199,4 +201,27 @@ mat-card-footer {
     border: 1px solid var(--theme-primary-200);
     width: 90px;
     height: 50px;
+}
+
+.checklist-flex {
+    @include mixins.flexbox(row, wrap, 10px, flex-start);
+}
+
+.question-index {
+    flex: 1;
+    max-width: 50px;
+}
+
+.question-image {
+    flex: 1;
+    max-width: 50px;
+}
+
+.question-text {
+    flex: auto;
+    font-size: 1.5rem;
+    text-align: start;
+    line-height: 2rem;
+    margin: 5px;
+    margin-top: 12px;
 }

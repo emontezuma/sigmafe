@@ -1,11 +1,12 @@
 import { createAction, props } from '@ngrx/store';
-import { MoldsHitsQueryData } from '../../molds/models/molds.models';
+import { MoldsData } from '../../molds/models';
 
-export const loadMoldsHitsQueryData = createAction(
-    '[Molds] Load Molds Data'
+export const loadMoldsData = createAction(
+    '[Molds] Load Molds Data',
+    props<{ skipRecords: number, takeRecords: number, order?: any }>()
 )
 
-export const loadedMoldsHitsQueryData = createAction(
+export const loadedMoldsData = createAction(
     '[Molds] Loaded Molds Data sucesssfully',
-    props<{ moldsHitsQueryData: MoldsHitsQueryData }>()
+    props<{ moldsData: MoldsData }>()
 );

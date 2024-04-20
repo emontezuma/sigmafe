@@ -320,7 +320,7 @@ mat-panel-title {
 }
 
 .checklist-view {
-    @include mixins.flexbox(column, wrap, 20px, flex-start, stretch);
+    @include mixins.flexbox(column, wrap, 10px, flex-start, stretch);
     margin: 10px;
 }
 
@@ -476,9 +476,10 @@ mat-panel-title {
     top: 0;
     left: 0;
     margin-top: -14px;
+    margin-left: -4px;
     color: var(--theme-primar-700) !important;
     background-color: var(--z-colors-page-card-background-color);
-    padding: 0px 4px;
+    padding: 0px 2px;
     border-radius: 4px;
 }
 

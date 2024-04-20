@@ -8,16 +8,39 @@
   <ng-template #molds>
     <div
       class="container-animated"
-      (@dissolve.done)="animationFinished($event)"
+      (@dissolve.done)="pageAnimationFinished($event)"
       @dissolve            
     >   
       <div
         class="cards-container"
         cdkScrollable
-        #moldsQueryList
+        #moldsQueryList        
       >
-        <div *ngFor="let mold of moldsHitsQueryData.molds | filter:filterMoldsBy; let i = index; trackBy: trackByFn" >
-          <app-mold-hits-counter [mold]="mold"></app-mold-hits-counter>
+        <div 
+          [@listAnimation]="moldsHitsToShow.length"
+          [@.disabled]="disableListAnimation"
+          (@listAnimation.done)="listAnimationFinished($event)"
+          (@listAnimation.start)="listAnimationStarted($event)"
+          class="mold-container"
+        >
+          <div 
+            *ngFor="let mold of moldsHitsToShow; let i = index; trackBy: trackByFn"
+            class="mold-container"
+          >
+            <app-mold-hits-counter              
+              class="mold-item"
+              [mold]="mold"
+              [intemIndex]="mold.index"
+              [ngStyle]="{ 'background-color': (mold.index % 2 === 0) ? 'transparent' : 'rgba(0, 0, 0, 0.3)' }"
+            ></app-mold-hits-counter>          
+          </div>
+        </div>
+        <div
+          *ngIf="moldsHitsToShow.length === 0 && !animatingList"
+          @dissolve
+          class="no-data-message"
+        >
+          No se hallaron moldes con los filtros establecidos
         </div>
       </div>
     </div>
