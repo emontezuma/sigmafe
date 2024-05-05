@@ -438,7 +438,7 @@ export const sampleSettings: SettingsData = {
   animate: false,
   timeOutFortDialog: 15,
   catalog: {
-    pageSize: 50,
+    pageSize: 10,
   }
 };
 
@@ -484,7 +484,10 @@ export const sampleColors: ColorsData = {
     cardBorderColor: Colors.green,
     cardDisabledBackgoundColor: Colors.magenta,
     cardDisabledBorderColor: Colors.pink,
-    cardDisabledForeColor: Colors.gray,
+    errorBorderColor: Colors.orangered,
+    errorForeColor: Colors.orangered,
+    errorBackgroundColor: Colors.white,
+    cardDisabledForeColor: Colors.lightgrey,
     tabBackgroundColor: Colors.gainsboro,
     tabBorderColor: Colors.silver,
     backgroundColor: Colors.white,    

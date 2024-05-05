@@ -1,4 +1,5 @@
 <div i18n class="container">
+  <ng-container *ngIf="settingsData$ | async "></ng-container>
   <mat-card class="card"
     *ngIf="showCard"
     [ngClass]="{
@@ -26,14 +27,6 @@
       }"
     >      
     </div>
-    <!--<mat-progress-bar
-      *ngIf="mold.alarmed"
-      mode="indeterminate"
-      color="warn"
-      name="active-progress-bar"
-      class="progress"
-    >
-    </mat-progress-bar> -->
     <mat-card-header>
       <mat-card-title-group class="border">
         <mat-card-title class="title">{{ mold.description }}</mat-card-title>
@@ -146,7 +139,7 @@
           [src]="mold.mainImagePath"
           [alt]="mold.description"            
           fill
-        >         
+        >
       </div>
     </mat-card-content>
     <mat-divider class="divider"></mat-divider>       
@@ -256,7 +249,7 @@
           [src]="mold.mainImagePath"
           [alt]="mold.description"            
           fill
-        >         
+        >
       </div>
     </mat-card-content>
     <div class="square-wide">

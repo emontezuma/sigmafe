@@ -1,6 +1,6 @@
 <ng-container i18n class="container">
-  <ng-container *ngTemplateOutlet="invalidSize ? invalid : valid">
-  </ng-container>
+  <ng-container *ngTemplateOutlet="invalidSize ? invalid : valid"></ng-container>
+  <ng-container *ngIf="profileData$ | async "></ng-container>
   <ng-template #valid>
     <mat-toolbar class="toolbar" color="primary">
       <button
@@ -160,7 +160,7 @@
             (@dissolve.start)="toolbarAnimationStarted($event)"
             [toolbar]="toolbarData"
           >
-          </app-toolbar>          
+          </app-toolbar> 
         </div>
         <div
           cdkScrollable

@@ -3,6 +3,8 @@
     mat-dialog-title
     class="simple-flex title"
   >
+    <ng-container *ngIf="settingsData$ | async "></ng-container>  
+
     <span>{{ data.title }}</span>
     <button
       *ngIf="data.showCloseButton"
@@ -63,7 +65,7 @@
               class="svgicon icon-medium"
               [ngStyle]="{ 'visibility': button.loading ? 'hidden' : 'visible' }"
               [svgIcon]="button.icon"
-          >                            
+          >                   
           </mat-icon>
           <mat-progress-spinner
               *ngIf="button.loading"
@@ -71,7 +73,7 @@
               diameter="24"      
               mode="indeterminate"                        
           >
-          </mat-progress-spinner>                    
+          </mat-progress-spinner>           
           <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
       </button>      
     </div>

@@ -13,10 +13,9 @@ import { loadProfileData } from './state/actions/profile.action';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
 import { RouterOutlet } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
 import { SnackComponent } from "./shared/components";
-import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -31,7 +30,7 @@ export class AppComponent implements AfterViewInit {
   onResize({ target } : any) {
     const { screen, outerHeight, innerHeight, outerWidth, innerWidth } = target;
     const screenData: Screen = {
-      platform: this.platform,
+      platform: this._platform,
       size: this.size,
       orientation: screen.orientation.type,
       outerHeight,
@@ -62,7 +61,7 @@ export class AppComponent implements AfterViewInit {
   toolbarAnimated: boolean = false;
   goTopButtonTimer: any;
   lotsOfTabs = new Array(6).fill(0).map((_, index) => `Tab ${index}`);
-  profileDataSubscriber: Subscription;
+  profileData$: Observable<ProfileData>;  
   profileData: ProfileData;
   avatar: string = '';
   tmpUpdateHits: any;
@@ -88,14 +87,14 @@ export class AppComponent implements AfterViewInit {
   ]);
   
   constructor (
-    private store: Store<AppState>,
-    public platform: Platform,
-    private breakpointObserver: BreakpointObserver,
-    private sharedService: SharedService,
-    private snackBar: MatSnackBar,
-    private changeDetectorRef: ChangeDetectorRef,
+    private _store: Store<AppState>,
+    public _platform: Platform,
+    private _breakpointObserver: BreakpointObserver,
+    private _sharedService: SharedService,
+    private _snackBar: MatSnackBar,
+    private _changeDetectorRef: ChangeDetectorRef,
     ) {
-      this.breakpointObserver
+      this._breakpointObserver
       .observe([
         Breakpoints.Handset,
         Breakpoints.HandsetLandscape,
@@ -124,52 +123,52 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
-    this.tmpUpdateHits = new FormGroup({
-      id: new FormControl(null, Validators.required),
-      hits: new FormControl(null, Validators.required),
-    })
-    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
-      this.profileData = profileData;
-    });    
-    this.sharedService.showLoader.subscribe((showLoader: ShowElement) => {
+    this._sharedService.connectToSocket();
+    this.profileData$ = this._store.select(selectProfileData).pipe(
+        tap( profileData => {
+        this.profileData = profileData;
+      })
+    );
+    this._sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       setTimeout(() => {
         this.loading = showLoader.show;        
       }, 0);      
     });
-    this.sharedService.showToolbar.subscribe((toolbar) => {
+    this._sharedService.showToolbar.subscribe((toolbar) => {
       this.toolbarData = toolbar;
       this.calculateOutletPosition();   
     });
-    this.sharedService.showScrollBar.subscribe((scrollbarData) => {
+    this._sharedService.showScrollBar.subscribe((scrollbarData) => {
       this.scrollbarData = scrollbarData;        
     });
-    this.sharedService.scrollbarInToolbar.subscribe((scrollbarData) => {
-      this.scrollbarInToobar = scrollbarData;        
+    this._sharedService.scrollbarInToolbar.subscribe((scrollbarIntoolbarData) => {      
+      this.scrollbarInToobar = scrollbarIntoolbarData;
+      this.calculateOutletPosition();
     });
-    this.sharedService.showToolbarWidth.subscribe((width) => {
+    this._sharedService.showToolbarWidth.subscribe((width) => {
       this.toolbarWidth = width + 60;
     });
-    this.sharedService.showProgressBar.subscribe((progressBar) => {
+    this._sharedService.showProgressBar.subscribe((progressBar) => {
       this.progressBarData = progressBar;      
     });
-    this.sharedService.showGoTop.subscribe((goTop) => {
+    this._sharedService.showGoTop.subscribe((goTop) => {
       this.onTopStatus = goTop.status;
-      this.changeDetectorRef.detectChanges();
+      this._changeDetectorRef.detectChanges();
     });
-    this.sharedService.snackMessage.subscribe((snackBar) => {
+    this._sharedService.snackMessage.subscribe((snackBar) => {
       let validDuration = snackBar.duration;      
       if (!snackBar.buttonIcon && !snackBar.buttonText && !validDuration) {
         validDuration = 4000;
       }
-      this.snackBar.openFromComponent(SnackComponent, {
+      this._snackBar.openFromComponent(SnackComponent, {
         data: snackBar,
-        panelClass: [snackBar.snackClass],
+        panelClass: snackBar.snackClass ? [snackBar.snackClass] : [],
         duration: validDuration
       });
     });
-    this.sharedService.setTimer();
+    this._sharedService.setTimer();
     this.handlerScreenSizeChange(null);
-    this.store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
+    this._store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
   }
 
   ngAfterViewInit(): void {
@@ -186,9 +185,18 @@ export class AppComponent implements AfterViewInit {
   }
  
 // Functions ================
+
+  receiveMold(mold: any) {
+    console.log(mold);
+  }
+
+  ReceiveMold(mold: any) {
+    console.log(mold);
+  }
+
   animationFinished(e: any) {    
     if (e.fromState !== 'void') {
-      this.sharedService.SetAnimationFinished(e.fromState, e.toState, true);
+      this._sharedService.SetAnimationFinished(e.fromState, e.toState, true);
     }  
   }
 
@@ -202,7 +210,7 @@ export class AppComponent implements AfterViewInit {
   handlerScreenSizeChange(screen: Screen | null) {
     if (!screen) {
       screen = {
-        platform: this.platform,
+        platform: this._platform,
         size: this.size,
         orientation: window.screen.orientation.type,
         innerHeight: window.innerHeight,
@@ -213,7 +221,7 @@ export class AppComponent implements AfterViewInit {
     }
     this.invalidSize = screen.innerWidth < 350 || screen.innerHeight < 400;
     if (!this.invalidSize) {
-      this.store.dispatch(
+      this._store.dispatch(
         appActions.changeScreenState({ screen })
       );
     }  
@@ -221,14 +229,14 @@ export class AppComponent implements AfterViewInit {
   }
 
   gotoTop() {
-    this.sharedService.setGoTopButton(
+    this._sharedService.setGoTopButton(
       ApplicationModules.GENERAL,
       'temp',
     );    
   }
 
   prepareRoute(outlet: RouterOutlet) {
-    this.sharedService.SetAnimationFinished('', '', false);
+    this._sharedService.SetAnimationFinished('', '', false);
     return outlet && outlet.activatedRouteData && outlet.activatedRouteData['animation'];
   }
 

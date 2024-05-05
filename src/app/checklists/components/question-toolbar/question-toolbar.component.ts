@@ -13,6 +13,9 @@ export class ToolbarComponent {
   ) { }
 
 // Hooks ====================
+  ngOnDestroy() {
+    if (this.buttonAction) this.buttonAction.unsubscribe();
+  }
 
 // Functions ================
   handleClick(action: string) {

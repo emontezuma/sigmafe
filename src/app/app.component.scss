@@ -188,7 +188,7 @@ mat-panel-title {
 }
 
 .error-box {
-  @include mixins.flexbox(column, wrap, 1px, end); 
+  @include mixins.flexbox(column, wrap, 1px, flex-end); 
   align-items: center;
 }
 
@@ -237,13 +237,4 @@ mat-panel-title {
   height: 32px;
   border-radius: 50%;
   outline: 2px solid var(--z-colors-page-background-color);
-}
-
-form {
-  display: flex;
-  flex-direction: row;
-  height: 75px;
-  align-items: normal;
-  gap: 10px;
-  margin-top: 20px;
 }

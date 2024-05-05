@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { routingAnimation, dissolve, fastDissolve, fromTop } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
-import { ApplicationModules, ButtonActions, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarElement } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarElement } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { SettingsData } from 'src/app/shared/models/settings.models';
@@ -14,11 +14,11 @@ import { ProfileData } from 'src/app/shared/models/profile.models';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ChecklistAnswerType, ChecklistQuestionStatus, ChecklistFillingData, ChecklistFillingItem, ChecklistState } from 'src/app/checklists/models/checklists.models';
-import { Subscription } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { selectChecklistFillingData, selectLoadingChecklistFillingState } from 'src/app/state/selectors/checklists.selectors';
 import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
 import { GenericDialogComponent } from 'src/app/shared/components';
-import { DatesDifference, RecordStatus, CapitalizationMethod } from 'src/app/shared/models/helpers.models';
+import { RecordStatus, CapitalizationMethod } from 'src/app/shared/models/helpers.models';
 
 @Component({
   selector: 'app-checklist-filling',
@@ -84,14 +84,16 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   currentTabIndex: number = 1;
   checklistProgress: number = 0;
   animationTimeout: any;
-  scrollSubscriber: Subscription;
-  settingDataSubscriber: Subscription;
-  profileDataSubscriber: Subscription;
-  toolbarClickSubscriber: Subscription;
-  showGoTopSubscriber: Subscription;
-  checklistFillingLoadingSubscriber: Subscription;
-  checklistFillingDataSubscriber: Subscription;
-  everySecondSubscriber: Subscription;
+
+  scroll$: Observable<any>;;
+  settingsData$: Observable<SettingsData>;
+  toolbarClick$: Observable<ToolbarButtonClicked>;    
+  checklistFillingData$: Observable<ChecklistFillingData>;      
+  profileData$: Observable<ProfileData>;  
+  showGoTop$: Observable<GoTopButtonStatus>;
+  checklistFillingLoading$: Observable<boolean>;
+  everySecond$: Observable<boolean>;
+
   unsavedChanges: boolean = false;
   noQuestions: boolean = false;
   showSpinner: boolean = false;
@@ -101,6 +103,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   alarmedToolTip: string = '';
   countdownToolTip: string = '';
   classLegacy: string = 'spinner-card-font';
+  pendingToolbarButtonIndex: number = null;
   layouts: SimpleMenuOption[] = [{
     caption: $localize`Flexbox`,
     icon: 'attachment',
@@ -165,98 +168,117 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   });
 
   constructor (
-    private store: Store<AppState>,
-    public sharedService: SharedService,
-    public scrollDispatcher: ScrollDispatcher,
-    public dialog: MatDialog,    
+    private _store: Store<AppState>,
+    public _sharedService: SharedService,
+    public _scrollDispatcher: ScrollDispatcher,
+    public _dialog: MatDialog,    
   ) { }
 
 // Hooks ====================
   ngOnInit(): void {
     // Dispatches
-    this.store.dispatch(loadChecklistFillingData());
+    this._store.dispatch(loadChecklistFillingData());
 
-    // Subscriptions
-    this.everySecondSubscriber = this.sharedService.pastSecond.subscribe((pulse) => {
-      const elapsedTime = this.sharedService.datesDifferenceInSeconds(this.checklist.dueDateToFinish);
-      if (elapsedTime.message.substring(0, 5) !== 'error') {
-        if (elapsedTime.totalSeconds < 0) {          
-          if (elapsedTime.totalSeconds * -1 < this.checklist.secondsToAlert) {
-            this.countdownToolTip = $localize`Falta poco para completar el checklist`;
-            this.showElapsedTime = 'showAlert';
+    this.everySecond$ = this._sharedService.pastSecond.pipe(
+      tap((pulse) => {
+        const elapsedTime = this._sharedService.datesDifferenceInSeconds(this.checklist.dueDateToFinish);
+        if (elapsedTime.message.substring(0, 5) !== 'error') {
+          if (elapsedTime.totalSeconds < 0) {          
+            if (elapsedTime.totalSeconds * -1 < this.checklist.secondsToAlert) {
+              this.countdownToolTip = $localize`Falta poco para completar el checklist`;
+              this.showElapsedTime = 'showAlert';
+            } else {
+              this.showElapsedTime = 'showNormal';
+              this.countdownToolTip = $localize`Cuenta regresiva...`;
+            }
           } else {
-            this.showElapsedTime = 'showNormal';
-            this.countdownToolTip = $localize`Cuenta regresiva...`;
+            this.showElapsedTime = 'showExpired';
+            this.countdownToolTip = $localize`Checklist expirado...`;
           }
+          this.elapsedTime = (elapsedTime.days !== '0' ? (elapsedTime.days + 'd ') : '') + elapsedTime.hours + ':' + elapsedTime.minutes + ':' + elapsedTime.seconds;
         } else {
-          this.showElapsedTime = 'showExpired';
-          this.countdownToolTip = $localize`Checklist expirado...`;
+          this.showElapsedTime = 'showError';
+          this.elapsedTime = 'Error/Fecha';
+          this.countdownToolTip = $localize`Error en la fecha`;
         }
-        this.elapsedTime = (elapsedTime.days !== '0' ? (elapsedTime.days + 'd ') : '') + elapsedTime.hours + ':' + elapsedTime.minutes + ':' + elapsedTime.seconds;
-      } else {
-        this.showElapsedTime = 'showError';
-        this.elapsedTime = 'Error/Fecha';
-        this.countdownToolTip = $localize`Error en la fecha`;
+      })
+    );
+    this.checklistFillingLoading$ = this._store.select(selectLoadingChecklistFillingState).pipe(
+      tap( loading => {
+        this.loading = loading;
+        this._sharedService.setGeneralLoading(
+          ApplicationModules.CHECKLIST_FILLING,
+          loading,
+        );
+        this._sharedService.setGeneralProgressBar(
+          ApplicationModules.CHECKLIST_FILLING,
+          loading,
+        );      
+        this.loading = loading;
+        if (this.pendingToolbarButtonIndex === 2 && !loading) {
+          this.pendingToolbarButtonIndex = null;
+          setTimeout(() => {
+            this.elements[2].loading = loading;  
+          }, 200);
+        }
+      })
+    );  
+    this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
+      tap((buttonClicked: ToolbarButtonClicked) => {      
+        if (buttonClicked.from !== ApplicationModules.CHECKLIST_FILLING) {
+            return
+        }
+        this.toolbarAction(buttonClicked);
       }
-    });
-    this.checklistFillingLoadingSubscriber = this.store.select(selectLoadingChecklistFillingState).subscribe( loading => {
-      this.loading = loading;
-      this.sharedService.setGeneralLoading(
-        ApplicationModules.CHECKLIST_FILLING,
-        loading,
-      );
-      this.sharedService.setGeneralProgressBar(
-        ApplicationModules.CHECKLIST_FILLING,
-        loading,
-      );      
-      this.loading = loading;
-    });    
-    this.toolbarClickSubscriber = this.sharedService.toolbarAction.subscribe((buttonClicked: ToolbarButtonClicked) => {
-      if (buttonClicked.from !== ApplicationModules.CHECKLIST_FILLING) {
-          return
-      }
-      this.toolbarAction(buttonClicked);
-    });
-    this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData;
-    });    
-    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
-      this.profileData = profileData;
-    });
-    this.sharedService.search.subscribe((searchBox) => {
+    ));
+    this.settingsData$ = this._store.select(selectSettingsData).pipe(
+      tap(settingsData => this.settingsData = settingsData)
+    );    
+    this.profileData$ = this._store.select(selectProfileData).pipe(
+      tap( profileData => {
+        this.profileData = profileData;
+      })
+    );
+    this._sharedService.search.subscribe((searchBox) => {
       if (searchBox.from === ApplicationModules.CHECKLIST_FILLING) {
         // this.filterMoldsBy = searchBox.textToSearch;  
       }
     });
-    this.checklistFillingDataSubscriber = this.store.select(selectChecklistFillingData).subscribe((checklistFillingData: ChecklistFillingData) => {        
-      this.loadChecklist(checklistFillingData, !this.loading && !this.loaded);      
-      if (!this.loading && !this.loaded) {
-        this.loaded = true;
-      }
-      if (!this.loading) {
-        if (this.loadFromButton > -1) {          
-          this.elements[this.loadFromButton].loading = false;
-          this.loadFromButton = -1;          
+    this.checklistFillingData$ = this._store.select(selectChecklistFillingData).pipe(
+      tap((checklistFillingData: ChecklistFillingData) => {        
+        this.loadChecklist(checklistFillingData, !this.loading && !this.loaded);      
+        if (!this.loading && !this.loaded) {
+          this.loaded = true;
         }
-        this.checklistTotalization();
-        this.updateSelectedViewArray();
-      }
-    });
-    this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
-      if (goTop.status === 'temp') {
-        this.onTopStatus = 'active';
-        this.checklistFilling.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-        // Ensure
-      }      
-    });
-    this.scrollSubscriber = this.scrollDispatcher
+        if (!this.loading) {
+          if (this.loadFromButton > -1) {          
+            this.elements[this.loadFromButton].loading = false;
+            this.loadFromButton = -1;          
+          }
+          this.checklistTotalization();
+          this.updateSelectedViewArray();
+        }
+      })
+    );
+    this.showGoTop$ = this._sharedService.showGoTop.pipe(
+      tap((goTop) => {
+        if (goTop.status === 'temp') {
+          this.onTopStatus = 'active';
+          this.checklistFilling.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+          // Ensure
+        }      
+      })
+    );
+    this.scroll$ = this._scrollDispatcher
     .scrolled()
-    .subscribe((data: any) => {      
-      this.getScrolling(data);
-    });        
+    .pipe(
+      tap((data: any) => {      
+        this.getScrolling(data);
+      })
+    );        
 
     // Settings
     this.setLayout(this.checklist?.viewType);
@@ -277,7 +299,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.sharedService.setToolbar({
+    this._sharedService.setToolbar({
       from: ApplicationModules.CHECKLIST_FILLING,
       show: false,
       showSpinner: false,
@@ -286,17 +308,10 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       elements: [],
       alignment: 'right',
     });
-    this.sharedService.setGeneralScrollBar(
+    this._sharedService.setGeneralScrollBar(
       ApplicationModules.CHECKLIST_FILLING,
       false,
-    );
-    // Turn off the subscriptions
-    if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
-    if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
-    if (this.toolbarClickSubscriber) this.toolbarClickSubscriber.unsubscribe();
-    if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
-    if (this.checklistFillingLoadingSubscriber) this.checklistFillingLoadingSubscriber.unsubscribe();
-    if (this.everySecondSubscriber) this.everySecondSubscriber.unsubscribe();
+    );        
   }
 
 // Functions ================
@@ -305,20 +320,20 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this.calcElements();
-        this.sharedService.setToolbar({
+        this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_FILLING,
           show: true,
-          showSpinner: true,
+          showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'left',
         });
-        this.sharedService.setGeneralScrollBar(
+        this._sharedService.setGeneralScrollBar(
           ApplicationModules.CHECKLIST_FILLING,
           true,
         );
-        this.sharedService.setGeneralLoading(
+        this._sharedService.setGeneralLoading(
           ApplicationModules.CHECKLIST_FILLING,
           false,
         ); // TODO: After recovery the data
@@ -443,7 +458,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       this.goTopButtonTimer = setTimeout(() => {
         if (this.onTopStatus !== 'inactive') {
           this.onTopStatus = 'inactive';
-          this.sharedService.setGoTopButton(
+          this._sharedService.setGoTopButton(
             ApplicationModules.GENERAL,
             'inactive',
           );
@@ -453,7 +468,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     }    
     if (this.onTopStatus !== status) {
       this.onTopStatus = status;
-      this.sharedService.setGoTopButton(
+      this._sharedService.setGoTopButton(
         ApplicationModules.GENERAL,
         status,
       );
@@ -528,7 +543,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
             status,
             actionRequired,
           };          
-          this.store.dispatch(updateChecklistQuestion({ item }));
+          this._store.dispatch(updateChecklistQuestion({ item }));
           if (this.selectedView.value !== 'all') {
             this.checklistAnimation();
           }                    
@@ -582,20 +597,20 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   convertDates() {
-    this.convertedDates.dueDateToFinish = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.dueDateToFinish, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);
-    this.convertedDates.equipment.lastChecklistDate = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.equipment?.lastChecklistDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);    
-    this.convertedDates.dueDateToStart = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.dueDateToStart, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.startDate = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.startDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.assignement.date = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.assignement?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.planning.date = this.sharedService.capitalization(this.sharedService.formatDate(this.checklist.planning?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.dueDateToFinish = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToFinish, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);
+    this.convertedDates.equipment.lastChecklistDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.equipment?.lastChecklistDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);    
+    this.convertedDates.dueDateToStart = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToStart, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.startDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.startDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.assignement.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.assignement?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.planning.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.planning?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
   }
 
   loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
     this.checklist = checklistFillingData;
     this.convertDates();
     if (firstTime && this.checklist.status !== RecordStatus.ACTIVE) {
-      this.sharedService.setButtonState(ButtonActions.START, false);      
-      this.sharedService.setButtonState(ButtonActions.UPLOAD_FILE, false);
+      this._sharedService.setButtonState(ButtonActions.START, false);      
+      this._sharedService.setButtonState(ButtonActions.UPLOAD_FILE, false);
       this.showInactiveMessage();
     } else {
       if (firstTime) {
@@ -629,8 +644,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   evaluateButtons() {
-    this.sharedService.setButtonState(ButtonActions.SAVE, this.unsavedChanges);
-    this.sharedService.setButtonState(ButtonActions.CANCEL, this.unsavedChanges);
+    this._sharedService.setButtonState(ButtonActions.SAVE, this.unsavedChanges);
+    this._sharedService.setButtonState(ButtonActions.CANCEL, this.unsavedChanges);
   }
 
   saveDataToLocal() {
@@ -645,14 +660,16 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
     if (action.action === ButtonActions.SAVE) {
 
     } else if (action.action === ButtonActions.CANCEL) {
+      this.elements[action.buttonIndex].loading = true;
+      this.pendingToolbarButtonIndex = 2;
       this.loadFromButton = action.buttonIndex;
       this.setTabIndex(0);
       this.loaded = false;
       this.unsavedChanges = false;
       this.evaluateButtons();
-      this.store.dispatch(loadChecklistFillingData());   
+      this._store.dispatch(loadChecklistFillingData());   
     } else {
-      this.elements[action.buttonIndex].loading = false;
+      
     }    
   }
 
@@ -673,7 +690,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   showCompletionMessage(responsesByDefault: number): void {
     const answers = responsesByDefault === 1 ? $localize` una respuesta ` : responsesByDefault + $localize` respuesta `
-    const dialogResponse = this.dialog.open(GenericDialogComponent, {
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
       width: '350px',
       disableClose: false,
       data: {
@@ -691,7 +708,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
 
   showInactiveMessage() : void {
     const message = $localize`El checklist <strong>está inactivo</strong> debe comunicarse con el administrador del sistema`;
-    this.sharedService.showSnackMessage({
+    this._sharedService.showSnackMessage({
       message,      
       duration: 0,
       snackClass: 'snack-primary',
@@ -702,7 +719,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   showInactiveMessage2(): void {
-    const dialogResponse = this.dialog.open(GenericDialogComponent, {
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
       width: '350px',
       disableClose: false,
       panelClass: "warn-dialog",

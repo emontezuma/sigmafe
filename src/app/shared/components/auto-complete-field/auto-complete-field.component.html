@@ -1,0 +1,55 @@
+<div
+  class="auto-complete__container"
+  i18n
+>
+  <ng-container *ngIf="textToSearch$ | async "></ng-container>   
+  <mat-form-field appearance="fill" class="auto-complete__field">
+    <input      
+      matInput
+      [matAutocomplete]="auto"
+      [formControl]="formField"
+      (keydown)="handleKeyDown($event)"
+    />
+    <mat-hint
+      *ngIf="leftHint"
+      class="auto-complete__hint" align="start"
+      >
+        <span class="auto-complete__hint--normal">{{ leftHint }}</span>        
+    </mat-hint>
+    <mat-hint class="auto-complete__hint" align="end" *ngIf="showDataState && totalCount > 0">Item(s): {{ list.length }} de {{ totalCount }}</mat-hint>
+    <mat-hint class="auto-complete__hint" align="end" *ngIf="showError">
+      <span class="auto-complete__hint--error"><strong>{{ noItemsError }}</strong></span>
+      <mat-icon class="auto-complete__small-icon--error" svgIcon="warn-line"></mat-icon>
+    </mat-hint>    
+    <div *ngIf="loading" matSuffix
+    >      
+      <mat-progress-spinner      
+        mode="indeterminate"
+        color="primary"
+        class="auto-complete__progress"
+        diameter="32"
+        >
+      </mat-progress-spinner>
+    </div>
+    <div *ngIf="this.formField.value?.id && !loading" matSuffix
+    >      
+      <mat-icon class="auto-complete__normal-icon">check</mat-icon>    
+    </div>
+    <mat-autocomplete
+      [showPanel]="true"
+      (optionsScroll)="onScroll()"
+      [displayWith]="displayFn"      
+      (optionSelected)="handleOptionSelected($event)"
+      autoActiveFirstOption
+      #auto="matAutocomplete"
+    >
+      <mat-option
+        *ngFor="let element of list"
+        [value]="element"
+        [title]="(element || {}).name"        
+      >
+        {{ element.name }}
+      </mat-option>      
+    </mat-autocomplete>
+  </mat-form-field>    
+</div>

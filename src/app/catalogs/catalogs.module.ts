@@ -1,18 +1,18 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
-import { SpinnerModule } from '../shared/components';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
-import { ImageNotFoundModule } from '../shared/directives';
-import { CatalogMoldsComponent, CatalogsHomeComponent } from './pages';
+import { ImageNotFoundModule, OptionsScrollModule } from '../shared/directives';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent } from './pages';
 import { CatalogsRoutingModule } from './catalogs-routing.module'
-
+import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule } from '../shared/components';
 
 @NgModule({
   declarations: [
-    CatalogMoldsComponent,
+    CatalogMoldsListComponent,
     CatalogsHomeComponent,
+    CatalogMoldEditionComponent,    
   ],
   imports: [
     CommonModule,
@@ -20,7 +20,15 @@ import { CatalogsRoutingModule } from './catalogs-routing.module'
     NgxSkeletonLoaderModule.forRoot(),
     SpinnerModule,
     ImageNotFoundModule,
+    OptionsScrollModule,
     CatalogsRoutingModule,
+    LabelEllipsisModule,
+    ReadonlyFieldModule,
+    ReactiveFormsModule,
+    AutoCompleteFieldModule,
+    InputFieldModule,
+    AreaFieldModule,
+    SelectFieldModule,
   ],   
 })
 export class CatalogsModule { }

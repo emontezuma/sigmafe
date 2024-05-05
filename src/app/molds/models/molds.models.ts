@@ -5,7 +5,7 @@ export interface MoldsData {
   }
   
   export interface Molds {
-    items?: MoldItem[];
+    items?: MoldItem[];    
     pageInfo?: PageInfo;
     totalCount?: number;
   }
@@ -91,4 +91,26 @@ export interface MoldsData {
   export interface MoldsState {
     loading: boolean;
     moldsData: MoldsData;
+}
+
+export interface MoldCatalog {
+  id: string;
+  description: string;
+  mainImagePath: string;
+  serialNumber: string;
+  label: string;
+  state: string;
+  status: string;
+  updatedAt: string;
+}
+
+export const emptyMoldCatalog = {
+  id: null,
+  description: null,
+  mainImagePath: null,
+  serialNumber: null,
+  label: null,
+  state: null,
+  status: null,
+  updatedAt: null,
 }

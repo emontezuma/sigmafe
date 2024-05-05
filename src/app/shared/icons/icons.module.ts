@@ -73,11 +73,11 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/check.svg")
     );
     iconRegistry.addSvgIcon(
-      "warn_line",
+      "warn-line",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_line.svg")
     );  
     iconRegistry.addSvgIcon(
-      "warn_fill",
+      "warn-fill",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_fill.svg")
     );
     iconRegistry.addSvgIcon(
@@ -85,7 +85,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/block.svg")
     );
     iconRegistry.addSvgIcon(
-      "attachment_file",
+      "attachment-file",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/attachment_file.svg")
     );
     iconRegistry.addSvgIcon(
@@ -133,11 +133,11 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/time.svg")
     );
     iconRegistry.addSvgIcon(
-      "task_notes",
+      "task-notes",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/task_notes.svg")
     );
     iconRegistry.addSvgIcon(
-      "white_list",
+      "white-list",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/white_list.svg")
     );
     iconRegistry.addSvgIcon(
@@ -145,7 +145,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/problems.svg")
     );
     iconRegistry.addSvgIcon(
-      "organizational_chart",
+      "organizational-chart",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/organizational_chart.svg")
     );
     iconRegistry.addSvgIcon(
@@ -157,7 +157,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/delete.svg")
     );
     iconRegistry.addSvgIcon(
-      "external_link",
+      "external-link",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/external_link.svg")
     );
     iconRegistry.addSvgIcon(
@@ -175,6 +175,30 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       "document",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/document.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "treasure-chest",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/treasure_chest.svg")
     );    
+    iconRegistry.addSvgIcon(
+      "copy",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/copy.svg")
+    );    
+    iconRegistry.addSvgIcon(
+      "garbage-can",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/garbage_can.svg")
+    );    
+    iconRegistry.addSvgIcon(
+      "cross",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/cross.svg")
+    );    
+    iconRegistry.addSvgIcon(
+      "lock-closed",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/lock_closed.svg")
+    );        
+    iconRegistry.addSvgIcon(
+      "arrow-left",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_left.svg")
+    );
   }
 }

@@ -1,14 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, delay, of, tap } from 'rxjs';
-import { Store } from '@ngrx/store';
     
-// import { sampleMoldsHitsQueryData } from '../../shared/sample-data';
 import { MoldsHitsQueryData } from '../models/molds-hits.models';
 import { GET_MOLDS_HITS, GET_MOLDS } from '../../graphql/graphql.queries';
 import { Apollo } from 'apollo-angular';
-// import { Socket } from 'ngx-socket-io';
-import { updateMoldsHitsData } from 'src/app/state/actions/molds-hits.actions';
-import { AppState } from 'src/app/state/app.state';
+
 
 @Injectable({
   providedIn: 'root'
@@ -23,20 +19,8 @@ export class MoldsService {
   lines: Observable<any[]> = this.linesBehaviorSubject.asObservable();
 
   constructor (
-    private apollo: Apollo,
-    // private socket: Socket,
-    private store: Store<AppState>,
-  ) {
-    // socket.fromEvent('response').subscribe((message: any) => {      
-    //   console.log('hitMold: ', message)            
-    //   this.store.dispatch(updateMoldsHitsData({ hitMold: message }));        
-    // });
-    
-    // socket.fromEvent('disconnect').subscribe(() => {
-        // TODO implement it...
-    // });
-  
-  }
+    private apollo: Apollo,    
+  ) {}
 
   // Functions ================  
   getMoldsHitsQueryData(): Observable<MoldsHitsQueryData> {
@@ -45,11 +29,11 @@ export class MoldsService {
     );
   }
 
-  getMoldsHitsQueryDataGql$() {
+  getMoldsHitsQueryDataGql$(): Observable<any> {
     return this.apollo.watchQuery({ query: GET_MOLDS_HITS }).valueChanges    
   }
 
-  getMoldsDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 0, orderBy: any = null) {
+  getMoldsDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, orderBy: any = null): Observable<any> {
     let variables = undefined;
     if (recosrdsToSkip !== 0) {
       variables = { recosrdsToSkip: recosrdsToSkip };
@@ -68,7 +52,7 @@ export class MoldsService {
         variables = { orderBy: orderBy };
       }
     }    
-    return this.apollo.watchQuery({ query: GET_MOLDS, variables }).valueChanges    
+    return this.apollo.watchQuery({ query: GET_MOLDS, variables, context: { headers: { 'x-customer-id': '1', 'x-language-id': '1',  }} }).valueChanges    
   }
 
   // End ======================

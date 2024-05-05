@@ -4,7 +4,7 @@ import { ImageNotFoundDirective } from './image-not-found.directive';
 
 @NgModule({
   declarations: [
-    ImageNotFoundDirective,    
+    ImageNotFoundDirective,
   ],
   exports: [
     ImageNotFoundDirective,    

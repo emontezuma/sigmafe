@@ -6,8 +6,7 @@ import { MaterialModule } from '../material';
 import { ChecklistFillingComponent, ChecklistsHomeComponent } from './pages';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ChecklistsRoutingModule } from './checklists-routing.module';
-import { SpinnerModule, ReadonlyFieldComponent } from '../shared/components';
-import { LabelEllipsisModule } from '../shared/components/label-ellipsis';
+import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule } from '../shared/components';
 import { IconsModule } from '../shared/icons';
 import { ImageNotFoundModule } from '../shared/directives';
 import { ChecklistFillingItemsComponent, ToolbarComponent } from './components';
@@ -18,7 +17,6 @@ import { ChecklistFillingItemsComponent, ToolbarComponent } from './components';
     ChecklistsHomeComponent,
     ChecklistFillingItemsComponent,
     ToolbarComponent,
-    ReadonlyFieldComponent,
   ],
   imports: [
     CommonModule,
@@ -33,6 +31,7 @@ import { ChecklistFillingItemsComponent, ToolbarComponent } from './components';
     IconsModule,
     LabelEllipsisModule,
     ImageNotFoundModule,
+    ReadonlyFieldModule,
   ],
   providers: [
     {

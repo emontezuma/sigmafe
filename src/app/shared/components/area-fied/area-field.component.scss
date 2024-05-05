@@ -1,0 +1,82 @@
+@use "../../../../assets/styles/mixins";
+
+.container {
+    height: 100%;
+    display: flex;
+}
+
+.field {
+  &__container {
+    @include mixins.flexbox(column, nowrap, 1px, flex-start, normal);
+    border: 1.5px solid var(--theme-primary-300);
+    border-radius: 5px;
+    padding: 10px;
+    min-width: 350px;
+    width: -webkit-fill-available;
+    flex: 1 1 350px;
+    &:disabled {
+      border: 1.5px solid var(--z-colors-page-button-disabled-border) !important;
+      span {
+        color: var(--z-colors-page-card-disabled-fore) !important;  
+      }
+      mat-hint {
+        color: var(--z-colors-page-card-disabled-fore) !important;  
+      }
+      input {
+        color: var(--z-colors-page-card-disabled-fore) !important;  
+      }
+    }
+    &--error {
+      border: 1.5px solid var(--z-colors-error-border-color) !important;
+      span {
+        color: var(--z-colors-error-border-color) !important;  
+      }
+    }    
+    .mat-mdc-form-field-hint-wrapper {
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+    
+  }
+  &__label {    
+    font-weight: 700;  
+    font-size: 1.3rem;
+    margin-bottom: 15px;    
+  }
+  &__required-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;    
+  }
+  &__required-label {    
+  }
+  &__field {
+    
+  }
+  &__required {    
+    color: var(--z-colors-required-fore-color);
+  }
+  &__error {
+    display: flex !important;
+    font-weight: 300;  
+    font-size: 1.1rem;    
+    align-items: center;
+  }
+  &__hint {
+    display: flex;
+    font-weight: 300;  
+    font-size: 1.1rem;
+    gap: 2px;
+    align-items: center;
+  }
+  &__help {
+    margin-top: 10px;
+    font-weight: 300;  
+    font-size: 1.2rem;    
+  }
+}
+
+
+::-webkit-scrollbar-button:single-button {
+  display: none;
+}

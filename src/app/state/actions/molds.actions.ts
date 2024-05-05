@@ -10,3 +10,8 @@ export const loadedMoldsData = createAction(
     '[Molds] Loaded Molds Data sucesssfully',
     props<{ moldsData: MoldsData }>()
 );
+
+export const prepareForcedUpdateFlag = createAction(
+    '[Molds] Turn off forcingUpdate',
+    props<{ forcedUpdate: boolean }>()
+);

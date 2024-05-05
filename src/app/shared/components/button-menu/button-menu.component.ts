@@ -31,6 +31,10 @@ export class ButtonMenuComponent {
     this.selectedOption = this.options.find(option => option.default);    
   }
 
+  ngOnDestroy() {
+    if (this.selection) this.selection.unsubscribe();
+  }
+
 // Functions ================
   setOption(index: number, selection: string) {
     if (!selection && this.options?.length) {

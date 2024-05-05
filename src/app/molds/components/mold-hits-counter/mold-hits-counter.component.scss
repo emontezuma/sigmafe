@@ -116,7 +116,7 @@ mat-card-title {
 }
 
 .mold-hits {
-    @include mixins.flexbox(row, wrap, 5px, end);    
+    @include mixins.flexbox(row, wrap, 5px, flex-end);    
     font-size: 5rem;
     font-weight: 700;
     border: 5px solid;
@@ -184,7 +184,7 @@ mat-card-title {
 }
 
 .molds-hits-data {
-    @include mixins.flexbox(row, wrap, 1px, end);    
+    @include mixins.flexbox(row, wrap, 1px, flex-end);    
 }
 
 .maintenance {
@@ -319,7 +319,7 @@ mat-card-title {
 }
 
 .mold-hits-wide {
-    @include mixins.flexbox(row, wrap, 5px, end);    
+    @include mixins.flexbox(row, wrap, 5px, flex-end);    
     font-size: 8rem;
     font-weight: 700;
     border: 5px solid;
@@ -332,7 +332,7 @@ mat-card-title {
 }
 
 .molds-hits-data-wide {
-    @include mixins.flexbox(row, wrap, 1px, end, normal);    
+    @include mixins.flexbox(row, wrap, 1px, flex-end, normal);    
 }
 
 .subtitle-wide {

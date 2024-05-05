@@ -40,6 +40,8 @@ mat-card-title {
 }
 
 .button-on-new-tab {
+  border: none;
+  cursor: pointer;
   background-color: transparent;
   &:hover {
     color: var(--theme-primary-500);
@@ -52,4 +54,10 @@ mat-card-title {
   &:hover {
     color: var(--theme-primary-500);
   }
+}
+
+::ng-deep .label-with-ellipsis {
+  margin: 0 !important;
+  padding: 5px 0px;
+  line-height: 27px;
 }

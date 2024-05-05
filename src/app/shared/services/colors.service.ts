@@ -77,7 +77,7 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-page-border', colorsData?.page?.border ?? colorToUse);
     document.documentElement.style.setProperty('--z-colors-page-card-disabled-border-color', colorsData?.page?.cardDisabledBorderColor ?? colorToUse);
     document.documentElement.style.setProperty('--z-colors-page-card-disabled-fore', colorsData?.page?.cardDisabledForeColor ?? colorToUse);
-    
+
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
     document.documentElement.style.setProperty('--z-colors-page-background-color', colorsData?.page?.backgroundColor ?? colorToUse);
     
@@ -128,7 +128,13 @@ export class ColorsService {
     
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
     document.documentElement.style.setProperty('--z-colors-table-hover-background-color', colorsData?.page?.tableHoverBackgroundColor ?? colorToUse);
-    
+        
+    document.documentElement.style.setProperty('--z-colors-required-fore-color', colorsData?.page?.requiredForeColor ?? Colors.orangered);
+    document.documentElement.style.setProperty('--z-colors-required-background-color', colorsData?.page?.requiredBackgroundColor ?? Colors.white);
+
+    document.documentElement.style.setProperty('--z-colors-error-fore-color', colorsData?.page?.errorForeColor ?? Colors.orangered);
+    document.documentElement.style.setProperty('--z-colors-error-background-color', colorsData?.page?.errorBackgroundColor ?? Colors.white);
+    document.documentElement.style.setProperty('--z-colors-error-border-color', colorsData?.page?.errorBorderColor ?? Colors.orangered);        
 
     // Custom colors
     document.documentElement.style.setProperty('--z-colors-white', Colors.white);    
@@ -147,8 +153,7 @@ export class ColorsService {
     // Colors needed in RGB to apply some alpha gradient
     document.documentElement.style.setProperty('--z-colors-primary-rgb', hexToRgb(this.primaryColor));
     document.documentElement.style.setProperty('--z-colors-warn-rgb', hexToRgb(this.warnColor));    
-    document.documentElement.style.setProperty('--z-colors-accent-rgb', hexToRgb(this.accentColor));
-    document.documentElement.style.setProperty('--z-colors-primary-rgb', hexToRgb(this.primaryColor));  
+    document.documentElement.style.setProperty('--z-colors-accent-rgb', hexToRgb(this.accentColor));    
   }    
 
   getSettingsData(): Observable<ColorsData> {

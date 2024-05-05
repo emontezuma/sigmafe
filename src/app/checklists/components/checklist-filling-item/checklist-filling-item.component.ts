@@ -7,8 +7,8 @@ import { selectScreenFeature } from 'src/app/state/selectors/screen.selectors';
 import { updateChecklistQuestion } from 'src/app/state/actions/checklists.actions';
 import { dissolve } from '../../../shared/animations/shared.animations';
 import { EChartsOption } from 'echarts';
-import { Subscription } from 'rxjs';
-import { ButtonActions } from 'src/app/shared/models/screen.models';
+import { Observable, tap } from 'rxjs';
+import { ButtonActions, SharedState } from 'src/app/shared/models/screen.models';
 
 @Component({
   selector: 'app-checklist-filling-item',
@@ -99,7 +99,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
       },
     ],
   };
-  screenSubscriber: Subscription;
+  screen$: Observable<SharedState>;
   observer;
 
   showChart: boolean = false;
@@ -107,29 +107,31 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
   miniChartHeight: number = 50;
 
   constructor (
-    private store: Store<AppState>,
-    private host: ElementRef, 
-    private zone: NgZone
+    private _store: Store<AppState>,
+    private _host: ElementRef, 
+    private _zone: NgZone
   ) { }
 
 // Hooks ====================
   ngOnInit() {
     this.observer = new ResizeObserver(entries => {
-      this.zone.run(() => {
+      this._zone.run(() => {
         this.adjustCardWidth(entries[0].contentRect.width);
       });
     });
-    this.observer.observe(this.host.nativeElement);
+    this.observer.observe(this._host.nativeElement);
 
-    this.screenSubscriber = this.store.select(selectScreenFeature).subscribe( screenData => {
-      if (this.questionCard) {
-        this.checkCardWidth();
-      } else {
-        setTimeout(() => {
+    this.screen$ = this._store.select(selectScreenFeature).pipe(
+      tap( screenData => {
+        if (this.questionCard) {
           this.checkCardWidth();
-        }, 300);
-      }
-    });    
+        } else {
+          setTimeout(() => {
+            this.checkCardWidth();
+          }, 300);
+        }
+      })
+    );
   }
   ngAfterViewInit(): void {
     const chip = document.getElementsByName("chip");    
@@ -138,10 +140,8 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
     });    
   }
 
-  ngOnDestroy(): void {
-    // Turn off the subscriptions
-    if (this.screenSubscriber) this.screenSubscriber.unsubscribe();
-    this.observer.unobserve(this.host.nativeElement);
+  ngOnDestroy(): void {    
+    this.observer.unobserve(this._host.nativeElement);
   }
 
 // Functions ================
@@ -171,7 +171,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
           status,
           actionRequired,
         };
-        this.store.dispatch(updateChecklistQuestion({ item: newItem }));        
+        this._store.dispatch(updateChecklistQuestion({ item: newItem }));        
       }        
     }      
   }

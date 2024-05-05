@@ -1,8 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { FormGroup } from '@angular/forms';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
-import { Subscription } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { routingAnimation, dissolve, fromLeft, listAnimation } from '../../../shared/animations/shared.animations';
 import { MoldHitsQuery } from '../../models/molds-hits.models';
@@ -10,10 +9,11 @@ import { AppState } from '../../../state/app.state';
 import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds-hits.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds-hits.actions';
 import { SharedService } from 'src/app/shared/services';
-import { ProfileData, ApplicationModules, ButtonActions, ToolbarButtonClicked, ToolbarElement, MoldStates } from 'src/app/shared/models';
+import { ProfileData, ApplicationModules, ButtonActions, ToolbarButtonClicked, ToolbarElement, GoTopButtonStatus, AnimationStatus, SearchBox } from 'src/app/shared/models';
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
+import { MoldStates } from 'src/app/catalogs';
 
 @Component({
   selector: 'app-molds-hits-counter',
@@ -26,18 +26,18 @@ export class MoldsHitsCounterComponent implements OnInit {
   @ViewChild('moldsQueryList') private moldsQueryList: ElementRef;  
   
 // Variables ===============
-  toolbarClickSubscriber: Subscription;
-  scrollSubscriber: Subscription;
-  settingDataSubscriber: Subscription;
-  profileDataSubscriber: Subscription;
-  searchBoxSubscriber: Subscription;
-  showGoTopSubscriber: Subscription;
-  animationSubscriber: Subscription;
-  moldsHitsLoadingSubscriber: Subscription;
-  moldsHitsDataSubscriber: Subscription;
-  everySecondSubscriber: Subscription;
-  
-  stopTimerSubscriber: Subscription;
+  scroll$: Observable<any>;;
+  settingsData$: Observable<SettingsData>;
+  toolbarClick$: Observable<ToolbarButtonClicked>;        
+  showGoTop$: Observable<GoTopButtonStatus>;
+  profileData$: Observable<ProfileData>;  
+  everySecond$: Observable<boolean>;
+  animation$: Observable<AnimationStatus>;
+  searchBox$: Observable<SearchBox>;
+  moldsHitsLoading$: Observable<boolean>;  
+  moldsHitsData$: Observable<MoldHitsQuery[]>;  
+  stopTimer$: Observable<boolean>;
+
   filteredMoldsHits: MoldHitsQuery[] = [];
   originalMoldsHits: MoldHitsQuery[] = [];
   moldsHitsToShow: MoldHitsQuery[] = [];
@@ -61,121 +61,136 @@ export class MoldsHitsCounterComponent implements OnInit {
   moldsToShow: number = 6;
   disableListAnimation: boolean = false;
   animatingList: boolean = false;
-  form = new FormGroup({
-  });
-
+  
   constructor(
-    private store: Store<AppState>,
-    private sharedService: SharedService,
-    public scrollDispatcher: ScrollDispatcher,
+    private _store: Store<AppState>,
+    private _sharedService: SharedService,
+    public _scrollDispatcher: ScrollDispatcher,
   ) { }
 
 // Hooks ====================
   ngOnInit() {
     // Dispatches
-    this.store.dispatch(loadMoldsHitsQueryData());  
+    this._store.dispatch(loadMoldsHitsQueryData());  
 
     // Settings
-    this.sharedService.setGeneralScrollBar(
+    this._sharedService.setGeneralScrollBar(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
     );
-    this.sharedService.setSearchBox(
+    this._sharedService.setSearchBox(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
     );    
-    this.moldsHitsLoadingSubscriber = this.store.select(selectLoadingMoldsHitsState).subscribe( loading => {
-      this.loading = loading;
-      this.sharedService.setGeneralLoading(
-        ApplicationModules.MOLDS_HITS_VIEW,
-        loading,
-      );
-      this.sharedService.setGeneralProgressBar(
-        ApplicationModules.MOLDS_HITS_VIEW,
-        loading,
-      );
-      this.loaded = loading === false;
-    });
-    
-    // Subscriptions
-    this.profileDataSubscriber = this.store.select(selectProfileData).subscribe( profileData => {
-      this.profileData = profileData;
-    });
-    this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData;
-    });    
-    this.moldsHitsDataSubscriber = this.store.select(selectMoldsHitsQueryData).subscribe( moldsHits => {
-      this.originalMoldsHits = moldsHits;
-      console.log(moldsHits);
-      this.filterMoldsHitsQueryData();
-        if (this.moldsHitsToShow.length > 0 && moldsHits?.length > 0) {
-        this.moldsHitsToShow.forEach((showedMold, index) => {
-          const moldToUpdate = moldsHits.find(mold => mold.id === showedMold.id);
-          this.moldsHitsToShow[index] = {
-            ...moldToUpdate,
-            index: showedMold.index,
-            updateHits: moldToUpdate.hits != showedMold.hits
-          }
-        })
-        return;
-      }      
-      this.showFrom = 0;
-      this.slider();
-    });
-    this.searchBoxSubscriber = this.sharedService.search.subscribe((searchBox) => {
-      if (searchBox.  from === ApplicationModules.MOLDS_HITS_VIEW) {
-        this.disableListAnimation = true;
-        this.filterMoldsBy = searchBox.textToSearch;
-        this.processFilterChange()
-      }
-    });
-    this.animationSubscriber = this.sharedService.isAnimationFinished.subscribe((animationStatus) => {      
-      if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
-        // this.animationFinished(null);
-      }      
-    });    
-    this.showGoTopSubscriber = this.sharedService.showGoTop.subscribe((goTop) => {
-      if (goTop.status === 'temp') {
-        this.onTopStatus = 'active';
-        this.moldsQueryList.nativeElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-        });
-        // Ensure
-      }      
-    });
-    this.toolbarClickSubscriber = this.sharedService.toolbarAction.subscribe((buttonClicked: ToolbarButtonClicked) => {
-      if (buttonClicked.from !== ApplicationModules.MOLDS_HITS_VIEW) {
-          return
-      }
-      this.toolbarAction(buttonClicked);      
-    });
-    this.everySecondSubscriber = this.sharedService.pastSecond.subscribe((pulse) => {
-      this.moldsHitsToShow = this.moldsHitsToShow.map((mold) => {
-        return {
-          ...mold,
-          elapsedTimeLabel: this.sharedService.labelElapsedTime(mold.lastHit),
-        };        
+    this.moldsHitsLoading$ = this._store.select(selectLoadingMoldsHitsState).pipe(
+      tap( loading => {
+        this.loading = loading;
+        this._sharedService.setGeneralLoading(
+          ApplicationModules.MOLDS_HITS_VIEW,
+          loading,
+        );
+        this._sharedService.setGeneralProgressBar(
+          ApplicationModules.MOLDS_HITS_VIEW,
+          loading,
+        );
+        this.loaded = loading === false;
       })
-    });    
-    this.stopTimerSubscriber = this.sharedService.timeCompleted.subscribe((timeCompleted) => {
-      if (timeCompleted) {        
+    );    
+    this.profileData$ = this._store.select(selectProfileData).pipe(
+      tap( profileData => {
+        this.profileData = profileData;
+      })
+    );
+    this.settingsData$ = this._store.select(selectSettingsData).pipe(
+      tap(settingsData => {
+        this.settingsData = settingsData;
+      })
+    );
+    this.moldsHitsData$ = this._store.select(selectMoldsHitsQueryData).pipe(
+      tap( moldsHits => {
+        this.originalMoldsHits = moldsHits;      
+        this.filterMoldsHitsQueryData();
+          if (this.moldsHitsToShow.length > 0 && moldsHits?.length > 0) {
+          this.moldsHitsToShow.forEach((showedMold, index) => {
+            const moldToUpdate = moldsHits.find(mold => mold.id === showedMold.id);
+            this.moldsHitsToShow[index] = {
+              ...moldToUpdate,
+              index: showedMold.index,
+              updateHits: moldToUpdate.hits != showedMold.hits
+            }
+          })
+          return;
+        }      
+        this.showFrom = 0;
         this.slider();
-      }      
-    });
-    this.stopTimerSubscriber = this.sharedService.stopTimer.subscribe((stopTimer) => {
-    });
-    this.scrollSubscriber = this.scrollDispatcher
+      })
+    );
+    this.searchBox$ = this._sharedService.search.pipe(
+      tap((searchBox) => {
+        if (searchBox.  from === ApplicationModules.MOLDS_HITS_VIEW) {
+          this.disableListAnimation = true;
+          this.filterMoldsBy = searchBox.textToSearch;
+          this.processFilterChange()
+        }
+      })
+    );
+    this.animation$ = this._sharedService.isAnimationFinished.pipe(
+      tap((animationStatus) => {      
+        if (animationStatus.isFinished && animationStatus.toState === 'ChecklistFillingComponent') {
+          // this.animationFinished(null);
+        }      
+      })
+    );
+    this.showGoTop$ = this._sharedService.showGoTop.pipe(
+      tap((goTop) => {
+        if (goTop.status === 'temp') {
+          this.onTopStatus = 'active';
+          this.moldsQueryList.nativeElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+          // Ensure
+        }      
+      })
+    );
+    this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
+      tap((buttonClicked: ToolbarButtonClicked) => {
+        if (buttonClicked.from !== ApplicationModules.MOLDS_HITS_VIEW) {
+            return
+        }
+        this.toolbarAction(buttonClicked);
+      })
+    );
+    this.everySecond$ = this._sharedService.pastSecond.pipe(
+      tap((pulse) => {
+        this.moldsHitsToShow = this.moldsHitsToShow.map((mold) => {
+          return {
+            ...mold,
+            elapsedTimeLabel: this._sharedService.labelElapsedTime(mold.lastHit),
+          };        
+        })
+      })
+    );
+    this.stopTimer$ = this._sharedService.timeCompleted.pipe(
+      tap((timeCompleted) => {        
+        if (timeCompleted) {        
+          this.slider();
+        }      
+      })
+    );    
+    this.scroll$ = this._scrollDispatcher
     .scrolled()
-    .subscribe((data: any) => {
-      this.getScrolling(data);
-    });
+    .pipe(      
+      tap((data: any) => {
+        this.getScrolling(data);
+      })
+    )
     
     // this.animationFinished(null);      
   }
 
   ngOnDestroy() : void {
-    this.sharedService.setToolbar({
+    this._sharedService.setToolbar({
       from: ApplicationModules.MOLDS_HITS_VIEW,
       show: false,
       showSpinner: false,
@@ -184,21 +199,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       elements: [],
       alignment: 'right',
     });
-    this.sharedService.setGeneralScrollBar(
+    this._sharedService.setGeneralScrollBar(
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
-    );
-    // Turn off subscriptions
-    if (this.scrollSubscriber) this.scrollSubscriber.unsubscribe();
-    if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
-    if (this.showGoTopSubscriber) this.showGoTopSubscriber.unsubscribe();
-    if (this.profileDataSubscriber) this.profileDataSubscriber.unsubscribe();
-    if (this.searchBoxSubscriber) this.searchBoxSubscriber.unsubscribe();
-    if (this.moldsHitsDataSubscriber) this.moldsHitsDataSubscriber.unsubscribe();
-    if (this.moldsHitsLoadingSubscriber) this.moldsHitsLoadingSubscriber.unsubscribe();
-    if (this.animationSubscriber) this.animationSubscriber.unsubscribe();
-    if (this.toolbarClickSubscriber) this.toolbarClickSubscriber.unsubscribe();  
-    if (this.stopTimerSubscriber) this.stopTimerSubscriber.unsubscribe();      
+    );                    
   }
 
 // Functions ================
@@ -206,10 +210,10 @@ export class MoldsHitsCounterComponent implements OnInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this.calcElements();
-        this.sharedService.setToolbar({
+        this._sharedService.setToolbar({
           from: ApplicationModules.MOLDS_HITS_VIEW,
           show: true,
-          showSpinner: false,
+          showSpinner: true,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
@@ -236,9 +240,9 @@ export class MoldsHitsCounterComponent implements OnInit {
   }
 
   finishAnimation() {
-    this.sharedService.setToolbarTime(this.filteredMoldsHits.length > this.moldsToShow ? this.timeToWait : 0);
+    this._sharedService.setToolbarTime(this.filteredMoldsHits.length > this.moldsToShow ? this.timeToWait : 0);
     this.sliderInitiated = false;
-    this.sharedService.setGeneralLoading(
+    this._sharedService.setGeneralLoading(
       ApplicationModules.MOLDS_HITS_VIEW,
       false,
     );
@@ -295,7 +299,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       },
       {
         caption: $localize`Alarmados`,
-        icon: 'warn_fill',
+        icon: 'warn-fill',
         value: ButtonActions.ALARMED,        
       },
       {
@@ -429,7 +433,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   }
   
   trackByFn(index: any, item: any) { 
-    return item.index + '/' + item.hits; 
+    return item.index; 
   }
 
   getScrolling(data: CdkScrollable) {   
@@ -443,7 +447,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.goTopButtonTimer = setTimeout(() => {
         if (this.onTopStatus !== 'inactive') {
           this.onTopStatus = 'inactive';
-          this.sharedService.setGoTopButton(
+          this._sharedService.setGoTopButton(
             ApplicationModules.GENERAL,
             'inactive',
           );
@@ -453,7 +457,7 @@ export class MoldsHitsCounterComponent implements OnInit {
     }
     if (this.onTopStatus !== status) {
       this.onTopStatus = status;
-      this.sharedService.setGoTopButton(
+      this._sharedService.setGoTopButton(
         ApplicationModules.GENERAL,
         status,
       );
@@ -468,11 +472,13 @@ export class MoldsHitsCounterComponent implements OnInit {
     } else if (action.field === "mold-status") {
       this.moldStatusFilter = action.action === ButtonActions.ALL ? '' : action.action;
     }
-    this.moldsHitsDataSubscriber = this.store.select(selectMoldsHitsQueryData).subscribe( filteredMoldsHits => {
-      this.disableListAnimation = true;
-      this.originalMoldsHits = filteredMoldsHits;      
-      this.processFilterChange();
-    });
+    this.moldsHitsData$ = this._store.select(selectMoldsHitsQueryData).pipe(
+      tap( filteredMoldsHits => {
+        this.disableListAnimation = true;
+        this.originalMoldsHits = filteredMoldsHits;      
+        this.processFilterChange();
+      })
+    );
   }
 
   processFilterChange() {
@@ -493,7 +499,7 @@ export class MoldsHitsCounterComponent implements OnInit {
 
   filterMoldsHitsQueryData() {        
       this.filteredMoldsHits = this.filterMoldsBy ? 
-      this.sharedService.filter(this.originalMoldsHits, this.filterMoldsBy).filter(mold => 
+      this._sharedService.filter(this.originalMoldsHits, this.filterMoldsBy).filter(mold => 
       (!this.moldColorFilter || mold.label  === this.moldColorFilter) &&
       (!this.moldStateFilter || mold.state  === this.moldStateFilter) &&
       (!this.moldStatusFilter || mold.status  === this.moldStatusFilter))
@@ -505,7 +511,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   }
 
   slider() {
-    this.sharedService.setGeneralLoading(
+    this._sharedService.setGeneralLoading(
       ApplicationModules.MOLDS_HITS_VIEW,
       true,
     );
@@ -554,7 +560,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.setToolbarLabel(`Página ${Math.ceil((this.showFrom) / this.moldsToShow)} de ${Math.ceil(this.filteredMoldsHits.length / this.moldsToShow)}`);
     } else if (this.filteredMoldsHits.length > 0) {
       this.showFrom = 0;
-      this.sharedService.setToolbarTime(0);
+      this._sharedService.setToolbarTime(0);
       this.filteredMoldsHits.forEach((mold, index) => {
         this.moldsHitsToShow.push({
           ...mold,
@@ -563,7 +569,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       });
       this.setToolbarLabel(`Página 1 de 1`);
     } else {
-      this.sharedService.setToolbarTime(0);
+      this._sharedService.setToolbarTime(0);
       this.setToolbarLabel('');      
     }
   }

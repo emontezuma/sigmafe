@@ -1,0 +1,398 @@
+<div
+  class="container"
+  #moldCatalogEdition
+  @routingAnimation
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  i18n
+>
+  <ng-container *ngIf="scroll$ | async "></ng-container>   
+  <ng-container *ngIf="showGoTop$ | async "></ng-container>   
+  <ng-container *ngIf="providers$ | async "></ng-container>
+  <ng-container *ngIf="manufacturers$ | async "></ng-container>
+  <ng-container *ngIf="settingsData$ | async "></ng-container>
+  <ng-container *ngIf="moldTypes$ | async "></ng-container>
+  <ng-container *ngIf="moldClasses$ | async "></ng-container>
+  <ng-container *ngIf="moldThresholdTypes$ | async "></ng-container>
+  <ng-container *ngIf="formFieldsChanges$ | async "></ng-container>  
+
+  <mat-card class="card">    
+    <form class="layout" (ngSubmit)="onSubmit()" [formGroup]="moldForm">
+
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="treasure-chest">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DEL MOLDE</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="300"
+                [fieldRequired]="true"
+                [showRightHint]="true"              
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignado al molde"              
+              >
+                <span fieldTitle class="label field__label">Descripción/Nombre del molde</span>
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.serialNumber"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="100"
+                [fieldRequired]="true"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el Serial del molde"              
+              >
+                <span fieldTitle class="label field__label">Serial/Número de serie</span>
+              </app-input-field>            
+            </div>
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 250px" [ngClass]="{ 'field__container--error': moldForm.controls.startingDate.touched && !moldForm.controls.startingDate.valid}" [disabled]="moldForm.controls.startingDate.disabled">
+                <span class="label field__label">Fecha de inicio</span>
+                <mat-form-field appearance="fill" class="field__field">
+                  <input class="field__input" matInput formControlName="startingDate" #startingDate name="startingDate" [matDatepicker]="picker">
+                  <mat-hint>MM/DD/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-error class="field__error field__required">
+                    <mat-icon class="field__required-icon" svgIcon="warn-line"></mat-icon>
+                    <span class="field__required-label"><strong>Error en el formato de la fecha</strong></span>
+                  </mat-error>                
+                </mat-form-field>
+                <span class="field__help">Especifique la fecha en que inicio operaciones éste molde</span>
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <app-area-field
+                [formField]="moldForm.controls.notes"
+                [fieldMaxLength]="500"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique las notas referentes a este molde"              
+              >
+                <span fieldTitle class="label field__label">Notas referentes al molde</span>
+              </app-area-field>    
+            </div>
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 350px" [ngClass]="{ 'field__container--error': moldForm.controls.moldType.touched && !moldForm.controls.moldType.valid}" [disabled]="moldForm.controls.moldType.disabled">
+                <span class="label field__label">Tipo de molde</span>
+                <app-auto-complete-field
+                  [formField]="moldForm.controls.moldType"
+                  [list]="moldTypes.items"
+                  [totalCount]="moldTypes.totalCount"   
+                  leftHint="Escriba el Tipo de molde"
+                  catalog="moldTypes"
+                  [loading]="moldTypes.loading"
+                  noItemsError="No hay Tipos de molde con este nombre"                
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help">Especifique el Tipo de molde</span>
+              </fieldset>    
+            </div>
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 350px" [ngClass]="{ 'field__container--error': moldForm.controls.moldClass.touched && !moldForm.controls.moldClass.valid}" [disabled]="moldForm.controls.moldClass.disabled">
+                <span class="label field__label">Clase de molde</span>
+                <app-auto-complete-field
+                  [formField]="moldForm.controls.moldClass"
+                  [list]="moldClasses.items"
+                  [totalCount]="moldClasses.totalCount"   
+                  leftHint="Escriba la Clase de molde"
+                  catalog="moldClasses"
+                  [loading]="moldClasses.loading"
+                  noItemsError="No hay Clases de molde con este nombre"                
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help">Especifique la Clase de molde</span>
+              </fieldset>    
+            </div>            
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[1] = true"
+          (closed)="panelOpenState[1] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[1]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[1]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="time">
+              </mat-icon>
+              <label class="accordion-label"
+                >USO</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[1]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 350px" [ngClass]="{ 'field__container--error': moldForm.controls.provider.touched && !moldForm.controls.provider.valid}" [disabled]="moldForm.controls.provider.disabled">
+                <span class="label field__label">Proveedor del molde</span>
+                <app-auto-complete-field
+                  [formField]="moldForm.controls.provider"
+                  [list]="providers.items"
+                  [totalCount]="providers.totalCount"   
+                  leftHint="Escriba el nombre del proveedor a buscar"             
+                  catalog="providers"
+                  [loading]="providers.loading"
+                  noItemsError="No hay proveedores con este nombre"                
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"                
+                >
+                </app-auto-complete-field>
+                <span class="field__help">Especifique el Nombre del proveedor del molde</span>
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 350px" [ngClass]="{ 'field__container--error': moldForm.controls.manufacturer.touched && !moldForm.controls.manufacturer.valid}" [disabled]="moldForm.controls.manufacturer.disabled">
+                <span class="label field__label">Fabricante del molde</span>
+                <app-auto-complete-field
+                  [formField]="moldForm.controls.manufacturer"
+                  [list]="manufacturers.items"
+                  [totalCount]="manufacturers.totalCount"
+                  leftHint="Escriba el nombre del fabricante a buscar"        
+                  catalog="manufacturers"
+                  [loading]="manufacturers.loading"
+                  noItemsError="No hay fabricantes con este nombre"                
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"                
+                >
+                </app-auto-complete-field>
+                <span class="field__help">Especifique el Nombre del fabricante del molde</span>
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset class="field__container" style="min-width: 250px" [ngClass]="{ 'field__container--error': moldForm.controls.manufacturingDate.touched && !moldForm.controls.manufacturingDate.valid}" [disabled]="moldForm.controls.manufacturingDate.disabled">
+                <span class="label field__label">Fecha de fabricación del molde</span>
+                <mat-form-field appearance="fill" class="field__field">
+                  <input class="field__input" matInput formControlName="manufacturingDate" #manufacturingDate name="manufacturingDate" [matDatepicker]="picker">
+                  <mat-hint>MM/DD/YYYY</mat-hint>
+                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-error class="field__error field__required">
+                    <mat-icon class="field__required-icon" svgIcon="warn-line"></mat-icon>
+                    <span class="field__required-label"><strong>Error en el formato de la fecha</strong></span>
+                  </mat-error>                
+                </mat-form-field>
+                <span class="field__help">Especifique la fecha en que se fabricó éste molde</span>
+              </fieldset>
+            </div>            
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[2] = true"
+          (closed)="panelOpenState[2] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[2]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[2]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="task-notes">
+              </mat-icon>
+              <label class="accordion-label">CONTROL</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[2]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-select-field
+                [formField]="moldForm.controls.moldThresholdType"
+                [list]="moldThresholdTypes.items"
+                leftHint="Campo requerido"                
+                [fieldRequired]="true"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"                
+                fieldHelp="Especifique la estrategia de control y seguimiento"              
+              >
+                <span fieldTitle class="label field__label">Estrategia de seguimiento</span>
+              </app-select-field>            
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.moldThresholdYellow"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje vacío o en cero para no aplicar umbral"
+                fieldHelp="Especifique el número de golpes que de alcanzarse se generará una advertencia"              
+              >
+                <span fieldTitle class="label field__label">Umbral de golpes (hits) para advertencia</span>
+              </app-input-field>            
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.moldThresholdRed"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje vacío o en cero para no aplicar umbral"
+                fieldHelp="Especifique el número de golpes que de alcanzarse se generará una ALARMA"              
+              >
+                <span fieldTitle class="label field__label">Umbral de golpes (hits) para ALARMA</span>
+              </app-input-field>            
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.moldThresholdDaysYellow"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje vacío o en cero para no aplicar umbral"
+                fieldHelp="Especifique el número de días que de alcanzarse se generará una advertencia"              
+              >
+                <span fieldTitle class="label field__label">Umbral de número de dias para advertencia</span>
+              </app-input-field>            
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [formField]="moldForm.controls.moldThresholdDaysRed"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje vacío o en cero para no aplicar umbral"
+                fieldHelp="Especifique el número de días que de alcanzarse se generará una ALARMA"              
+              >
+                <span fieldTitle class="label field__label">Umbral de número de días para ALARMA</span>
+              </app-input-field>            
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </form>
+    <div class="grid-dates">
+      <div class="flex">
+        <div class="readonly-value">213</div> 
+        <div class="label-with-no-index">ID del registro</div> 
+      </div>
+      <div class="flex">
+        <div class="readonly-value">{{ today | date:'medium' }}</div> 
+        <div class="flex-row">
+          <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+          <div class="label-with-no-index">Fecha de creación</div> 
+        </div>
+      </div>
+      <div class="flex">
+        <div class="readonly-value">Elvis Montezuma</div> 
+        <div class="flex-row">
+          <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+          <div class="label-with-no-index">Creado por</div> 
+        </div>
+      </div>
+      <div class="flex">
+        <div class="readonly-value">{{ today | date:'medium' }}</div> 
+        <div class="flex-row">
+          <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+          <div class="label-with-no-index">Fecha de modificación</div> 
+        </div>
+      </div>
+      <div class="flex">
+        <div class="readonly-value">Elvis Montezuma</div> 
+        <div class="flex-row">
+          <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+          <div class="label-with-no-index">Modificado por</div> 
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

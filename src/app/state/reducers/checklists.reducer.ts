@@ -18,9 +18,16 @@ export const initialState: ChecklistFillingState = {
 
 export const checklistFillingReducer = createReducer(
   initialState,
-  on(checklistFillingActions.loadChecklistFillingData, ( state ) => ({ ...state, loading: true })),
+  on(checklistFillingActions.loadChecklistFillingData, ( state ) => ({ 
+    ...state,
+    loading: true 
+  })),
   
-  on(checklistFillingActions.loadedChecklistFillingData, (state, { checklistFillingData } ) => ({ ...state, loading: false, checklistFillingData })),
+  on(checklistFillingActions.loadedChecklistFillingData, (state, { checklistFillingData } ) => ({ 
+    ...state,
+    loading: false,
+    checklistFillingData
+  })),
   
   on(checklistFillingActions.updateChecklistQuestion, (state, { item } ) => {
     const checkForAlrmedQuestion = (answer: string, alarms: ChecklistAlarms[]): boolean => {

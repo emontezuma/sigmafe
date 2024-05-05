@@ -1,4 +1,4 @@
-import { MoldStates } from "src/app/shared/models/screen.models";
+import { MoldStates } from "src/app/catalogs";
 import { MoldLastMaintenance } from "./molds.models";
 import { PageInfo } from "src/app/shared/models/helpers.models";
 

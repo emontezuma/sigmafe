@@ -219,6 +219,11 @@ export interface PageColors {
     tablePaginatorBackgroundColor?: string,
     tablePaginatorForeColor?: string,
     tableHoverBackgroundColor?: string,
+    errorForeColor?: string,
+    errorBackgroundColor?: string,
+    errorBorderColor?: string;
+    requiredForeColor?: string,
+    requiredBackgroundColor?: string,    
 }
 
 export interface ColorsData {

@@ -5,6 +5,15 @@
   @routingAnimation
   (@routingAnimation.done)="animationFinished($event)"
 >
+  <ng-container *ngIf="settingsData$ | async "></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="checklistFillingData$ | async "></ng-container>    
+  <ng-container *ngIf="scroll$ | async "></ng-container>   
+  <ng-container *ngIf="profileData$ | async "></ng-container>   
+  <ng-container *ngIf="showGoTop$ | async "></ng-container>   
+  <ng-container *ngIf="checklistFillingLoading$ | async "></ng-container>     
+  <ng-container *ngIf="everySecond$ | async "></ng-container>       
+   
   <mat-tab-group    
     mat-stretch-tabs="false"
     mat-align-tabs="start"
@@ -221,7 +230,7 @@
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Efectuado por</mat-card-subtitle>
-                  </div>         
+                  </div>
 
                   <div class="grid-multiple equipment">
                     <div                       
@@ -260,7 +269,7 @@
                       [reference]="checklist.type?.code"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
-                      icon="white_list"
+                      icon="white-list"
                       [showGoToRecord]="true"
                       [recordId]="checklist.type?.id"
                     >
@@ -273,7 +282,7 @@
                       [reference]="checklist.class?.code"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
-                      icon="white_list"
+                      icon="white-list"
                       [showGoToRecord]="true"
                       [recordId]="checklist.class?.id"
                     >
@@ -374,7 +383,7 @@
                         [loading]="loading"
                         icon="man"
                       >
-                      </app-readonly-field>               
+                      </app-readonly-field>      
                       <mat-card-subtitle class="label">
                         Asignado a
                       </mat-card-subtitle>
@@ -383,7 +392,7 @@
                       <app-readonly-field
                         [label]="checklist.assignement?.department"
                         [loading]="loading"
-                        icon="organizational_chart"
+                        icon="organizational-chart"
                       >
                       </app-readonly-field>
                       <mat-card-subtitle class="label">
@@ -396,7 +405,7 @@
                         [loading]="loading"
                         icon="event"
                       >
-                      </app-readonly-field>             
+                      </app-readonly-field>    
                       <mat-card-subtitle class="label">
                         Fecha de asignación
                       </mat-card-subtitle>
@@ -407,7 +416,7 @@
                         [loading]="loading"
                         icon="country"
                       >
-                      </app-readonly-field>             
+                      </app-readonly-field>    
                       <mat-card-subtitle class="label">
                         País
                       </mat-card-subtitle>
@@ -438,9 +447,9 @@
                       <app-readonly-field
                         [label]="checklist.assignement?.type"
                         [loading]="loading"
-                        icon="white_list"                
+                        icon="white-list"                
                       >
-                      </app-readonly-field>                     
+                      </app-readonly-field>            
                       <mat-card-subtitle class="label">
                         Tipo de asignación
                       </mat-card-subtitle>
@@ -491,7 +500,7 @@
                         [loading]="loading"
                         icon="man"
                       >
-                      </app-readonly-field>             
+                      </app-readonly-field>    
                       <mat-card-subtitle class="label">
                         Planificado por
                       </mat-card-subtitle>
@@ -500,7 +509,7 @@
                       <app-readonly-field
                         [label]="checklist.planning?.department"
                         [loading]="loading"
-                        icon="organizational_chart"
+                        icon="organizational-chart"
                       >
                       </app-readonly-field>
                       <mat-card-subtitle class="label">
@@ -513,7 +522,7 @@
                         [loading]="loading"
                         icon="event"
                       >
-                      </app-readonly-field>             
+                      </app-readonly-field>    
                       <mat-card-subtitle class="label">
                         Fecha de planificación
                       </mat-card-subtitle>
@@ -535,7 +544,7 @@
                     }"
                   >
                     <mat-panel-title>
-                      <mat-icon class="accordion-icon" svgIcon="task_notes">
+                      <mat-icon class="accordion-icon" svgIcon="task-notes">
                       </mat-icon>
                       <label class="accordion-label">Notas del checklist</label>
                     </mat-panel-title>
@@ -605,7 +614,7 @@
         </label>        
       </ng-template>
       <ng-template matTabContent>
-        <div class="flex-box checklist-toolbar">          
+        <div class="flex-box checklist-toolbar"> 
           <div class="margined"></div>
           <button
             mat-button

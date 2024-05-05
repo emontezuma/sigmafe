@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsComponent, CatalogsHomeComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -14,8 +14,18 @@ const routes: Routes = [
     children: [
       {
         path: 'molds',
-        component: CatalogMoldsComponent,
+        component: CatalogMoldsListComponent,
         data: { animation: 'CatalogMoldsComponent' },
+      },
+      {
+        path: 'molds/create',
+        component: CatalogMoldEditionComponent,
+        data: { animation: 'CatalogMoldEditionComponent' },
+      },
+      {
+        path: 'molds/edit/:id',
+        component: CatalogMoldEditionComponent,
+        data: { animation: 'CatalogMoldEditionComponent' },
       },
       {
         path: '**',

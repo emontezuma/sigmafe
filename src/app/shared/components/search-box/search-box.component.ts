@@ -29,5 +29,9 @@ export class SearchBoxComponent {
     });    
   }
 
+  ngOnDestroy() {
+    if (this.searchBy) this.searchBy.unsubscribe();
+  }
+
 // End ======================
 }

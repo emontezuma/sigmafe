@@ -1,7 +1,7 @@
 @use "../../../../assets/styles/mixins";
 
 .container {
-    margin-bottom: 10px;
+    margin: 5px 1px;
     counter-reset: counter;
 }
 
@@ -12,22 +12,17 @@
     color: var(--z-colors-page-fore);
 }
 
-.tab-general-info {
-    @include mixins.flexbox(row, wrap, 1px, flex-start);
-    font-size: 1.6rem;
-    font-weight: 500;
-    align-content: center;
-}
+.tab-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 5px;
+} 
 
 .tab-questions {
     @include mixins.flexbox(column, wrap, 10px, flex-start);
     font-size: 1.6rem;
     font-weight: 500;
     align-content: center; 
-}
-
-.tabs {
-    margin: 5px 10px 10px 10px;
 }
 
 mat-card-title {
@@ -157,12 +152,6 @@ mat-card-subtitle {
     padding: 0 10px 10px;
 }
 
-.tab-icon {
-    width: 32px;
-    height: 32px;
-    margin-right: 5px;
-}
-
 mat-expansion-panel {
     border: 1.5px solid var(--theme-primary-500);
     box-shadow: unset;
@@ -206,14 +195,6 @@ mat-panel-title {
     background-color: transparent;
 }
 
-.divider {
-    @include mixins.divider(10px, 5px, 0px, 0px);   
-}
-
-.divider-vertical {
-    @include mixins.divider(0px, 0px, 5px, -5px, var(--z-colors-page-card-fore), 30px, 1px);   
-}
-
 .label-reference {
     background-color: var(--z-colors-page-shadow);
     padding: 0px 5px;
@@ -246,7 +227,6 @@ mat-panel-title {
     border-radius: 4px;
     padding: 5px;
 }
-
 
 .equipment {    
     padding: 0px !important;
@@ -601,4 +581,10 @@ app-checklist-filling-item {
 
 ::ng-deep .mat-mdc-tab.mdc-tab:nth-child(2) {    
     margin-left: -30px;
+}
+
+app-label-ellipsis {
+    margin: 0px;
+    padding: 5px 0px;
+    line-height: 27px;
 }

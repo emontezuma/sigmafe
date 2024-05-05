@@ -1,6 +1,6 @@
-import { Component, OnInit, Inject, } from '@angular/core';
+import { Component, Inject, } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
-import { Subscription } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Store } from '@ngrx/store';
 
 import { AppState } from '../../../state/app.state'; 
@@ -23,8 +23,8 @@ defaultButtonIcons: string[] = [
   'cancel',
 ];
 loading: boolean = false;
-settingDataSubscriber: Subscription;
-everySecondSubscriber: Subscription;
+settingsData$: Observable<SettingsData>;
+everySecond$: Observable<boolean>;
 settingsData: SettingsData;
 closed: boolean = false;
 timeOutforDefaultButton: number = 0;
@@ -48,25 +48,28 @@ smallFont: SmallFont = {
 }  
 
 constructor (
-  private store: Store<AppState>,
-  public dialogRef: MatDialogRef<GenericDialogComponent>,
-  public sharedService: SharedService,
+  private _store: Store<AppState>,
+  public _dialogRef: MatDialogRef<GenericDialogComponent>,
+  public _sharedService: SharedService,
   @Inject(MAT_DIALOG_DATA) public data: any
 ) {
-  this.settingDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
-    this.settingsData = settingsData;
-    if (this.settingsData.timeOutFortDialog && this.settingsData.timeOutFortDialog > 0) {
-      this.timeOutforDefaultButton = this.settingsData.timeOutFortDialog;
-      this.everySecondSubscriber = this.sharedService.pastSecond.subscribe((pulse) => {
-        this.timeOutforDefaultButton = this.timeOutforDefaultButton - 1;
-        if (this.timeOutforDefaultButton === 0) {
-          this.data.action = this.defaultAction;
-          this.everySecondSubscriber.unsubscribe();
-          this.dialogRef.close(this.data);
-        }    
-      });
-    }
-  });
+  this.settingsData$ = this._store.select(selectSettingsData).pipe(
+    tap( settingsData => {
+      this.settingsData = settingsData;
+      if (this.settingsData.timeOutFortDialog && this.settingsData.timeOutFortDialog > 0) {
+        this.timeOutforDefaultButton = this.settingsData.timeOutFortDialog;
+        this.everySecond$ = this._sharedService.pastSecond.pipe(
+          tap((pulse) => {
+            this.timeOutforDefaultButton = this.timeOutforDefaultButton - 1;
+            if (this.timeOutforDefaultButton === 0) {
+              this.data.action = this.defaultAction;            
+              this._dialogRef.close(this.data);
+            }    
+          })
+        );
+      }
+    })
+  );
 } 
 
 // Hooks ====================
@@ -89,12 +92,7 @@ constructor (
       this.defaultAction = this.data.buttons.find((button : any) => button.default).action;
     }
   }
-
-  ngOnDestroy(): void {
-    if (this.settingDataSubscriber) this.settingDataSubscriber.unsubscribe();
-    if (this.everySecondSubscriber) this.everySecondSubscriber.unsubscribe();
-  }
-
+  
 // Functions ================
   trackByFn(index: any, item: any) { 
     return index; 
@@ -107,14 +105,14 @@ constructor (
     this.data.buttons[index].loading = true;
     setTimeout(() => {      
       this.data.action = this.data.buttons[index].action;
-      this.dialogRef.close(this.data);
+      this._dialogRef.close(this.data);
     }, 1000);    
   }
 
   handleCloseButtonClick() {
     this.closed = true;
     this.data.action = 'cancel'; 
-    this.dialogRef.close(this.data);
+    this._dialogRef.close(this.data);
   }
 
 // End ======================

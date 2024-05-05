@@ -1,7 +1,9 @@
 <div
+    *ngIf="data?.message"
     class="container"
     [style.maxWidth.px]="maxWidth"
 >
+    <ng-container *ngIf="screenData$ | async "></ng-container>
     <div
         class="message"        
     >        
@@ -26,14 +28,14 @@
             <mat-icon            
                 class="svgicon icon-medium"            
                 [svgIcon]="data.buttonIcon"            
-            >                            
+            >                   
             </mat-icon>
         </button>    
         <mat-icon
             *ngIf="!data.buttonText && !!data.icon && !data.buttonIcon"
             class="svgicon only-icon"            
             [svgIcon]="data.icon"            
-        >                            
+        >                   
         </mat-icon>
     </div>
 </div>

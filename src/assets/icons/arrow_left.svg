@@ -1,7 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"  x="0px" y="0px" width="32" height="32" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve" viewbox="0 0 32 32">
-
-<rect class="st2" width="24" height="24" style="fill:none;;"></rect>
-<circle id="58128986_shock_x5F_color_same" class="stshockcolor" cx="12" cy="12" r="10" style="fill: rgb(244, 67, 54);" data-st="fill:#FF4081;;"></circle>
-<path class="st0" d="M2,12C2,6.479,6.479,2,12,2c5.523,0,10,4.479,10,10H2z" style="opacity:0.2;fill:#FFFFFF;;"></path>
-<polygon class="st3" points="12,18 12,14 18,14 18,10 12,10 12,6 6,12 " style="fill:#D0D8DC;;"></polygon>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"  x="0px" y="0px" width="32" height="32" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve" viewbox="0 0 32 32">
+<path d="M12,2C6.48,2,2,6.48,2,12c0,5.52,4.48,10,10,10c5.52,0,10-4.48,10-10C22,6.48,17.52,2,12,2z M18,14h-6v4l-6-6l6-6v4h6V14z"></path>
 </svg>

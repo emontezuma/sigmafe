@@ -6,10 +6,9 @@ import { MoldHitsQuery, MoldLabelColor, MoldTresholdState } from '../../models/m
 import { fromTop, numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
-import { SharedService } from '../../../shared/services/shared.service';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
-import { Subscription } from 'rxjs';
-import { MoldStates } from 'src/app/shared/models/screen.models';
+import { Observable, tap } from 'rxjs';
+import { MoldStates } from 'src/app/catalogs';
 
 @Component({
   selector: 'app-mold-hits-counter',
@@ -39,7 +38,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   alarmLevel = 0;
   maintenanceClass: string = 'meter-30';
   lastChartValue: number = 0; 
-  settingsDataSubscriber: Subscription;
+  settingsData$: Observable<SettingsData>;
   limits: SpinnerLimits[] = [{
     start: 0,
     finish: 75,
@@ -95,24 +94,24 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   showPrefix = false;
 
   constructor (
-    private store: Store<AppState>,
-    private sharedService: SharedService,
+    private _store: Store<AppState>,    
   ) { }
 
 // Hooks ====================
   ngOnInit() {
-    this.settingsDataSubscriber = this.store.select(selectSettingsData).subscribe( settingsData => {
-      this.settingsData = settingsData;
-      this.assignSettings(); 
-      this.calcData();
-      this.hits = this.mold.hits ?? 0;    
-      this.numberToArray(this.hits, this.mold.previousHits);      
-      this.prepareDataToChart(this.hits, this.mold.thresholdRed ?? 0)          
-    });        
+    this.settingsData$ = this._store.select(selectSettingsData).pipe(
+      tap( settingsData => {
+        this.settingsData = settingsData;
+        this.assignSettings(); 
+        this.calcData();
+        this.hits = this.mold.hits ?? 0;    
+        this.numberToArray(this.hits, this.mold.previousHits);      
+        this.prepareDataToChart(this.hits, this.mold.thresholdRed ?? 0)          
+      })
+    )      
   }
 
-  ngOnChanges(): void {
-    let indice = this.intemIndex;
+  ngOnChanges(): void {    
     this.hits = this.mold.hits ?? 0;
     if (this.mold.updateHits) {      
       this.numberToArray(this.hits, this.mold.previousHits);      
@@ -125,20 +124,15 @@ export class MoldHitsCounterComponent implements AfterViewInit {
     progressBars.forEach((element) => {
       element?.style.setProperty('--mdc-linear-progress-track-color', 'var(--z-colors-page-background-color)');     
     })
-  }
+  }  
   
-  ngOnDestroy(): void {
-    if (this.settingsDataSubscriber) this.settingsDataSubscriber.unsubscribe()
-  }
-
 // Functions ================
   calcData() {
     this.maintenanceClass = this.mold.nextMaintenance?.alarmed ? 'meter-31' : 'meter-32'
   }
   
   assignSettings() {
-    this.borderColorClass = 'meter-0';
-    // this.progressForeColorClass = this.settingsData?.waitingColor;    
+    this.borderColorClass = 'meter-0';    
   }
 
   numberToArray(current: number, previous: number) {    
@@ -147,8 +141,10 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       this.showNumber[0] = 'Pair';
       return;
     }
+    console.log(this.digitPair);
+    console.log(this.digitOdd);
     for (let i = 0; i < current.toString().length; i++) {
-    const before = previous ?? 0;
+      const before = previous ?? 0;
       const base = 10 ** (current.toString().length - 1 - i);      
       const currentAmount = current.toString().substring(i);
       let beforeAmount = before.toString().substring(i);

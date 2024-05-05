@@ -1,10 +1,10 @@
-import { AfterViewInit, Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subscription } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
 import { AppState } from 'src/app/state/app.state';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ButtonActions, ShowElement, ToolbarControl } from 'src/app/shared/models/screen.models';
+import { ButtonActions, ButtonState, ShowElement, ToolbarControl, Screen } from 'src/app/shared/models/screen.models';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 
@@ -14,26 +14,28 @@ import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
   styleUrls: ['./toolbar.component.scss']
 })
 export class ToolbarComponent implements AfterViewInit {
-@ViewChild('toolbarBox') toolbarBox: ElementRef;
 @Input() toolbar: ToolbarControl;
 
 // Variables ================
   showSearchBox: ShowElement;
   toolbarHeight: number = 64;
-  changeStateSubscriber: Subscription;
-  showSearchSubscriber: Subscription;
-  screenDataSubscriber: Subscription;
+  changeState$: Observable<ButtonState>;
+  showSearch$: Observable<ShowElement>;
+  screenData$: Observable<Screen>;
   scrollbarActivated: boolean = false;
   mostRight: number = 0;
   mostLeft: number = 0;
+  totalElementsWidth: number = 0;
+  screenWidth: number = 0;
   // TEMP
   stopTimer: boolean = false;
-  firstTime: boolean = true;  
-  timeOutforTimer: number = 0;  
-  timeOutCountdown: number = 0;  
-  everySecondSubscriber: Subscription;
-  timeIntervalSubscriber: Subscription;
-  intervalSeconds: any;  
+  firstTime: boolean = true;
+  timeOutforTimer: number = 0;
+  timeOutCountdown: number = 0;
+  everySecond$: Observable<boolean>;
+  timeInterval$: Observable<number>;
+
+  intervalSeconds: any;
   classLegacy: string = 'spinner-card-font';
   classWarm: string = 'spinner-accent';
   limits: SpinnerLimits[] = [];
@@ -58,85 +60,91 @@ export class ToolbarComponent implements AfterViewInit {
   }  
 
   constructor (
-    private sharedService: SharedService,
-    private store: Store<AppState>,
+    private _sharedService: SharedService,
+    private _store: Store<AppState>,
   ) { }
 
 // Hooks ====================
   ngOnInit(): void {
-    this.screenDataSubscriber = this.store.select(selectSharedScreen).subscribe(screenData => {      
-      this.scrollbarActivated = screenData.innerWidth <= (this.toolbarBox.nativeElement.clientWidth + 30);
-      this.sharedService.setScrollbarInToolbar(this.scrollbarActivated);      
-    });    
-    this.showSearchSubscriber = this.sharedService.showSearch.subscribe((searchBox) => {
-      this.showSearchBox = searchBox;
-    });
-    this.changeStateSubscriber = this.sharedService.buttonStateChange.subscribe((buttonState) => {
-      const element = this.toolbar.elements.find((element) => {
-        return element.action === buttonState.action
-      });
-      if (element) {
-        element.disabled = !buttonState.enabled;
-      }
-    });    
-    this.everySecondSubscriber = this.sharedService.pastSecond.subscribe((pulse) => {
-      if (this.stopTimer || this.timeOutforTimer == 0) return;
-      if (this.timeOutCountdown === 0) {
-        this.sharedService.setTimeCompleted(true);
-        return;
-      }
-      // Hay un issue que hace que el primer segundo se consuma muy rapido
-      if (this.timeOutCountdown === this.timeOutforTimer && this.firstTime) {
-        this.firstTime = false;
-        return;
-      }
-
-      this.timeOutCountdown = this.timeOutCountdown - 1;        
-    });
-    this.timeIntervalSubscriber = this.sharedService.timeInterval.subscribe((interval) => {      
-      this.firstTime = true;
-      this.timeOutforTimer = interval;  
-      this.timeOutCountdown = this.timeOutforTimer;  
-      this.toolbar.showSpinner = interval > 0;      
-    });
+    this.totalElementsWidth = (this.toolbar.showSpinner ? 55 : 0) + (this.toolbar.elements.length - 1) * 5;
+    this.screenData$ = this._store.select(selectSharedScreen).pipe(
+      tap(screenData => {
+        this.screenWidth = screenData.innerWidth;
+        this.validateScrollbar();
+      })
+    );
+    this.showSearch$ = this._sharedService.showSearch.pipe(
+      tap((searchBox) => {
+        this.showSearchBox = searchBox;
+      })
+    );
+    this.changeState$ = this._sharedService.buttonStateChange.pipe(
+      tap((buttonState) => {
+        const element = this.toolbar.elements.find((element) => {
+          return element.action === buttonState.action
+        });
+        if (element) {
+          element.disabled = !buttonState.enabled;
+        }
+      })
+    );
+    this.everySecond$ = this._sharedService.pastSecond.pipe(
+      tap((pulse) => {     
+        if (this.stopTimer || this.timeOutforTimer == 0) return;
+        if (this.timeOutCountdown === 0) {
+          this._sharedService.setTimeCompleted(true);
+          return;
+        }
+        // Hay un issue que hace que el primer segundo se consuma muy rapido
+        if (this.timeOutCountdown === this.timeOutforTimer && this.firstTime) {
+          this.firstTime = false;
+          return;
+        }
+        this.timeOutCountdown = this.timeOutCountdown - 1;
+      })
+    );
+    this.timeInterval$ = this._sharedService.timeInterval.pipe(
+      tap((interval) => {      
+        this.firstTime = true;
+        this.timeOutforTimer = interval;
+        this.timeOutCountdown = this.timeOutforTimer;      
+        this.toolbar.showSpinner = interval > 0;
+      })
+    );
   }
 
   ngAfterViewInit(): void {
-    console.log(this.toolbarBox);
+    const toolbarElements = document.getElementsByName("toolbar-element");
+    toolbarElements.forEach((element) => {       
+      this.totalElementsWidth = this.totalElementsWidth + element.clientWidth;
+    });    
+    this.validateScrollbar();
   }
-
-  ngOnDestroy(): void {
-    if (this.showSearchSubscriber) this.showSearchSubscriber.unsubscribe();
-    if (this.changeStateSubscriber) this.changeStateSubscriber.unsubscribe();
-    if (this.everySecondSubscriber) this.everySecondSubscriber.unsubscribe();
-    if (this.timeIntervalSubscriber) this.timeIntervalSubscriber.unsubscribe();    
-  }
-
+  
 // Functions ================
+  validateScrollbar() {
+    this.scrollbarActivated = this.totalElementsWidth - (this.screenWidth - 32) >= 0;
+    this._sharedService.setScrollbarInToolbar(this.scrollbarActivated);
+  }
   sendSearchText(e: any) {
-    this.sharedService.setText(e, this.showSearchBox.from);
+    this._sharedService.setText(e, this.showSearchBox.from);
   }
 
   trackByFn(index: any, item: any) { 
-    return index; 
+    return index;
   }
 
   handleClick(index: number, action: ButtonActions, field: string) {
-    this.toolbar.elements[index].loading = true;
-    setTimeout(() => {
-      this.toolbar.elements[index].loading = false;
-      // TODO que hacer en tiempos muy largos
-    }, 5000);
-    this.sharedService.setToolbarClick(action, this.toolbar.from, index, field);
+    this._sharedService.setToolbarClick(action, this.toolbar.from, index, field);
   }
 
   handleSelection(event: any, field: string) {
-    this.sharedService.setToolbarClick(event.selection, this.toolbar.from, event.index, field);
+    this._sharedService.setToolbarClick(event.selection, this.toolbar.from, event.index, field);
   }
 
   handleStopTimer() {
     this.stopTimer = !this.stopTimer    
-    this.sharedService.setToolbarStopTimer(this.stopTimer);
+    this._sharedService.setToolbarStopTimer(this.stopTimer);
   }
 
   moveToolbar(button: string) {

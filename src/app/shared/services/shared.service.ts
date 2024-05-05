@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, animationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, } from '../models/screen.models';
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
 import { CapitalizationMethod, DatesDifference } from '../models/helpers.models';
-interface buttonState {
-  action?: ButtonActions;
-  enabled: boolean;
-}
+import { GET_MOLDS } from '../../graphql/graphql.queries';
+import { Apollo } from 'apollo-angular';
+import { environment } from 'src/environments/environment';
+import { Store } from '@ngrx/store';
+import { AppState, updateMoldsHitsData } from 'src/app/state';
 
 @Injectable({
   providedIn: 'root',
@@ -20,8 +20,8 @@ export class SharedService {
   private toolbarActionBehaviorSubject: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1, field: '' });
   toolbarAction: Observable<ToolbarButtonClicked> = this.toolbarActionBehaviorSubject.asObservable();
 
-  private buttonStateChangeBehaviorSubject: BehaviorSubject<buttonState> = new BehaviorSubject<buttonState>({ action: undefined, enabled: true });
-  buttonStateChange: Observable<buttonState> = this.buttonStateChangeBehaviorSubject.asObservable();
+  private buttonStateChangeBehaviorSubject: BehaviorSubject<ButtonState> = new BehaviorSubject<ButtonState>({ action: undefined, enabled: true });
+  buttonStateChange: Observable<ButtonState> = this.buttonStateChangeBehaviorSubject.asObservable();
 
   private snackMessageBehaviorSubject: BehaviorSubject<SnackMessage> = new BehaviorSubject<SnackMessage>({ 
     message: '',
@@ -62,8 +62,8 @@ export class SharedService {
   private showGoTopBehaviorSubject: BehaviorSubject<GoTopButtonStatus> = new BehaviorSubject<GoTopButtonStatus>({ from: '', status: 'inactive' });
   showGoTop: Observable<GoTopButtonStatus> = this.showGoTopBehaviorSubject.asObservable();
 
-  private isAnimationFinishedBehaviorSubject: BehaviorSubject<animationStatus> = new BehaviorSubject<animationStatus>({ toState: '', fromState: '', isFinished: false });
-  isAnimationFinished: Observable<animationStatus> = this.isAnimationFinishedBehaviorSubject.asObservable();
+  private isAnimationFinishedBehaviorSubject: BehaviorSubject<AnimationStatus> = new BehaviorSubject<AnimationStatus>({ toState: '', fromState: '', isFinished: false });
+  isAnimationFinished: Observable<AnimationStatus> = this.isAnimationFinishedBehaviorSubject.asObservable();
 
   private pastSecondBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
   pastSecond: Observable<boolean> = this.pastSecondBehaviorSubject.asObservable();
@@ -80,9 +80,10 @@ export class SharedService {
   private scrollbarInToolbarBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
   scrollbarInToolbar: Observable<boolean> = this.scrollbarInToolbarBehaviorSubject.asObservable();
 
-  constructor (
-    public snackBar: MatSnackBar,
-    public datePipe: DatePipe,    
+  constructor (    
+    public _datePipe: DatePipe,
+    private _apollo: Apollo,
+    private _store: Store<AppState>,
   ) {}
 
 // Functions ================
@@ -189,7 +190,9 @@ export class SharedService {
     
     let dateFrom: number = 0; 
     try {
-      dateFrom = Date.parse(date);
+      const dateConverted = new Date(date).toString() + ' UTC';
+      dateFrom = Date.parse(dateConverted);
+      
     } catch (error) {
       try {
 
@@ -333,7 +336,7 @@ export class SharedService {
       return '';
     }
 
-    return this.datePipe.transform(new Date(date), format).replace(/p. m./gi, 'PM').replace(/a. m./gi, 'AM');
+    return this._datePipe.transform(new Date(date), format).replace(/p. m./gi, 'PM').replace(/a. m./gi, 'AM');
   }
 
   lookIntoObject(object: any, cad: string): boolean {
@@ -359,6 +362,54 @@ export class SharedService {
     }
     return dataToFilter.filter(item => this.lookIntoObject(item, cad));    
   }
-  
+
+  connectToSocket(): void {
+    const host = `${environment.webSocketAddress}/moldhub`; // SET THIS TO YOUR SERVER
+    try {
+      let socket = new WebSocket(host);
+      socket.onopen  = (msg) => { 
+        socket.send("{ \"protocol\": \"json\", \"version\": 1 }\u001e");         
+      };
+      socket.onmessage = (receivedMold: any) => {
+        if (receivedMold?.data) {
+          const data = JSON.parse(receivedMold?.data.replace("\u001e", ""));          
+          if (data?.arguments?.length > 0) {
+            console.log(data?.arguments[0]);
+            this._store.dispatch(updateMoldsHitsData({ hitMold: data?.arguments[0] }));         
+          }
+        }
+        
+      };
+      socket.onclose = (msg) => { 
+      };     
+    }
+    catch(ex){ 
+      console.log(ex); 
+    }
+        
+  }
+
+  getHardcodedValues$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, orderBy: any = null) {
+    let variables = undefined;
+    if (recosrdsToSkip !== 0) {
+      variables = { recosrdsToSkip: recosrdsToSkip };
+    }
+    if (recosrdsToTake !== 0) {
+      if (variables) {         
+        variables = { ...variables, recosrdsToTake: recosrdsToTake };
+      } else {
+        variables = { recosrdsToTake: recosrdsToTake };
+      }      
+    }
+    if (orderBy) {
+      if (variables) {         
+        variables = { ...variables, orderBy: orderBy };
+      } else {
+        variables = { orderBy: orderBy };
+      }
+    }    
+    return this._apollo.watchQuery({ query: GET_MOLDS, variables, context: { headers: { 'x-customer-id': '1', 'x-language-id': '1',  }} }).valueChanges    
+  }
+
 // End ======================
 }

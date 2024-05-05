@@ -47,5 +47,8 @@ export interface PageInfo {
     pageSize?: number;
     totalPages?: number;
     totalRecords?: number;
+    inactiveRecords?: number;
+    activeRecords?: number;
+    forcedUpdate?: boolean;
   }
   

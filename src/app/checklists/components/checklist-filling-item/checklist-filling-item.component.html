@@ -2,6 +2,7 @@
   class="container"
   #questionCard
 >
+<ng-container *ngIf="screen$ | async "></ng-container>
   <mat-card
     class="question-card"
     [ngClass]="{
@@ -42,10 +43,10 @@
           item.status === ChecklistQuestionStatus.COMPLETED
             ? 'check'
             : item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING
-            ? 'attachment_file'
+            ? 'attachment-file'
             : item.status === ChecklistQuestionStatus.CANCELLED
             ? 'block'
-            : 'warn_fill'
+            : 'warn-fill'
         "
         [matTooltipDisabled]="item.status === ChecklistQuestionStatus.COMPLETED"
         [matTooltip]="cornerTooltip"       
@@ -84,7 +85,7 @@
                   No
                 </mat-chip-option>
               </mat-chip-listbox>
-            </div>          
+            </div> 
             <img
               *ngIf="item.icon"
               alt="image"

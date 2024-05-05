@@ -3,7 +3,20 @@
   class="container"
   @routingAnimation  
 >  
+  <ng-container *ngIf="scroll$ | async "></ng-container>   
+  <ng-container *ngIf="settingsData$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>
+  <ng-container *ngIf="profileData$ | async "></ng-container>   
+  <ng-container *ngIf="showGoTop$ | async "></ng-container>   
+  <ng-container *ngIf="everySecond$ | async "></ng-container>  
+  <ng-container *ngIf="animation$ | async "></ng-container>
+  <ng-container *ngIf="searchBox$ | async "></ng-container>  
+  <ng-container *ngIf="moldsHitsData$ | async "></ng-container>   
+  <ng-container *ngIf="moldsHitsLoading$ | async "></ng-container>   
+  <ng-container *ngIf="stopTimer$ | async "></ng-container>   
+
   <ng-container *ngTemplateOutlet="!loading ? molds : loader">
+
   </ng-container>
   <ng-template #molds>
     <div
@@ -32,7 +45,7 @@
               [mold]="mold"
               [intemIndex]="mold.index"
               [ngStyle]="{ 'background-color': (mold.index % 2 === 0) ? 'transparent' : 'rgba(0, 0, 0, 0.3)' }"
-            ></app-mold-hits-counter>          
+            ></app-mold-hits-counter> 
           </div>
         </div>
         <div
@@ -65,11 +78,11 @@
               }"
               count="3"
             >
-            </ngx-skeleton-loader>              
+            </ngx-skeleton-loader>     
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>
           <mat-card-content class="image-container">
-            <ngx-skeleton-loader [theme]="{ width: '140px', height: '140px', backgroundColor: 'rgba(0, 0, 0, 0.075)' }" count="1"  appearance="circle"></ngx-skeleton-loader>            
+            <ngx-skeleton-loader [theme]="{ width: '140px', height: '140px', backgroundColor: 'rgba(0, 0, 0, 0.075)' }" count="1"  appearance="circle"></ngx-skeleton-loader>   
           </mat-card-content>
           <mat-divider class="divider"></mat-divider>       
           <mat-card-footer class="image-text">
@@ -92,7 +105,7 @@
               [theme]="{ backgroundColor: 'rgba(0, 0, 0, 0.075)' }"
               count="1"
             >
-            </ngx-skeleton-loader>              
+            </ngx-skeleton-loader>     
           </mat-card-content>
         </mat-card>
       </div>

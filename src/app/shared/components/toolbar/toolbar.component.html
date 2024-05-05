@@ -1,23 +1,30 @@
 <div class="container">
   <mat-toolbar 
-    class="toolbar" 
+    class="toolbar"
     #scrollbar
-    [ngStyle]="{ 'height': scrollbarActivated ? '80px' : '64px' }"
+    [ngStyle]="{ 'height': scrollbarActivated ? '84px' : '64px' }"
   >
+    <ng-container *ngIf="changeState$ | async "></ng-container>
+    <ng-container *ngIf="showSearch$ | async "></ng-container>
+    <ng-container *ngIf="screenData$ | async "></ng-container>    
+    <ng-container *ngIf="everySecond$ | async "></ng-container>    
+    <ng-container *ngIf="timeInterval$ | async "></ng-container>    
+
     <div 
-      #toolbarBox 
+      name="toolbar-box"
       [ngClass]="toolbar.toolbarClass"
       [ngStyle]="{ 'margin-left': toolbar.alignment === 'right' ? 'auto' : 'unset', 'margin-right': toolbar.alignment === 'left' ? 'auto' : 'unset' }"
+      [ngStyle]="{ 'width': scrollbarActivated ? 'unset' : '100%' }"
     >
       <div
         *ngIf="toolbar.showSpinner"
         class="tab-spinner"
         [ngClass]="{ 'pulse-with-accent': stopTimer }"
       >
-        <app-spinner          
+        <app-spinner           
           [matTooltip]="stopTimer ? 'Reanudar' : 'Detener'"
           matTooltipClass="tooltip-general"
-          matTooltipShowDelay="100"          
+          matTooltipShowDelay="100" 
           [legacy]="stopTimer ? classWarm : classLegacy"
           [spinnerMode]="stopTimer ? 'indeterminate' : 'determinate'"
           [diameter]="50"
@@ -34,11 +41,12 @@
         </app-spinner>        
       </div>
       <div
+        name="toolbar-element"
         class="toolbar-button-container"
+        [ngStyle]="{ 'margin-left': button.alignment === 'right' ? 'auto' : 'unset', 'margin-right': button.alignment === 'left' ? 'auto' : 'unset' }"
         *ngFor="
           let button of toolbar.elements;
-          let i = index;
-          trackBy: trackByFn
+          let i = index;          
         "
       >
         <div *ngIf="button.type === 'label' && button.caption"
@@ -78,6 +86,19 @@
             button.showCaption ? button.caption : ""
           }}</label>
         </button>
+        <div 
+          *ngIf="button.locked"
+          class="button-locked"
+        >
+          <mat-icon
+            class="svgicon small-locked"
+            svgIcon="lock-closed"
+            matTooltip="Puede requerir clave"
+            matTooltipClass="tooltip-general"
+            matTooltipShowDelay="100"
+          >
+          </mat-icon>
+        </div>
         <mat-divider
           *ngIf="button.type === 'divider'"
           vertical
@@ -100,17 +121,7 @@
           [tooltip]="button.tooltip"
           (selection)="handleSelection($event, button.field)"
         >
-        </app-button-menu>
-        <div *ngIf="button.locked && !button.disabled" class="button-locked">
-          <mat-icon
-            class="svgicon small-locked"
-            svgIcon="small-locked"
-            matTooltip="Puede requerir clave"
-            matTooltipClass="tooltip-general"
-            matTooltipShowDelay="100"
-          >
-          </mat-icon>
-        </div>
+        </app-button-menu>        
       </div>
     </div>    
   </mat-toolbar>
