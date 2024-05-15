@@ -11,10 +11,12 @@ const routes: Routes = [
   {
     path: 'molds',
     loadChildren: () => import('./molds/molds.module').then(m => m.MoldsModule),    
+    data: { animation: 'isTop' },
   },
   {
     path: 'catalogs',
     loadChildren: () => import('./catalogs/catalogs.module').then(m => m.CatalogsModule),    
+    data: { animation: 'isTop' },
   },
   {
     path: '404',

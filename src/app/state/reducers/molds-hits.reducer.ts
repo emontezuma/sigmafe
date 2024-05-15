@@ -22,18 +22,21 @@ export const moldsHitsReducer = createReducer(
 
   on(moldsActions.updateMoldsHitsData, (state, { hitMold } ) => {
     const updatedMolds = state.moldsHitsQueryData?.data?.map((mold) => {
-      if (mold.id == hitMold.id) {
+      if (mold.data.id == hitMold.id) {
        return { 
           ...mold,
-          hits: hitMold.hits,
-          previousHits: hitMold.previousHits,
-          lastHit: hitMold.lastHit,
-          thresholdState: hitMold.thresholdState,
-          label: hitMold.label,
-          thresholdRed: hitMold.thresholdRed,
-          mainImagePath: hitMold.mainImagePath,
-          status: hitMold.status,
-          state: hitMold.state,
+          data: {
+            ...mold.data,
+            hits: hitMold.hits,
+            previousHits: hitMold.previousHits,
+            lastHit: hitMold.lastHit,          
+            thresholdState: hitMold.thresholdState,
+            label: hitMold.label,
+            thresholdRed: hitMold.thresholdRed,
+            mainImagePath: hitMold.mainImagePath,
+            status: hitMold.status,
+            state: hitMold.state,
+          }
         }
       }
       return mold;

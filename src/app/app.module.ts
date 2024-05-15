@@ -24,6 +24,7 @@ import { GraphQLModule } from './graphql.module';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './shared/services';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
+import { InterceptorInterceptor } from './interceptor.interceptor';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     DatePipe,
     { provide: MatPaginatorIntl, useClass: CustomPaginator},
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "fill" }},
+    { provide: HTTP_INTERCEPTORS, useClass: InterceptorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

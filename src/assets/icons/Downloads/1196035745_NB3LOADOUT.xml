@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TransportationStatus xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2" xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2" xmlns="urn:oasis:names:specification:ubl:schema:xsd:TransportationStatus-2">
+    <cbc:ID>4454CA70-CA18-4F7E-B163-7911C4133C0D</cbc:ID>
+    <cbc:UUID>LOGLT2100/4454CA70-CA18-4F7E-B163-7911C4133C0D</cbc:UUID>
+    <cbc:IssueDate>2022-03-22</cbc:IssueDate>
+    <cbc:IssueTime>09:47:16</cbc:IssueTime>
+    <cbc:Note>LOGLT2100</cbc:Note>
+    <cac:TransportEvent>
+        <cbc:IdentificationID>PlannedLoading</cbc:IdentificationID>
+        <cac:CurrentStatus>
+            <cbc:Text/>
+        </cac:CurrentStatus>
+        <cac:Period>
+            <cbc:StartDate>2022-03-22</cbc:StartDate>
+            <cbc:StartTime>00:00:00</cbc:StartTime>
+            <cbc:EndDate>2022-03-22</cbc:EndDate>
+            <cbc:EndTime>00:00:00</cbc:EndTime>
+        </cac:Period>
+    </cac:TransportEvent>
+    <cac:TransportEvent>
+        <cbc:IdentificationID>BookingConfirmationCodeAssigned</cbc:IdentificationID>
+        <cac:CurrentStatus>
+            <cbc:ConditionCode schemeURI="urn:dupont.com:sap:idoc:shpmnt:exti2">BookingConfirmationCode</cbc:ConditionCode>
+            <cbc:Text>XX</cbc:Text>
+        </cac:CurrentStatus>
+    </cac:TransportEvent>
+    <cac:DocumentReference>
+        <cbc:ID schemeURI="urn:dupont-com:sap:idoc:shpmnt:tknum">0021478434</cbc:ID>
+    </cac:DocumentReference>
+    <cac:SenderParty>
+        <cac:PartyIdentification>
+            <cbc:ID>BDP</cbc:ID>
+        </cac:PartyIdentification>
+    </cac:SenderParty>
+    <cac:ReceiverParty>
+        <cac:PartyIdentification>
+            <cbc:ID>DUPONT</cbc:ID>
+        </cac:PartyIdentification>
+    </cac:ReceiverParty>
+</TransportationStatus>

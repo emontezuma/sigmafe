@@ -4,7 +4,14 @@
         <mat-form-field appearance="fill" class="field__field">
             <mat-select [formControl]="formField" name="fieldControl" (selectionChange)="handleSelectionChange($event)">
                 <mat-option *ngFor="let item of list; let i = index;" [value]="item">
-                    {{ item.friendlyText }}                    
+                    <div class="option-container">
+                        <div
+                            *ngIf="selectType === 'colored'"
+                            [ngStyle]="{ 'background-color': item.value }"
+                            class="circle" >
+                        </div>
+                        {{ item.friendlyText }}
+                    </div>
                 </mat-option>
             </mat-select>            
             <mat-hint

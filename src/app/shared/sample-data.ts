@@ -438,7 +438,7 @@ export const sampleSettings: SettingsData = {
   animate: false,
   timeOutFortDialog: 15,
   catalog: {
-    pageSize: 10,
+    pageSize: 50,
   }
 };
 

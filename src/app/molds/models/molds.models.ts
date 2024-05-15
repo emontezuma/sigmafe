@@ -1,7 +1,8 @@
+import { GeneralTranslatedFields } from "src/app/catalogs/models";
 import { PageInfo } from "src/app/shared/models";
 
 export interface MoldsData {
-    molds?: Molds;
+    moldsPaginated?: Molds;
   }
   
   export interface Molds {
@@ -11,17 +12,44 @@ export interface MoldsData {
   }
   
   export interface MoldItem {
+    friendlyStatus?: string;
+    friendlyState?: string;
+    friendlyThresholdState?: string;
+    friendlyThresholdType?: string;
+    friendlyStrategy?: string;
+    friendlyLabel?: string;
+    isTranslated?: boolean;
+    translatedReference: string;
+    translatedDescripcion?: string;
+    translatedNotes?: string;
+    translatedPartNumber?: GeneralTranslatedFields;
+    translatedLine?: GeneralTranslatedFields;
+    translatedEquipment?: GeneralTranslatedFields;
+    translatedLastMaintenance?: GeneralTranslatedFields;
+    translatedManufacturer?: GeneralTranslatedFields;
+    translatedLastResetting?: GeneralTranslatedFields;
+    translatedProvider?: GeneralTranslatedFields;
+    translatedLocation?: GeneralTranslatedFields;
+    translatedMoldType?: GeneralTranslatedFields;
+    translatedMoldClass?: GeneralTranslatedFields;    
+    data: MoldDetail;
+  }
+
+  export interface MoldDetail {
     serialNumber?: string;
     description?: string;
+    prefix?: string;
+    notes?: string;
+    reference?: string;
     manufacturerId?: number;
     providerId?: number;
     manufacturingDate?: string;
-    startingDate?: any
-    MoldLastMaintenanceId?: any
+    startingDate?: any;
+    MoldLastMaintenanceId?: any;
     hits?: number;
     previousHits?: number;
     lastHit?: string;
-    lastResettingId?: any
+    lastResettingId?: any;
     thresholdType?: string;
     thresholdYellow?: number;
     thresholdRed?: number;
@@ -38,38 +66,36 @@ export interface MoldsData {
     position?: number;
     mainImagePath?: string;
     strategy?: string;
-    lastLocationId?: any
-    thresholdYellowDateReached?: any
-    thresholdRedDateReached?: any
+    lastLocationId?: any;
+    thresholdYellowDateReached?: any;
+    thresholdRedDateReached?: any;
     id?: number;
     customerId?: number;
     status?: string;
-    createdById?: any
+    createdById?: any;
     createdAt?: string;
-    updatedById?: any
+    updatedById?: any;
     updatedAt?: string;
-    deletedById?: any
-    deletedAt?: any
-    deletedBy?: any
-    updatedBy?: any
-    createdBy?: any
-    customer?: MoldRelateddata;
-    lastLocation?: any
-    partNumber?: MoldRelateddata;
-    line?: MoldRelateddata;
-    equipment?: MoldRelateddata;
-    provider?: MoldRelateddata;
+    deletedById?: any;
+    deletedAt?: any;
+    deletedBy?: any;
+    updatedBy?: any;
+    createdBy?: any;
+    lastLocation?: any;
     lastResetting?: MoldLastResetting;
     lastMaintenance?: MoldLastMaintenance;
-    manufacturer?: MoldRelateddata;
-    receiver?: any
+    manufacturer?: DetailGeneralData;    
   }
   
-  export interface MoldRelateddata {
+  export interface DetailGeneralData {
     name?: string;
     reference?: string;
+    description?: string;
+    notes?: string;
+    prefix?: string;
     id?: number;
-    status?: string;
+    status?: string;        
+    translated?: boolean;
   }
 
   export interface MoldLastMaintenance {
@@ -79,12 +105,12 @@ export interface MoldsData {
     startDate?: string;
     finishedDate?: string;
     status?: string;        
-    provider?: MoldRelateddata;
+    provider?: DetailGeneralData;
   }
 
   export interface MoldLastResetting {
     resettingDate?: string;
-    user?: MoldRelateddata;
+    user?: DetailGeneralData;
     userId?: number;
 }
   
@@ -105,12 +131,68 @@ export interface MoldCatalog {
 }
 
 export const emptyMoldCatalog = {
-  id: null,
-  description: null,
-  mainImagePath: null,
-  serialNumber: null,
-  label: null,
-  state: null,
-  status: null,
-  updatedAt: null,
+  friendlyState: null,
+  friendlyStatus: null,
+  data: {
+    id: null,
+    description: null,
+    mainImagePath: null,
+    serialNumber: null,
+    label: null,
+    state: null,
+    status: null,
+    updatedAt: null,
+  }  
+}
+
+export const emptyMoldItem: MoldDetail = {  
+    serialNumber: null,
+    description: null,
+    prefix: null,
+    notes: null,
+    reference: null,
+    manufacturerId: null,
+    providerId: null,
+    manufacturingDate: null,
+    startingDate: null,
+    MoldLastMaintenanceId: null,
+    hits: null,
+    previousHits: null,
+    lastHit: null,
+    lastResettingId: null,
+    thresholdType: null,
+    thresholdYellow: null,
+    thresholdRed: null,
+    thresholdState: null,
+    thresholdDateYellow: null,
+    thresholdDateRed: null,
+    receiverId: null,
+    label: null,
+    state: null,
+    nextMaintenance: null,
+    equipmentId: null,
+    lineId: null,
+    partNumberId: null,
+    position: null,
+    mainImagePath: null,
+    strategy: null,
+    lastLocationId: null,
+    thresholdYellowDateReached: null,
+    thresholdRedDateReached: null,
+    id: 0,
+    customerId: null,
+    status: null,
+    createdById: null,
+    createdAt: null,
+    updatedById: null,
+    updatedAt: null,
+    deletedById: null,
+    deletedAt: null,
+    deletedBy: null,
+    updatedBy: null,
+    createdBy: null,
+    lastLocation: null,
+    lastResetting: null,
+    lastMaintenance: null,
+    manufacturer: null,
 }

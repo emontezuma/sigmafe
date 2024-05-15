@@ -13,7 +13,8 @@ import { SnackMessage, Screen } from '../../models/screen.models';
 })
 export class SnackComponent implements OnInit, AfterViewInit{
   maxWidth: number = 0;
-  screenData$: Observable<Screen>;  
+  screenData$: Observable<Screen>;
+  showSnackText: boolean = false;
 
   constructor (    
     @Inject(MAT_SNACK_BAR_DATA) public data: SnackMessage,
@@ -26,8 +27,7 @@ export class SnackComponent implements OnInit, AfterViewInit{
 
 // Hooks ====================
 
-  ngOnInit() {        
-  }
+  ngOnInit() { }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -37,6 +37,9 @@ export class SnackComponent implements OnInit, AfterViewInit{
         })
       );
     });
+    setTimeout(() => {
+      this.showSnackText = true;  
+    }, 100);
   }
   
 

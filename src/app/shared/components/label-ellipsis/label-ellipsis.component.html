@@ -6,7 +6,8 @@
     matTooltipPosition="below"
     matTooltipShowDelay = "100"
     [ngStyle]="{ '-webkit-line-clamp': lines }"
-    [matTooltipDisabled]="activateTooltip(tooltip)"                                                        
+    [matTooltipDisabled]="activateTooltip(tooltip)"
+    [innerHTML]="labelInnerHTML"
 >
     {{ label }}
 </p>

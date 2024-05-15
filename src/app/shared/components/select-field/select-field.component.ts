@@ -18,14 +18,13 @@ export class SelectFieldComponent {
   @Input() currentErrorIcon: string;
   @Input() fieldRequired: boolean;      
   @Input() showRightHint: boolean;  
+  @Input() selectType: string;  
 
   @Output() selectSelectionChange = new EventEmitter<MatSelectChange>();
 
 // Hooks ====================
 
-  ngOnInit(): void {
-    console.log(this.list);
-  }
+  ngOnInit(): void { }
 
 // Functions ================
   handleSelectionChange(event: MatSelectChange) {

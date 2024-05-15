@@ -9,14 +9,14 @@ import { ChecklistsRoutingModule } from './checklists-routing.module';
 import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule } from '../shared/components';
 import { IconsModule } from '../shared/icons';
 import { ImageNotFoundModule } from '../shared/directives';
-import { ChecklistFillingItemsComponent, ToolbarComponent } from './components';
+import { ChecklistFillingItemsComponent, QuestionToolbarComponent } from './components';
 
 @NgModule({
   declarations: [  
     ChecklistFillingComponent,
     ChecklistsHomeComponent,
     ChecklistFillingItemsComponent,
-    ToolbarComponent,
+    QuestionToolbarComponent,
   ],
   imports: [
     CommonModule,

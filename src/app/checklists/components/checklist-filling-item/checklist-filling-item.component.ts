@@ -133,6 +133,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
       })
     );
   }
+  
   ngAfterViewInit(): void {
     const chip = document.getElementsByName("chip");    
     chip.forEach((element) => {

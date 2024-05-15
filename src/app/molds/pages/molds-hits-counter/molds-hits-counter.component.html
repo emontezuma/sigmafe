@@ -1,6 +1,7 @@
 <div
   i18n
   class="container"
+  #moldHitsCounter
   @routingAnimation  
 >  
   <ng-container *ngIf="scroll$ | async "></ng-container>   
@@ -13,7 +14,8 @@
   <ng-container *ngIf="searchBox$ | async "></ng-container>  
   <ng-container *ngIf="moldsHitsData$ | async "></ng-container>   
   <ng-container *ngIf="moldsHitsLoading$ | async "></ng-container>   
-  <ng-container *ngIf="stopTimer$ | async "></ng-container>   
+  <ng-container *ngIf="stopTimer$ | async "></ng-container>
+  <ng-container *ngIf="screen$ | async "></ng-container>
 
   <ng-container *ngTemplateOutlet="!loading ? molds : loader">
 
@@ -26,8 +28,7 @@
     >   
       <div
         class="cards-container"
-        cdkScrollable
-        #moldsQueryList        
+        cdkScrollable        
       >
         <div 
           [@listAnimation]="moldsHitsToShow.length"
@@ -38,13 +39,15 @@
         >
           <div 
             *ngFor="let mold of moldsHitsToShow; let i = index; trackBy: trackByFn"
-            class="mold-container"
+            class="mold-container"                        
+            #hitsCounters     
           >
-            <app-mold-hits-counter              
+            <app-mold-hits-counter            
+                                 
               class="mold-item"
               [mold]="mold"
-              [intemIndex]="mold.index"
-              [ngStyle]="{ 'background-color': (mold.index % 2 === 0) ? 'transparent' : 'rgba(0, 0, 0, 0.3)' }"
+              [intemIndex]="mold.data.index"
+              [ngStyle]="{ 'background-color': (mold.data.index % 2 === 0) ? 'transparent' : 'rgba(0, 0, 0, 0.3)' }"
             ></app-mold-hits-counter> 
           </div>
         </div>

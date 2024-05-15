@@ -8,6 +8,7 @@
         class="message"        
     >        
         <span 
+            *ngIf="showSnackText"
             class="snack-text"
             [innerHTML]="data.message"             
         >

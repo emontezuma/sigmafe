@@ -3,6 +3,7 @@
   i18n
 >
   <ng-container *ngIf="textToSearch$ | async "></ng-container>   
+  
   <mat-form-field appearance="fill" class="auto-complete__field">
     <input      
       matInput
@@ -16,7 +17,9 @@
       >
         <span class="auto-complete__hint--normal">{{ leftHint }}</span>        
     </mat-hint>
-    <mat-hint class="auto-complete__hint" align="end" *ngIf="showDataState && totalCount > 0">Item(s): {{ list.length }} de {{ totalCount }}</mat-hint>
+    <mat-hint class="auto-complete__hint" align="end" *ngIf="showDataState && totalCount > 0">      
+      <span class="auto-complete__hint--normal">Item(s): {{ list.length }} de {{ totalCount }}</span>        
+    </mat-hint>
     <mat-hint class="auto-complete__hint" align="end" *ngIf="showError">
       <span class="auto-complete__hint--error"><strong>{{ noItemsError }}</strong></span>
       <mat-icon class="auto-complete__small-icon--error" svgIcon="warn-line"></mat-icon>
@@ -45,10 +48,13 @@
     >
       <mat-option
         *ngFor="let element of list"
-        [value]="element"
-        [title]="(element || {}).name"        
+        [value]="element"        
       >
-        {{ element.name }}
+        {{ 
+          catalog === 'partNumbers' && element.translatedReference ? 
+          ( element.translatedName + ' (' + element.translatedReference + ")" ) : 
+          element.translatedName
+        }}
       </mat-option>      
     </mat-autocomplete>
   </mat-form-field>    

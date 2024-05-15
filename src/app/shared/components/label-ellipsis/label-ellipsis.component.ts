@@ -8,6 +8,7 @@ import { Component, Input } from '@angular/core';
 export class LabelEllipsisComponent {
   @Input() label: string;
   @Input() lines: number;
+  @Input() labelInnerHTML: string;
 
 // Functions ================
   activateTooltip(e: HTMLElement) {    

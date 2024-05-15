@@ -15,6 +15,7 @@ import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
+import { CatalogsService } from '../../services';
 
 @Component({
   selector: 'app-catalog-molds',
@@ -27,8 +28,8 @@ export class CatalogMoldsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
   // Variables ===============
-  displayedColumns: string[] = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'lastUpdate'];
-  dataSource = new MatTableDataSource<MoldItem>([]);      
+  moldsTableColumns: string[] = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'updatedAt'];
+  moldsCatalogData = new MatTableDataSource<MoldItem>([]);      
   
   moldsData$: Observable<MoldsData>;
   sort$: Observable<any>;
@@ -38,6 +39,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   profileData$: Observable<ProfileData>;
   searchBox$: Observable<SearchBox>;
   screenData$: Observable<Screen>;
+  allMoldsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
   byDefaultIconPath: string = "assets/icons/treasure-chest.svg";
@@ -47,6 +49,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   settingsData: SettingsData;
   profileData: ProfileData;
   filterMoldsBy: string;
+  allMoldsToCsv: any;
   moldsData: Molds = {
     items: new Array(5).fill(null),
   }
@@ -67,7 +70,8 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   constructor(
     private _store: Store<AppState>,
     private _sharedService: SharedService,
-    private _router: Router
+    private _router: Router,
+    private _catalogsService: CatalogsService,
   ) { }
 
   // Hooks ====================
@@ -110,8 +114,10 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.  from === ApplicationModules.MOLDS_CATALOG) {
+        if (searchBox.from === ApplicationModules.MOLDS_CATALOG) {
+          console.log(searchBox.textToSearch);
           this.filterMoldsBy = searchBox.textToSearch;    
+          this.requestData(0, this.pageInfo.pageSize);      
         }
       })
     );
@@ -133,18 +139,20 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     this.moldsData$ = this._store.select(selectMoldsData).pipe(
       skip(1),
       tap( moldsData => {        
-        this.setPaginator(moldsData.molds.totalCount);
-        this.moldsData = JSON.parse(JSON.stringify(moldsData.molds));
-        this.paginator.pageIndex = this.pageInfo.currentPage; 
-        this.paginator.length = this.pageInfo.totalRecords;
-        if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-          this.moldsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.moldsData.items);
-        }      
-        this.moldsData.items.length = this.pageInfo.totalRecords;
-        this.dataSource = new MatTableDataSource<MoldItem>(this.moldsData.items);
-        this.dataSource.paginator = this.paginator;
-        // this.dataSource.sort = this.sort;
-        this.dataSource.sortData = () => this.moldsData.items;    
+        this.setPaginator(moldsData.moldsPaginated.totalCount);
+        this.moldsData = JSON.parse(JSON.stringify(moldsData.moldsPaginated));
+        if (this.paginator) {
+          this.paginator.pageIndex = this.pageInfo.currentPage; 
+          this.paginator.length = this.pageInfo.totalRecords;
+          if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
+            this.moldsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.moldsData.items);
+          }      
+        }        
+        this.moldsData.items.length = this.moldsData.totalCount;
+        this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
+        this.moldsCatalogData.paginator = this.paginator;
+        // this.moldsCatalogData.sort = this.sort;
+        this.moldsCatalogData.sortData = () => this.moldsData.items;    
       })
     );
     this.moldsDataLoading$ = this._store.select(selectLoadingMoldsState).pipe(
@@ -188,25 +196,27 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    this.moldsCatalogData.paginator = this.paginator;
+    this.moldsCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
         this.pageInfo.currentPage = 0;
         if (sortData.direction) {
           if (sortData.active === 'position') {
-            const sortAscending = 'ASC';
-            this.order = JSON.parse(`{ "partNumber": { "name": "${sortData.direction.toUpperCase()}" }, "position": "${sortAscending}" }`);            
-          } else if (sortData.active === 'hits') {            
-            this.order = JSON.parse(`{ "hits": "${sortData.direction.toUpperCase()}" }`);
-          } else if (sortData.active === 'lastUpdate') {            
-            this.order = JSON.parse(`{ "updatedAt": "${sortData.direction.toUpperCase()}" }`);
+            const sortAscending = 'ASC';            
+            this.order = JSON.parse(`[ { "translatedPartNumber": { "translatedName": "${sortData.direction.toUpperCase()}" } }, { "data": { "position": "${sortAscending}" } } ]`);            
+          } else if (sortData.active === 'state' || sortData.active === 'generalInfo') {            
+            this.order = JSON.parse(`{ "friendlyState": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'mainInfo') {            
+            this.order = JSON.parse(`{ "data": { "description": { "${sortData.direction.toUpperCase()}" } }`);
+          } else if (sortData.active === 'status') {            
+            this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
           } else {
-            this.order = JSON.parse(`{ "${sortData.active}": "${sortData.direction.toUpperCase()}" }`);
+            this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
         }
-        this.requestData(0, this.pageInfo.pageSize, this.order);      
+        this.requestData(0, this.pageInfo.pageSize);      
       })
     );
   }
@@ -218,18 +228,24 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       ...this.pageInfo, 
       currentPage: event?.pageIndex, 
     };    
-    this.requestData(this.pageInfo.currentPage * this.pageInfo.pageSize, this.pageInfo.pageSize, this.order);
+    this.requestData(this.pageInfo.currentPage * this.pageInfo.pageSize, this.pageInfo.pageSize);
   }
 
-  requestData(skipRecords: number, takeRecords: number, order?: any) {    
+  requestData(skipRecords: number, takeRecords: number) {    
     this.moldsData = {
       items: new Array(5).fill(emptyMoldCatalog),
     }
-    this.dataSource = new MatTableDataSource<MoldItem>(this.moldsData.items);
+    let filter = null;
+    if (this.filterMoldsBy) {      
+      const cadFilter = ` { "or": [ { "translatedDescription": { "contains": "${this.filterMoldsBy}" } }, { "translatedReference": { "contains": "${this.filterMoldsBy}" } }, { "mold": { "serialNumber": { "contains": "${this.filterMoldsBy}" } } } ] }`;
+      filter = JSON.parse(cadFilter);                  
+    }
+    this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
     this._store.dispatch(loadMoldsData({ 
       skipRecords, 
-      takeRecords, 
-      order,
+      takeRecords,
+      filter,
+      order: this.order,
     }));
   }
 
@@ -268,13 +284,26 @@ export class CatalogMoldsListComponent implements AfterViewInit {
           pageSize: this.settingsData.catalog?.pageSize,
         }
         this.pendingToolbarButtonIndex = 2;
-        this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize, this.order);
+        this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements[action.buttonIndex].loading = true;
         this._router.navigateByUrl("/catalogs/molds/create");
         setTimeout(() => {
           this.elements[action.buttonIndex].loading = false;  
         }, 200);
+      } else if (action.action === ButtonActions.EXPORT_TO_CSV) {
+        this.elements[action.buttonIndex].loading = true;
+        this.allMoldsToCsv$ = this._catalogsService.getAllMoldsToCsv$().pipe(
+          tap(moldToCsv => {
+            const fileData$ = this._catalogsService.getAllMoldsCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
+            .subscribe(data => { 
+              this.downloadFile(data, moldToCsv?.data?.exportMoldToCSV?.downloadFilename);
+              setTimeout(() => {
+                this.elements[action.buttonIndex].loading = false;  
+              }, 200);
+            })
+          })
+        );
       }
     }    
   }
@@ -335,7 +364,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
-      action: ButtonActions.EXPORT_TO_EXCEL,
+      action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
       caption: '',
@@ -370,14 +399,29 @@ export class CatalogMoldsListComponent implements AfterViewInit {
 
   mapColumns() {
     if (this.size !== 'small') {
-      this.displayedColumns = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'lastUpdate'];  
+      this.moldsTableColumns = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'updatedAt'];  
     } else {
-      this.displayedColumns = ['id', 'mainImagePath', 'mainInfo', 'generalInfo'];
+      this.moldsTableColumns = ['id', 'mainImagePath', 'mainInfo', 'generalInfo'];
     }
   }
   
   setTabIndex(tab: any) { 
     this.currentTabIndex = tab;
+  }
+
+  downloadFile(data: any, fileName: string): void {
+    var blob = new Blob(["\uFEFF" + data], {
+      type: "text/csv;charset=utf-8",
+    }),
+    url = window.URL.createObjectURL(blob);
+    let link = document.createElement("a");
+    fileName = fileName.replace(/\n/g, "");
+    fileName = fileName.replace(/\r/g, "");
+    link.download = fileName;
+    link.href = url;
+    link.click();
+    window.URL.revokeObjectURL(url);
+    link.remove();
   }
 
 }

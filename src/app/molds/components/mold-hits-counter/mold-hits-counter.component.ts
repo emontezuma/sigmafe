@@ -2,13 +2,14 @@ import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app.state';
 
-import { MoldHitsQuery, MoldLabelColor, MoldTresholdState } from '../../models/molds-hits.models';
+import { MoldHitsQuery, MoldLabelColor, MoldStates, MoldTresholdState } from '../../models/molds-hits.models';
 import { fromTop, numbers } from '../../../shared/animations/shared.animations';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../../shared/models/settings.models';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
 import { Observable, tap } from 'rxjs';
-import { MoldStates } from 'src/app/catalogs';
+import { SharedService } from 'src/app/shared/services';
+
 
 @Component({
   selector: 'app-mold-hits-counter',
@@ -94,7 +95,8 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   showPrefix = false;
 
   constructor (
-    private _store: Store<AppState>,    
+    private _store: Store<AppState>,
+    public _sharedService: SharedService,
   ) { }
 
 // Hooks ====================
@@ -104,18 +106,18 @@ export class MoldHitsCounterComponent implements AfterViewInit {
         this.settingsData = settingsData;
         this.assignSettings(); 
         this.calcData();
-        this.hits = this.mold.hits ?? 0;    
-        this.numberToArray(this.hits, this.mold.previousHits);      
-        this.prepareDataToChart(this.hits, this.mold.thresholdRed ?? 0)          
+        this.hits = this.mold.data.hits ?? 0;    
+        this.numberToArray(this.hits, this.mold.data.previousHits);      
+        this.prepareDataToChart(this.hits, this.mold.data.thresholdRed ?? 0)          
       })
     )      
   }
 
   ngOnChanges(): void {    
-    this.hits = this.mold.hits ?? 0;
-    if (this.mold.updateHits) {      
-      this.numberToArray(this.hits, this.mold.previousHits);      
-      this.prepareDataToChart(this.hits, this.mold.thresholdRed ?? 0)    
+    this.hits = this.mold.data.hits ?? 0;
+    if (this.mold.data.updateHits) {      
+      this.numberToArray(this.hits, this.mold.data.previousHits);      
+      this.prepareDataToChart(this.hits, this.mold.data.thresholdRed ?? 0)    
     }    
   }
 
@@ -128,7 +130,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
   
 // Functions ================
   calcData() {
-    this.maintenanceClass = this.mold.nextMaintenance?.alarmed ? 'meter-31' : 'meter-32'
+    this.maintenanceClass = this.mold.data.nextMaintenance?.alarmed ? 'meter-31' : 'meter-32'
   }
   
   assignSettings() {
@@ -141,8 +143,6 @@ export class MoldHitsCounterComponent implements AfterViewInit {
       this.showNumber[0] = 'Pair';
       return;
     }
-    console.log(this.digitPair);
-    console.log(this.digitOdd);
     for (let i = 0; i < current.toString().length; i++) {
       const before = previous ?? 0;
       const base = 10 ** (current.toString().length - 1 - i);      
@@ -164,26 +164,26 @@ export class MoldHitsCounterComponent implements AfterViewInit {
         this.showNumber[i] = this.showNumber[i] === 'Pair' ? 'Odd' : 'Pair';      
       }
     };
-    this.mold.updateHits = false;
+    this.mold.data.updateHits = false;
   }
 
   setProgressColors() {
     this.borderColorClass = 
-      this.mold.thresholdState === MoldTresholdState.YELLOW ? 
-      'meter-2' : this.mold.thresholdState === MoldTresholdState.RED ? 
+      this.mold.data.thresholdState === MoldTresholdState.YELLOW ? 
+      'meter-2' : this.mold.data.thresholdState === MoldTresholdState.RED ? 
       'meter-3' : 'meter-1';    
     
     this.progressBackgroundColorClass = 
-      this.mold.thresholdState === MoldTresholdState.YELLOW ? 
-      'meter-12' : this.mold.thresholdState === MoldTresholdState.RED ? 
+      this.mold.data.thresholdState === MoldTresholdState.YELLOW ? 
+      'meter-12' : this.mold.data.thresholdState === MoldTresholdState.RED ? 
       'meter-11' : 'meter-10';
 
     this.progressForeColorClass =
-      this.mold.thresholdState === MoldTresholdState.YELLOW ? 
-      'meter-22' : this.mold.thresholdState === MoldTresholdState.RED ? 
+      this.mold.data.thresholdState === MoldTresholdState.YELLOW ? 
+      'meter-22' : this.mold.data.thresholdState === MoldTresholdState.RED ? 
       'meter-21' : 'meter-20';    
     
-      this.alarmed = this.mold.thresholdState === MoldTresholdState.YELLOW || this.mold.thresholdState === MoldTresholdState.RED;
+      this.alarmed = this.mold.data.thresholdState === MoldTresholdState.YELLOW || this.mold.data.thresholdState === MoldTresholdState.RED;
   }
 
   prepareDataToChart(current: number, limit: number) {
@@ -201,17 +201,6 @@ export class MoldHitsCounterComponent implements AfterViewInit {
     return index; 
   }
 
-  getState(state: MoldStates) {
-    return state === MoldStates.IN_PRODUCTION ?
-    $localize`En producción` :
-    state === MoldStates.IN_REPAIRING ?
-    $localize`En reparación` :
-    state === MoldStates.IN_WAREHOUSE ?
-    $localize`En almacén` :
-    state === MoldStates.OUT_OF_SERVICE ?
-    $localize`Fuera de servicio` : state
-  }
-
   getClass(state: MoldStates) {
     return state === MoldStates.IN_PRODUCTION ?
     'state-green' :
@@ -226,7 +215,7 @@ export class MoldHitsCounterComponent implements AfterViewInit {
 // Getters ==================
 
   get lastHitDate() {
-    return this.mold?.lastHit ?? '';
+    return this.mold.data?.lastHit ?? '';
   }
 
   get MoldLabelColor() {

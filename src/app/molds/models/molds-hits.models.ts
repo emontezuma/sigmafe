@@ -1,4 +1,4 @@
-import { MoldStates } from "src/app/catalogs";
+import { GeneralTranslatedFields } from "src/app/catalogs";
 import { MoldLastMaintenance } from "./molds.models";
 import { PageInfo } from "src/app/shared/models/helpers.models";
 
@@ -25,6 +25,14 @@ export interface MoldLocation {
 }
 
 export interface MoldHitsQuery {
+    data: MoldHitsDetail;
+    isTranslated?: boolean;
+    friendlyState?: string;
+    translatedDescription?: string;
+    translatedPartNumber?: GeneralTranslatedFields; 
+}
+
+export interface MoldHitsDetail {
     id?: string;
     description?: string;
     hits?: number;
@@ -79,3 +87,10 @@ export enum MoldLabelColor {
     DODGERBLUE = 'dodgerblue',
     ORANGE = 'orange',
 }
+
+export enum MoldStates {
+    IN_PRODUCTION = 'in-production',
+    IN_WAREHOUSE = 'in-warehouse',
+    IN_REPAIRING = 'in-reparing',
+    OUT_OF_SERVICE = 'out-of-service',
+  }

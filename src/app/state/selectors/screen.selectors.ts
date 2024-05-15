@@ -8,6 +8,3 @@ export const selectSharedScreen = createSelector(
     selectScreenFeature,
     (state: SharedState) => state.screen
 );
-
-
-  

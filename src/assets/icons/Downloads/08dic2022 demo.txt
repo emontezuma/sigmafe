@@ -1,0 +1,201 @@
+ALTER TABLE `sigma`.`cat_checklists` 
+ADD COLUMN `alarma_vencimiento` CHAR(1) NULL DEFAULT 'S' AFTER `mensaje_mmcall`,
+ADD COLUMN `llamada` CHAR(1) NOT NULL DEFAULT 'N' AFTER `alarma_vencimiento`,
+ADD COLUMN `sms` CHAR(1) NULL DEFAULT 'N' AFTER `llamada`,
+ADD COLUMN `mmcall` CHAR(1) NULL DEFAULT 'N' AFTER `sms`,
+ADD COLUMN `correo` CHAR(1) NULL DEFAULT 'N' AFTER `mmcall`,
+ADD COLUMN `autonomo` CHAR(1) NULL DEFAULT 'N' AFTER `correo`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`, `llamada`);
+;
+
+ALTER TABLE `sigma`.`cat_fallas` 
+ADD COLUMN `sap_tipo` VARCHAR(10) NULL DEFAULT NULL AFTER `nombre`;
+
+ALTER TABLE `sigma`.`cat_generales` 
+ADD COLUMN `area` BIGINT(20) NULL DEFAULT '0' COMMENT 'Id del area del asociada al rechazo' AFTER `imagen`;
+
+ALTER TABLE `sigma`.`cat_maquinas` 
+ADD COLUMN `sap_location` VARCHAR(100) NULL DEFAULT NULL AFTER `imagen`,
+ADD COLUMN `sap_id` VARCHAR(100) NULL DEFAULT NULL AFTER `sap_location`,
+ADD COLUMN `sap_cierre` CHAR(1) NULL DEFAULT 'N' AFTER `sap_id`,
+ADD COLUMN `agregar_confirmacion` CHAR(1) NULL DEFAULT 'S' AFTER `wip_flag`;
+
+ALTER TABLE `sigma`.`cat_procesos` 
+ADD COLUMN `abb_mostrar_equipos` CHAR(1) NULL DEFAULT 'N' COMMENT 'Mostrar botones del equipo' AFTER `id_mapa13`;
+
+ALTER TABLE `sigma`.`cat_usuarios` 
+ADD COLUMN `departamentos` CHAR(1) NULL DEFAULT 'N' COMMENT 'Ver todos los departamentos (S/N)' AFTER `area`;
+
+ALTER TABLE `sigma`.`cat_variables` 
+ADD COLUMN `frecuencia` BIGINT(5) NULL DEFAULT '0' COMMENT 'Frecuencia de lectura' AFTER `sms`,
+ADD COLUMN `poner_nota` CHAR(1) NULL DEFAULT 'N' AFTER `puede_alarmarse`,
+CHANGE COLUMN `minimo` `minimo` DECIMAL(45,10) NULL DEFAULT NULL ,
+CHANGE COLUMN `maximo` `maximo` DECIMAL(45,10) NULL DEFAULT NULL ,
+CHANGE COLUMN `sensor` `sensor` BIGINT(10) NULL DEFAULT '0' ,
+CHANGE COLUMN `ultima_lectura_valor` `ultima_lectura_valor` VARCHAR(100) NULL DEFAULT NULL ;
+
+ALTER TABLE `sigma`.`checkeje_cab` 
+ADD COLUMN `alarmado_vencido` CHAR(1) NULL DEFAULT 'N' AFTER `equipo`,
+ADD COLUMN `fecha_alarma` DATETIME NULL DEFAULT NULL AFTER `alarmado_vencido`,
+ADD COLUMN `aprobado` CHAR(1) NULL DEFAULT 'S' AFTER `fecha_alarma`,
+ADD COLUMN `aprobado_por` BIGINT(20) NULL DEFAULT '0' AFTER `aprobado`,
+ADD COLUMN `justificacion_llenado` VARCHAR(500) NULL DEFAULT NULL AFTER `aprobado_por`,
+ADD COLUMN `justificacion_causa` BIGINT(20) NULL DEFAULT '0' AFTER `justificacion_llenado`,
+ADD COLUMN `repeticiones` INT(2) NULL DEFAULT '0' AFTER `justificacion_causa`,
+ADD COLUMN `autonomo` CHAR(1) NULL DEFAULT 'N' AFTER `repeticiones`,
+ADD COLUMN `desde` DATETIME NULL DEFAULT NULL AFTER `autonomo`,
+ADD COLUMN `hasta` DATETIME NULL DEFAULT NULL AFTER `desde`,
+ADD COLUMN `lineas` INT(4) NULL DEFAULT '0' AFTER `hasta`;
+
+ALTER TABLE `sigma`.`checkeje_det` 
+ADD COLUMN `id` BIGINT(20) NOT NULL AUTO_INCREMENT FIRST,
+ADD COLUMN `fecha_captura` DATETIME NULL DEFAULT NULL AFTER `fecha_alarma`,
+ADD COLUMN `sensor_id` BIGINT(20) NULL DEFAULT '0' AFTER `fecha_captura`,
+ADD COLUMN `actualizaciones` INT(5) NULL DEFAULT '0' AFTER `sensor_id`,
+ADD COLUMN `autonomo` CHAR(1) NULL DEFAULT 'N' AFTER `actualizaciones`,
+CHANGE COLUMN `orden` `orden` INT(6) NULL DEFAULT '0' COMMENT 'Orden en el checklist' ,
+CHANGE COLUMN `valor` `valor` VARCHAR(100) NULL DEFAULT NULL COMMENT 'Valor capturado' ,
+ADD PRIMARY KEY (`id`),
+ADD INDEX `index10` (`equipo` ASC),
+ADD INDEX `Index20` (`variable` ASC, `equipo` ASC, `fecha_captura` ASC),
+ADD INDEX `Index30` (`checklist` ASC, `variable` ASC),
+DROP INDEX `checklist` ;
+;
+
+ALTER TABLE `sigma`.`configuracion` 
+ADD COLUMN `be_alarmas_sms_twi` CHAR(1) NULL DEFAULT 'N' AFTER `turno_fecha`,
+ADD COLUMN `be_alarmas_llamadas_twi` CHAR(1) NULL DEFAULT 'n' AFTER `be_alarmas_sms_twi`,
+ADD COLUMN `be_alarmas_wa_twi` CHAR(1) NULL DEFAULT 'N' AFTER `be_alarmas_llamadas_twi`,
+ADD COLUMN `tcpip` CHAR(1) NULL DEFAULT 'N' AFTER `be_alarmas_wa_twi`,
+ADD COLUMN `dreax_ip` VARCHAR(20) NULL DEFAULT NULL AFTER `tcpip`,
+ADD COLUMN `dreax_pto` VARCHAR(20) NULL DEFAULT NULL AFTER `dreax_ip`,
+ADD COLUMN `dreax_ulectura` DATETIME NULL DEFAULT NULL AFTER `dreax_pto`,
+ADD COLUMN `twilio_sms` CHAR(1) NULL DEFAULT 'N' AFTER `dreax_ulectura`,
+ADD COLUMN `twilio_wha` CHAR(1) NULL DEFAULT 'N' AFTER `twilio_sms`,
+ADD COLUMN `twilio_lla` CHAR(1) NULL DEFAULT 'N' AFTER `twilio_wha`,
+ADD COLUMN `twilio_sms_numero` VARCHAR(50) NULL DEFAULT NULL AFTER `twilio_lla`,
+ADD COLUMN `twilio_sms_codigo_1` VARCHAR(100) NULL DEFAULT NULL AFTER `twilio_sms_numero`,
+ADD COLUMN `twilio_sms_codigo_2` VARCHAR(100) NULL DEFAULT NULL AFTER `twilio_sms_codigo_1`,
+ADD COLUMN `twilio_wha_numero` VARCHAR(50) NULL DEFAULT NULL AFTER `twilio_sms_codigo_2`,
+ADD COLUMN `twilio_lla_numero` VARCHAR(50) NULL DEFAULT NULL AFTER `twilio_wha_numero`,
+ADD COLUMN `ip_fija` CHAR(1) NULL DEFAULT 'N' AFTER `twilio_lla_numero`,
+ADD COLUMN `usar_webs` CHAR(1) NULL DEFAULT 'S' AFTER `ip_fija`,
+ADD COLUMN `reportar_produccion_pantalla` CHAR(1) NULL DEFAULT 'N' AFTER `usar_webs`,
+ADD COLUMN `imprimir_etiqueta_produccion` CHAR(1) NULL DEFAULT 'N' AFTER `reportar_produccion_pantalla`,
+ADD COLUMN `mostrar_boton_adherencia` CHAR(1) NULL DEFAULT 'N' AFTER `imprimir_etiqueta_produccion`,
+ADD COLUMN `prefijo_sensor` VARCHAR(10) NULL DEFAULT NULL AFTER `mostrar_boton_adherencia`,
+ADD COLUMN `prefijo_qr_ordenes` VARCHAR(10) NULL DEFAULT NULL AFTER `prefijo_sensor`,
+ADD COLUMN `prefijo_qr_lote` VARCHAR(10) NULL DEFAULT NULL AFTER `prefijo_qr_ordenes`,
+ADD COLUMN `sap_interfaz_andon` CHAR(1) NULL DEFAULT 'N' AFTER `prefijo_qr_lote`,
+ADD COLUMN `sap_creacion_andon_endpoint` VARCHAR(150) NULL DEFAULT NULL AFTER `sap_interfaz_andon`,
+ADD COLUMN `sap_modificacion_andon_endpoint` VARCHAR(150) NULL DEFAULT NULL AFTER `sap_creacion_andon_endpoint`,
+ADD COLUMN `sap_creacion_andon_usuario` VARCHAR(50) NULL DEFAULT NULL AFTER `sap_modificacion_andon_endpoint`,
+ADD COLUMN `sap_creacion_andon_headers_user` VARCHAR(50) NULL DEFAULT NULL AFTER `sap_creacion_andon_usuario`,
+ADD COLUMN `sap_creacion_andon_headers_clave` VARCHAR(50) NULL DEFAULT NULL AFTER `sap_creacion_andon_headers_user`,
+ADD COLUMN `sap_interfaz_cierre` CHAR(1) NULL DEFAULT 'N' AFTER `sap_creacion_andon_headers_clave`,
+ADD COLUMN `abb_saltar_proceso` CHAR(1) NULL DEFAULT 'N' AFTER `sap_interfaz_cierre`,
+ADD COLUMN `sap_activate_trace` CHAR(1) NULL DEFAULT 'S' AFTER `abb_saltar_proceso`,
+ADD COLUMN `dreax_lotes_desde` INT(2) NULL DEFAULT '0' AFTER `sap_activate_trace`,
+ADD COLUMN `dreax_lotes_hasta` INT(2) NULL DEFAULT '0' AFTER `dreax_lotes_desde`;
+
+ALTER TABLE `sigma`.`consultas_cab` 
+ADD COLUMN `equipo` BIGINT(20) NULL DEFAULT '0' AFTER `estatus`,
+ADD COLUMN `variable` BIGINT(20) NULL DEFAULT '0' AFTER `equipo`,
+ADD COLUMN `tipo_valor` INT(1) NULL DEFAULT '0' AFTER `variable`;
+
+ALTER TABLE `sigma`.`lecturas` 
+ADD COLUMN `defecto` BIGINT(20) NULL DEFAULT '0' COMMENT 'ID del defecto' AFTER `modulo`,
+ADD COLUMN `defecto_area` BIGINT(20) NULL DEFAULT '0' AFTER `defecto`,
+ADD COLUMN `origen` INT(1) NULL DEFAULT '0' COMMENT 'Origen (0=Sensor, 1=Escaner)' AFTER `estatus`;
+
+CREATE TABLE IF NOT EXISTS `sigma`.`lecturas_variables` (
+  `id` INT(20) NOT NULL AUTO_INCREMENT COMMENT 'Número automático único',
+  `fecha` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora automática en que se genera el registro',
+  `sensor` BIGINT(10) NULL DEFAULT NULL COMMENT 'ID del sensor que genera la señal',
+  `valor` VARCHAR(255) NULL DEFAULT '' COMMENT 'Valor recibido del sensor',
+  `modulo` INT(2) NULL DEFAULT '0',
+  `estatus` INT(2) NULL DEFAULT '0' COMMENT 'Estatus 0=Creado, 1=En proceso, 2=Procesado, 3=Procesado pero no usado porque habia uno mas reciente, 4=No hay catalogo de checklist asociado',
+  PRIMARY KEY (`id`),
+  INDEX `NewIndex1` (`estatus` ASC),
+  INDEX `NewIndex2` (`fecha` ASC, `estatus` ASC))
+ENGINE = MyISAM
+AUTO_INCREMENT = 6
+DEFAULT CHARACTER SET = utf16
+COLLATE = utf16_bin;
+
+ALTER TABLE `sigma`.`lotes` 
+ADD COLUMN `ubicacion` VARCHAR(50) NULL DEFAULT NULL AFTER `calcular_progreso`,
+ADD INDEX `NewIndex6` (`ubicacion` ASC);
+;
+
+ALTER TABLE `sigma`.`lotes_historia` 
+ADD COLUMN `usuario_cierre` BIGINT(20) NULL DEFAULT '0' COMMENT 'Usuario que termina el proceso' AFTER `ultimo_estado`;
+
+CREATE TABLE IF NOT EXISTS `sigma`.`lotes_produccion` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'ID del registro',
+  `etiqueta` VARCHAR(30) NULL DEFAULT NULL COMMENT 'Lote de etiqueta',
+  `fecha` DATETIME NULL DEFAULT NULL COMMENT 'Fecha de la actualización',
+  `equipo` BIGINT(20) NULL DEFAULT '0' COMMENT 'ID del equipo',
+  `orden` VARCHAR(50) NULL DEFAULT NULL COMMENT 'Orden de produccion',
+  `orden_id` BIGINT(20) NULL DEFAULT '0',
+  `parte` BIGINT(20) NULL DEFAULT '0' COMMENT 'Numero de parte',
+  `estatus` INT(11) NULL DEFAULT '0' COMMENT '0=OK, 1=NOOK',
+  `defecto` BIGINT(20) NULL DEFAULT '0' COMMENT 'Defecto',
+  `area` BIGINT(20) NULL DEFAULT '0',
+  `usuario` BIGINT(20) NULL DEFAULT '0' COMMENT 'Operador',
+  `total_retrabajos` INT(1) NULL DEFAULT '0',
+  `retrabajo1` BIGINT(20) NULL DEFAULT '0' COMMENT 'Codigo de retrabajo',
+  `usuario_retrabajo1` BIGINT(20) NULL DEFAULT '0' COMMENT 'Operador del retrabajo',
+  `fecha_retrabajo1` DATETIME NULL DEFAULT NULL COMMENT 'Fecha del retrabajo',
+  `turno_retrabajo1` BIGINT(20) NULL DEFAULT '0',
+  `retrabajo2` BIGINT(20) NULL DEFAULT '0',
+  `usuario_retrabajo2` BIGINT(20) NULL DEFAULT '0',
+  `fecha_retrabajo2` DATETIME NULL DEFAULT NULL,
+  `turno_retrabajo2` BIGINT(20) NULL DEFAULT '0',
+  `retrabajo3` BIGINT(20) NULL DEFAULT '0',
+  `usuario_retrabajo3` BIGINT(20) NULL DEFAULT '0',
+  `fecha_retrabajo3` DATETIME NULL DEFAULT NULL,
+  `turno` BIGINT(20) NULL DEFAULT '0',
+  `turno_retrabajo3` BIGINT(20) NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  INDEX `NewIndex1` (`etiqueta` ASC, `equipo` ASC))
+ENGINE = MyISAM
+AUTO_INCREMENT = 8
+DEFAULT CHARACTER SET = latin1;
+
+CREATE TABLE IF NOT EXISTS `sigma`.`moldes` (
+  `golpes` BIGINT(6) NULL DEFAULT '0')
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = latin1;
+
+ALTER TABLE `sigma`.`plan_checklists` 
+ADD COLUMN `mensaje2` VARCHAR(300) NULL DEFAULT NULL AFTER `mmcall`,
+ADD COLUMN `mensaje_mmcall2` VARCHAR(60) NULL DEFAULT NULL AFTER `mensaje2`,
+ADD COLUMN `titulo2` VARCHAR(100) NULL DEFAULT NULL AFTER `mensaje_mmcall2`,
+ADD COLUMN `sms2` CHAR(1) NULL DEFAULT 'N' AFTER `titulo2`,
+ADD COLUMN `llamada2` CHAR(1) NULL DEFAULT 'N' AFTER `sms2`,
+ADD COLUMN `correo2` CHAR(1) NULL DEFAULT 'N' AFTER `llamada2`,
+ADD COLUMN `mmcall2` CHAR(1) NULL DEFAULT 'N' AFTER `correo2`,
+ADD COLUMN `requiere_aprobacion` CHAR(1) NULL DEFAULT 'N' AFTER `ejecucion`;
+
+ALTER TABLE `sigma`.`relacion_procesos_sensores` 
+CHANGE COLUMN `sensor` `sensor` BIGINT(10) NULL DEFAULT NULL COMMENT 'ID del sensor' ;
+
+ALTER TABLE `sigma`.`reportes` 
+ADD COLUMN `notificacion` VARCHAR(20) NULL DEFAULT NULL AFTER `usado`,
+ADD COLUMN `proceso` INT(6) NULL DEFAULT NULL AFTER `notificacion`,
+ADD COLUMN `confirmacion` DATETIME NULL DEFAULT NULL COMMENT 'Fecha de confirmación' AFTER `proceso`,
+ADD COLUMN `tiempoconfirmacion` BIGINT(6) NULL DEFAULT '0' AFTER `confirmacion`;
+
+CREATE TABLE IF NOT EXISTS `sigma`.`sap_trace` (
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
+  `tdate` DATETIME NULL DEFAULT NULL,
+  `tfrom` VARCHAR(10) NULL DEFAULT NULL,
+  `tendpoint` VARCHAR(200) NULL DEFAULT NULL,
+  `tpayload` VARCHAR(2000) NULL DEFAULT NULL,
+  `tresult` VARCHAR(2000) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = MyISAM
+AUTO_INCREMENT = 19
+DEFAULT CHARACTER SET = latin1;

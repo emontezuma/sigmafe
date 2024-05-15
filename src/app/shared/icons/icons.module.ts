@@ -200,5 +200,22 @@ export class IconsModule {
       "arrow-left",
       sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_left.svg")
     );
+    iconRegistry.addSvgIcon(
+      "wrench",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/wrench.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "pencil",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/pencil.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "world",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/world.svg")
+    );
+    iconRegistry.addSvgIcon(
+      "disconnect",
+      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/disconnect.svg")
+    );
   }
+  
 }

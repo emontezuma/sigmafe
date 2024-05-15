@@ -4,7 +4,7 @@
     border-radius: 5px;
     border-top: 3px solid transparent;    
     counter-reset: counter;
-    margin-bottom: 5px
+    margin-bottom: 5px;    
 }
 
 .meter-0 {
@@ -99,10 +99,11 @@ mat-card-title {
     // max-width: 400px;
     // min-width: 350px;
     border-radius: 10px 0px;    
+    border: 6px solid transparent;
     flex: 1;
 }
 
-.card-wide {    
+.card-wide {        
     height: 100%;
     border-radius: 10px 0px;    
     display: flex;
@@ -264,6 +265,10 @@ mat-card-title {
 
 .border-green {
     border: 6px solid green !important;
+}
+
+.border-transparent {
+    border: 5px solid transparent !important;
 }
 
 .text-wide {

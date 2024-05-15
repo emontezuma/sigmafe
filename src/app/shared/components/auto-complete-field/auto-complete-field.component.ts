@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges } 
 import { FormControl } from '@angular/forms';
 import { debounceTime, startWith, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { GeneralCatalogItem, GeneralCatalogParams } from 'src/app/catalogs';
+import { GeneralCatalogMappedItem, GeneralCatalogParams } from 'src/app/catalogs';
 
 @Component({
   selector: 'app-auto-complete-field',
@@ -12,7 +12,8 @@ import { GeneralCatalogItem, GeneralCatalogParams } from 'src/app/catalogs';
 export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges {
   
   @Input() formField: FormControl;  
-  @Input() list: GeneralCatalogItem[];
+  // @Input() list: GeneralCatalogItem[];
+  @Input() list: GeneralCatalogMappedItem[];  
   @Input() defaultValue?: any;
   @Input() placeHolder: string;
   @Input() totalCount: number;
@@ -22,12 +23,14 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   @Input() leftHint: string;  
   @Input() showDataState: boolean;    
   
-  @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogItem}>();
+  // @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogItem}>();
+  @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogMappedItem}>();
   @Output() getMoreData = new EventEmitter<GeneralCatalogParams>();
 
   textToSearch$: Observable<any>;
   private textToSearch: string;
   showError: boolean = false;
+  selectedOption: boolean = false;
 
 // Hooks ====================
   ngOnInit(): void {
@@ -35,9 +38,14 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
       startWith(''),
       debounceTime(400),
       tap(textToSearch => {        
-        if (this.textToSearch === (textToSearch?.name ?? textToSearch)) return;
+        if (this.selectedOption) {
+          this.selectedOption = false;
+          return;
+        }
 
-        this.textToSearch = textToSearch?.name ?? textToSearch;
+        if (this.textToSearch === (textToSearch?.translatedName ?? textToSearch)) return;
+
+        this.textToSearch = textToSearch?.translatedName ?? textToSearch;
         
         this.getMoreData.emit({ 
           catalogName: this.catalog,
@@ -54,7 +62,6 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges() {
-    console.log(!this.loading, this.list.length === 0 && !this.formField.value?.id);
     this.showError = (!this.loading && this.list.length === 0 && !this.formField.value?.id);
     if (this.showError) {
       this.formField.setErrors({ 'incorrect': true })
@@ -77,13 +84,14 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   displayFn(data: any): string {
-    return data && data.name ? data.name : '';
+    return data && data.translatedName ? data.translatedName : '';
   }
 
   handleOptionSelected(event: any) {
+    this.selectedOption = true;
     this.optionSelected.emit({ 
       catalogName: this.catalog,
-      selectedData: event?.option?.value,
+      selectedData: event?.option?.value,      
     });
   }
 

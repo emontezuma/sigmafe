@@ -5,7 +5,7 @@ import { MoldsState } from '../../molds/models';
 export const initialState: MoldsState = {
   loading: false,
   moldsData: {
-    molds: {
+    moldsPaginated: {
       items: [],      
       pageInfo: {
         hasNextPage: false,
@@ -24,28 +24,30 @@ export const moldsReducer = createReducer(
     skipRecords,
     takeRecords,
   })),
+
   on(moldsActions.loadedMoldsData, (state, { moldsData } ) => ({
     ...state,
     loading: false,
     moldsData: {
       ...moldsData,
-      molds: {
-        ...moldsData.molds,
+      moldsPaginated: {
+        ...moldsData.moldsPaginated,
         pageInfo: {
-          ...moldsData.molds.pageInfo,
+          ...moldsData.moldsPaginated.pageInfo,
           forcedUpdate: true,
         }
       }
     }
   })),
+
   on(moldsActions.prepareForcedUpdateFlag, ( state ) => ({ 
     ...state,        
     moldsData: {
       ...state.moldsData,
       molds: {
-        ...state.moldsData.molds,
+        ...state.moldsData.moldsPaginated,
         pageInfo: {
-          ...state.moldsData.molds.pageInfo,
+          ...state.moldsData.moldsPaginated.pageInfo,
           forcedUpdate: false,
         }
       }

@@ -18,7 +18,8 @@
         align-items: center;
         font-weight: 300;  
         font-size: 1.1rem;
-        max-width: 50%; 
+        text-wrap: nowrap;
+        overflow: hidden;    
         &--error {
             color: var(--z-colors-error-fore-color);
             overflow: hidden;
@@ -42,6 +43,7 @@
             fill: var(--z-colors-required-fore-color);
             color: var(--z-colors-required-fore-color);
             font-size: 20px;
+            margin-left: 5px;
         }
         &--no-error {
             fill: var(--z-colors-status-ok);
@@ -49,6 +51,7 @@
             font-size: 20px;
             width: 20px;
             height: 20px;
+            margin-left: 5px;
         }
     }    
     &__normal-icon {                

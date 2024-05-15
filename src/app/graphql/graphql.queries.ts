@@ -1,20 +1,24 @@
 import { gql } from 'apollo-angular';
 
 export const GET_LINES = gql`
-  query Lines {
-    lines {
-      id
-      customerId
-      plantId
-      name
-      reference
-      status
-      createdBy
-      createdAt
-      updatedBy
-      updatedAt
-      deletedBy
-      deletedAt
+  query LinesPaginated {
+    linesPaginated {
+      items {
+        data {
+          id
+          customerId
+          plantId
+          name
+          reference
+          status
+          createdBy
+          createdAt
+          updatedBy
+          updatedAt
+          deletedBy
+          deletedAt
+        }
+      }    
     }
   }
 `;
@@ -22,6 +26,7 @@ export const GET_LINES = gql`
 export const GET_MOLDS_HITS = gql`
 query MoldsUnlimited {
   moldsUnlimited {
+    data {
       serialNumber
       description
       manufacturerId
@@ -53,46 +58,70 @@ query MoldsUnlimited {
       thresholdYellowDateReached
       thresholdRedDateReached
       id
-      partNumber {
-        reference
-      }        
       status      
+    }
+    isTranslated
+    friendlyState
+    translatedDescription
+    translatedPartNumber {
+      translatedReference
+      translatedName
+      isTranslated
+    }            
   }
 }
 `;
 
 export const GET_MOLDS = gql`
-  query Molds(
+  query MoldsPaginated (
     $recosrdsToSkip: Int,
     $recosrdsToTake: Int,
-    $orderBy: [MoldSortInput!]
+    $orderBy: [FriendlyMoldSortInput!],
+    $filterBy: FriendlyMoldFilterInput,
   ) {
-    molds(skip: $recosrdsToSkip, take: $recosrdsToTake, order: $orderBy) {
+  moldsPaginated (
+    skip: $recosrdsToSkip,
+    take: $recosrdsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
       items {
-        serialNumber
-        description
-        hits
-        lastHit
-        label
-        state
-        partNumberId
-        position
-        mainImagePath
-        id
-        status
-        updatedAt
-        updatedBy {
-          name
+        friendlyStatus
+        friendlyState
+        friendlyThresholdState
+        friendlyThresholdType
+        friendlyStrategy
+        friendlyLabel
+        translatedPartNumber {
+          translatedName
+          translatedReference
+          translatedNotes
+          translatedPrefix
+          isTranslated            
         }
-        partNumber {
-          name
-        }        
+        data {
+          serialNumber
+          description
+          hits
+          lastHit
+          label
+          state
+          partNumberId
+          position
+          mainImagePath
+          id
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
       }
       pageInfo {
         hasNextPage
         hasPreviousPage
-      }
-      totalCount
+      }    
+      totalCount    
     }
   }
 `;
@@ -109,90 +138,185 @@ export const GET_HARDCODED_VALUES = gql`
     skip: $recosrdsToSkip, 
     take: $recosrdsToTake
   ) {
+      totalCount
+      items {
+          languageId
+          tableName
+          value
+          friendlyText
+          status
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }
+    }
+  }
+`;
+
+export const GET_PROVIDERS_LAZY_LOADING = gql`
+  query ProvidersPaginated (
+      $recosrdsToSkip: Int,
+      $recosrdsToTake: Int,
+      $orderBy: [TranslatedProviderDtoSortInput!],
+      $filterBy: TranslatedProviderDtoFilterInput
+  ) {
+  providersPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated
+        data {
+            name
+            id        
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_MANUFACTURERS_LAZY_LOADING = gql`
+  query ManufacturersPaginated (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [TranslatedManufacturerDtoSortInput!],
+    $filterBy: TranslatedManufacturerDtoFilterInput
+  ) {
+  manufacturersPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated
+        data {
+            name
+            id        
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_LINES_LAZY_LOADING = gql`
+  query LinesPaginated (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [TranslatedLineDtoSortInput!],
+    $filterBy: TranslatedLineDtoFilterInput
+  ) {
+  linesPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated
+        data {
+            name
+            id        
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_EQUIPMENTS_LAZY_LOADING = gql`
+  query EquipmentsPaginated (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [TranslatedEquipmentDtoSortInput!],
+    $filterBy: TranslatedEquipmentDtoFilterInput
+  ) {
+  equipmentsPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated
+        data {
+            name
+            id        
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_PART_NUMBERS_LAZY_LOADING = gql`
+  query PartNumbersPaginated (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [TranslatedPartNumberDtoSortInput!],
+    $filterBy: TranslatedPartNumberDtoFilterInput
+  ) {
+  partNumbersPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
     totalCount
     items {
-        languageId
-        tableName
-        value
-        friendlyText
-        status
+      translatedName
+      translatedReference
+      isTranslated
+      data {
+          name
+          id        
+      }      
     }
     pageInfo {
       hasNextPage
       hasPreviousPage
-    }
-  }
-}
-`;
-
-export const GET_PROVIDERS_LAZY_LOADING = gql`
-  query Providers(
-      $recosrdsToSkip: Int,
-      $recosrdsToTake: Int,
-      $orderBy: [ProviderSortInput!],
-      $filterBy: ProviderFilterInput
-    ) {
-  providers(
-    where: $filterBy, 
-    order: $orderBy, 
-    skip: $recosrdsToSkip, 
-    take: $recosrdsToTake
-  ) {
-    totalCount
-    items {
-        name
-        id
-        translations {
-            name
-            languageId
-        }
-    }
-    pageInfo {
-        hasNextPage
-        hasPreviousPage
-    }
-  }
-}
-`;
-
-export const GET_MANUFACTURERS_LAZY_LOADING = gql`
-  query Manufacturers(
-    $recosrdsToSkip: Int,
-    $recosrdsToTake: Int,
-    $orderBy: [ManufacturerSortInput!],
-    $filterBy: ManufacturerFilterInput
-  ) {
-  manufacturers(
-    where: $filterBy, 
-    order: $orderBy, 
-    skip: $recosrdsToSkip, 
-    take: $recosrdsToTake
-  ) {
-    totalCount
-    items {
-        name
-        id
-        translations {
-            name
-            languageId
-        }
-    }
-    pageInfo {
-        hasNextPage
-        hasPreviousPage
-    }
+    }  
   }
 }
 `;
 
 export const GET_GENERICS_LAZY_LOADING = gql`
-  query Generics(
+  query GenericsPaginated (
     $recosrdsToSkip: Int,
     $recosrdsToTake: Int,
-    $orderBy: [GenericSortInput!],
-    $filterBy: GenericFilterInput
+    $orderBy: [TranslatedGenericDtoSortInput!],
+    $filterBy: TranslatedGenericDtoFilterInput
   ) {
-  generics(
+  genericsPaginated (
     where: $filterBy, 
     order: $orderBy, 
     skip: $recosrdsToSkip, 
@@ -200,12 +324,15 @@ export const GET_GENERICS_LAZY_LOADING = gql`
   ) {
     totalCount
     items {
-        name
-        id
-        translations {
-            name
-            languageId
-        }
+        data {
+          name
+          tableName
+          id
+        }        
+        translatedTableName
+        translatedName
+        translatedReference
+        friendlyStatus
     }
     pageInfo {
         hasNextPage
@@ -213,4 +340,106 @@ export const GET_GENERICS_LAZY_LOADING = gql`
     }
   }
 }
+`;
+
+export const GET_MAINTENANCE_HISTORICAL_LAZY_LOADING = gql`
+  query MaintenanceHistorical (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [MaintenanceHistoricalSortInput!],
+    $filterBy: MaintenanceHistoricalFilterInput
+  ) {
+    maintenanceHistorical (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+    totalCount
+    items {
+      moldId
+      id
+      maintenanceDate
+      state
+      operatorName
+      notes
+      provider {
+        id
+        name
+        reference
+        translations {
+            name
+            languageId
+        }
+      }
+    }
+  }
+}
+`;
+
+export const GET_ALL_MOLDS_TO_CSV = gql`
+  query ExportMoldToCSV {
+    exportMoldToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+export const GET_MOLD = gql`
+  query Mold (
+    $moldId: Long!
+    $customerId: Long!
+  ) {
+  mold (
+    id: $moldId,
+    customerId: $customerId
+  ) {
+      serialNumber
+      description
+      notes
+      reference
+      manufacturerId
+      providerId
+      manufacturingDate
+      startingDate
+      lastMaintenanceId
+      hits
+      previousHits
+      lastHit
+      lastResettingId
+      thresholdType
+      thresholdYellow
+      thresholdRed
+      thresholdState
+      thresholdDateYellow
+      thresholdDateRed
+      receiverId
+      label
+      state
+      nextMaintenance
+      equipmentId
+      lineId
+      partNumberId
+      position
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      strategy
+      lastLocationId
+      thresholdYellowDateReached
+      thresholdRedDateReached
+      moldTypeId
+      moldClassId
+      id
+      customerId
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+    }
+  }
 `;

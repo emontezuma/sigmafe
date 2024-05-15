@@ -27,5 +27,11 @@ export const initialState: SharedState = {
 export const sharedReducer = createReducer(
   initialState,
   on(sharedActions.changeScreenState, (state, { screen } ) => ({ ...state, screen })),
+  on(sharedActions.changeScreenAllHeight, (state, { allHeight } ) => ({
+    ...state, 
+    screen: {
+      ...state.screen,
+      allHeight,
+    }
+  })),
 );
-  

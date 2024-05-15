@@ -3,7 +3,7 @@ import { MoldsData } from '../../molds/models';
 
 export const loadMoldsData = createAction(
     '[Molds] Load Molds Data',
-    props<{ skipRecords: number, takeRecords: number, order?: any }>()
+    props<{ skipRecords: number, takeRecords: number, order?: any, filter?: any }>()
 )
 
 export const loadedMoldsData = createAction(

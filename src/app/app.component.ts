@@ -38,8 +38,8 @@ export class AppComponent implements AfterViewInit {
       outerWidth,
       innerWidth,
     }
-    this.handlerScreenSizeChange(screenData);
     this.calculateOutletPosition();
+    this.handlerScreenSizeChange(screenData);    
   }
 
 // Variables ================
@@ -203,8 +203,9 @@ export class AppComponent implements AfterViewInit {
   calculateOutletPosition() {        
     const toolbarHeight = this.scrollbarInToobar ? 80 : 61;
     this.toolbarHeight = toolbarHeight - 61;
-    this.allHeight = (window.innerHeight - 98)  - (this.toolbarData.show ? (toolbarHeight + 15) : 0);
+    this.allHeight = (window.innerHeight - 98)  - (this.toolbarData.show ? (toolbarHeight + 15) : 0);    
     this.outletHeight = (window.innerHeight - 106) + 'px';
+    this._sharedService.setAllHeight(this.allHeight);    
   }
 
   handlerScreenSizeChange(screen: Screen | null) {
@@ -217,6 +218,7 @@ export class AppComponent implements AfterViewInit {
         outerHeight: window.outerHeight,
         outerWidth: window.outerWidth,
         innerWidth: window.innerWidth,
+        allHeight: this.allHeight,
       };
     }
     this.invalidSize = screen.innerWidth < 350 || screen.innerHeight < 400;
@@ -242,6 +244,7 @@ export class AppComponent implements AfterViewInit {
 
   toolbarAnimationFinished(e: any) {
     this.toolbarAnimated = true;
+    this._sharedService.setToolbarAnimationFinished(true);
   }
 
   toolbarAnimationStarted(e: any) {

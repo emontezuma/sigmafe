@@ -8,7 +8,7 @@ body {
   font-size: 12px;
   color: var(--z-colors-page-fore);
   background-color: var(--z-colors-page-background-color);
-  overflow: hidden;
+  overflow: hidden;  
 }
 
 body {
@@ -52,6 +52,11 @@ body {
   height: 16px;
 }
 
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
 ::-webkit-scrollbar-button:single-button {
   background: var(--theme-primary-100) !important;
   border: 2px solid var(--theme-primary-200) !important;
@@ -78,11 +83,13 @@ body {
   background: rgba(0, 0, 0, 0.1) !important;
   background-clip: content-box;
   border: 5px solid transparent;
+  box-shadow: inset 0 0 10px 10px rgba(0, 0, 0, 0.2) !important;
 }
 
 ::-webkit-scrollbar-track {
   background: var(--z-colors-white) !important;
   border: 2px solid var(--z-colors-page-border) !important;
+  box-shadow: inset 0 0 10px 10px var(--z-colors-page-border);
   margin: 3px;
   border-radius: 3px;
 }
@@ -473,7 +480,8 @@ mat-tab-group {
   &__required-icon {
     font-size: 16px !important;
     width: 16px !important;
-    height: 16px !important;    
+    height: 16px !important;
+    margin-right: 5px;  
   }
   &__required-label {    
   }
@@ -501,4 +509,8 @@ mat-tab-group {
     font-weight: 300;  
     font-size: 1.2rem;    
   }
+}
+
+mat-divider {
+  border-color: var(--theme-primary-300) !important;
 }

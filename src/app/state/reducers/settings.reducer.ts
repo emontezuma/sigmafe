@@ -17,7 +17,7 @@ export const initialState: SettingsState = {
     animate: false,
     timeOutFortDialog: 0,
     catalog: {
-      pageSize: 10,
+      pageSize: 50,
     }
   },  
 };

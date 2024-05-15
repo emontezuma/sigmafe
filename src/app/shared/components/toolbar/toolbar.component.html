@@ -64,6 +64,7 @@
           [matTooltipDisabled]="!button.showTooltip"
           [matTooltip]="button.tooltip"
           matTooltipClass="tooltip-general"
+          [type]="button.elementType"
           matTooltipShowDelay="100"
           [disabled]="button.disabled || button.loading"
           (click)="handleClick(i, button.action, button.field)"

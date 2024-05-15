@@ -597,12 +597,12 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   convertDates() {
-    this.convertedDates.dueDateToFinish = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToFinish, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);
-    this.convertedDates.equipment.lastChecklistDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.equipment?.lastChecklistDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);    
-    this.convertedDates.dueDateToStart = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToStart, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.startDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.startDate, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.assignement.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.assignement?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
-    this.convertedDates.planning.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.planning?.date, 'EEEE d MMM yyyy hh:MM:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.dueDateToFinish = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToFinish, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);
+    this.convertedDates.equipment.lastChecklistDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.equipment?.lastChecklistDate, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);    
+    this.convertedDates.dueDateToStart = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.dueDateToStart, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.startDate = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.startDate, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.assignement.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.assignement?.date, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
+    this.convertedDates.planning.date = this._sharedService.capitalization(this._sharedService.formatDate(this.checklist.planning?.date, 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE);        
   }
 
   loadChecklist(checklistFillingData: ChecklistFillingData, firstTime: boolean) {
@@ -715,7 +715,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       icon: '',
       buttonText: '',
       buttonIcon: '',
-  });
+    });
   }
 
   showInactiveMessage2(): void {

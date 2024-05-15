@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
 import { Observable, tap } from 'rxjs';
 
 import { routingAnimation, dissolve, fromLeft, listAnimation } from '../../../shared/animations/shared.animations';
-import { MoldHitsQuery } from '../../models/molds-hits.models';
+import { MoldHitsQuery, MoldStates } from '../../models/molds-hits.models';
 import { AppState } from '../../../state/app.state'; 
 import { selectMoldsHitsQueryData, selectLoadingMoldsHitsState } from '../../../state/selectors/molds-hits.selectors'; 
 import { loadMoldsHitsQueryData } from 'src/app/state/actions/molds-hits.actions';
@@ -13,7 +13,6 @@ import { ProfileData, ApplicationModules, ButtonActions, ToolbarButtonClicked, T
 import { SettingsData } from '../../../shared/models/settings.models'
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
-import { MoldStates } from 'src/app/catalogs';
 
 @Component({
   selector: 'app-molds-hits-counter',
@@ -21,12 +20,15 @@ import { MoldStates } from 'src/app/catalogs';
   templateUrl: './molds-hits-counter.component.html',
   styleUrls: ['./molds-hits-counter.component.scss']
 })
-export class MoldsHitsCounterComponent implements OnInit {
+export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
   @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
-  @ViewChild('moldsQueryList') private moldsQueryList: ElementRef;  
+  @ViewChild('moldHitsCounter') moldHitsCounter: ElementRef;
+  @ViewChildren('hitsCounters') hitsCounters: QueryList<ElementRef>;
+  
   
 // Variables ===============
-  scroll$: Observable<any>;;
+  scroll$: Observable<any>;
+  
   settingsData$: Observable<SettingsData>;
   toolbarClick$: Observable<ToolbarButtonClicked>;        
   showGoTop$: Observable<GoTopButtonStatus>;
@@ -37,6 +39,7 @@ export class MoldsHitsCounterComponent implements OnInit {
   moldsHitsLoading$: Observable<boolean>;  
   moldsHitsData$: Observable<MoldHitsQuery[]>;  
   stopTimer$: Observable<boolean>;
+  screen$: Observable<number>;  
 
   filteredMoldsHits: MoldHitsQuery[] = [];
   originalMoldsHits: MoldHitsQuery[] = [];
@@ -59,6 +62,8 @@ export class MoldsHitsCounterComponent implements OnInit {
   showFrom: number = 0;
   timeToWait: number = 6;
   moldsToShow: number = 6;
+  cardHeight: number = 210;
+  allHeight: number = 6;
   disableListAnimation: boolean = false;
   animatingList: boolean = false;
   
@@ -108,17 +113,20 @@ export class MoldsHitsCounterComponent implements OnInit {
     );
     this.moldsHitsData$ = this._store.select(selectMoldsHitsQueryData).pipe(
       tap( moldsHits => {
-        this.originalMoldsHits = moldsHits;      
+        this.originalMoldsHits = moldsHits;
         this.filterMoldsHitsQueryData();
-          if (this.moldsHitsToShow.length > 0 && moldsHits?.length > 0) {
+        if (this.moldsHitsToShow.length > 0 && moldsHits?.length > 0) {
           this.moldsHitsToShow.forEach((showedMold, index) => {
-            const moldToUpdate = moldsHits.find(mold => mold.id === showedMold.id);
+            const moldToUpdate = moldsHits.find(mold => mold.data.id === showedMold.data.id);
             this.moldsHitsToShow[index] = {
               ...moldToUpdate,
-              index: showedMold.index,
-              updateHits: moldToUpdate.hits != showedMold.hits
+              data: {
+                ...moldToUpdate.data,
+                index: showedMold.data.index,
+                updateHits: moldToUpdate.data.hits != showedMold.data.hits,
+              },              
             }
-          })
+          });          
           return;
         }      
         this.showFrom = 0;
@@ -145,7 +153,7 @@ export class MoldsHitsCounterComponent implements OnInit {
       tap((goTop) => {
         if (goTop.status === 'temp') {
           this.onTopStatus = 'active';
-          this.moldsQueryList.nativeElement.scrollIntoView({
+          this.moldHitsCounter.nativeElement.scrollIntoView({
             behavior: 'smooth',
             block: 'start',
           });
@@ -161,15 +169,8 @@ export class MoldsHitsCounterComponent implements OnInit {
         this.toolbarAction(buttonClicked);
       })
     );
-    this.everySecond$ = this._sharedService.pastSecond.pipe(
-      tap((pulse) => {
-        this.moldsHitsToShow = this.moldsHitsToShow.map((mold) => {
-          return {
-            ...mold,
-            elapsedTimeLabel: this._sharedService.labelElapsedTime(mold.lastHit),
-          };        
-        })
-      })
+    this.everySecond$ = this._sharedService.pastSecond.pipe(      
+      
     );
     this.stopTimer$ = this._sharedService.timeCompleted.pipe(
       tap((timeCompleted) => {        
@@ -185,9 +186,36 @@ export class MoldsHitsCounterComponent implements OnInit {
         this.getScrolling(data);
       })
     )
-    
+
+    this.screen$ = this._sharedService.getAllHeight.pipe(
+      tap((allHeight) => {
+        this.allHeight = allHeight;
+        if (allHeight > 0) {
+          this.calculateMoldsToShow();
+        }        
+      })
+    )
     // this.animationFinished(null);      
   }
+
+  ngAfterViewInit(): void {        
+    this.hitsCounters.changes.subscribe((components: QueryList<ElementRef>) => {      
+      components.forEach((component: any) => {
+        this.cardHeight = component.nativeElement?.offsetHeight > this.cardHeight ? component.nativeElement?.offsetHeight : this.cardHeight;
+      });
+      this.calculateMoldsToShow();
+    });      
+  }
+
+  calculateMoldsToShow() {
+    const decimals = this.allHeight / (this.cardHeight + 10) - Math.floor(this.allHeight / (this.cardHeight + 10));
+    if (decimals < .15) {
+      this.moldsToShow = Math.floor(this.allHeight / (this.cardHeight + 10)) - 1;
+    } else {
+      this.moldsToShow = Math.floor(this.allHeight / (this.cardHeight + 10));
+    }
+  }
+  
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
@@ -499,15 +527,15 @@ export class MoldsHitsCounterComponent implements OnInit {
 
   filterMoldsHitsQueryData() {        
       this.filteredMoldsHits = this.filterMoldsBy ? 
-      this._sharedService.filter(this.originalMoldsHits, this.filterMoldsBy).filter(mold => 
-      (!this.moldColorFilter || mold.label  === this.moldColorFilter) &&
-      (!this.moldStateFilter || mold.state  === this.moldStateFilter) &&
-      (!this.moldStatusFilter || mold.status  === this.moldStatusFilter))
+      this._sharedService.filterObject(this.originalMoldsHits, this.filterMoldsBy).filter(mold => 
+      (!this.moldColorFilter || mold.data.label  === this.moldColorFilter) &&
+      (!this.moldStateFilter || mold.data.state  === this.moldStateFilter) &&
+      (!this.moldStatusFilter || mold.data.status  === this.moldStatusFilter))
       :
       this.originalMoldsHits.filter(mold => 
-      (!this.moldColorFilter || mold.label  === this.moldColorFilter) &&
-      (!this.moldStateFilter || mold.state  === this.moldStateFilter) &&
-      (!this.moldStatusFilter || mold.status  === this.moldStatusFilter));            
+      (!this.moldColorFilter || mold.data.label  === this.moldColorFilter) &&
+      (!this.moldStateFilter || mold.data.state  === this.moldStateFilter) &&
+      (!this.moldStatusFilter || mold.data.status  === this.moldStatusFilter));            
   }
 
   slider() {
@@ -520,38 +548,37 @@ export class MoldsHitsCounterComponent implements OnInit {
     this.moldsHitsToShow = [];        
   }
 
-  showingMolds() {        
+  addMoldsHitsToShow(element: number) {
+    this.moldsHitsToShow.push({
+      ...this.filteredMoldsHits[element],
+      data: {
+        ...this.filteredMoldsHits[element].data,
+        index: element + 1,
+      },            
+    });
+  }
+
+  showingMolds() {       
+    
     const moldsToShowLessOne = this.moldsToShow - 1;    
     if (this.filteredMoldsHits.length > this.moldsToShow) {                 
       if (this.showFrom + moldsToShowLessOne > this.filteredMoldsHits.length) {
         for (let i = this.showFrom; i < this.filteredMoldsHits.length; i++) {
-          this.moldsHitsToShow.push({
-            ...this.filteredMoldsHits[i],
-            index: i + 1,
-          });
+          this.addMoldsHitsToShow(i);
         }
         for (let i = 0; i <= (this.showFrom + moldsToShowLessOne - this.filteredMoldsHits.length); i++) {
-          this.moldsHitsToShow.push({
-            ...this.filteredMoldsHits[i],
-            index: i + 1,
-          });
+          this.addMoldsHitsToShow(i);
         }
         this.showFrom = this.showFrom + moldsToShowLessOne - this.filteredMoldsHits.length + 1;        
       } else {
         const limit = this.showFrom + moldsToShowLessOne > this.filteredMoldsHits.length - 1 ? this.filteredMoldsHits.length - 1 : this.showFrom + moldsToShowLessOne;
         for (let i = this.showFrom ; i <= limit; i++) {
-          this.moldsHitsToShow.push({
-            ...this.filteredMoldsHits[i],
-            index: i + 1,
-          });
+          this.addMoldsHitsToShow(i);
         }
         this.showFrom = this.showFrom + this.moldsToShow;
         if (this.moldsHitsToShow.length < this.moldsToShow) {
           for (let i = 0; i <= (this.moldsToShow - this.moldsHitsToShow.length - 1); i++) {
-            this.moldsHitsToShow.push({
-              ...this.filteredMoldsHits[i],
-              index: i + 1,
-            });
+            this.addMoldsHitsToShow(i);
           }
           this.showFrom = this.moldsToShow - this.moldsHitsToShow.length + 1;
         }
@@ -564,7 +591,10 @@ export class MoldsHitsCounterComponent implements OnInit {
       this.filteredMoldsHits.forEach((mold, index) => {
         this.moldsHitsToShow.push({
           ...mold,
-          index: index + 1,
+          data: {
+            ...mold.data,
+            index: index + 1,
+          },                        
         });
       });
       this.setToolbarLabel(`Página 1 de 1`);

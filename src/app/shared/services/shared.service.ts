@@ -50,8 +50,15 @@ export class SharedService {
    });
   showToolbar: Observable<ToolbarControl> = this.toolbarBehaviorSubject.asObservable();
 
+  private toolbarAnimationFinishedBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
+  toolbarAnimationFinished: Observable<boolean> = this.toolbarAnimationFinishedBehaviorSubject.asObservable();
+
   private showToolbarWidthBehaviorSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
   showToolbarWidth: Observable<number> = this.showToolbarWidthBehaviorSubject.asObservable();
+
+  private allHeightBehaviorSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  getAllHeight: Observable<number> = this.allHeightBehaviorSubject.asObservable();
+
 
   private showProgressBarBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showProgressBar: Observable<ShowElement> = this.showProgressBarBehaviorSubject.asObservable();
@@ -115,8 +122,16 @@ export class SharedService {
     this.toolbarBehaviorSubject.next(toolbarControl);
   }
 
+  setToolbarAnimationFinished(toolbarAnimationFinished: boolean) {
+    this.toolbarAnimationFinishedBehaviorSubject.next(toolbarAnimationFinished);
+  }
+
   setToolbarWidth(width: number) {
     this.showToolbarWidthBehaviorSubject.next(width);
+  }
+
+  setAllHeight(allHeight: number) {
+    this.allHeightBehaviorSubject.next(allHeight);
   }
   
   setGeneralScrollBar(from: string, showScrollBar: boolean) {
@@ -223,7 +238,7 @@ export class SharedService {
     } else if (result < 86400) {
       return $localize `Hace ${Math.round(result / 3600)} horas`;
     }
-    return '';
+    return this.formatDate(new Date(dateFrom).toString(), 'EEEE, YYYY-MMM-dd HH:mm:ss');
   }
 
   datesDifferenceInSeconds(dateFrom: any, dateTo: any = '', type: string = 'elapsed'): DatesDifference {
@@ -331,11 +346,12 @@ export class SharedService {
     }    
   }
 
-  formatDate(date: string, format: string = 'yyyy/MM/dd HH:mm:ss'): string {
-    if (!date || !this.isDateValid(date as any)) {
+  formatDate(date: string | any, format: string = 'yyyy/MM/dd HH:mm:ss'): string {
+    // if (!date || !this.isDateValid(date as any)) {
+    if (!date) {
       return '';
     }
-
+    
     return this._datePipe.transform(new Date(date), format).replace(/p. m./gi, 'PM').replace(/a. m./gi, 'AM');
   }
 
@@ -356,7 +372,7 @@ export class SharedService {
     return false;
   }
 
-  filter(dataToFilter: any[], cad: string): any[] {    
+  filterObject(dataToFilter: any[], cad: string): any[] {    
     if (!cad) {
       return dataToFilter;
     }
@@ -370,12 +386,14 @@ export class SharedService {
       socket.onopen  = (msg) => { 
         socket.send("{ \"protocol\": \"json\", \"version\": 1 }\u001e");         
       };
-      socket.onmessage = (receivedMold: any) => {
-        if (receivedMold?.data) {
-          const data = JSON.parse(receivedMold?.data.replace("\u001e", ""));          
+      socket.onmessage = (socketObject: any) => {
+        if (socketObject?.data) {
+          const data = JSON.parse(socketObject?.data.replace("\u001e", ""));          
           if (data?.arguments?.length > 0) {
-            console.log(data?.arguments[0]);
-            this._store.dispatch(updateMoldsHitsData({ hitMold: data?.arguments[0] }));         
+            if (data?.target === 'ReceiveMold') {
+              console.log(data?.arguments[0]);
+              this._store.dispatch(updateMoldsHitsData({ hitMold: data?.arguments[0] }));
+            }
           }
         }
         
@@ -408,7 +426,25 @@ export class SharedService {
         variables = { orderBy: orderBy };
       }
     }    
-    return this._apollo.watchQuery({ query: GET_MOLDS, variables, context: { headers: { 'x-customer-id': '1', 'x-language-id': '1',  }} }).valueChanges    
+    return this._apollo.watchQuery({ 
+      query: GET_MOLDS,
+      variables
+    }).valueChanges    
+  }
+
+  convertUtcTolocal(dateUtc: string): Date | string {
+    if (!dateUtc || dateUtc.trim() === '') {
+      return '';
+    }
+    
+    try {
+      const dateConverted = new Date(Date.parse(new Date(dateUtc).toString() + ' UTC'));
+      return dateConverted;
+
+    } catch (error) {      
+        return 'Conversion error UTC date';
+    }      
+    
   }
 
 // End ======================

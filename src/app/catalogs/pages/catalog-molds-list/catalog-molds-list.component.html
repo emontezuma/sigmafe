@@ -12,16 +12,17 @@
   <ng-container *ngIf="searchBox$ | async "></ng-container>
   <ng-container *ngIf="screenData$ | async "></ng-container>
   <ng-container *ngIf="animationData$ | async "></ng-container>
+  <ng-container *ngIf="allMoldsToCsv$ | async "></ng-container>  
 
   <div
     class="molds-table"    
   >
-    <table mat-table [dataSource]="dataSource" matSort>
+    <table mat-table [dataSource]="moldsCatalogData" matSort>
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
         <td mat-cell *matCellDef="let row">
-          <ng-container *ngIf="!loading">{{ row.id }}</ng-container>
+          <ng-container *ngIf="!loading">{{ row.data.id }}</ng-container>
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
       </ng-container>
@@ -33,19 +34,19 @@
           <div *ngIf="!loading" class="card-image">
             <div
               class="image-container"
-              *ngIf="row.mainImagePath"
+              *ngIf="row.data.mainImagePath"
             >
               <img                
                 @dissolve
                 appImageNotFound                
                 class="mold-image"                        
-                [src]="row.mainImagePath"
-                [alt]="row.description"            
+                [src]="row.data.mainImagePath"
+                [alt]="row.data.description"            
                 fill
               >      
             </div>
             <div
-              *ngIf="!row.mainImagePath"
+              *ngIf="!row.data.mainImagePath"
               class="icon-container"
             >
               <mat-icon svgIcon="treasure-chest"></mat-icon>
@@ -64,8 +65,8 @@
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
         <td mat-cell *matCellDef="let row">
-          <ng-container *ngIf="!loading">
-            <strong>{{ row.description }}</strong>
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.data.description }} / <strong>{{ row.data.position }}</strong></strong>
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
@@ -75,7 +76,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Serial</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            {{ row.serialNumber }}
+            {{ row.data.serialNumber }}
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
@@ -84,17 +85,17 @@
       <ng-container matColumnDef="mainInfo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Molde</th>
         <td class="main-info" mat-cell *matCellDef="let row">
-          <div><strong>{{ row.description }}</strong></div>
-          <div>Serial: <strong>{{ row.serialNumber }}</strong></div>  
+          <div><strong>{{ row.translatedDescription }}</strong></div>
+          <div>Serial: <strong>{{ row.data.serialNumber }}</strong></div>  
         </td>
       </ng-container>
 
       <ng-container matColumnDef="generalInfo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Información general</th>
         <td class="general-info" mat-cell *matCellDef="let row">  
-          <div>Estado: {{ row.state }}</div>
-          <div>Estatus: <strong>{{ row.status }}</strong></div>  
-          <div>Últ.actualización: <span>{{ row.updatedAt  | date:'medium' }}</span></div>
+          <div>Estado: {{ row.friendlyState  }}</div>
+          <div>Estatus: <strong>{{ row.friendlyStatus }}</strong></div>  
+          <div>Últ.actualización: <span>{{ row.data.updatedAt  | date:'medium' }}</span></div>
         </td>
       </ng-container>
 
@@ -102,7 +103,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Posición actual</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            {{ row.partNumber.name }} / <strong>{{ row.position }}</strong>
+            {{ row.translatedPartNumber.translatedName }} / <strong>{{ row.data.position }}</strong>
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
@@ -112,9 +113,9 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Etiqueta</th>
         <td mat-cell *matCellDef="let row">
           <div
-            *ngIf="row.label && !loading"
+            *ngIf="row.data.label && !loading"
             class="card-color"
-            [ngStyle]="{ 'background-color': row.label }"
+            [ngStyle]="{ 'background-color': row.data.label }"
           >
           </div>
           <ngx-skeleton-loader
@@ -132,7 +133,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado actual</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            {{ row.state }}
+            {{ row.friendlyState }}
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
@@ -142,8 +143,8 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Golpes acumulados</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            <div><strong>{{ row.hits !== 0 ? (row.hits | number:"1.") : "Sin golpes a la fecha" }}</strong></div>   
-            <div>Últ. golpe: {{ row.lastHit ? (row.lastHit | date:"medium") : "Indeterminado" }}</div>   
+            <div><strong>{{ row.data.hits !== 0 ? (row.data.hits | number:"1.") : "Sin golpes a la fecha" }}</strong></div>   
+            <div>Últ. golpe: {{ row.data.lastHit ? (row.data.lastHit | date:"medium") : "Indeterminado" }}</div>   
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
@@ -153,26 +154,31 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            {{ row.status }}
+            {{ row.friendlyStatus }}
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="lastUpdate">
+      <ng-container matColumnDef="updatedAt">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Últ. actualización</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            <div>{{ row.updatedBy?.name }}</div>   
-            <div>{{ row.updatedAt | date:"medium" }}</div>   
+            <div>{{ row.data.updatedBy?.name }}</div>   
+            <div>{{ row.data.updatedAt | date:"medium" }}</div>   
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: 1"></tr>
-      <tr class="table-row" mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
+      <tr mat-header-row *matHeaderRowDef="moldsTableColumns; sticky: 1"></tr>
+      <tr 
+        class="table-row"
+        mat-row *matRowDef="let row;
+        columns: moldsTableColumns"
+        [routerLink]="['/catalogs/molds/edit/', row.data.id]"
+      >
+      </tr>
       <div *ngIf="!loading">
         <tr class="molds-table-mat-row" *matNoDataRow>
           <td class="molds-table__no-data" colspan="10">

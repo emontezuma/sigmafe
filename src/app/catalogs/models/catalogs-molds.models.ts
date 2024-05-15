@@ -7,53 +7,108 @@ export enum CatalogsMolds {
 }
 
 export interface GeneralCatalogData {
-  loading: boolean;
-  totalCount: number;
+  loading?: boolean;
+  totalCount?: number;
   currentPage?: number;
-  pageInfo: GeneralCatalogPageInfo;
-  items: GeneralCatalogItem[];
+  pageInfo?: GeneralCatalogPageInfo;
+  // items?: GeneralCatalogItem[];
+  items?: GeneralCatalogMappedItem[];
+  cadRight?: string;
+}
+
+export interface MaintenanceHistoricalData {
+  loading?: boolean;
+  totalCount?: number;
+  currentPage?: number;
+  pageInfo?: GeneralCatalogPageInfo;
+  items?: MaintenanceHistoricalDataItem[];
   cadRight?: string;
 }
 
 export interface GeneralHardcodedValuesData {
-  loading: boolean;
-  totalCount: number;
+  loading?: boolean;
+  totalCount?: number;
   currentPage?: number;
-  pageInfo: GeneralCatalogPageInfo;
-  items: GeneralHardcodedValuesItem[];
+  pageInfo?: GeneralCatalogPageInfo;
+  items?: GeneralHardcodedValuesItem[];
   cadRight?: string;
 }
 
 export interface GeneralCatalogPageInfo {
-  hasPreviousPage: boolean;
-  hasNextPage: boolean;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
 }
 
-export interface GeneralCatalogItem {
+export interface GeneralCatalogItem {  
+  data?: GeneralCatalogInternalData;
+  translatedName?: string;
+  translatedReference?: string;
+  translatedDescription?: string;
+  translatedPrefix: string;
+  translatedNotes?: string;
+  isTranslated?: boolean;
+  translations?: GeneralCatalogTranslations[];
+}
+
+export interface GeneralCatalogMappedItem {  
   id: number;
-  name: string;
-  reference: string;
-  translations: GeneralCatalogTranslations[];
+  translatedName?: string;
+  translatedDescription?: string;
+  translatedReference?: string;
+  isTranslated?: boolean;
+}
+
+export interface GeneralCatalogInternalData {  
+  id?: number;
+  name?: string;
+  description?: string;
+  reference?: string;
+  notes?: string;
+  prefix?: string;
+  status?: string;
+}
+
+export interface MaintenanceHistoricalDataItem {
+  moldId?: number;
+  id?: number;
+  maintenanceDate?: string;
+  state?: string;
+  operatorName?: string;
+  notes?: string;
+  // provider?: GeneralCatalogItem;
+  provider?: GeneralCatalogMappedItem
 }
 
 export interface GeneralHardcodedValuesItem {
-  id: number;
-  languageId: number;
-  friendlyText: string;
-  value: string;
-  translations: GeneralCatalogTranslations[];
+  id?: number;
+  languageId?: number;
+  friendlyText?: string;
+  value?: string;
+  translations?: GeneralCatalogTranslations[];
 }
 
 export interface GeneralCatalogTranslations {
-  name: string;
+  languageId?: number;
+  name?: string;
   reference: string;
-  languageId: number;
+  descripcion?: string;
+  notes?: string;
+  prefix?: string;
+}
+
+export interface GeneralTranslatedFields {
+  isTranslated?: boolean;
+  translatedName?: string;
+  translatedReference: string;
+  translatedDescripcion?: string;
+  translatedNotes?: string;
+  translatedPrefix?: string;
 }
 
 export interface GeneralCatalogParams {
-  catalogName: string;
-  textToSearch: string;
-  initArray: boolean;
+  catalogName?: string;
+  textToSearch?: string;
+  initArray?: boolean;
 }
 
 export const emptyGeneralCatalogData: GeneralCatalogData = {
@@ -80,6 +135,18 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     cadRight: '',
   }
 
+  export const emptyMaintenanceHistoricalData: MaintenanceHistoricalData = {
+    loading: false,
+    totalCount: 0,
+    currentPage: 0,
+    pageInfo: {
+      hasPreviousPage: false,
+      hasNextPage: false,
+    },
+    items: [],
+    cadRight: '',
+  }
+
   export enum MoldStates {
     IN_PRODUCTION = 'in-production',
     IN_WAREHOUSE = 'in-warehouse',
@@ -93,4 +160,9 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     BOTH = 'both',
     DAYS = 'days',
   }
-  
+
+  export enum MoldControlStates {
+    RED = 'red',
+    YELLOW = 'yellow',
+  } 
+ 

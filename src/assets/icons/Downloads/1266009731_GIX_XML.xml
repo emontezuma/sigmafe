@@ -1,0 +1,357 @@
+<?xml version="1.0"?>
+<Request>
+    <ControlNumber>EXEOFPPFX.20221012201255.xml</ControlNumber>
+    <UniqueMessageID>c08b8546-d871-407b-b7ca-b4ef64bb55d8</UniqueMessageID>
+    <FromIdentifier>GH</FromIdentifier>
+    <ToIdentifier>Tietan</ToIdentifier>
+    <Customer>Emerald Materials</Customer>
+    <Timestamp>2022-10-13T07:22:55.853-04:00</Timestamp>
+    <PrimaryKey>6700-B048837</PrimaryKey>
+    <SecondaryKey/>
+    <Header Action="Original" RequestType="ShipNotice" Type="Export">
+        <Parties type="Exporter">
+            <Party-Name>EMERALD KALAMA CHEMICAL, B.V.</Party-Name>
+            <Party-Address>FASCINATIO BOULEVARD 230</Party-Address>
+            <Party-City>3065 WB ROTTERDAM</Party-City>
+            <Party-PostalCode>3065 WB</Party-PostalCode>
+            <Party-Country>NL</Party-Country>
+            <PartyLocation-ID>6700</PartyLocation-ID>
+            <Party-Contacts Action="Add">
+                <Contact-Name>unknown /ROBERTO AQUINO</Contact-Name>
+                <Contact-CommunicationAddress type="Email">EUROPEORDERS@EMERALDMATERIALS.COM</Contact-CommunicationAddress>
+                <Contact-CommunicationAddress type="Telephone">0108081284</Contact-CommunicationAddress>
+            </Party-Contacts>
+        </Parties>
+        <Parties type="ShipFrom">
+            <Party-Name>VEEMBEDRIJF DE RIJKE BV</Party-Name>
+            <Party-Address>NIEUWESLUISWEG 250/PORTNR 5046/3197 KV BOTLEK-ROTTERDAM, NL/</Party-Address>
+            <Party-City>PORTNR 5046</Party-City>
+            <Party-Country>NL</Party-Country>
+            <PartyLocation-ID>EU</PartyLocation-ID>
+            <Party-Contacts Action="Add">
+                <Contact-Name>unknown /ROBERTO AQUINO</Contact-Name>
+                <Contact-CommunicationAddress type="Telephone">0108081284</Contact-CommunicationAddress>
+                <Contact-CommunicationAddress type="Email">EUROPEORDERS@EMERALDMATERIALS.COM</Contact-CommunicationAddress>
+            </Party-Contacts>
+        </Parties>
+        <Parties type="ShipTo">
+            <Party-Name>EXXONMOBIL CORP</Party-Name>
+            <Party-Address>C/O TEKNOR APEX COMPANY/CHEMICALS DIVISION/751 DUPREE STREET/BROWNSVILLE, TN 38012, USA</Party-Address>
+            <Party-City>BROWNSVILLE</Party-City>
+            <Party-PostalCode>38012</Party-PostalCode>
+            <Party-Country>US</Party-Country>
+            <PartyLocation-ID>404686</PartyLocation-ID>
+            <Party-Contacts Action="Add">
+                <Contact-Name>unknown /BDP</Contact-Name>
+                <Contact-CommunicationAddress type="Telephone">na</Contact-CommunicationAddress>
+                <Contact-CommunicationAddress type="Email">EMERALD.EXPORT.NL@BDPINT.COM</Contact-CommunicationAddress>
+            </Party-Contacts>
+        </Parties>
+        <Parties type="Forwarder">
+            <Party-Name>BDP Netherlands B.V</Party-Name>
+            <PartyLocation-ID>414203880</PartyLocation-ID>
+        </Parties>
+        <Parties type="Seller">
+            <Party-Name>EMERALD KALAMA CHEMICAL, B.V.</Party-Name>
+            <Party-City>3065 WB ROTTERDAM</Party-City>
+            <Party-Country>NL</Party-Country>
+            <PartyLocation-ID>6700</PartyLocation-ID>
+            <Party-Contacts Action="Add">
+                <Contact-Name>unknown /ROBERTO AQUINO</Contact-Name>
+            </Party-Contacts>
+        </Parties>
+        <Parties type="Consignee">
+            <Party-Name>ExxonMobil Corp</Party-Name>
+            <Party-Name>C/O Teknor Apex Company Chemicals Division</Party-Name>
+            <Party-Name>751 Dupree Street</Party-Name>
+            <Party-Name>Brownsville, TN 38012, USA</Party-Name>
+            <Party-Name>Marcio.l.bolicenho@exxonmobil.com</Party-Name>
+            <Party-Name>felipe.m.ferreira@exxonmobil.com</Party-Name>
+            <Party-Name>Tel#: 55 41 3619 3107</Party-Name>
+        </Parties>
+        <Parties type="Notify">
+            <Party-Name>A.N. Deringer, Inc.</Party-Name>
+            <Party-Name>Attn. Kristy Graham   tel. +001 206 433 8557</Party-Name>
+            <Party-Name>16238 42nd ave S</Party-Name>
+            <Party-Name>Tukwila WA 98188 USA</Party-Name>
+            <Party-Name>kgraham@anderinger.com</Party-Name>
+            <Party-Name>emerald@anderinger.com</Party-Name>
+        </Parties>
+        <Parties type="AlsoNotify">
+            <Party-Name>ExxonMobil Corp</Party-Name>
+            <Party-Name>C/O Teknor Apex Company Chemicals Division</Party-Name>
+            <Party-Name>751 Dupree Street</Party-Name>
+            <Party-Name>BROWNSVILLE, TN 38012 - USA</Party-Name>
+            <Party-Name>Felipe Ferreira</Party-Name>
+            <Party-Name>Tel#: 55 41 3619 3107</Party-Name>
+        </Parties>
+        <References type="SalesOrderNumber">
+            <ReferenceNumber>6700-B048837</ReferenceNumber>
+            <ReferenceDate>2022-10-12</ReferenceDate>
+            <ReferenceTime>20:12:55</ReferenceTime>
+        </References>
+        <Notes type="ForwarderInstructions">ATTENTION BDP BOOKING DESK:</Notes>
+        <Notes type="ForwarderInstructions">3x 40ft container (40ft HC are acceptable)</Notes>
+        <Notes type="ForwarderInstructions">To guarantee ETA at the customer, please make sure</Notes>
+        <Notes type="ForwarderInstructions">to add 10 days to ETA confirmed by carrier</Notes>
+        <Notes type="ForwarderInstructions">IF MORE THAN 3 CONTAINERS PLEASE SHIP VIA MSC!!!</Notes>
+        <Notes type="ForwarderInstructions">ATTENTION BDP DOC DESK:</Notes>
+        <Notes type="ForwarderInstructions">PLEASE BOOK DDP (DOOR DELIVERY) WITH OOCL</Notes>
+        <Notes type="ForwarderInstructions">Do not mention freight on B/L</Notes>
+        <Notes type="ForwarderInstructions">Notice of arrival to:emerald@anderinger.com</Notes>
+        <Notes type="ForwarderInstructions">DOCUMENTS:</Notes>
+        <Notes type="ForwarderInstructions">1 SEAWAY BILL</Notes>
+        <Notes type="ForwarderInstructions">1 INVOICE</Notes>
+        <Notes type="ForwarderInstructions">1 COC/COA</Notes>
+        <Notes type="ForwarderInstructions">1 PACKING SLIP</Notes>
+        <Notes type="ForwarderInstructions">Instruction EKC11201 10+2 / PNTI is applicable</Notes>
+        <Notes type="ForwarderInstructions">DOCUMENTS SEND TO:</Notes>
+        <Notes type="ForwarderInstructions">fabiola.roxadelliarnold@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">patricia.garcia@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">michael.r.clark@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">Int.Syn.AM.Tolling.Replenishment@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">felipe.m.ferreira@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">GTCemerald@emeraldmaterials.com</Notes>
+        <Notes type="ForwarderInstructions">emerald@anderinger.com</Notes>
+        <Notes type="ForwarderInstructions">No need to send documents per courier service</Notes>
+        <Notes type="ForwarderInstructions">MENTION ON B/L:</Notes>
+        <Notes type="ForwarderInstructions">EORI# NL001871109</Notes>
+        <Notes type="ForwarderInstructions">PO# 4452316761/40/50/60</Notes>
+        <Notes type="ForwarderInstructions">Supplierapos;s FDA registration# 10256071416</Notes>
+        <Notes type="ForwarderInstructions">Customerapos;s federal tax ID#  13-5409005</Notes>
+        <Notes type="ForwarderInstructions">TA item# 0060122</Notes>
+        <Notes type="ForwarderInstructions">Freight and destination charges prepaid</Notes>
+        <Notes type="ForwarderInstructions">SCHEDULING OF DELIVERIES:</Notes>
+        <Notes type="ForwarderInstructions">Debbie Meyer</Notes>
+        <Notes type="ForwarderInstructions">dmeyer@teknorapex.com</Notes>
+        <Notes type="ForwarderInstructions">DESTINATION: BROWNSVILLE, TN 38012 / USA</Notes>
+        <Notes type="ForwarderInstructions">CONSIGNEE:</Notes>
+        <Notes type="ForwarderInstructions">ExxonMobil Corp</Notes>
+        <Notes type="ForwarderInstructions">C/O Teknor Apex Company Chemicals Division</Notes>
+        <Notes type="ForwarderInstructions">751 Dupree Street</Notes>
+        <Notes type="ForwarderInstructions">Brownsville, TN 38012, USA</Notes>
+        <Notes type="ForwarderInstructions">Marcio.l.bolicenho@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">felipe.m.ferreira@exxonmobil.com</Notes>
+        <Notes type="ForwarderInstructions">Tel#: 55 41 3619 3107</Notes>
+        <Notes type="ForwarderInstructions">NOTIFY 1:</Notes>
+        <Notes type="ForwarderInstructions">A.N. Deringer, Inc.</Notes>
+        <Notes type="ForwarderInstructions">Attn. Kristy Graham   tel. +001 206 433 8557</Notes>
+        <Notes type="ForwarderInstructions">16238 42nd ave S</Notes>
+        <Notes type="ForwarderInstructions">Tukwila WA 98188 USA</Notes>
+        <Notes type="ForwarderInstructions">kgraham@anderinger.com</Notes>
+        <Notes type="ForwarderInstructions">emerald@anderinger.com</Notes>
+        <Notes type="ForwarderInstructions">NOTIFY 2:</Notes>
+        <Notes type="ForwarderInstructions">ExxonMobil Corp</Notes>
+        <Notes type="ForwarderInstructions">C/O Teknor Apex Company Chemicals Division</Notes>
+        <Notes type="ForwarderInstructions">751 Dupree Street</Notes>
+        <Notes type="ForwarderInstructions">BROWNSVILLE, TN 38012 - USA</Notes>
+        <Notes type="ForwarderInstructions">Felipe Ferreira</Notes>
+        <Notes type="ForwarderInstructions">Tel#: 55 41 3619 3107</Notes>
+        <Notes type="ForwarderInstructions">*</Notes>
+        <Notes type="ForwarderInstructions">Roberto Aquino phone : +31(0)10 808 1284</Notes>
+        <Notes type="ForwarderInstructions">e-mail: EuropeOrders@EmeraldMaterials.com</Notes>
+        <Notes type="ForwarderInstructions">*</Notes>
+        <Notes type="ForwarderInstructions">Roberto Aquino phone : +31(0)10 808 1284</Notes>
+        <Notes type="ForwarderInstructions">*</Notes>
+        <Notes type="ForwarderInstructions">ATTENTION WAREHOUSE:</Notes>
+        <Notes type="ForwarderInstructions">CoA + packing slip in folder to be added</Notes>
+        <Notes type="ForwarderInstructions">on last pallet loaded into the container</Notes>
+        <Notes type="ForwarderInstructions">Single standing big bag to be wrapped</Notes>
+        <Notes type="ForwarderInstructions">SCHEDULING OF DELIVERIES:</Notes>
+        <Notes type="ForwarderInstructions">Please contact email below at least one work day</Notes>
+        <Notes type="ForwarderInstructions">prior for the delivery appointment time and inform</Notes>
+        <Notes type="ForwarderInstructions">EM PO number.</Notes>
+        <Notes type="ForwarderInstructions">Debbie Meyer</Notes>
+        <Notes type="ForwarderInstructions">dmeyer@teknorapex.com</Notes>
+        <Notes type="ForwarderInstructions">Roberto Aquino phone : +31(0)10 808 1284</Notes>
+        <Notes type="ForwarderInstructions">CHEMTEL (contract# MIS3073265)</Notes>
+        <Notes type="ForwarderInstructions">1-800-255-3924 (USA)</Notes>
+        <Notes type="ForwarderInstructions">+1-813-248-0585 (outside USA)</Notes>
+        <Notes type="ForwarderInstructions">Att WH: MENTION ABOVE EMERGENCY INFO ON CMR</Notes>
+        <CommercialInvoice>
+            <TermsofSaleCode>DDP</TermsofSaleCode>
+            <CurrencyCode>EUR</CurrencyCode>
+            <IncoTermsUnlocCode>n/a</IncoTermsUnlocCode>
+        </CommercialInvoice>
+        <Transportation LegType="Primary" MethodofTransportation="Ocean">
+            <OriginCodeType Type="UNLOCCode">
+                <OriginCode>NLRTM</OriginCode>
+            </OriginCodeType>
+            <DestinationCodeType Type="UNLOCCode">
+                <DestinationCode>NLRTM</DestinationCode>
+            </DestinationCodeType>
+            <DestinationCountryCode>US</DestinationCountryCode>
+            <TypeofMoveCode Type="DD"/>
+            <Carrier>
+                <CarrierName>BDP PRE CARRIAGE</CarrierName>
+                <CarrierCode type="SCAC">BDP1</CarrierCode>
+            </Carrier>
+        </Transportation>
+        <Equipment>
+            <EquipmentNumber>1</EquipmentNumber>
+            <Measurements type="NetWeightKilograms">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrossWeightKilograms">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+            <EquipmentType>CL40</EquipmentType>
+            <EquipmentSize>CL</EquipmentSize>
+            <Amounts>
+                <AmountType>EquipmentTotalPackages</AmountType>
+                <AmountValue>19</AmountValue>
+                <AmountUnit>EA</AmountUnit>
+            </Amounts>
+        </Equipment>
+        <Equipment>
+            <EquipmentNumber>2</EquipmentNumber>
+            <Measurements type="NetWeightKilograms">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrossWeightKilograms">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+            <EquipmentType>CL40</EquipmentType>
+            <EquipmentSize>CL</EquipmentSize>
+            <Amounts>
+                <AmountType>EquipmentTotalPackages</AmountType>
+                <AmountValue>19</AmountValue>
+                <AmountUnit>EA</AmountUnit>
+            </Amounts>
+        </Equipment>
+        <Equipment>
+            <EquipmentNumber>3</EquipmentNumber>
+            <Measurements type="NetWeightKilograms">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrossWeightKilograms">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+            <EquipmentType>CL40</EquipmentType>
+            <EquipmentSize>CL</EquipmentSize>
+            <Amounts>
+                <AmountType>EquipmentTotalPackages</AmountType>
+                <AmountValue>19</AmountValue>
+                <AmountUnit>EA</AmountUnit>
+            </Amounts>
+        </Equipment>
+        <Status>
+            <StatusType type="RequestedDeliveryDate"/>
+            <StatusDate>2022-10-10</StatusDate>
+            <StatusTime>00:00:00</StatusTime>
+        </Status>
+        <Status>
+            <StatusType type="RequestedPlantShipDate"/>
+            <StatusDate>2022-08-30</StatusDate>
+            <StatusTime>00:00:00</StatusTime>
+        </Status>
+    </Header>
+    <Detail>
+        <ProductDetail>
+            <LineItemNo>1</LineItemNo>
+            <ProductCode>BZOHPURB-23</ProductCode>
+            <BrandName>PUROX ~B FLAKES PURE GRADE BENZOIC ACID IN 1000 KG BIG BAG / 1 BIG BAG PER PALLET</BrandName>
+            <Compliance>
+                <ClassificationNumber>2916.31.0090</ClassificationNumber>
+            </Compliance>
+            <BilledQuantity>19</BilledQuantity>
+            <BilledQuantityUnit>EA</BilledQuantityUnit>
+            <NoOfPkgs>19</NoOfPkgs>
+            <TypePkgCode>BIGBAGS</TypePkgCode>
+            <Measurements type="NetWtKgs">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrsWtKgs">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+        </ProductDetail>
+        <ProductReferences type="DeliveryNote">
+            <ProductReferenceNumber>SB00063562</ProductReferenceNumber>
+        </ProductReferences>
+        <ProductEquipment>
+            <Prod-EquipNo>1</Prod-EquipNo>
+            <Prod-EquipType>CL40</Prod-EquipType>
+            <Prod-EquipSize>CL</Prod-EquipSize>
+        </ProductEquipment>
+    </Detail>
+    <Detail>
+        <ProductDetail>
+            <LineItemNo>2</LineItemNo>
+            <ProductCode>BZOHPURB-23</ProductCode>
+            <BrandName>PUROX ~B FLAKES PURE GRADE BENZOIC ACID IN 1000 KG BIG BAG / 1 BIG BAG PER PALLET</BrandName>
+            <Compliance>
+                <ClassificationNumber>2916.31.0090</ClassificationNumber>
+            </Compliance>
+            <BilledQuantity>19</BilledQuantity>
+            <BilledQuantityUnit>EA</BilledQuantityUnit>
+            <NoOfPkgs>19</NoOfPkgs>
+            <TypePkgCode>BIGBAGS</TypePkgCode>
+            <Measurements type="NetWtKgs">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrsWtKgs">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+        </ProductDetail>
+        <ProductReferences type="DeliveryNote">
+            <ProductReferenceNumber>SB00063563</ProductReferenceNumber>
+        </ProductReferences>
+        <ProductEquipment>
+            <Prod-EquipNo>2</Prod-EquipNo>
+            <Prod-EquipType>CL40</Prod-EquipType>
+            <Prod-EquipSize>CL</Prod-EquipSize>
+        </ProductEquipment>
+    </Detail>
+    <Detail>
+        <ProductDetail>
+            <LineItemNo>3</LineItemNo>
+            <ProductCode>BZOHPURB-23</ProductCode>
+            <BrandName>PUROX ~B FLAKES PURE GRADE BENZOIC ACID IN 1000 KG BIG BAG / 1 BIG BAG PER PALLET</BrandName>
+            <Compliance>
+                <ClassificationNumber>2916.31.0090</ClassificationNumber>
+            </Compliance>
+            <BilledQuantity>19</BilledQuantity>
+            <BilledQuantityUnit>EA</BilledQuantityUnit>
+            <NoOfPkgs>19</NoOfPkgs>
+            <TypePkgCode>BIGBAGS</TypePkgCode>
+            <Measurements type="NetWtKgs">
+                <MeasurementValue>19000</MeasurementValue>
+            </Measurements>
+            <Measurements type="GrsWtKgs">
+                <MeasurementValue>19380</MeasurementValue>
+            </Measurements>
+        </ProductDetail>
+        <ProductReferences type="DeliveryNote">
+            <ProductReferenceNumber>SB00063564</ProductReferenceNumber>
+        </ProductReferences>
+        <ProductEquipment>
+            <Prod-EquipNo>3</Prod-EquipNo>
+            <Prod-EquipType>CL40</Prod-EquipType>
+            <Prod-EquipSize>CL</Prod-EquipSize>
+        </ProductEquipment>
+    </Detail>
+    <Footer>
+        <Measurements item="NetWeightKilograms">
+            <MeasurementValue>19000</MeasurementValue>
+        </Measurements>
+        <Measurements item="GrossWeightKilograms">
+            <MeasurementValue>19380</MeasurementValue>
+        </Measurements>
+    </Footer>
+    <Footer>
+        <Measurements item="NetWeightKilograms">
+            <MeasurementValue>19000</MeasurementValue>
+        </Measurements>
+        <Measurements item="GrossWeightKilograms">
+            <MeasurementValue>19380</MeasurementValue>
+        </Measurements>
+    </Footer>
+    <Footer>
+        <Measurements item="NetWeightKilograms">
+            <MeasurementValue>19000</MeasurementValue>
+        </Measurements>
+        <Measurements item="GrossWeightKilograms">
+            <MeasurementValue>19380</MeasurementValue>
+        </Measurements>
+    </Footer>
+</Request>

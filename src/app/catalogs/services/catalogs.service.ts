@@ -1,7 +1,9 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_HARDCODED_VALUES } from 'src/app/graphql/graphql.queries';
+import { Observable, catchError, map, of, tap } from 'rxjs';
+import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_HARDCODED_VALUES, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD } from 'src/app/graphql/graphql.queries';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,170 +12,119 @@ import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERIC
 export class CatalogsService {
 
   constructor (
-    private apollo: Apollo,    
+    private _apollo: Apollo,    
+    private _http: HttpClient,    
   ) {}
   
 // Functions ================  
-  getpProvidersLazyLoadingDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, filterBy: any = null, orderBy: any = null): Observable<any> {
-    let variables = undefined;
-    if (recosrdsToSkip !== 0) {
-      variables = { recosrdsToSkip };
-    }
-    if (recosrdsToTake !== 0) {
-      if (variables) {         
-        variables = { ...variables, recosrdsToTake };
-      } else {
-        variables = { recosrdsToTake };
-      }      
-    }
-    if (orderBy) {
-      if (variables) {         
-        variables = { ...variables, orderBy };
-      } else {
-        variables = { orderBy };
-      }
-    }        
-    if (filterBy) {
-      if (variables) {         
-        variables = { ...variables, filterBy };
-      } else {
-        variables = { filterBy };
-      }    
-    }
-    
-    return this.apollo.watchQuery({ 
-      query: GET_PROVIDERS_LAZY_LOADING, 
-      variables, 
-      context: { 
-        headers: { 
-          'x-customer-id': '1', 
-          'x-language-id': '1',  
-        }
-      } 
+  getpProvidersLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_PROVIDERS_LAZY_LOADING,
+      variables,
     }).valueChanges;
   }
 
-  getManufacturersLazyLoadingDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, filterBy: any = null, orderBy: any = null): Observable<any> {
-    let variables = undefined;
-    if (recosrdsToSkip !== 0) {
-      variables = { recosrdsToSkip };
-    }
-    if (recosrdsToTake !== 0) {
-      if (variables) {         
-        variables = { ...variables, recosrdsToTake };
-      } else {
-        variables = { recosrdsToTake };
-      }      
-    }
-    if (orderBy) {
-      if (variables) {         
-        variables = { ...variables, orderBy };
-      } else {
-        variables = { orderBy };
-      }
-    }        
-    if (filterBy) {
-      if (variables) {         
-        variables = { ...variables, filterBy };
-      } else {
-        variables = { filterBy };
-      }    
-    }
-    
-    return this.apollo.watchQuery({ 
+  getManufacturersLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
       query: GET_MANUFACTURERS_LAZY_LOADING, 
-      variables, 
-      context: { 
-        headers: { 
-          'x-customer-id': '1', 
-          'x-language-id': '1',  
-        }
-      } 
+      variables,
     }).valueChanges;
   }
 
-  getGenericsLazyLoadingDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, filterBy: any = null, orderBy: any = null): Observable<any> {
-    let variables = undefined;
-    if (recosrdsToSkip !== 0) {
-      variables = { recosrdsToSkip };
-    }
-    if (recosrdsToTake !== 0) {
-      if (variables) {         
-        variables = { ...variables, recosrdsToTake };
-      } else {
-        variables = { recosrdsToTake };
-      }      
-    }
-    if (orderBy) {
-      if (variables) {         
-        variables = { ...variables, orderBy };
-      } else {
-        variables = { orderBy };
-      }
-    }        
-    if (filterBy) {
-      if (variables) {         
-        variables = { ...variables, filterBy };
-      } else {
-        variables = { filterBy };
-      }    
-    }
+  getLinesLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_LINES_LAZY_LOADING, 
+      variables, 
+    }).valueChanges;
+  }
 
-    return this.apollo.watchQuery({ 
+  getEquipmentsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_EQUIPMENTS_LAZY_LOADING, 
+      variables, 
+    }).valueChanges;
+  }
+
+  getMaintenancesLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, 
+      variables, 
+    }).valueChanges;
+  }
+
+  getPartNumbersLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_PART_NUMBERS_LAZY_LOADING, 
+      variables, 
+    }).valueChanges;
+  }
+
+  getGenericsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
       query: GET_GENERICS_LAZY_LOADING, 
       variables, 
-      context: { 
-        headers: { 
-          'x-customer-id': '1', 
-          'x-language-id': '1',  
-        }
-      } 
     }).valueChanges;
   }
 
-  getHardcodedValuesDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, filterBy: any = null, orderBy: any = null): Observable<any> {
+  getMoldDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_MOLD, 
+      variables, 
+    }).valueChanges;
+  }
 
+  getHardcodedValuesDataGql$(variables: any): Observable<any> {
     // No filters, skip or take records applied to the hardcode values table but the tableNamefield, 
     // This is because this values list must be short
 
+  return this._apollo.watchQuery({ 
+      query: GET_HARDCODED_VALUES, 
+      variables, 
+    }).valueChanges;
+  }
+
+  getAllMoldsToCsv$(): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+
+  getAllMoldsCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.apiUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+
+  getMoldsDataGql$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, orderBy: any = null, filter: any = null): Observable<any> {
     let variables = undefined;
-    recosrdsToSkip = 0;
-    recosrdsToTake = 0;
     if (recosrdsToSkip !== 0) {
-      variables = { recosrdsToSkip };
+      variables = { recosrdsToSkip: recosrdsToSkip };
     }
     if (recosrdsToTake !== 0) {
       if (variables) {         
-        variables = { ...variables, recosrdsToTake };
+        variables = { ...variables, recosrdsToTake: recosrdsToTake };
       } else {
-        variables = { recosrdsToTake };
+        variables = { recosrdsToTake: recosrdsToTake };
       }      
     }
     if (orderBy) {
       if (variables) {         
-        variables = { ...variables, orderBy };
+        variables = { ...variables, orderBy: orderBy };
       } else {
-        variables = { orderBy };
+        variables = { orderBy: orderBy };
       }
-    }            
-    if (filterBy) {
+    }    
+    if (filter) {
       if (variables) {         
-        variables = { ...variables, filterBy };
+        variables = { ...variables, filterBy: filter };
       } else {
-        variables = { filterBy };
-      }    
-    }
-
-    return this.apollo.watchQuery({ 
-      query: GET_HARDCODED_VALUES, 
-      variables, 
-      context: { 
-        headers: { 
-          'x-customer-id': '1', 
-          'x-language-id': '1',  
-        }
-      } 
-    }).valueChanges;
+        variables = { filterBy: filter };
+      }
+    }    
+    return this._apollo.watchQuery({ 
+      query: GET_MOLDS,
+      variables
+    }).valueChanges    
   }
 
 // End ======================  

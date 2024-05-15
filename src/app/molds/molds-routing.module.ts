@@ -8,12 +8,11 @@ const routes: Routes = [
     path: '',
     component: MoldsHitsCounterComponent,
     data: { animation: 'MoldsHitsCounterComponent' },
+    canActivate: [accessValidationGuard],        
     children: [
       {
         path: '**',
         component: MoldsHitsCounterComponent,
-        data: { animation: 'MoldsHitsCounterComponent' },
-        canActivate: [accessValidationGuard],        
       },
     ]
   },

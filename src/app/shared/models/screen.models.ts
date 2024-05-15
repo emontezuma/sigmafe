@@ -18,6 +18,7 @@ export interface Screen {
   orientation: string;
   outerHeight: number;
   outerWidth: number;
+  allHeight?: number;
 }
 
 export enum ButtonActions {
@@ -41,6 +42,7 @@ export enum ButtonActions {
   BACK = 'back',
   INACTIVATE = 'inactivate',
   DELETE = 'delete',
+  TRANSLATION = 'translation',
 }
 
 export interface ToolbarElement {
@@ -58,6 +60,7 @@ export interface ToolbarElement {
   icon?: string;
   iconSize?: string;
   class?: string;
+  elementType?: string;
   classAlarmed?: string;
   disabled?: boolean;
   locked?: boolean;
@@ -131,6 +134,16 @@ export enum ApplicationModules {
 export enum ScreenSizes {
   NORMAL = 'normal',
   SMALL = 'small',
+}
+
+export enum toolbarMode {
+  SAVE = 'save',
+  CANCEL = 'cancel',
+  COPY = 'copy',
+  INACTIVATE = 'inactivate',
+  ACTIVATE = 'activate',
+  REMOVE = 'remove',
+  INITIALIZE = 'initialize',
 }
 
 export interface SimpleMenuOption {

@@ -46,7 +46,8 @@
   &__required-icon {
     font-size: 16px !important;
     width: 16px !important;
-    height: 16px !important;    
+    height: 16px !important;  
+    margin-right: 5px;  
   }
   &__required-label {    
   }
@@ -76,6 +77,11 @@
   }
 }
 
+.option-container {
+  display: flex;
+  align-items: center;
+}
+
 mat-option:nth-child(2n) {
   background-color: var(--z-colors-table-odd-background-color);  
 }
@@ -91,4 +97,16 @@ mat-option:nth-child(1) {
 
 mat-option {    
   border-bottom: 1px solid var(--theme-primary-300);
+}
+
+.circle {  
+  border-radius: 5px;  
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):not(.mat-mdc-option-multiple) {
+  background-color: rgba(0, 0, 0, 0.05) !important;  
+  font-weight: 700;
 }

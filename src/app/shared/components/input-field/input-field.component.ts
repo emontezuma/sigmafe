@@ -26,6 +26,7 @@ export class InputFieldComponent {
   @Input() fieldRequired: boolean;    
   @Input() fieldMaxLength: number;    
   @Input() showRightHint: boolean;  
+  @Input() initialFocus: boolean;    
 
   @Output() inputKeydown = new EventEmitter<KeyboardEvent>();
 
