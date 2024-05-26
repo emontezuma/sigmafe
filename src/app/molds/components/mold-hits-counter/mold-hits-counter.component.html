@@ -425,7 +425,7 @@
       </div>
       <mat-card-subtitle
         class="last-hit-wide"
-        [matTooltip]="lastHitDate | date:'EEEE, YYYY-MMM-dd HH:mm:ss'"
+        [matTooltip]="_sharedService.labelElapsedTime(mold.data.lastHit)"
         matTooltipClass="tooltip-general"
         matTooltipShowDelay="100" >
         <span>Últ. golpe: </span>

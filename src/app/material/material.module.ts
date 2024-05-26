@@ -28,6 +28,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   exports: [
@@ -60,6 +61,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatNativeDateModule,
     MatAutocompleteModule, 
     MatFormFieldModule,
+    MatBadgeModule,
 ]
 })
 

@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
 import { CapitalizationMethod, DatesDifference } from '../models/helpers.models';
-import { GET_MOLDS } from '../../graphql/graphql.queries';
+import { GET_LANGUAGES_LAZY_LOADING, GET_MOLDS } from '../../graphql/graphql.queries';
 import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
@@ -17,7 +17,12 @@ export class SharedService {
   private searchBehaviorSubject: BehaviorSubject<SearchBox> = new BehaviorSubject<SearchBox>({ textToSearch: '', from: '' });
   search: Observable<SearchBox> = this.searchBehaviorSubject.asObservable();
 
-  private toolbarActionBehaviorSubject: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ action: undefined, from: '', buttonIndex: -1, field: '' });
+  private toolbarActionBehaviorSubject: BehaviorSubject<ToolbarButtonClicked> = new BehaviorSubject<ToolbarButtonClicked>({ 
+    action: undefined,
+    from: '',
+    buttonIndex: -1,
+    field: ''
+  });
   toolbarAction: Observable<ToolbarButtonClicked> = this.toolbarActionBehaviorSubject.asObservable();
 
   private buttonStateChangeBehaviorSubject: BehaviorSubject<ButtonState> = new BehaviorSubject<ButtonState>({ action: undefined, enabled: true });
@@ -30,6 +35,7 @@ export class SharedService {
     icon: '',
     snackClass: '',
     buttonIcon: '',
+    showProgressBar: true,
   });
   snackMessage: Observable<SnackMessage> = this.snackMessageBehaviorSubject.asObservable();
   
@@ -433,8 +439,8 @@ export class SharedService {
   }
 
   convertUtcTolocal(dateUtc: string): Date | string {
-    if (!dateUtc || dateUtc.trim() === '') {
-      return '';
+    if (!dateUtc || dateUtc?.trim() === '') {
+      return null;
     }
     
     try {
@@ -442,9 +448,23 @@ export class SharedService {
       return dateConverted;
 
     } catch (error) {      
-        return 'Conversion error UTC date';
-    }      
-    
+        return null;
+    }
+  }
+
+  actionCancelledByTheUser() {
+    const message = $localize`Acción cancelada por el usuario`;
+    this.showSnackMessage({
+      message,
+      snackClass: 'snack-primary',      
+    });
+  }
+
+  getlanguagesLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_LANGUAGES_LAZY_LOADING,
+      variables,
+    }).valueChanges;
   }
 
 // End ======================

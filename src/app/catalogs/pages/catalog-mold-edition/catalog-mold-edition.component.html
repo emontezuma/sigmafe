@@ -19,14 +19,27 @@
   <ng-container *ngIf="lines$ | async"></ng-container>
   <ng-container *ngIf="equipments$ | async"></ng-container>
   <ng-container *ngIf="maintenances$ | async"></ng-container>  
-  <ng-container *ngIf="moldFormChanges$ | async"></ng-container>
+  <!--<ng-container *ngIf="moldFormChanges$ | async"></ng-container>-->
   <ng-container *ngIf="moldThresholdTypeChanges$ | async"></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="mold$ | async "></ng-container>  
+  <ng-container *ngIf="moldDataLoading$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+  <ng-container *ngIf="updateMold$ | async "></ng-container>  
 
   <mat-card class="card">
+    <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">
+      <div [ngClass]="getMoldStateClass()">
+        <mat-icon class="message-icon" svgIcon="warn-fill"></mat-icon>
+        <app-label-ellipsis
+          [labelInnerHTML]="getMoldStateLabel()"
+          [lines]="2"
+        ></app-label-ellipsis>
+      </div>
+    </div>
+    <mat-divider *ngIf="mold.thresholdState" style="margin: 5px 10px"></mat-divider>
     <form
         focusInvalidInput
         class="layout"
@@ -192,7 +205,10 @@
                 }"
                 [disabled]="moldForm.controls.moldType.disabled"
               >
-                <span class="label field__label">Tipo de molde</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Tipo de molde</span>
+                  <span class="field__label" *ngIf="moldForm.controls.moldType?.value?.id">id: {{ moldForm.controls.moldType?.value?.id }}</span>
+                </div>
                 <app-auto-complete-field
                   [formField]="moldForm.controls.moldType"
                   [list]="moldTypes.items"
@@ -206,7 +222,7 @@
                   (getMoreData)="getMoreData($event)"
                 >
                 </app-auto-complete-field>
-                <span class="field__help">Especifique el Tipo de molde {{ moldForm.controls.moldType?.value['data']?.id }}</span>
+                <span class="field__help">Especifique el Tipo de molde</span>
               </fieldset>
             </div>
             <div class="field-items">
@@ -220,7 +236,10 @@
                 }"
                 [disabled]="moldForm.controls.moldClass.disabled"
               >
+              <div class="title-with-id">
                 <span class="label field__label">Clase de molde</span>
+                <span class="field__label" *ngIf="moldForm.controls.moldClass?.value?.id">id: {{ moldForm.controls.moldClass?.value?.id }}</span>
+              </div>
                 <app-auto-complete-field
                   [formField]="moldForm.controls.moldClass"
                   [list]="moldClasses.items"
@@ -239,48 +258,53 @@
             </div>
             <div class="field-items">
               <fieldset
-                class="field__container"
-                [ngClass]="{ 'field__container--error': moldForm.controls.mainImagePath.touched && !moldForm.controls.mainImagePath.valid }"
-                [disabled]="moldForm.controls.mainImagePath.disabled"
+                class="field__container"                
               >
-                <span class="label field__label">Ruta de la imagen a mostrar</span>
-                <mat-form-field appearance="fill" class="field__field">
-                  <input
-                    class="field__input"
-                    matInput
-                    [formControl]="moldForm.controls.mainImagePath"
-                    #fieldControl
-                    name="fieldControl"
-                    [maxlength]="255"                                        
-                  />
-                  <mat-hint class="field__hint" align="start">
-                    <span class="field__required-label"
-                      ><strong>Campo opcional</strong></span
+                <div class="image-and-field">
+                  <div class="field-components">
+                    <span class="label field__label">Imagen a mostrar</span>                
+                    <mat-form-field appearance="fill" class="field__field">
+                      <input
+                        class="field__input"
+                        matInput
+                        [formControl]="moldForm.controls.mainImageName"                        
+                        [readonly]="true"
+                      />
+                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept="*.png;*.jpg;*.svg;*.bmp" #fileInput> 
+                      <button matSuffix mat-icon-button (click)="fileInput.click()" style="margin-right: 5px;">                      
+                          <mat-icon>search</mat-icon>                      
+                      </button>                                    
+                    </mat-form-field>                                
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este molde</span>
+                  </div>                  
+                  <div *ngIf="!loading" class="card-image">
+                    <div
+                      class="image-container"
+                      *ngIf="this.mold.mainImagePath"
                     >
-                  </mat-hint>
-                  <mat-hint class="field__hint" align="end">{{ fieldControl?.value.length + " / 255" }}</mat-hint>                  
-                  <button
-                    *ngIf="fieldControl?.value.length > 0 && !fieldControl.disabled"
-                    matSuffix
-                    mat-icon-button
-                    aria-label="Clear"
-                    (click)="moldForm.controls.mainImagePath.setValue('')"
-                  >
-                    <mat-icon>close</mat-icon>
-                  </button>
-                  <input type="file" style="display: none" (change)="onFileSelected($event)" accept="*.png;*.jpg;*.svg;*.bmp" #fileInput> 
-                  <button matSuffix mat-icon-button (click)="fileInput.click()" style="margin-right: 5px;">                      
-                      <mat-icon>search</mat-icon>                      
-                  </button>                                    
-                </mat-form-field>
-                <span class="field__help">Especifique la ruta de la imagen que se mostrará en las vistas de este molde</span>
+                      <img                
+                        @dissolve
+                        appImageNotFound                
+                        class="mold-image"                        
+                        [src]="this.mold.mainImagePath"
+                        [alt]="this.mold.mainImagePath"            
+                        fill
+                      >      
+                    </div>
+                    <div
+                      *ngIf="!this.mold.mainImagePath"
+                      class="icon-container"
+                    >
+                      <mat-icon class="default-icon" svgIcon="treasure-chest"></mat-icon>
+                    </div>    
+                  </div>
+                </div>                
               </fieldset>              
             </div>
           </div>
           <mat-divider style="margin: 5px 10px"></mat-divider>
           <div class="grid-multiple margin-top">            
             <div class="field-items">
-              {{ moldForm.controls.provider | json }}
               <fieldset
                 class="field__container"
                 style="min-width: 350px"
@@ -291,7 +315,10 @@
                 }"
                 [disabled]="moldForm.controls.provider.disabled"
               >
-                <span class="label field__label">Proveedor del molde</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Proveedor del molde</span>
+                  <span class="field__label" *ngIf="moldForm.controls.provider?.value?.id">Id: {{ moldForm.controls.provider?.value?.id }}</span>
+                </div>
                 <app-auto-complete-field
                   [formField]="moldForm.controls.provider"
                   [list]="providers.items"
@@ -321,7 +348,10 @@
                 }"
                 [disabled]="moldForm.controls.manufacturer.disabled"
               >
-                <span class="label field__label">Fabricante del molde</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Fabricante del molde</span>
+                  <span class="field__label" *ngIf="moldForm.controls.manufacturer?.value?.id">id: {{ moldForm.controls.manufacturer?.value?.id }}</span>
+                </div>                
                 <app-auto-complete-field
                   [formField]="moldForm.controls.manufacturer"
                   [list]="manufacturers.items"
@@ -423,6 +453,19 @@
           </mat-expansion-panel-header>
           <div class="grid-multiple margin-top">
             <div class="field-items">
+              <app-select-field
+                [formField]="moldForm.controls.state"
+                [list]="states.items"
+                leftHint="Campo opcional"
+                [showRightHint]="true"
+                fieldHelp="Especifique el color de la etiqueta"
+              >
+                <span fieldTitle class="label field__label"
+                  >Estado del molde</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
               <fieldset
                 class="field__container"
                 style="min-width: 350px"
@@ -433,7 +476,10 @@
                 }"
                 [disabled]="moldForm.controls.partNumber.disabled"
               >
-                <span class="label field__label">Número de parte</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Número de parte</span>
+                  <span class="field__label" *ngIf="moldForm.controls.partNumber?.value?.id">id: {{ moldForm.controls.partNumber?.value?.id }}</span>
+                </div>                                
                 <app-auto-complete-field
                   [formField]="moldForm.controls.partNumber"
                   [list]="partNumbers.items"
@@ -477,7 +523,10 @@
                 }"
                 [disabled]="moldForm.controls.line.disabled"
               >
-                <span class="label field__label">Línea de producción</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Línea de producción</span>
+                  <span class="field__label" *ngIf="moldForm.controls.line?.value?.id">id: {{ moldForm.controls.line?.value?.id }}</span>
+                </div>                 
                 <app-auto-complete-field
                   [formField]="moldForm.controls.line"
                   [list]="lines.items"
@@ -507,7 +556,10 @@
                 }"
                 [disabled]="moldForm.controls.line.disabled"
               >
-                <span class="label field__label">Equipo/Máquina</span>
+                <div class="title-with-id">
+                  <span class="label field__label">Equipo/Máquina</span>
+                  <span class="field__label" *ngIf="moldForm.controls.equipment?.value?.id">id: {{ moldForm.controls.equipment?.value?.id }}</span>
+                </div>                                 
                 <app-auto-complete-field
                   [formField]="moldForm.controls.equipment"
                   [list]="equipments.items"
@@ -534,8 +586,8 @@
           hideToggle="true"
           [expanded]="panelOpenState[2]"
           [ngClass]="{
-            'control-panel-red': this.moldState === MoldControlStates.RED,
-            'control-panel-yellow': this.moldState === MoldControlStates.YELLOW
+            'control-panel-red': mold.thresholdState === MoldControlStates.RED,
+            'control-panel-yellow': mold.thresholdState === MoldControlStates.YELLOW
           }"
         >
           <mat-expansion-panel-header
@@ -566,21 +618,11 @@
               </button>
             </div>
           </mat-expansion-panel-header>
-          <div class="grid-multiple-rows">
-            <div *ngIf="this.moldState" class="grid-multiple margin-top">
-              <div [ngClass]="getMoldStateClass()">
-                <mat-icon class="message-icon" svgIcon="warn-fill"></mat-icon>
-                <app-label-ellipsis
-                  [labelInnerHTML]="getMoldStateLabel()"
-                  [lines]="2"
-                ></app-label-ellipsis>
-              </div>
-            </div>
-            <mat-divider *ngIf="this.moldState" style="margin: 5px 10px"></mat-divider>
+          <div class="grid-multiple-rows">            
             <div class="grid-multiple margin-top">
               <div class="field-items">
                 <app-select-field
-                  [formField]="moldForm.controls.moldThresholdType"
+                  [formField]="moldForm.controls.thresholdType"
                   [list]="moldThresholdTypes.items"
                   leftHint="Campo requerido"
                   [fieldRequired]="true"
@@ -595,14 +637,15 @@
                 </app-select-field>
               </div>
               <div class="field-items">
-                <app-input-field
-                  [formField]="moldForm.controls.moldThresholdYellow"
+                <app-input-field                
+                  [formField]="moldForm.controls.thresholdYellow"
                   leftHint="Campo opcional"
                   fieldInputType="number"
+                  currentErrorMessage="El valor de arvertencia no debe ser mayor al valor de la Alarma"
                   currentErrorIcon="warn-line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje vacío o en cero para no aplicar umbral"
+                  rightHint="Deje el valor vacío para no aplicar umbral"
                   fieldHelp="Especifique el número de golpes que de alcanzarse se generará una advertencia"
                 >
                   <span fieldTitle class="label field__label"
@@ -612,13 +655,13 @@
               </div>
               <div class="field-items">
                 <app-input-field
-                  [formField]="moldForm.controls.moldThresholdRed"
+                  [formField]="moldForm.controls.thresholdRed"
                   leftHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje vacío o en cero para no aplicar umbral"
+                  rightHint="Deje Deje el valor vacío para no aplicar umbral"
                   fieldHelp="Especifique el número de golpes que de alcanzarse se generará una ALARMA"
                 >
                   <span fieldTitle class="label field__label"
@@ -628,10 +671,11 @@
               </div>
               <div class="field-items">
                 <app-input-field
-                  [formField]="moldForm.controls.moldThresholdDaysYellow"
+                  [formField]="moldForm.controls.thresholdDaysYellow"
                   leftHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
+                  currentErrorMessage="El Número de días de arvertencia no debe ser mayor al Número de días de la Alarma"
                   [showCloseButton]="true"
                   [showRightHint]="true"
                   rightHint="Deje vacío o en cero para no aplicar umbral"
@@ -644,7 +688,7 @@
               </div>
               <div class="field-items">
                 <app-input-field
-                  [formField]="moldForm.controls.moldThresholdDaysRed"
+                  [formField]="moldForm.controls.thresholdDaysRed"
                   leftHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
@@ -660,7 +704,7 @@
               </div>
               <div class="field-items">
                 <app-select-field
-                  [formField]="moldForm.controls.labelColor"
+                  [formField]="moldForm.controls.label"
                   selectType="colored"
                   [list]="labelColors.items"
                   leftHint="Campo opcional"
@@ -691,8 +735,8 @@
               <div class="flex grid-center">
                 <div class="readonly-value last-values">
                   {{
-                    tmpHits !== 0
-                      ? (tmpHits | number : "1.")
+                    mold.hits !== 0
+                      ? (mold.hits | number : "1.")
                       : "Sin golpes a la fecha"
                   }}
                 </div>
@@ -702,7 +746,7 @@
               </div>
               <div class="flex grid-center">
                 <div class="readonly-value last-values">
-                  {{ today | date : "medium" }}
+                  {{ _sharedService.labelElapsedTime(mold.lastHit) }}
                 </div>
                 <div class="flex-row">
                   <div class="label-with-no-index">Fecha del último golpe</div>
@@ -857,7 +901,7 @@
                 <mat-label class="button-label">Agregar un mantenimiento...</mat-label>
               </button>          
               <button
-                [disabled]="!mold.id || mold.id === 0"
+                [disabled]="maintenances.items.length === 0"
                 mat-button
                 class="toolbar-button warn"
                 aria-label="icon-button with menu icon"
@@ -891,35 +935,38 @@
         </mat-expansion-panel>
       </mat-accordion>
     </form>
-    <div class="catalog-footer">
+    <div
+      *ngIf="mold.id"
+      class="catalog-footer"
+    >
       <div class="grid-dates">
         <div class="flex">
-          <div class="readonly-value item-id">213</div>
+          <div class="readonly-value item-id">{{ mold.id }}</div>
           <div class="label-with-no-index">ID del registro</div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ today | date : "medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(mold.createdAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de creación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">Elvis Montezuma</div>
+          <div class="readonly-value">{{ mold.createdBy?.name }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Creado por</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ today | date : "medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(mold.updatedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de modificación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">Elvis Montezuma</div>
+          <div class="readonly-value">{{ mold.updatedBy?.name }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
@@ -927,16 +974,16 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive">
+      <div class="grid-inactive" *ngIf="mold.deletedById > 0">
         <div class="flex">
-          <div class="readonly-value">{{ today | date : "medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(mold.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de inactivación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">Elvis Montezuma</div>
+          <div class="readonly-value">{{ mold.deletedBy?.name }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Inactivado por</div>

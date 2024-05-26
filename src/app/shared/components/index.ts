@@ -10,3 +10,4 @@ export * from './auto-complete-field';
 export * from './input-field';
 export * from './area-fied';
 export * from './select-field';
+export * from './translations-dialog';

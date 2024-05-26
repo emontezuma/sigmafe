@@ -1,41 +1,74 @@
 <ng-container class="container">
-    <fieldset class="field__container" [ngClass]="{ 'field__container--error': formField.touched && !formField.valid }" [disabled]="formField.disabled">
-        <ng-content select="[fieldTitle]"></ng-content>        
-        <mat-form-field appearance="fill" class="field__field">
-            <mat-select [formControl]="formField" name="fieldControl" (selectionChange)="handleSelectionChange($event)">
-                <mat-option *ngFor="let item of list; let i = index;" [value]="item">
-                    <div class="option-container">
-                        <div
-                            *ngIf="selectType === 'colored'"
-                            [ngStyle]="{ 'background-color': item.value }"
-                            class="circle" >
-                        </div>
-                        {{ item.friendlyText }}
-                    </div>
-                </mat-option>
-            </mat-select>            
-            <mat-hint
-                *ngIf="leftHint"
-                class="field__hint"
-                align="start"
-            >   
-                <span class="field__required-label"><strong>{{ leftHint }}</strong></span>     
-            </mat-hint>
-            <mat-hint
-                *ngIf="showRightHint"
-                class="field__hint"
-                align="end"
-            >
-                {{ rightHint }}
-            </mat-hint>
-            <mat-error 
-                *ngIf="currentErrorIcon || currentErrorMessage"
-                class="field__error field__required"
-            >
-                <mat-icon class="field__required-icon" [svgIcon]="currentErrorIcon"></mat-icon>
-                <span class="field__required-label"><strong>{{ currentErrorMessage }}</strong></span>
-            </mat-error>            
-        </mat-form-field>
-        <span class="field__help">{{ fieldHelp }}</span>
-      </fieldset>
+  <fieldset
+    class="field__container"
+    [ngClass]="{
+      'field__container--error': formField.touched && !formField.valid
+    }"
+    [disabled]="formField.disabled"
+  >
+    <ng-content select="[fieldTitle]"></ng-content>
+    <mat-form-field appearance="fill" class="field__field">
+      <mat-select
+        [formControl]="formField"
+        name="fieldControl"
+        (selectionChange)="handleSelectionChange($event)"
+      >
+        <mat-select-trigger class="trigger" *ngIf="selectType === 'countries'">
+          <div class="option-container">
+            <div class="image-container">
+              <img
+                appImageNotFound                
+                class="country-image fixed"
+                [ngStyle]="{ 'border-color': getItemField(formField.value, 'used') ? 'var(--theme-primary-500)' : 'rgba(0, 0, 0, 0.1)' }"
+                [src]="selectedLanguageImage"
+                alt="formField.value"
+                (error)="changeImageByError(0)"
+              />
+            </div>
+            <span>{{ getItemField(formField.value, 'friendlyText') }}</span>
+          </div>
+        </mat-select-trigger>
+        <mat-option *ngFor="let item of list; let i = index" [value]="item.value">
+          <div class="option-container">
+            <div
+              *ngIf="selectType === 'colored'"
+              [ngStyle]="{ 'background-color': item.value }"
+              class="circle"
+            ></div>
+            <div *ngIf="selectType === 'countries'" class="image-container">
+              <img
+                class="country-image fixed"
+                [ngStyle]="{ 'border-color': item.used ? 'var(--theme-primary-500)' : 'rgba(0, 0, 0, 0.1)' }"
+                [src]="item.mainImagePath"
+                [alt]="item.mainImagePath"
+                (error)="changeImageByError(i)"                
+              />
+            </div>
+            {{ item.friendlyText }}
+          </div>
+        </mat-option>
+      </mat-select>
+      <mat-hint *ngIf="leftHint" class="field__hint" align="start">
+        <span class="field__required-label"
+          ><strong>{{ leftHint }}</strong></span
+        >
+      </mat-hint>
+      <mat-hint *ngIf="showRightHint" class="field__hint" align="end">
+        {{ rightHint }}
+      </mat-hint>
+      <mat-error
+        *ngIf="currentErrorIcon || currentErrorMessage"
+        class="field__error field__required"
+      >
+        <mat-icon
+          class="field__required-icon"
+          [svgIcon]="currentErrorIcon"
+        ></mat-icon>
+        <span class="field__required-label"
+          ><strong>{{ currentErrorMessage }}</strong></span
+        >
+      </mat-error>
+    </mat-form-field>
+    <span class="field__help">{{ fieldHelp }}</span>
+  </fieldset>
 </ng-container>

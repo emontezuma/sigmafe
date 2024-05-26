@@ -493,20 +493,22 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.field === "mold-color") {
-      this.moldColorFilter = action.action === ButtonActions.ALL ? '' : action.action;
-    } else if (action.field === "mold-state") {
-      this.moldStateFilter = action.action === ButtonActions.ALL ? '' : action.action;
-    } else if (action.field === "mold-status") {
-      this.moldStatusFilter = action.action === ButtonActions.ALL ? '' : action.action;
+    if (action.from === ApplicationModules.MOLDS_HITS_VIEW  && this.elements.length > 0) {
+      if (action.field === "mold-color") {
+        this.moldColorFilter = action.action === ButtonActions.ALL ? '' : action.action;
+      } else if (action.field === "mold-state") {
+        this.moldStateFilter = action.action === ButtonActions.ALL ? '' : action.action;
+      } else if (action.field === "mold-status") {
+        this.moldStatusFilter = action.action === ButtonActions.ALL ? '' : action.action;
+      }
+      this.moldsHitsData$ = this._store.select(selectMoldsHitsQueryData).pipe(
+        tap( filteredMoldsHits => {
+          this.disableListAnimation = true;
+          this.originalMoldsHits = filteredMoldsHits;      
+          this.processFilterChange();
+        })
+      );
     }
-    this.moldsHitsData$ = this._store.select(selectMoldsHitsQueryData).pipe(
-      tap( filteredMoldsHits => {
-        this.disableListAnimation = true;
-        this.originalMoldsHits = filteredMoldsHits;      
-        this.processFilterChange();
-      })
-    );
   }
 
   processFilterChange() {

@@ -21,14 +21,14 @@ export class InterceptorInterceptor implements HttpInterceptor {
     let handled: boolean = false;
     const authToken = 'SAMPLE';
     const authReq = request.clone({
-      headers: request.headers.set('x-customer-id', '1')
+      headers: request.headers
+      .set('x-customer-id', '1')
       .set('x-language-id', '1')
       .set('x-time-zone', '-6')
       .set('x-token', authToken)
     });  
 
     return next.handle(authReq).pipe(      
-      retry(2),
       catchError((error: HttpErrorResponse) => {
         // TODO: Add error handling logic here
         let message = error.message;
@@ -36,12 +36,9 @@ export class InterceptorInterceptor implements HttpInterceptor {
           message = error.error.errors[0].message;
         }        
         this._sharedService.showSnackMessage({
-          message,      
-          duration: 0,
+          message,                
           snackClass: 'snack-warn',
-          icon: 'disconnect',
-          buttonText: '',
-          buttonIcon: '',
+          icon: 'disconnect',          
         });      
         return throwError(error);
       }),

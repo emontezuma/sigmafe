@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { routingAnimation, dissolve, fastDissolve, fromTop } from '../../../shared/animations/shared.animations';
 import { SmallFont, SpinnerFonts, SpinnerLimits } from 'src/app/shared/models/colors.models';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarElement } from 'src/app/shared/models/screen.models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, ScreenSizes, SimpleMenuOption, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton } from 'src/app/shared/models/screen.models';
 import { AppState } from '../../../state/app.state'; 
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { SettingsData } from 'src/app/shared/models/settings.models';
@@ -657,20 +657,22 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.action === ButtonActions.SAVE) {
+    if (action.from === ApplicationModules.CHECKLIST_FILLING  && this.elements.length > 0) {
+      if (action.action === ButtonActions.SAVE) {
 
-    } else if (action.action === ButtonActions.CANCEL) {
-      this.elements[action.buttonIndex].loading = true;
-      this.pendingToolbarButtonIndex = 2;
-      this.loadFromButton = action.buttonIndex;
-      this.setTabIndex(0);
-      this.loaded = false;
-      this.unsavedChanges = false;
-      this.evaluateButtons();
-      this._store.dispatch(loadChecklistFillingData());   
-    } else {
-      
-    }    
+      } else if (action.action === ButtonActions.CANCEL) {
+        this.elements[action.buttonIndex].loading = true;
+        this.pendingToolbarButtonIndex = 2;
+        this.loadFromButton = action.buttonIndex;
+        this.setTabIndex(0);
+        this.loaded = false;
+        this.unsavedChanges = false;
+        this.evaluateButtons();
+        this._store.dispatch(loadChecklistFillingData());   
+      } else {
+        
+      }    
+    }
   }
 
   cancelled() {
@@ -695,6 +697,7 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
       disableClose: false,
       data: {
         title: $localize`Respuestas por defecto`,
+        defaultButtons: dialogByDefaultButton.ACCEPT,
         buttons: [],
         body: {
           message: $localize`El checklist fue configurado para aplicar <strong>${answers}</strong> por defecto.`,
@@ -709,12 +712,8 @@ export class ChecklistFillingComponent implements AfterViewInit, OnDestroy {
   showInactiveMessage() : void {
     const message = $localize`El checklist <strong>está inactivo</strong> debe comunicarse con el administrador del sistema`;
     this._sharedService.showSnackMessage({
-      message,      
-      duration: 0,
-      snackClass: 'snack-primary',
-      icon: '',
-      buttonText: '',
-      buttonIcon: '',
+      message,            
+      snackClass: 'snack-primary',      
     });
   }
 

@@ -125,6 +125,7 @@ export const GET_MOLDS = gql`
     }
   }
 `;
+
 export const GET_HARDCODED_VALUES = gql`  
   query HardcodedValues (
       $recosrdsToSkip: Int,
@@ -171,10 +172,11 @@ export const GET_PROVIDERS_LAZY_LOADING = gql`
       items {
         translatedName
         translatedReference
-        isTranslated
+        isTranslated        
         data {
             name
-            id        
+            id      
+            status  
         }      
       }
       pageInfo {
@@ -205,7 +207,8 @@ export const GET_MANUFACTURERS_LAZY_LOADING = gql`
         isTranslated
         data {
             name
-            id        
+            id  
+            status      
         }      
       }
       pageInfo {
@@ -235,6 +238,7 @@ export const GET_LINES_LAZY_LOADING = gql`
         translatedReference
         isTranslated
         data {
+          status
             name
             id        
         }      
@@ -266,6 +270,7 @@ export const GET_EQUIPMENTS_LAZY_LOADING = gql`
         translatedReference
         isTranslated
         data {
+            status
             name
             id        
         }      
@@ -298,6 +303,7 @@ export const GET_PART_NUMBERS_LAZY_LOADING = gql`
       isTranslated
       data {
           name
+          status
           id        
       }      
     }
@@ -327,12 +333,14 @@ export const GET_GENERICS_LAZY_LOADING = gql`
         data {
           name
           tableName
+          status
           id
         }        
         translatedTableName
         translatedName
         translatedReference
         friendlyStatus
+        isTranslated
     }
     pageInfo {
         hasNextPage
@@ -387,59 +395,339 @@ export const GET_ALL_MOLDS_TO_CSV = gql`
 `;
 
 export const GET_MOLD = gql`
-  query Mold (
-    $moldId: Long!
-    $customerId: Long!
+  query OneMold (
+    $moldId: Long!,    
   ) {
-  mold (
-    id: $moldId,
-    customerId: $customerId
+  oneMold (
+    id: $moldId        
   ) {
-      serialNumber
-      description
-      notes
-      reference
-      manufacturerId
-      providerId
-      manufacturingDate
-      startingDate
-      lastMaintenanceId
-      hits
-      previousHits
-      lastHit
-      lastResettingId
-      thresholdType
-      thresholdYellow
-      thresholdRed
-      thresholdState
-      thresholdDateYellow
-      thresholdDateRed
-      receiverId
-      label
-      state
-      nextMaintenance
-      equipmentId
-      lineId
-      partNumberId
-      position
-      mainImagePath
-      mainImageGuid
-      mainImageName
-      strategy
-      lastLocationId
-      thresholdYellowDateReached
-      thresholdRedDateReached
-      moldTypeId
-      moldClassId
-      id
-      customerId
-      status
-      createdById
-      createdAt
-      updatedById
-      updatedAt
-      deletedById
-      deletedAt
+      data {
+        serialNumber
+        description
+        notes
+        reference
+        manufacturerId
+        providerId
+        manufacturingDate
+        startingDate
+        lastMaintenanceId
+        hits
+        previousHits
+        lastHit
+        lastResettingId
+        thresholdType
+        thresholdYellow
+        thresholdRed
+        thresholdState
+        thresholdDateYellow
+        thresholdDateRed
+        receiverId
+        label
+        state
+        nextMaintenance
+        equipmentId
+        lineId
+        partNumberId
+        position
+        mainImagePath
+        mainImageGuid
+        mainImageName
+        strategy
+        lastLocationId
+        thresholdYellowDateReached
+        thresholdRedDateReached
+        moldTypeId
+        moldClassId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        provider {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        manufacturer {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        line {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        partNumber {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        equipment {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }        
+        }
+        moldType {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        moldClass {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        createdBy {
+          name
+        }
+        updatedBy {
+          name
+        }
+        deletedBy {
+          name
+        }
+      }
+      translatedCustomer {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
+      translatedManufacturer {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyState
+        friendlyStatus
+      }
+      translatedProvider {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyState
+        friendlyStatus
+      }
+      translatedLastMaintenance {
+        isTranslated
+        translatedNotes
+        friendlyState
+        friendlyStatus
+      }
+      translatedLastResetting {
+        isTranslated
+        translatedNotes
+        friendlyStatus
+      }
+      translatedReceiver {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        translatedOthers01
+        translatedOthers02
+        friendlyStatus
+      }
+      translatedEquipment {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
+      translatedLine {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
+      translatedPartNumber {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
+      translatedLocation {
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyState
+        friendlyStatus
+      }
+      translatedMoldType {
+        isTranslated
+        translatedTableName
+        translatedName
+        translatedReference
+        translatedNotes
+        friendlyStatus
+      }
+      translatedMoldClass {
+        isTranslated
+        translatedTableName
+        translatedName
+        translatedReference
+        translatedNotes
+        friendlyStatus
+      } 
     }
+  }
+`;
+
+export const GET_MOLD_TRANSLATIONS = gql`
+  query MoldsTranslationsTable (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [MoldTranslationTableSortInput!],
+    $filterBy: MoldTranslationTableFilterInput,    
+  ) {
+  moldsTranslationsTable(
+    skip: $recosrdsToSkip,
+    take: $recosrdsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        moldId
+        description
+        reference
+        notes
+        thresholdType
+        thresholdState
+        label
+        state
+        strategy
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const GET_LANGUAGES_LAZY_LOADING = gql`
+  query Languages (
+    $recosrdsToSkip: Int,
+    $recosrdsToTake: Int,
+    $orderBy: [LanguageSortInput!],
+    $filterBy: LanguageFilterInput
+  ) {
+  languages (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recosrdsToSkip, 
+    take: $recosrdsToTake
+  ) {
+    totalCount
+    items {        
+      name
+      mainImagePath
+      id      
+      status
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+    }  
+  }
+}
+`;
+
+export const INACTIVATE_MOLD = gql`
+  mutation CreateOrUpdateMold (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateMold (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
   }
 `;

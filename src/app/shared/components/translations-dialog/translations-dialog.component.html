@@ -1,0 +1,167 @@
+<div i18n class="container">
+  <div
+      mat-dialog-title
+      class="simple-flex title"      
+    >
+    <ng-container *ngIf="settingsData$ | async"></ng-container>
+    <ng-container *ngIf="everySecond$ | async"></ng-container>
+    <ng-container *ngIf="languages$ | async"></ng-container>
+
+    <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
+    <div class="title-text" [innerHTML]="data.title"></div>    
+  </div>
+  <mat-divider class="divider-title"></mat-divider>
+  <div class="dialog-content" mat-dialog-content>
+    <form
+      #translationsDialog
+      focusInvalidInput
+      class="layout"
+      (ngSubmit)="onSubmit()"
+      [formGroup]="translationsForm"
+      #f="ngForm"
+    >
+      <div class="grid-multiple margin-top" @dissolve>        
+        <div class="field-items">
+          <app-select-field
+            [formField]="translationsForm.controls.language"
+            selectType="countries"
+            [list]="languages.items"
+            [showRightHint]="true"
+            fieldHelp="Especifique el lenguaje/idioma"
+            (selectSelectionChange)="setLanguage($event)"
+          >
+            <span fieldTitle class="label field__label">Lenguaje</span>
+          </app-select-field>
+        </div>
+        <div class="field-items">
+          <app-input-field
+            [formField]="translationsForm.controls.description"
+            leftHint="Campo requerido"  
+            [fieldMaxLength]="100"
+            [fieldRequired]="true"
+            [showRightHint]="true"
+            [showCloseButton]="true"
+            fieldHelp="Traduzca la Descripción/Nombre relacionada al registro"
+            [initialFocus]="true"
+          >
+            <span fieldTitle class="label field__label"
+              >Traducción para el Nombre o Descripción del registro</span
+            >
+          </app-input-field>
+        </div>
+        <div class="field-items">
+          <app-input-field
+            [formField]="translationsForm.controls.reference"
+            leftHint="Campo requerido"
+            [fieldMaxLength]="50"
+            [fieldRequired]="true"
+            [showRightHint]="true"
+            [showCloseButton]="true"
+            fieldHelp="Traduzca la Referencia relacionada al registro"
+            [initialFocus]="true"
+          >
+            <span fieldTitle class="label field__label"
+              >Traducción para la Referencia del registro</span
+            >
+          </app-input-field>
+        </div>
+        <div class="field-items">
+          <app-area-field
+            [formField]="translationsForm.controls.notes"
+            [fieldMaxLength]="500"
+            [showRightHint]="true"
+            [showCloseButton]="true"
+            [minRows]="1"
+            [maxRows]="5"
+            fieldHelp="Traduzca las Notas relacionadas al registro"
+          >
+            <span fieldTitle class="label field__label"
+              >Traducción para las Notas del registro</span
+            >
+          </app-area-field>
+        </div>
+      </div>
+      <div
+        *ngIf="selectedTranslation && selectedTranslation.updatedAt && selectedTranslation.updatedByUserName"
+        class="catalog-footer"
+      >        
+        <div class="grid-dates">
+          <div class="flex">
+            <div class="readonly-value">{{ selectedTranslation.updatedAt ? (_sharedService.convertUtcTolocal(selectedTranslation.updatedAt) | date :"medium") : '' }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+              <div class="label-with-no-index">Última actualización</div>
+            </div>
+          </div>
+          <div class="flex">
+            <div class="readonly-value">{{ selectedTranslation.updatedByUserName }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+              <div class="label-with-no-index">Actualizado por</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <mat-divider class="divider"></mat-divider>
+  <div class="dialog-bottom-message">
+    <span class="span-bottom-message" [innerHTML]="data.bottomMessage"> </span>
+  </div>
+  <div class="simple-flex dialog-actions" mat-dialog-actions>
+    <div
+      *ngIf="timeOutforDefaultButton > 0 && !closed"
+      class="tab-spinner"
+      [ngClass]="{ 'pulse-with-warn': timeOutforDefaultButton < 10 }"
+    >
+      <app-spinner
+        [legacy]="classLegacy"
+        [diameter]="40"
+        [value]="(timeOutforDefaultButton / timeOutFortDialog) * 100"
+        [countdown]="timeOutforDefaultButton"
+        [showBackgound]="true"
+        [suffix]="'s'"
+        [limits]="limits"
+        [fonts]="fonts"
+        [showPrefix]="true"
+        [smallFont]="smallFont"
+      >
+      </app-spinner>
+    </div>
+    <div
+      class="toolbar-button-container"      
+      *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn"
+    >
+      <button
+        mat-button
+        class="toolbar-button"
+        aria-label="icon-button with menu icon"
+        [ngClass]="button.class"
+        [matTooltipDisabled]="!button.showTooltip"
+        [matTooltip]="button.tooltip"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
+        [disabled]="button.disabled || button.loading"
+        (click)="handleClick(button.action)"
+      >
+        <mat-icon
+          *ngIf="button.showIcon"
+          class="svgicon icon-medium"
+          [ngStyle]="{ visibility: button.loading ? 'hidden' : 'visible' }"
+          [svgIcon]="button.icon"
+        >
+        </mat-icon>
+        <mat-progress-spinner
+          *ngIf="button.loading"
+          class="spinner-medium-button"
+          diameter="24"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+        <label class="button-label">{{
+          button.showCaption ? button.caption : ""
+        }}</label>
+      </button>
+    </div>
+  </div>
+</div>

@@ -17,9 +17,9 @@ import { InitializerModule } from './initializer/initializer.module';
 import { IconsModule } from './shared/icons';
 import { NotFoundComponent } from './shared/pages';
 import { reducers } from '../app/state/app.state';
-import { MoldsHitsEffects, MoldsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects } from './state/effects';
+import { MoldsHitsEffects, MoldsEffects, MoldEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects } from './state/effects';
 import { ImageNotFoundModule, OptionsScrollModule } from './shared/directives';
-import { SnackComponent, SpinnerModule, GenericDialogComponent, ToolbarComponent, SearchBoxComponent, ButtonMenuComponent, } from './shared/components';
+import { SnackComponent, SpinnerModule, GenericDialogComponent, ToolbarComponent, SearchBoxComponent, ButtonMenuComponent, TranslationsDialogComponent, InputFieldModule, AreaFieldModule, SelectFieldModule } from './shared/components';
 import { GraphQLModule } from './graphql.module';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './shared/services';
@@ -33,6 +33,7 @@ import { InterceptorInterceptor } from './interceptor.interceptor';
     SearchBoxComponent,
     ToolbarComponent,
     GenericDialogComponent,
+    TranslationsDialogComponent,
     SnackComponent,
     ButtonMenuComponent,
   ],
@@ -51,10 +52,13 @@ import { InterceptorInterceptor } from './interceptor.interceptor';
     IconsModule,
     NgxSkeletonLoaderModule.forRoot(),
     StoreModule.forRoot(reducers),
-    EffectsModule.forRoot([MoldsHitsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects, MoldsEffects ]),
+    EffectsModule.forRoot([MoldsHitsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects, MoldsEffects, MoldEffects ]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true }),
     SpinnerModule,
-    GraphQLModule,    
+    GraphQLModule,
+    InputFieldModule,
+    AreaFieldModule,
+    SelectFieldModule,
   ],
   providers: [
     DatePipe,

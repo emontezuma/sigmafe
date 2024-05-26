@@ -4,3 +4,4 @@ export * from './models';
 export * from './pages';
 export * from './catalogs-routing.module';
 export * from './catalogs.module';
+export * from './custom-validators';

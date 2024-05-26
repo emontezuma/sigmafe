@@ -21,8 +21,6 @@ export class MoldHitsCounterComponent implements AfterViewInit {
 @Input() mold: MoldHitsQuery;
 @Input() intemIndex: number;
 
-@ViewChild('moldProgressBar') private moldProgressBar: ElementRef;
-  
 // Variables ================
   showCard: boolean = false;
   alarmed: boolean = false;

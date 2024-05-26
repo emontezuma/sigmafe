@@ -80,6 +80,8 @@
 .option-container {
   display: flex;
   align-items: center;
+  gap: 10px;
+  height: 32px;
 }
 
 mat-option:nth-child(2n) {
@@ -109,4 +111,29 @@ mat-option {
 .mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled):not(.mat-mdc-option-multiple) {
   background-color: rgba(0, 0, 0, 0.05) !important;  
   font-weight: 700;
+}
+
+.country-image {
+    width: 24px;
+    height: 24px;
+    border: 2px solid;  
+    border-radius: 50%;
+    padding: 2px;
+}
+
+.image-container {
+  margin-top: 5px;  
+}
+
+.fixed {
+  max-width: 24px;
+  max-height: 24px;
+}
+
+.trigger {
+  margin-top: -10px;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper {
+  height: 56px;
 }

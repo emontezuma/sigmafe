@@ -16,6 +16,7 @@ import { RouterOutlet } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
 import { SnackComponent } from "./shared/components";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -156,9 +157,16 @@ export class AppComponent implements AfterViewInit {
       this._changeDetectorRef.detectChanges();
     });
     this._sharedService.snackMessage.subscribe((snackBar) => {
-      let validDuration = snackBar.duration;      
+      let validDuration = snackBar.duration;
+      let showProgressBar = snackBar?.showProgressBar;
+      if (showProgressBar === undefined) {
+        snackBar = {
+          ...snackBar,
+          showProgressBar: true,
+        }
+      }
       if (!snackBar.buttonIcon && !snackBar.buttonText && !validDuration) {
-        validDuration = 4000;
+        validDuration = environment.snackByDefaultDuration;
       }
       this._snackBar.openFromComponent(SnackComponent, {
         data: snackBar,

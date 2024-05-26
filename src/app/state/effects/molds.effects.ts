@@ -9,20 +9,22 @@ import { CatalogsService } from '../../catalogs/services/catalogs.service';
 export class MoldsEffects {  
   loadMolds$ = createEffect(() => this.actions$.pipe(    
     ofType('[Molds] Load Molds Data'),
-    mergeMap((action: any) => this._catalogsService.getMoldsDataGql$(action.skipRecords, action.takeRecords, action.order, action.filter)
-      .pipe(        
-        map((moldsGqlData: any) => {
-          const moldsData = moldsGqlData?.data;
-          return {
-            type: '[Molds] Loaded Molds Data sucesssfully', moldsData 
-          }
-          
-        }),
-        catchError(() => EMPTY)
-      ))
-    )
-  );
- 
+    mergeMap((action: any) => this._catalogsService.getMoldsDataGql$(
+      action.skipRecords,
+      action.takeRecords,
+      action.order,
+      action.filter
+    ).pipe(
+      map((moldsGqlData: any) => {
+        const moldsData = moldsGqlData?.data;
+        return {
+          type: '[Molds] Loaded Molds Data sucesssfully', moldsData 
+        }
+      }),
+      catchError(() => EMPTY)
+    ))
+  ));
+
   constructor (
     private actions$: Actions,
     private _catalogsService: CatalogsService,

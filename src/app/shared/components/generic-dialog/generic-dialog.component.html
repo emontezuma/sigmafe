@@ -2,10 +2,13 @@
   <div
     mat-dialog-title
     class="simple-flex title"
+    #genericDialog
   >
     <ng-container *ngIf="settingsData$ | async "></ng-container>  
+    <ng-container *ngIf="everySecond$ | async "></ng-container>      
 
-    <span>{{ data.title }}</span>
+    <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
+    <div class="title-text" [innerHTML]="data.title"></div>
     <button
       *ngIf="data.showCloseButton"
       mat-icon-button
@@ -36,7 +39,7 @@
       <app-spinner            
         [legacy]="classLegacy"
         [diameter]="40"
-        [value]="timeOutforDefaultButton / settingsData.timeOutFortDialog * 100"
+        [value]="timeOutforDefaultButton / timeOutFortDialog * 100"
         [countdown]="timeOutforDefaultButton"
         [showBackgound]="true"
         [suffix]="'s'"
@@ -52,13 +55,13 @@
           mat-button                    
           class="toolbar-button"    
           aria-label="icon-button with menu icon"
-          [ngClass]="[ button.class ]"
+          [ngClass]="button.class"
           [matTooltipDisabled]="!button.showTooltip"
           [matTooltip]="button.tooltip"
           matTooltipClass = "tooltip-general"
           matTooltipShowDelay = "100"
           [disabled]="button.disabled || button.loading"
-          (click)="handleClick(i, button.action)"
+          (click)="handleClick(button.action)"
       >
           <mat-icon
               *ngIf="button.showIcon"

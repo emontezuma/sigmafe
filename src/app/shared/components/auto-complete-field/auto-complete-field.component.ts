@@ -62,7 +62,7 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   ngOnChanges() {
-    this.showError = (!this.loading && this.list.length === 0 && !this.formField.value?.id);
+    this.showError = (!this.loading && this.list.length === 0 && !this.formField.value?.id && this.formField.touched);
     if (this.showError) {
       this.formField.setErrors({ 'incorrect': true })
     } else {
@@ -95,9 +95,7 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
     });
   }
 
-  handleKeyDown(event: KeyboardEvent) {
-    
-  }
+  handleKeyDown(event: KeyboardEvent) { }
   
 // End ======================
 }

@@ -13,6 +13,16 @@ export interface GeneralCatalogData {
   pageInfo?: GeneralCatalogPageInfo;
   // items?: GeneralCatalogItem[];
   items?: GeneralCatalogMappedItem[];
+  cadRight?: string;  
+}
+
+export interface GeneralCatalogTranslationsData {
+  loading?: boolean;
+  totalCount?: number;
+  currentPage?: number;
+  pageInfo?: GeneralCatalogPageInfo;
+  // items?: GeneralCatalogItem[];
+  items?: GeneralCatalogMappedItem[];
   cadRight?: string;
 }
 
@@ -51,11 +61,30 @@ export interface GeneralCatalogItem {
 }
 
 export interface GeneralCatalogMappedItem {  
-  id: number;
+  id?: number;
+  status?: string;
+  isTranslated?: boolean;
   translatedName?: string;
   translatedDescription?: string;
-  translatedReference?: string;
+  translatedReference?: string;  
+  translatedNotes?: string;  
+  translatedPrefix?: string;  
+}
+
+export interface GeneralCatalogTranslationsItem {  
+  id?: number;
+  moldId?: number;
+  description?: string;
+  notes?: string;
+  prefix?: string;
+  languageId?: number;
+  createdBy?: string;
   isTranslated?: boolean;
+  translatedName?: string;
+  translatedDescription?: string;
+  translatedReference?: string;  
+  translatedNotes?: string;  
+  translatedPrefix?: string;  
 }
 
 export interface GeneralCatalogInternalData {  
@@ -82,9 +111,11 @@ export interface MaintenanceHistoricalDataItem {
 export interface GeneralHardcodedValuesItem {
   id?: number;
   languageId?: number;
+  mainImagePath?: string;
   friendlyText?: string;
-  value?: string;
-  translations?: GeneralCatalogTranslations[];
+  used?: boolean;
+  value: string;
+  disabled: boolean;
 }
 
 export interface GeneralCatalogTranslations {
@@ -123,6 +154,15 @@ export const emptyGeneralCatalogData: GeneralCatalogData = {
   cadRight: '',
 }
 
+export const emptyGeneralCatalogItem: GeneralCatalogMappedItem = {
+  id: 0,
+  status: '',
+  isTranslated: false,
+  translatedName: '',
+  translatedDescription: '',
+  translatedReference: '',
+}
+
 export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     loading: false,
     totalCount: 0,
@@ -134,6 +174,14 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     items: [],
     cadRight: '',
   }
+
+  export const emptyGeneralHardcodedValuesItem: GeneralHardcodedValuesItem = {
+    id: 0,
+    languageId: 0,
+    friendlyText: '',
+    value: '',
+    disabled: false,
+  }  
 
   export const emptyMaintenanceHistoricalData: MaintenanceHistoricalData = {
     loading: false,
@@ -165,4 +213,5 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     RED = 'red',
     YELLOW = 'yellow',
   } 
+  
  

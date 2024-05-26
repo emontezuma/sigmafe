@@ -174,6 +174,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         }
       })
     );
+    this.calcElements();
   }
 
   ngOnDestroy() : void {
@@ -251,8 +252,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
 
   pageAnimationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
-      setTimeout(() => {
-        this.calcElements();
+      setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.MOLDS_CATALOG,
           show: true,
@@ -275,9 +275,9 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.MOLDS_CATALOG) {
+    if (action.from === ApplicationModules.MOLDS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
-        this.elements[action.buttonIndex].loading = true;
+        this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
           ...this.pageInfo,
           currentPage: 0,
@@ -286,20 +286,20 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         this.pendingToolbarButtonIndex = 2;
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
-        this.elements[action.buttonIndex].loading = true;
+        this.elements.find(e => e.action === action.action).loading = true;                
         this._router.navigateByUrl("/catalogs/molds/create");
         setTimeout(() => {
-          this.elements[action.buttonIndex].loading = false;  
+          this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
-      } else if (action.action === ButtonActions.EXPORT_TO_CSV) {
-        this.elements[action.buttonIndex].loading = true;
+      } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
+        this.elements.find(e => e.action === action.action).loading = true;                          
         this.allMoldsToCsv$ = this._catalogsService.getAllMoldsToCsv$().pipe(
           tap(moldToCsv => {
             const fileData$ = this._catalogsService.getAllMoldsCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, moldToCsv?.data?.exportMoldToCSV?.downloadFilename);
               setTimeout(() => {
-                this.elements[action.buttonIndex].loading = false;  
+                this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
             })
           })

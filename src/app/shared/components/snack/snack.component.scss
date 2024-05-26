@@ -1,3 +1,8 @@
+.container {
+  position: relative;
+  min-height: 40px;
+}
+
 .message {
   display: flex;
   flex-direction: row;
@@ -97,4 +102,13 @@
 
 .snack-text {
   flex: 3;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 0;
+  margin-bottom: 4px;
+  left: 0;
+  width: calc(100% - 8px);
+  margin-left: 4px;
 }

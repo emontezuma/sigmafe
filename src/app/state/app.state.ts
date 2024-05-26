@@ -11,13 +11,15 @@ import { ColorsState } from "../shared/models/colors.models"
 import { colorsReducer } from "./reducers/colors.reducer";
 import { ChecklistFillingState } from "../checklists/models/checklists.models";
 import { checklistFillingReducer } from "./reducers/checklists.reducer";
-import { MoldsState } from "../molds";
+import { MoldState, MoldsState } from "../molds";
 import { moldsReducer } from "./reducers/molds.reducer";
+import { moldReducer } from "./reducers/mold.reducer";
 
 export interface AppState {
     shared: SharedState,
     moldsHits: MoldsHitsState,
     molds: MoldsState,
+    mold: MoldState,
     settings: SettingsState,
     profile: ProfileState,
     colors: ColorsState,
@@ -28,6 +30,7 @@ export const reducers: ActionReducerMap<AppState> = {
     shared: sharedReducer,
     moldsHits: moldsHitsReducer,
     molds: moldsReducer,
+    mold: moldReducer,    
     settings: settingsReducer,
     profile: profileReducer,
     colors: colorsReducer,

@@ -68,6 +68,10 @@
           matTooltipShowDelay="100"
           [disabled]="button.disabled || button.loading"
           (click)="handleClick(i, button.action, button.field)"
+          [matBadge]="button.badgeText"
+          [matBadgeSize]="button.badgeSize"
+          [matBadgeColor]="button.badgeStyle"
+          [matBadgeHidden]="!button.showBadge"
         >
           <mat-icon
             *ngIf="button.showIcon"

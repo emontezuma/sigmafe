@@ -53,6 +53,11 @@ export class AreaFieldComponent {
 
   @Output() inputKeydown = new EventEmitter<KeyboardEvent>();
 
+// Hooks ====================
+  ngOnDestroy() {
+    if (this.inputKeydown) this.inputKeydown.unsubscribe();
+  }
+
 // Functions ================
   handleInput(event: any) {
     this.inputKeydown.emit(event);

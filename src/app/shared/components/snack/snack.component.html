@@ -4,6 +4,7 @@
     [style.maxWidth.px]="maxWidth"
 >
     <ng-container *ngIf="screenData$ | async "></ng-container>
+    <ng-container *ngIf="interval$ | async "></ng-container>    
     <div
         class="message"        
     >        
@@ -38,6 +39,15 @@
             [svgIcon]="data.icon"            
         >                   
         </mat-icon>
-    </div>
+    </div>    
 </div>
+<mat-progress-bar
+    *ngIf="data?.showProgressBar"
+    mode="determinate"
+    [value]="barValue"
+    [color]="data.progressBarColor"
+    class="progress bottom"
+    name="active-progress-bar"      
+>
+</mat-progress-bar>
 

@@ -514,3 +514,8 @@ mat-tab-group {
 mat-divider {
   border-color: var(--theme-primary-300) !important;
 }
+
+.warn-dialog  {
+  overflow: hidden !important;
+  box-shadow: 0px 0px 2px 5px var(--theme-warn-300);
+}
