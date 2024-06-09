@@ -448,7 +448,7 @@ mat-tab-group {
     width: -webkit-fill-available;
     flex: 1 1 350px;
     &:disabled {
-      border: 1.5px solid var(--z-colors-page-button-disabled-border) !important;
+      border: 1.5px solid var(--z-colors-page-button-disabled-border);
       span {
         color: var(--z-colors-page-card-disabled-fore) !important;  
       }
@@ -468,7 +468,6 @@ mat-tab-group {
     .mat-mdc-form-field-hint-wrapper {
       padding-left: 0px !important;
       padding-right: 0px !important;
-      width: calc(100% - 10px);
     }
     
   }
@@ -476,6 +475,13 @@ mat-tab-group {
     font-weight: 700;  
     font-size: 1.3rem;
     margin-bottom: 15px;    
+  }
+  &__check-label {    
+    font-weight: 700;  
+    font-size: 1.3rem;
+    margin-bottom: 5px;    
+    margin-left: 5px;    
+
   }
   &__required-icon {
     font-size: 16px !important;
@@ -503,6 +509,8 @@ mat-tab-group {
     font-size: 1.1rem;
     gap: 2px;
     align-items: center;
+    line-height: 13px;
+    padding: 3px 0px;
   }
   &__help {
     margin-top: 10px;
@@ -518,4 +526,11 @@ mat-divider {
 .warn-dialog  {
   overflow: hidden !important;
   box-shadow: 0px 0px 2px 5px var(--theme-warn-300);
+}
+
+.mat-mdc-form-field-icon-suffix {
+  padding: 0 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }

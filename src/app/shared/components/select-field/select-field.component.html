@@ -9,6 +9,7 @@
     <ng-content select="[fieldTitle]"></ng-content>
     <mat-form-field appearance="fill" class="field__field">
       <mat-select
+        #selection
         [formControl]="formField"
         name="fieldControl"
         (selectionChange)="handleSelectionChange($event)"

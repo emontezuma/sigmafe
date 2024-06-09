@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
     
 @Component({
@@ -6,7 +6,9 @@ import { FormControl } from '@angular/forms';
   templateUrl: './input-field.component.html',
   styleUrls: ['./input-field.component.scss']
 })
-export class InputFieldComponent {
+export class InputFieldComponent implements OnChanges {
+  @ViewChild('selection', { static: false }) selection: ElementRef;
+  
   private _fieldInputType = '';
 
   @Input() get fieldInputType() {
@@ -27,12 +29,24 @@ export class InputFieldComponent {
   @Input() fieldMaxLength: number;    
   @Input() showRightHint: boolean;  
   @Input() initialFocus: boolean;    
+  @Input() bordered: boolean;  
+  @Input() focused: boolean;     
+  @Input() rightSuffix: string;       
 
   @Output() inputKeydown = new EventEmitter<KeyboardEvent>();
 
 // Hooks ====================
   ngOnDestroy() {
     if (this.inputKeydown) this.inputKeydown.unsubscribe();
+  }
+
+  ngOnChanges(): void { 
+    if (this.focused) {
+      setTimeout(() => {
+        this.selection.nativeElement.focus();
+        console.log('focused')
+      }, 100)
+    }
   }
 
 // Functions ================

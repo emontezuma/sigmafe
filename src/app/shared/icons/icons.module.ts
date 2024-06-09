@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { DomSanitizer } from "@angular/platform-browser";
+import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   declarations: [],
@@ -17,204 +18,216 @@ export class IconsModule {
     sanitizer: DomSanitizer,
   ) {
     iconRegistry.addSvgIcon(
-      "vertical-menu",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/vertical_menu.svg")
+      'vertical-menu',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/vertical_menu.svg`)
     );
     iconRegistry.addSvgIcon(
-      "menu",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/menu.svg")
+      'menu',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/menu.svg`)
     );
     iconRegistry.addSvgIcon(
-      "download",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/download.svg")
+      'download',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/download.svg`)
     );
     iconRegistry.addSvgIcon(
-      "reload",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/reload.svg")
+      'reload',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/reload.svg`)
     );
     iconRegistry.addSvgIcon(
-      "attachment",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/attachment.svg")
+      'attachment',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/attachment.svg`)
     );
     iconRegistry.addSvgIcon(
-      "save",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/save.svg")
+      'save',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/save.svg`)
     );
     iconRegistry.addSvgIcon(
-      "cancel",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/cancel.svg")
+      'cancel',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/cancel.svg`)
     );
     iconRegistry.addSvgIcon(
-      "checklist",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/checklist.svg")
+      'checklist',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/checklist.svg`)
     );
     iconRegistry.addSvgIcon(
-      "support",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/support.svg")
+      'support',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/support.svg`)
     );
     iconRegistry.addSvgIcon(
-      "checklist-header",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/checklist_header.svg")
+      'checklist-header',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/checklist_header.svg`)
     );
     iconRegistry.addSvgIcon(
-      "small-locked",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/small_locked.svg")
+      'small-locked',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/small_locked.svg`)
     );
     iconRegistry.addSvgIcon(
-      "arrow-up",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_up.svg")
+      'arrow-up',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_up.svg`)
     );
     iconRegistry.addSvgIcon(
-      "arrow-down",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_down.svg")
+      'arrow-down',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_down.svg`)
     );
     iconRegistry.addSvgIcon(
-      "check",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/check.svg")
+      'check',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/check.svg`)
     );
     iconRegistry.addSvgIcon(
-      "warn-line",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_line.svg")
+      'warn-line',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/warn_line.svg`)
     );  
     iconRegistry.addSvgIcon(
-      "warn-fill",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/warn_fill.svg")
+      'warn-fill',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/warn_fill.svg`)
     );
     iconRegistry.addSvgIcon(
-      "block",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/block.svg")
+      'block',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/block.svg`)
     );
     iconRegistry.addSvgIcon(
-      "attachment-file",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/attachment_file.svg")
+      'attachment-file',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/attachment_file.svg`)
     );
     iconRegistry.addSvgIcon(
-      "more_info",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/more_info.svg")
+      'more_info',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/more_info.svg`)
     );
     iconRegistry.addSvgIcon(
-      "event",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/event.svg")
+      'event',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/event.svg`)
     );
     iconRegistry.addSvgIcon(
-      "man",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/man.svg")
+      'man',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/man.svg`)
     );
     iconRegistry.addSvgIcon(
-      "briefcase",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/briefcase.svg")
+      'briefcase',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/briefcase.svg`)
     );
     iconRegistry.addSvgIcon(
-      "gear",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/gear.svg")
+      'gear',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/gear.svg`)
     );
     iconRegistry.addSvgIcon(
-      "industry",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/industry.svg")
+      'industry',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/industry.svg`)
     );
     iconRegistry.addSvgIcon(
-      "country",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/country.svg")
+      'country',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/country.svg`)
     );
     iconRegistry.addSvgIcon(
-      "company",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/company.svg")
+      'company',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/company.svg`)
     );
     iconRegistry.addSvgIcon(
-      "priority",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/priority.svg")
+      'priority',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/priority.svg`)
     );
     iconRegistry.addSvgIcon(
-      "assignement",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/assignement.svg")
+      'assignement',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/assignement.svg`)
     );
     iconRegistry.addSvgIcon(
-      "time",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/time.svg")
+      'time',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/time.svg`)
     );
     iconRegistry.addSvgIcon(
-      "task-notes",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/task_notes.svg")
+      'task-notes',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/task_notes.svg`)
     );
     iconRegistry.addSvgIcon(
-      "white-list",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/white_list.svg")
+      'white-list',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/white_list.svg`)
     );
     iconRegistry.addSvgIcon(
-      "problems",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/problems.svg")
+      'problems',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/problems.svg`)
     );
     iconRegistry.addSvgIcon(
-      "organizational-chart",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/organizational_chart.svg")
+      'organizational-chart',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/organizational_chart.svg`)
     );
     iconRegistry.addSvgIcon(
-      "solution",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/solution.svg")
+      'solution',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/solution.svg`)
     );
     iconRegistry.addSvgIcon(
-      "delete",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/delete.svg")
+      'delete',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/delete.svg`)
     );
     iconRegistry.addSvgIcon(
-      "external-link",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/external_link.svg")
+      'external-link',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/external_link.svg`)
     );
     iconRegistry.addSvgIcon(
-      "record",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/record.svg")
+      'record',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/record.svg`)
     );  
     iconRegistry.addSvgIcon(
-      "flash",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/flash.svg")
+      'flash',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/flash.svg`)
     );  
     iconRegistry.addSvgIcon(
-      "palette",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/palette.svg")
+      'palette',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/palette.svg`)
     );
     iconRegistry.addSvgIcon(
-      "document",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/document.svg")
+      'document',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/document.svg`)
     );
     iconRegistry.addSvgIcon(
-      "treasure-chest",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/treasure_chest.svg")
+      'treasure-chest',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/treasure_chest.svg`)
     );    
     iconRegistry.addSvgIcon(
-      "copy",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/copy.svg")
+      'copy',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/copy.svg`)
     );    
     iconRegistry.addSvgIcon(
-      "garbage-can",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/garbage_can.svg")
+      'garbage-can',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/garbage_can.svg`)
     );    
     iconRegistry.addSvgIcon(
-      "cross",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/cross.svg")
+      'cross',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/cross.svg`)
     );    
     iconRegistry.addSvgIcon(
-      "lock-closed",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/lock_closed.svg")
+      'lock-closed',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/lock_closed.svg`)
     );        
     iconRegistry.addSvgIcon(
-      "arrow-left",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/arrow_left.svg")
+      'arrow-left',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_left.svg`)
     );
     iconRegistry.addSvgIcon(
-      "wrench",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/wrench.svg")
+      'wrench',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/wrench.svg`)
     );
     iconRegistry.addSvgIcon(
-      "pencil",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/pencil.svg")
+      'pencil',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/pencil.svg`)
     );
     iconRegistry.addSvgIcon(
-      "world",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/world.svg")
+      'world',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/world.svg`)
     );
     iconRegistry.addSvgIcon(
-      "disconnect",
-      sanitizer.bypassSecurityTrustResourceUrl("../../../assets/icons/disconnect.svg")
+      'disconnect',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/disconnect.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'allow_list2',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/allow_list2.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'file',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/file.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equation',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation.svg`)
     );
   }
   

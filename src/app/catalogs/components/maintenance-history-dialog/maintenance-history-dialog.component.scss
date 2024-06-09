@@ -1,0 +1,211 @@
+@use "../../../../assets/styles/mixins";
+
+.toolbar-button {
+  margin-right: 5px;
+  display: flex;
+  height: 40px;
+  flex-direction: row;
+  border-radius: 8px 0px;
+  border: 2.5px solid rgba(var(--z-colors-primary-rgb), 0.5);
+}
+
+.mdc-button__label {
+  margin-top: -8px;
+}
+
+.button-label {
+  margin-left: 5px;
+  font-weight: 600;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.divider {
+  margin-bottom: 2px;
+}
+
+.divider-title {
+  margin-top: 2px;
+}
+
+.dialog-bottom-message {
+  background-color: var(--z-colors-page-shadow);
+  text-align: right;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--z-colors-status-alarm);  
+}
+
+.span-bottom-message {
+  margin-right: 15px;
+}
+
+.dialog-actions {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  background-color: var(--z-colors-page-shadow);
+}
+
+.title {
+  font-weight: 700;
+  background-color: var(--z-colors-page-shadow);
+  display: flex;
+  align-items: center;
+  height: 55px;
+  padding-top: 10px;
+}
+
+.icon-medium {
+  width: 24px !important;
+  height: 24px !important;
+  margin: 0px !important;
+}
+
+.spinner-medium-button {
+  color: var(--z-colors-page-button-disabled-fore);
+  position: absolute;
+  left: 0;
+  margin-left: -24px;
+  margin-top: -2px;
+  ::ng-deep circle {
+    stroke: var(--z-colors-page-button-disabled-fore);
+  }
+}
+
+.in-button {
+  gap: 5px;
+  align-items: center;
+}
+
+.close-button {
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 2rem;
+  margin-right: 5px;
+  margin-top: 5px;
+}
+
+.title-with-id {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+
+.dialog-content {
+  font-size: 1.3rem;
+  color: var(--z-colors-page-fore);
+  max-height: 400px;
+  margin: 2px;
+  padding: 0px 5px 0px 10px;
+  border-style: none;
+}
+
+.container {
+  background-color: var(--z-colors-page-background-color);
+  color: var(--z-colors-page-fore);
+  counter-reset: counter counter;
+}
+
+.tab-spinner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  margin-left: 10px;
+  margin-top: 8px;
+}
+
+.icon-button {
+  height: 32px;
+  width: 32px;
+  margin-left: -4px;
+}
+
+.title-text {
+  margin-left: 10px;
+}
+
+.grid-multiple {
+  @include mixins.flexbox(row, wrap, 10px, flex-start, stretch);
+  width: -webkit-fill-available;
+  padding: 5px;
+}
+
+.margin-top {
+  margin-top: 5px;
+}
+
+.field-items {
+  flex: 1 1 32%;
+}
+
+.label::before {
+  counter-increment: counter;
+  content: counter(counter) ": ";
+}
+
+.flex {
+  @include mixins.flexbox(column, wrap, 5px, flex-start, flex-start);
+  margin-top: 10px;
+}
+
+.grid-dates {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;  
+}
+
+.readonly-value {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.check-span {
+  font-size: 1.35rem;
+}
+
+.flex-row {
+  @include mixins.flexbox(row, wrap, 12px, flex-start, center);
+  flex: 1;
+}
+
+.small-icon {
+  font-size: 2rem !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  margin-right: -8px !important;
+}
+
+.label-with-no-index {
+  font-weight: 400;
+  font-size: 1.1rem;
+}
+
+.catalog-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 4px 4px 0px 0px;
+    border: 1px solid var(--z-colors-page-border);
+    box-shadow: 0px 2px 2px 0px var(--z-colors-page-border);
+    width: -webkit-fill-available;
+    margin: 5px;  
+  }
+  
+  .hits {
+    margin-top: -20px;
+    ::ng-deep .field__container {
+      border-style: none !important;
+    }
+  }
+
+  .multi-fieldset {
+    border: none;
+    margin: 0px;
+    padding: 0px;
+  }

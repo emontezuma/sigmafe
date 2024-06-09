@@ -28,6 +28,10 @@
   <ng-container *ngIf="moldDataLoading$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateMold$ | async "></ng-container>  
+  <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>    
+  <ng-container *ngIf="deleteMoldTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addMoldTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>           
 
   <mat-card class="card">
     <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">
@@ -41,7 +45,6 @@
     </div>
     <mat-divider *ngIf="mold.thresholdState" style="margin: 5px 10px"></mat-divider>
     <form
-        focusInvalidInput
         class="layout"
         (ngSubmit)="onSubmit()"
         [formGroup]="moldForm"
@@ -63,7 +66,7 @@
             }"
           >
             <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="treasure-chest">
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
                 >INFORMACIÓN PRINCIPAL DEL MOLDE</label
@@ -88,10 +91,11 @@
           <div class="grid-multiple margin-top">
             <div class="field-items">
               <app-input-field
+                [focused]="focusThisField==='description'"
+                [bordered]="true"
                 [formField]="moldForm.controls.description"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="300"
-                [fieldRequired]="true"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
@@ -106,10 +110,11 @@
             </div>
             <div class="field-items">
               <app-input-field
+                [focused]="focusThisField==='serialNumber'"
+                [bordered]="true"
                 [formField]="moldForm.controls.serialNumber"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="100"
-                [fieldRequired]="true"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
@@ -123,10 +128,10 @@
             </div>
             <div class="field-items">
               <app-input-field
+                [bordered]="true"
                 [formField]="moldForm.controls.reference"
-                leftHint="Campo opcional"
+                rightHint="Campo opcional"                  
                 [fieldMaxLength]="100"
-                [fieldRequired]="true"
                 [showRightHint]="true"
                 [showCloseButton]="true"
                 fieldHelp="Especifique la referencia del molde"
@@ -147,7 +152,7 @@
                 }"
                 [disabled]="moldForm.controls.startingDate.disabled"
               >
-                <span class="label field__label">Fecha de inicio</span>
+                <span class="label field__label">Fecha de inicio de operaciones</span>
                 <mat-form-field appearance="fill" class="field__field">
                   <input
                     class="field__input"
@@ -174,13 +179,13 @@
                   </mat-error>
                 </mat-form-field>
                 <span class="field__help"
-                  >Especifique la fecha en que inicio operaciones éste
-                  molde</span
+                  >Especifique la fecha en que inicio operaciones de éste molde</span
                 >
               </fieldset>
             </div>
             <div class="field-items">
               <app-area-field
+                [bordered]="true"
                 [formField]="moldForm.controls.notes"
                 [fieldMaxLength]="500"
                 [showRightHint]="true"
@@ -210,11 +215,12 @@
                   <span class="field__label" *ngIf="moldForm.controls.moldType?.value?.id">id: {{ moldForm.controls.moldType?.value?.id }}</span>
                 </div>
                 <app-auto-complete-field
+                  [focused]="focusThisField==='moldType'"
                   [formField]="moldForm.controls.moldType"
                   [list]="moldTypes.items"
                   [totalCount]="moldTypes.totalCount"
                   leftHint="Escriba el Tipo de molde"
-                  catalog="moldTypes"
+                  [catalog]="SystemTables.MOLD_TYPES"
                   [loading]="moldTypes.loading"
                   noItemsError="No hay Tipos de molde con este nombre"
                   [showDataState]="true"
@@ -241,11 +247,12 @@
                 <span class="field__label" *ngIf="moldForm.controls.moldClass?.value?.id">id: {{ moldForm.controls.moldClass?.value?.id }}</span>
               </div>
                 <app-auto-complete-field
+                [focused]="focusThisField==='moldClass'"
                   [formField]="moldForm.controls.moldClass"
                   [list]="moldClasses.items"
                   [totalCount]="moldClasses.totalCount"
                   leftHint="Escriba la Clase de molde"
-                  catalog="moldClasses"
+                  [catalog]="SystemTables.MOLD_CLASSES"
                   [loading]="moldClasses.loading"
                   noItemsError="No hay Clases de molde con este nombre"
                   [showDataState]="true"
@@ -270,32 +277,52 @@
                         [formControl]="moldForm.controls.mainImageName"                        
                         [readonly]="true"
                       />
-                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept="*.png;*.jpg;*.svg;*.bmp" #fileInput> 
-                      <button matSuffix mat-icon-button (click)="fileInput.click()" style="margin-right: 5px;">                      
-                          <mat-icon>search</mat-icon>                      
-                      </button>                                    
-                    </mat-form-field>                                
+                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
+                      <button
+                        matSuffix
+                        mat-icon-button
+                        (click)="fileInput.click()"
+                        style="margin-right: 5px;"
+                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>search</mat-icon>
+                      </button>
+                      <button
+                        *ngIf="mold.mainImage"
+                        matSuffix
+                        mat-icon-button
+                        (click)="removeImage()"
+                        style="margin-right: 5px;"
+                        matTooltip="Remueve la imagen del molde"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>          
                     <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este molde</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
-                      *ngIf="this.mold.mainImagePath"
+                      *ngIf="this.mold.mainImage"
                     >
                       <img                
                         @dissolve
                         appImageNotFound                
                         class="mold-image"                        
-                        [src]="this.mold.mainImagePath"
-                        [alt]="this.mold.mainImagePath"            
+                        [src]="this.mold.mainImage"
+                        [alt]="this.mold.mainImage"            
                         fill
                       >      
                     </div>
                     <div
-                      *ngIf="!this.mold.mainImagePath"
+                      *ngIf="!this.mold.mainImage"
                       class="icon-container"
                     >
-                      <mat-icon class="default-icon" svgIcon="treasure-chest"></mat-icon>
+                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
                     </div>    
                   </div>
                 </div>                
@@ -320,11 +347,12 @@
                   <span class="field__label" *ngIf="moldForm.controls.provider?.value?.id">Id: {{ moldForm.controls.provider?.value?.id }}</span>
                 </div>
                 <app-auto-complete-field
+                  [focused]="focusThisField==='provider'"
                   [formField]="moldForm.controls.provider"
                   [list]="providers.items"
                   [totalCount]="providers.totalCount"
                   leftHint="Escriba el nombre del proveedor a buscar"
-                  catalog="providers"
+                  [catalog]="SystemTables.PROVIDERS"
                   [loading]="providers.loading"
                   noItemsError="No hay proveedores con este nombre"
                   [showDataState]="true"
@@ -353,11 +381,12 @@
                   <span class="field__label" *ngIf="moldForm.controls.manufacturer?.value?.id">id: {{ moldForm.controls.manufacturer?.value?.id }}</span>
                 </div>                
                 <app-auto-complete-field
+                  [focused]="focusThisField==='manufacturer'"
                   [formField]="moldForm.controls.manufacturer"
                   [list]="manufacturers.items"
                   [totalCount]="manufacturers.totalCount"
-                  leftHint="Escriba el nombre del fabricante a buscar"
-                  catalog="manufacturers"
+                  leftHint="Escriba el nombre del fabricante a buscar"                  
+                  [catalog]="SystemTables.MANUFACTURERS"
                   [loading]="manufacturers.loading"
                   noItemsError="No hay fabricantes con este nombre"
                   [showDataState]="true"
@@ -414,6 +443,24 @@
                 >
               </fieldset>
             </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="moldForm.controls.timeZone"
+                rightHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                leftHint="Expresado en segundos"
+                fieldHelp="Timezone del molde"
+                [rightSuffix]="getHours()"
+              >
+                <span fieldTitle class="label field__label"
+                  >Tiempo del huso horario del molde</span
+                >
+              </app-input-field>
+            </div>
           </div>
           
         </mat-expansion-panel>
@@ -453,19 +500,6 @@
           </mat-expansion-panel-header>
           <div class="grid-multiple margin-top">
             <div class="field-items">
-              <app-select-field
-                [formField]="moldForm.controls.state"
-                [list]="states.items"
-                leftHint="Campo opcional"
-                [showRightHint]="true"
-                fieldHelp="Especifique el color de la etiqueta"
-              >
-                <span fieldTitle class="label field__label"
-                  >Estado del molde</span
-                >
-              </app-select-field>
-            </div>
-            <div class="field-items">
               <fieldset
                 class="field__container"
                 style="min-width: 350px"
@@ -479,13 +513,14 @@
                 <div class="title-with-id">
                   <span class="label field__label">Número de parte</span>
                   <span class="field__label" *ngIf="moldForm.controls.partNumber?.value?.id">id: {{ moldForm.controls.partNumber?.value?.id }}</span>
-                </div>                                
+                </div>          
                 <app-auto-complete-field
+                  [focused]="focusThisField==='partNumber'"
                   [formField]="moldForm.controls.partNumber"
                   [list]="partNumbers.items"
                   [totalCount]="partNumbers.totalCount"
-                  leftHint="Escriba el número de parte"
-                  catalog="partNumbers"
+                  leftHint="Escriba el número de parte"                  
+                  [catalog]="SystemTables.PARTNUMBERS"
                   [loading]="partNumbers.loading"
                   noItemsError="No hay números de parte con este nombre"
                   [showDataState]="true"
@@ -500,13 +535,14 @@
             </div>
             <div class="field-items">
               <app-input-field
+                [bordered]="true"
                 [formField]="moldForm.controls.position"
-                leftHint="Campo opcional"
+                rightHint="Campo opcional"
                 fieldInputType="number"
                 currentErrorIcon="warn-line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
-                rightHint="Deje vacío o en cero para no asignar el molde"
+                leftHint="Deje vacío o en cero para no asignar el molde"
                 fieldHelp="Especifique la posición donde se adignará el molde"
               >
                 <span fieldTitle class="label field__label">Posición</span>
@@ -528,11 +564,12 @@
                   <span class="field__label" *ngIf="moldForm.controls.line?.value?.id">id: {{ moldForm.controls.line?.value?.id }}</span>
                 </div>                 
                 <app-auto-complete-field
+                  [focused]="focusThisField==='line'"
                   [formField]="moldForm.controls.line"
                   [list]="lines.items"
                   [totalCount]="lines.totalCount"
-                  leftHint="Escriba el nombre de la línea de producción a buscar"
-                  catalog="lines"
+                  leftHint="Escriba el nombre de la línea de producción a buscar"                  
+                  [catalog]="SystemTables.LINES"
                   [loading]="lines.loading"
                   noItemsError="No hay líneas de producción con este nombre"
                   [showDataState]="true"
@@ -551,21 +588,22 @@
                 style="min-width: 350px"
                 [ngClass]="{
                   'field__container--error':
-                    moldForm.controls.line.touched &&
-                    !moldForm.controls.line.valid
+                    moldForm.controls.equipment.touched &&
+                    !moldForm.controls.equipment.valid
                 }"
-                [disabled]="moldForm.controls.line.disabled"
+                [disabled]="moldForm.controls.equipment.disabled"
               >
                 <div class="title-with-id">
                   <span class="label field__label">Equipo/Máquina</span>
                   <span class="field__label" *ngIf="moldForm.controls.equipment?.value?.id">id: {{ moldForm.controls.equipment?.value?.id }}</span>
-                </div>                                 
+                </div>           
                 <app-auto-complete-field
+                  [focused]="focusThisField==='equipment'"
                   [formField]="moldForm.controls.equipment"
                   [list]="equipments.items"
                   [totalCount]="equipments.totalCount"
-                  leftHint="Escriba el nombre del equipo a buscar"
-                  catalog="equipments"
+                  leftHint="Escriba el nombre del equipo a buscar"                  
+                  [catalog]="SystemTables.EQUIPMENTS"
                   [loading]="equipments.loading"
                   noItemsError="No hay equipos/máquinas con este nombre"
                   [showDataState]="true"
@@ -637,15 +675,16 @@
                 </app-select-field>
               </div>
               <div class="field-items">
-                <app-input-field                
+                <app-input-field
+                  [bordered]="true"
                   [formField]="moldForm.controls.thresholdYellow"
-                  leftHint="Campo opcional"
+                  rightHint="Campo opcional"
                   fieldInputType="number"
-                  currentErrorMessage="El valor de arvertencia no debe ser mayor al valor de la Alarma"
+                  currentErrorMessage="El valor de advertencia no debe ser mayor al valor de la Alarma"
                   currentErrorIcon="warn-line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje el valor vacío para no aplicar umbral"
+                  leftHint="Deje el valor vacío para no aplicar umbral"
                   fieldHelp="Especifique el número de golpes que de alcanzarse se generará una advertencia"
                 >
                   <span fieldTitle class="label field__label"
@@ -655,13 +694,14 @@
               </div>
               <div class="field-items">
                 <app-input-field
+                  [bordered]="true"
                   [formField]="moldForm.controls.thresholdRed"
-                  leftHint="Campo opcional"
+                  rightHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje Deje el valor vacío para no aplicar umbral"
+                  leftHint="Deje el valor vacío para no aplicar umbral"
                   fieldHelp="Especifique el número de golpes que de alcanzarse se generará una ALARMA"
                 >
                   <span fieldTitle class="label field__label"
@@ -671,14 +711,15 @@
               </div>
               <div class="field-items">
                 <app-input-field
-                  [formField]="moldForm.controls.thresholdDaysYellow"
-                  leftHint="Campo opcional"
+                  [bordered]="true"
+                  [formField]="moldForm.controls.thresholdDateYellow"
+                  rightHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
                   currentErrorMessage="El Número de días de arvertencia no debe ser mayor al Número de días de la Alarma"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje vacío o en cero para no aplicar umbral"
+                  leftHint="Deje vacío o en cero para no aplicar umbral"
                   fieldHelp="Especifique el número de días que de alcanzarse se generará una advertencia"
                 >
                   <span fieldTitle class="label field__label"
@@ -688,13 +729,14 @@
               </div>
               <div class="field-items">
                 <app-input-field
-                  [formField]="moldForm.controls.thresholdDaysRed"
-                  leftHint="Campo opcional"
+                  [bordered]="true"
+                  [formField]="moldForm.controls.thresholdDateRed"
+                  rightHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorIcon="warn-line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
-                  rightHint="Deje vacío o en cero para no aplicar umbral"
+                  leftHint="Deje vacío o en cero para no aplicar umbral"
                   fieldHelp="Especifique el número de días que de alcanzarse se generará una ALARMA"
                 >
                   <span fieldTitle class="label field__label"
@@ -707,7 +749,8 @@
                   [formField]="moldForm.controls.label"
                   selectType="colored"
                   [list]="labelColors.items"
-                  leftHint="Campo opcional"
+                  leftHint="Seleccione un valor de la lista"
+                  rightHint="Campo opcional"
                   [showRightHint]="true"
                   fieldHelp="Especifique el color de la etiqueta"
                 >
@@ -720,7 +763,8 @@
                 <app-select-field
                   [formField]="moldForm.controls.state"
                   [list]="states.items"
-                  leftHint="Campo opcional"
+                  leftHint="Seleccione un valor de la lista"
+                  rightHint="Campo opcional"
                   [showRightHint]="true"
                   fieldHelp="Especifique el Estado actual del molde"
                 >
@@ -755,8 +799,8 @@
               <div class="flex grid-center">
                 <div class="readonly-value last-values">
                   {{
-                    tmpDays !== 0
-                      ? (tmpDays | number : "1.")
+                    tmpDate !== 0
+                      ? (tmpDate | number : "1.")
                       : "Indeterminado..."
                   }}
                 </div>
@@ -807,40 +851,76 @@
             >
               <table mat-table [dataSource]="maintenanceHistorical">
 
-                <ng-container matColumnDef="date">
-                  <th mat-header-cell *matHeaderCellDef>Fecha</th>
-                  <td mat-cell *matCellDef="let row">{{ row.maintenanceDate | date: 'EEE, dd-MMM-yyyy' }}</td>
+                <ng-container matColumnDef="item">
+                  <th mat-header-cell *matHeaderCellDef>#</th>                  
+                  <td mat-cell *matCellDef="let row; let i = index">
+                    <ng-container *ngIf="!loadingMaintenance">{{ i + 1 }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
                 </ng-container>
-                
+
                 <ng-container matColumnDef="provider">
                   <th mat-header-cell *matHeaderCellDef>Proveedor</th>
-                  <td mat-cell *matCellDef="let row">{{ row.provider?.name }}</td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!loadingMaintenance">{{ row.provider?.name }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="operator">
                   <th mat-header-cell *matHeaderCellDef>Operador</th>
-                  <td mat-cell *matCellDef="let row">{{ row.operatorName }}</td>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!loadingMaintenance">{{ row.operatorName }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
                 </ng-container>
 
-                <ng-container matColumnDef="state">
+                <ng-container matColumnDef="friendlyState">
                   <th mat-header-cell *matHeaderCellDef>Estado del molde</th>
-                  <td class="main-info" mat-cell *matCellDef="let row">{{ row.state }}</td>
+                  <td class="main-info" mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!loadingMaintenance">{{ row.friendlyState }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
                 </ng-container>
 
                 <ng-container matColumnDef="notes">
                   <th mat-header-cell *matHeaderCellDef>Notas</th>
-                  <td class="general-info" mat-cell *matCellDef="let row">{{ row.notes }}</td>
+                  <td class="general-info" mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!loadingMaintenance">{{ row.notes }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
                 </ng-container>
+
+                <ng-container matColumnDef="range">
+                  <th mat-header-cell *matHeaderCellDef>Tiempo de mantto</th>
+                  <td mat-cell *matCellDef="let row">
+                    <ng-container *ngIf="!loadingMaintenance">{{ row.startDate | date: "dd-MMM-yyyy" }} <strong>{{ !row.startDate || !row.finishedDate ?  "" : "/" }}</strong> {{ row.finishedDate | date: "dd-MMM-yyyy" }}</ng-container>
+                    <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+                  </td>
+                </ng-container>                
 
                 <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef>Acciones</th>
                   <td class="general-info" mat-cell *matCellDef="let row">
-                    <button matSuffix mat-icon-button (click)="editMaintenance(row.id)" style="margin-right: 5px;">                      
-                      <mat-icon svgIcon="pencil"></mat-icon>
-                    </button>                                    
-                    <button matSuffix mat-icon-button (click)="removeMaintenance(row.id)" style="margin-right: 5px;">                      
-                      <mat-icon svgIcon="garbage-can"></mat-icon>
-                    </button>                                    
+                    <div
+                      class="box-row"
+                      *ngIf="!loadingMaintenance"
+                    >
+                      <button matSuffix mat-icon-button (click)="handleAddHistoricalButtonClick(row.id)" style="margin-right: 5px;">
+                        <mat-icon svgIcon="pencil"></mat-icon>
+                      </button>
+                      <button matSuffix mat-icon-button (click)="handleRemoveAllHistoricalButtonClick('delete', row.id)" style="margin-right: 5px;">
+                        <mat-icon svgIcon="garbage-can"></mat-icon>
+                      </button>
+                    </div>
+                    <ngx-skeleton-loader
+                      *ngIf="loadingMaintenance"
+                      class="box-row"
+                      [theme]="{ height: '36px', width: '36px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)' }"
+                      count="2"
+                      appearance="circle"
+                    >
+                    </ngx-skeleton-loader>
                   </td>
                 </ng-container>
 
@@ -849,8 +929,8 @@
 
                 <div *ngIf="!loading">
                   <tr class="molds-table-mat-row" *matNoDataRow>
-                    <td class="molds-table__no-data" colspan="6">
-                      No hay registros a mostrar
+                    <td class="molds-table__no-data" colspan="7">
+                      No hay histórico a mostrar
                     </td>
                   </tr>
                 </div>
@@ -877,14 +957,14 @@
           <div class="grid-multiple-rows no-flex">
             <div class="maintenance-buttons">
               <button
-                [disabled]="!mold.id || mold.id === 0"
+                [disabled]="!mold.id || mold.id === 0 || loadingMaintenance"
                 mat-button
                 class="toolbar-button"
                 aria-label="icon-button with menu icon"
                 matTooltip="Agrega un nuevo mantenimiento al molde"
                 matTooltipClass="tooltip-general"
                 matTooltipShowDelay="100"
-                (click)="handleAddHistoricalButtonClick()"
+                (click)="handleAddHistoricalButtonClick(0)"
               >
                 <mat-icon                
                   class="svgicon icon-medium"                
@@ -901,14 +981,14 @@
                 <mat-label class="button-label">Agregar un mantenimiento...</mat-label>
               </button>          
               <button
-                [disabled]="maintenances.items.length === 0"
+                [disabled]="maintenances.items.length === 0 || loadingMaintenance"
                 mat-button
                 class="toolbar-button warn"
                 aria-label="icon-button with menu icon"
                 matTooltip="Elimina el historial de mantenimiento"
                 matTooltipClass="tooltip-general"
                 matTooltipShowDelay="100"
-                (click)="handleRemoveAllHistoricalButtonClick()"
+                (click)="handleRemoveAllHistoricalButtonClick('delete')"
               >
                 <mat-icon                
                   class="svgicon icon-medium"                
@@ -922,13 +1002,38 @@
                   mode="indeterminate"
                 >
                 </mat-progress-spinner>
-                <mat-label class="button-label">Eliminar historial!</mat-label>
-              </button>                            
+                <mat-label class="button-label">Eliminar todo el historial</mat-label>
+              </button>      
+              <button
+                [disabled]="!mold.id || mold.id === 0 || loadingMaintenance"
+                mat-button
+                class="toolbar-button"
+                aria-label="icon-button with menu icon"
+                matTooltip="Actualiza el historial de mantenimiento"
+                matTooltipClass="tooltip-general"
+                matTooltipShowDelay="100"
+                (click)="handleUpdateHistoricalButtonClick()"
+              >
+                <mat-icon                
+                  class="svgicon icon-medium"                
+                  svgIcon="reload"
+                  [ngStyle]="{ visibility: loadingMaintenance ? 'hidden' : 'visible' }"
+                >
+                </mat-icon>
+                <mat-progress-spinner
+                  *ngIf="loadingMaintenance"
+                  class="spinner-regular-button"
+                  diameter="32"
+                  mode="indeterminate"
+                >
+                </mat-progress-spinner>
+                <mat-label class="button-label">Actualizar</mat-label>
+              </button>      
               <app-label-ellipsis
                 class="readonly-value"
-                style="margin-left: auto"         
+                style="margin-left: auto"                         
                 [lines]="1"
-                [labelInnerHTML]="historicalItemsLabel"
+                [labelInnerHTML]="!loadingMaintenance ? historicalItemsLabel : 'Calculando...'"
               ></app-label-ellipsis>              
             </div>
           </div>
@@ -952,7 +1057,7 @@
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ mold.createdBy?.name }}</div>
+          <div class="readonly-value">{{ mold.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Creado por</div>
@@ -966,7 +1071,7 @@
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ mold.updatedBy?.name }}</div>
+          <div class="readonly-value">{{ mold.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
@@ -983,7 +1088,7 @@
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ mold.deletedBy?.name }}</div>
+          <div class="readonly-value">{{ mold.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Inactivado por</div>
@@ -998,3 +1103,12 @@
     </div>
   </mat-card>
 </div>
+<ng-template #skeleton>
+  <ngx-skeleton-loader
+    *ngIf="loadingMaintenance"
+    class="skeleton"
+    [theme]="{ height: '24px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', maxWidth: '140px', width: '140px' }"
+    count="1"
+  >
+  </ngx-skeleton-loader>
+</ng-template>

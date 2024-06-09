@@ -1,24 +1,31 @@
 <ng-container class="container">
   <fieldset
     class="field__container"
-    [ngClass]="{
-      'field__container--error': formField.touched && !formField.valid
-    }"
+    [ngClass]="{ 'field__container--error': formField.touched && !formField.valid }"
     [disabled]="formField.disabled"
+    [ngClass]="{ 'not-bordered': !bordered }"
   >
     <ng-content select="[fieldTitle]"></ng-content>
     <mat-form-field appearance="fill" class="field__field">
       <input
         class="field__input"
+        [required]="fieldRequired"
         matInput
         [formControl]="formField"
-        #fieldControl
-        name="fieldControl"
+        #selection
+        name="selection"
         [maxlength]="fieldMaxLength"
         (input)="handleInput($event)"
         [type]="fieldInputType"
         [cdkFocusInitial]="initialFocus"
       />
+      <div
+        *ngIf="rightSuffix"
+        class="field__right-suffix"
+        matSuffix
+      >
+        {{ rightSuffix }}
+      </div>
       <mat-hint *ngIf="leftHint" class="field__hint" align="start">
         <span class="field__required-label"
           ><strong>{{ leftHint }}</strong></span
@@ -28,7 +35,7 @@
         {{
           rightHint
             ? rightHint
-            : fieldControl?.value.length + " / " + fieldMaxLength
+            : selection?.value.length + " / " + fieldMaxLength
         }}
       </mat-hint>
       <mat-error
@@ -45,10 +52,10 @@
       </mat-error>      
       <button
         *ngIf="
-          fieldControl?.value.length > 0 &&
-          !fieldControl.disabled &&
-          showCloseButton
-        "
+          selection?.value.length > 0 &&
+          !selection.disabled &&
+          showCloseButton"
+        style="margin-right: 5px;"
         matSuffix
         mat-icon-button
         aria-label="Clear"

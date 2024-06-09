@@ -212,6 +212,10 @@ mat-panel-title {
   color: var(--z-colors-white) !important;
 }
 
+.icon-accordion {
+  color: var(--z-colors-white) !important;
+}
+
 .divider {
   @include mixins.divider();    
 }
@@ -230,6 +234,7 @@ mat-panel-title {
 .panel-main {
   padding: 10px;
   margin: 10px;
+  outline: 2px solid var(--z-colors-page-fore-color);
 }
 
 .item-image {
@@ -237,4 +242,9 @@ mat-panel-title {
   height: 32px;
   border-radius: 50%;
   outline: 2px solid var(--z-colors-page-background-color);
+}
+
+.panel-icon {
+  width: 32px;
+  height: 32px;  
 }

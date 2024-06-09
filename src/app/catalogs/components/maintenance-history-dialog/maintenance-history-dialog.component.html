@@ -1,0 +1,298 @@
+<div 
+  i18n
+  class="container"  
+>
+  <div mat-dialog-title class="simple-flex title">
+    <ng-container *ngIf="settingsData$ | async"></ng-container>
+    <ng-container *ngIf="everySecond$ | async"></ng-container>
+    <ng-container *ngIf="providers$ | async"></ng-container>
+    <ng-container *ngIf="maintenanceStates$ | async"></ng-container>
+    <ng-container *ngIf="addMoldMaintenanceHistory$ | async"></ng-container>
+    <ng-container *ngIf="maintenance$ | async"></ng-container>    
+
+    <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
+    <div class="title-text" [innerHTML]="data.title"></div>
+  </div>
+  <mat-divider class="divider-title"></mat-divider>
+  <div
+    class="dialog-content"
+    mat-dialog-content    
+  >
+    <form
+      #maintenanceHistory
+      class="layout"
+      (ngSubmit)="onSubmit()"
+      [formGroup]="maintenanceHistoryForm"
+      #f="ngForm"
+    >
+      <fieldset
+        class="multi-fieldset"
+        [disabled]="savingData"
+        #moldMaintenanceHistory
+      >
+        <div class="grid-multiple margin-top" @dissolve>
+          <div class="field-items">
+            <app-select-field
+              [focused]="focusFirstField"
+              [formField]="maintenanceHistoryForm.controls.state"
+              [list]="maintenanceStates.items"
+              leftHint="Campo requerido"              
+              [showRightHint]="true"
+              currentErrorMessage="Este campo no puede estar vacío"
+              currentErrorIcon="warn-line"
+              fieldHelp="Especifique el estado del molde luego de mantenimiento"
+            >
+              <span fieldTitle class="label field__label"
+                >Estado del molde luego del mantenimiento</span
+              >
+            </app-select-field>
+          </div>
+          <div class="field-items">
+            <fieldset
+              class="field__container"
+              [ngClass]="{
+                'field__container--error':
+                  maintenanceHistoryForm.controls.provider.touched &&
+                  !maintenanceHistoryForm.controls.provider.valid
+              }"
+              [disabled]="maintenanceHistoryForm.controls.provider.disabled"
+            >
+              <div class="title-with-id">
+                <span class="label field__label"
+                  >Proveedor que realizó el servicio</span
+                >
+                <span
+                  class="field__label"
+                  *ngIf="maintenanceHistoryForm.controls.provider?.value?.id"
+                  >Id:
+                  {{ maintenanceHistoryForm.controls.provider?.value?.id }}</span
+                >
+              </div>
+              <app-auto-complete-field                
+                [formField]="maintenanceHistoryForm.controls.provider"
+                [list]="providers.items"
+                [totalCount]="providers.totalCount"
+                leftHint="Escriba parcialmente nombre del proveedor"
+                [catalog]="SystemTables.PROVIDERS"
+                [loading]="providers.loading"
+                noItemsError="No hay proveedores con este nombre"
+                [showDataState]="true"
+                (optionSelected)="handleOptionSelected($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              </app-auto-complete-field>
+              <span class="field__help"
+                >Proveedor que relalizó el
+                mantenimiento</span
+              >
+            </fieldset>
+          </div>
+          <div class="field-items">
+            <app-input-field
+              [bordered]="true"
+              [formField]="maintenanceHistoryForm.controls.operatorName"
+              leftHint="Campo opcional"
+              [fieldMaxLength]="30"              
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              fieldHelp="Especifique el Nombre del operador"
+            >
+              <span fieldTitle class="label field__label"
+                >Nombre del operador</span
+              >
+            </app-input-field>
+          </div>
+          <div class="field-items"></div>
+          <div class="field-items">
+            <fieldset
+              class="field__container"
+              [ngClass]="{
+                'field__container--error':
+                  (maintenanceHistoryForm.controls.startDate.touched &&
+                  !maintenanceHistoryForm.controls.startDate.valid) ||
+                  (maintenanceHistoryForm.controls.finishedDate.touched &&
+                  !maintenanceHistoryForm.controls.finishedDate.valid) 
+              }"
+              [disabled]="maintenanceHistoryForm.controls.startDate.disabled || maintenanceHistoryForm.controls.finishedDate.disabled"
+            >
+              <span class="label field__label">Tiempo de mantenimiento</span>
+              <mat-form-field appearance="fill" class="field__field">
+                <mat-date-range-input [rangePicker]="picker">
+                  <input
+                    class="field__input"
+                    matStartDate
+                    matInput
+                    formControlName="startDate"
+                    #startDate
+                    name="startDate"
+                  />
+                  <input
+                    class="field__input"
+                    matEndDate
+                    matInput
+                    formControlName="finishedDate"
+                    #finishedDate
+                    name="finishedDate"
+                  />
+                </mat-date-range-input>
+                <mat-hint>DD/MM/AAAA – DD/MM/AAAA</mat-hint>
+                <mat-datepicker-toggle
+                  matIconSuffix
+                  [for]="picker"
+                ></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </mat-form-field>
+              <span class="field__help"
+                >Especifique el tiempo de mantenimiento del molde</span
+              >
+            </fieldset>
+          </div>
+          <div class="field-items">
+            <app-area-field
+              [formField]="maintenanceHistoryForm.controls.notes"
+              [fieldMaxLength]="300"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              leftHint="Describa el trabajo efectuado al molde"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Notas relacionadas al mantenimiento"
+            >
+              <span fieldTitle class="label field__label"
+                >Notas del mantenimiento</span
+              >
+            </app-area-field>
+          </div>
+          <div class="field-items">
+            <fieldset class="field__container">
+              <span class="label field__label">Resultado del mantenimiento</span>
+              <mat-checkbox
+                style="margin-top: -10px"
+                class="field__label"
+                (change)="enableHits($event.checked)"
+                formControlName="updateHitsCumulative"
+              >
+                <span class="check-span"> Actualizar el Número de Golpes </span>
+              </mat-checkbox>
+              <app-input-field
+                class="hits"
+                [bordered]="false"
+                [formField]="maintenanceHistoryForm.controls.hitsAfter"
+                fieldInputType="number"
+                leftHint="Nuevo número de golpes"
+                [fieldMaxLength]="20"                
+                [showRightHint]="false"
+                [showCloseButton]="true"
+              >
+              </app-input-field>
+              <mat-checkbox
+                style="margin-top: -10px"
+                class="field__label"
+                (change)="enableMaintenanceDate($event.checked)"
+                formControlName="updateLastMaintenanceDate"
+              >
+                <span class="check-span">
+                  Actualizar la última fecha de mantenimiento
+                </span>
+              </mat-checkbox>
+              <div class="hits">
+                <fieldset
+                  class="field__container"
+                  [disabled]="
+                    maintenanceHistoryForm.controls.maintenanceDate.disabled
+                  "
+                >
+                  <mat-form-field appearance="fill" class="field__field">
+                    <input
+                      class="field__input"
+                      matInput
+                      formControlName="maintenanceDate"
+                      #maintenanceDate
+                      name="maintenanceDate"
+                      [matDatepicker]="maintenanceDatePicker"
+                    />
+                    <mat-hint class="field__hint" align="start">
+                      <span class="field__required-label"
+                        ><strong>Fecha del último mantenimiento</strong></span
+                      >
+                    </mat-hint>
+                    <mat-datepicker-toggle
+                      matIconSuffix
+                      [for]="maintenanceDatePicker"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #maintenanceDatePicker></mat-datepicker>
+                    <mat-error class="field__error field__required">
+                      <span class="field__required-label">
+                        <strong>Fecha inválida</strong>
+                      </span>
+                    </mat-error>
+                  </mat-form-field>
+                </fieldset>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+  <mat-divider class="divider"></mat-divider>
+  <div *ngIf="data.bottomMessage" class="dialog-bottom-message">
+    <span class="span-bottom-message" [innerHTML]="data.bottomMessage"> </span>
+  </div>
+  <div class="simple-flex dialog-actions" mat-dialog-actions>
+    <div
+      *ngIf="timeOutforDefaultButton > 0 && !closed"
+      class="tab-spinner"
+      [ngClass]="{ 'pulse-with-warn': timeOutforDefaultButton < 10 }"
+    >
+      <app-spinner
+        [legacy]="classLegacy"
+        [diameter]="40"
+        [value]="(timeOutforDefaultButton / timeOutFortDialog) * 100"
+        [countdown]="timeOutforDefaultButton"
+        [showBackgound]="true"
+        [suffix]="'s'"
+        [limits]="limits"
+        [fonts]="fonts"
+        [showPrefix]="true"
+        [smallFont]="smallFont"
+      >
+      </app-spinner>
+    </div>
+    <div
+      class="toolbar-button-container"
+      *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn"
+    >
+      <button
+        mat-button
+        class="toolbar-button"
+        aria-label="icon-button with menu icon"
+        [ngClass]="button.class"
+        [matTooltipDisabled]="!button.showTooltip"
+        [matTooltip]="button.tooltip"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
+        [disabled]="button.disabled || button.loading"
+        (click)="handleClick(button.action)"
+      >
+        <mat-icon
+          *ngIf="button.showIcon"
+          class="svgicon icon-medium"
+          [ngStyle]="{ visibility: button.loading ? 'hidden' : 'visible' }"
+          [svgIcon]="button.icon"
+        >
+        </mat-icon>
+        <mat-progress-spinner
+          *ngIf="button.loading"
+          class="spinner-medium-button"
+          diameter="24"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+        <label class="button-label">{{
+          button.showCaption ? button.caption : ""
+        }}</label>
+      </button>
+    </div>
+  </div>
+</div>

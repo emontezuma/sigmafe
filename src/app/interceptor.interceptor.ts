@@ -28,7 +28,8 @@ export class InterceptorInterceptor implements HttpInterceptor {
       .set('x-token', authToken)
     });  
 
-    return next.handle(authReq).pipe(      
+    return next.handle(authReq)
+    .pipe(      
       catchError((error: HttpErrorResponse) => {
         // TODO: Add error handling logic here
         let message = error.message;

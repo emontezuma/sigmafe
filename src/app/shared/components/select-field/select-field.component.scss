@@ -69,6 +69,8 @@
     font-size: 1.1rem;
     gap: 2px;
     align-items: center;
+    line-height: 13px;
+    padding: 3px 0px;   
   }
   &__help {
     margin-top: 10px;
@@ -93,12 +95,12 @@ mat-option:nth-child(2n+1) {
 }
 
 mat-option:nth-child(1) {    
-  border-top: 1px solid var(--theme-primary-300);
+  border-top: 1px solid var(--theme-primary-200);
   background-color: var(--z-colors-table-even-background-color) !important;  
 }
 
 mat-option {    
-  border-bottom: 1px solid var(--theme-primary-300);
+  border-bottom: 1px solid var(--theme-primary-200);
 }
 
 .circle {  
@@ -132,8 +134,4 @@ mat-option {
 
 .trigger {
   margin-top: -10px;
-}
-
-::ng-deep .mat-mdc-text-field-wrapper {
-  height: 56px;
 }

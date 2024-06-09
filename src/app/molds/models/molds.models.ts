@@ -2,6 +2,7 @@ import {
   GeneralCatalogMappedItem,
   GeneralTranslatedFields,
 } from 'src/app/catalogs/models';
+import { GeneralTranslation } from 'src/app/catalogs/models/generics.models';
 import { PageInfo } from 'src/app/shared/models';
 
 export interface MoldsData {
@@ -28,7 +29,7 @@ export interface MoldItem {
   friendlyLabel?: string;
   isTranslated?: boolean;
   translatedReference: string;
-  translatedDescripcion?: string;
+  translateddescription?: string;
   translatedNotes?: string;
   translatedPartNumber?: GeneralTranslatedFields;
   translatedLine?: GeneralTranslatedFields;
@@ -53,7 +54,7 @@ export interface MoldDetail {
   providerId?: number;
   manufacturingDate?: string;
   startingDate?: any;
-  MoldLastMaintenanceId?: any;
+  moldLastMaintenanceId?: any;
   hits?: number;
   previousHits?: number;
   lastHit?: string;
@@ -62,8 +63,8 @@ export interface MoldDetail {
   thresholdYellow?: number;
   thresholdRed?: number;
   thresholdState?: string;
-  thresholdDaysYellow?: number;
-  thresholdDaysRed?: number;
+  thresholdDateYellow?: number;
+  thresholdDateRed?: number;
   receiverId?: number;
   label?: string;
   state?: string;
@@ -75,6 +76,7 @@ export interface MoldDetail {
   mainImageGuid?: string;
   mainImagePath?: string;
   mainImageName?: string;
+  mainImage?: string;
   strategy?: string;
   lastLocationId?: any;
   thresholdYellowDateReached?: any;
@@ -101,19 +103,9 @@ export interface MoldDetail {
   moldClass?: GeneralCatalogMappedItem;
   line?: GeneralCatalogMappedItem;
   equipment?: GeneralCatalogMappedItem;
-  translations?: MoldTranslation[];
+  translations?: GeneralTranslation[];
 }
 
-export interface MoldTranslation {
-  languageId: number;
-  languageName: string;
-  languageIso: string;
-  updatedByUserName: string;
-  updatedAt: string;
-  description: string;
-  reference: string;
-  notes: string;
-}
 export interface MoldLastMaintenance {
   maintenanceDate?: string;
   state?: string;
@@ -176,7 +168,7 @@ export const emptyMoldItem: MoldDetail = {
   providerId: null,
   manufacturingDate: null,
   startingDate: null,
-  MoldLastMaintenanceId: null,
+  moldLastMaintenanceId: null,
   hits: null,
   previousHits: null,
   lastHit: null,
@@ -185,8 +177,8 @@ export const emptyMoldItem: MoldDetail = {
   thresholdYellow: null,
   thresholdRed: null,
   thresholdState: null,
-  thresholdDaysYellow: null,
-  thresholdDaysRed: null,
+  thresholdDateYellow: null,
+  thresholdDateRed: null,
   receiverId: null,
   label: null,
   state: null,
@@ -197,6 +189,7 @@ export const emptyMoldItem: MoldDetail = {
   position: null,
   mainImagePath: null,
   mainImageName: null,
+  mainImage: null,
   strategy: null,
   lastLocationId: null,
   thresholdYellowDateReached: null,

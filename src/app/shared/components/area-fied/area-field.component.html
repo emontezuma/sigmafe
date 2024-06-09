@@ -1,12 +1,17 @@
 <ng-container class="container">
-    <fieldset class="field__container" [ngClass]="{ 'field__container--error': formField.touched && !formField.valid }" [disabled]="formField.disabled">
+    <fieldset
+        class="field__container"
+        [ngClass]="{ 'field__container--error': formField.touched && !formField.valid }"
+        [disabled]="formField.disabled"
+        [ngClass]="{ 'not-bordered': !bordered }"
+    >
         <ng-content select="[fieldTitle]"></ng-content>        
         <mat-form-field appearance="fill" class="field__field">
             <textarea class="field__input"
                 matInput
                 [formControl]="formField"
-                #fieldControl
-                name="fieldControl"
+                #selection
+                name="selection"
                 [maxlength]="fieldMaxLength"                
                 (input)="handleInput($event)"
                 [type]="fieldInputType"
@@ -26,7 +31,7 @@
                 class="field__hint"
                 align="end"
             >
-                {{ rightHint ? rightHint : (fieldControl?.value.length + ' / ' + fieldMaxLength) }}
+                {{ rightHint ? rightHint : (selection?.value.length + ' / ' + fieldMaxLength) }}
             </mat-hint>
             <mat-error 
                 *ngIf="currentErrorIcon || currentErrorMessage"
@@ -36,7 +41,7 @@
                 <span class="field__required-label"><strong>{{ currentErrorMessage }}</strong></span>
             </mat-error>
             <button 
-                *ngIf="fieldControl?.value.length > 0 && !fieldControl.disabled && showCloseButton"
+                *ngIf="selection?.value.length > 0 && !selection.disabled && showCloseButton"
                 matSuffix 
                 mat-icon-button 
                 aria-label="Clear"

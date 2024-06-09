@@ -1,0 +1,457 @@
+<div
+  class="container"
+  #catalogEdition
+  @routingAnimation
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  i18n
+>
+  <ng-container *ngIf="scroll$ | async"></ng-container>
+  <ng-container *ngIf="variable$ | async"></ng-container>  
+  <ng-container *ngIf="showGoTop$ | async"></ng-container>
+  <ng-container *ngIf="uoms$ | async"></ng-container>
+  <ng-container *ngIf="valueTypes$ | async"></ng-container>
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+  <ng-container *ngIf="sigmaTypes$ | async"></ng-container>
+  <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
+  <ng-container *ngIf="resetValueModes$ | async"></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+  <ng-container *ngIf="updateVariable$ | async "></ng-container>  
+  <ng-container *ngIf="updateVariableCatalog$ | async "></ng-container>    
+  <ng-container *ngIf="deleteVariableTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addVariableTranslations$ | async "></ng-container>     
+
+  <mat-card class="card">
+    <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="variableForm"
+        #f="ngForm"
+      >
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DE LA VARIABLE</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='name'"
+                [bordered]="true"
+                [formField]="variableForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="300"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignadoa la variable"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Descripción/Nombre de la variable</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='prefix'"
+                [bordered]="true"
+                [formField]="variableForm.controls.prefix"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="50"
+                [showRightHint]="true"                
+                [showCloseButton]="true"
+                fieldHelp="Especifique la abreviación de la variable"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Abreviación de la variable</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="variableForm.controls.reference"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="100"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                fieldHelp="Especifique la referencia de la variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Referencia</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items field-items--bordered">
+              <app-area-field
+                [bordered]="false"
+                [formField]="variableForm.controls.notes"
+                [fieldMaxLength]="500"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique las notas referentes a esta variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Notas referentes a la variable</span
+                >
+              </app-area-field>
+              <mat-checkbox
+                style="margin-top: -10px"
+                class="field__check-label"
+                formControlName="showNotes"
+              >
+                <span class="check-span">Utilizar éstas notas como título/pregunta en el checklist</span>
+              </mat-checkbox>
+            </div>                     
+            <div class="field-items">
+              <fieldset class="field__container">
+                <div class="image-and-field">
+                  <div class="field-components">
+                    <span class="label field__label">Imagen a mostrar</span>                
+                    <mat-form-field appearance="fill" class="field__field">
+                      <input
+                        class="field__input"
+                        matInput
+                        [formControl]="variableForm.controls.mainImageName"                        
+                        [readonly]="true"
+                      />
+                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
+                      <button
+                        matSuffix
+                        mat-icon-button
+                        (click)="fileInput.click()"
+                        style="margin-right: 5px;"
+                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>search</mat-icon>
+                      </button>
+                      <button
+                        *ngIf="variable.mainImage"
+                        matSuffix
+                        mat-icon-button
+                        (click)="removeImage()"
+                        style="margin-right: 5px;"
+                        matTooltip="Remueve la imagen de la variable"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>          
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta variable</span>
+                  </div>                  
+                  <div *ngIf="!loading" class="card-image">
+                    <div
+                      class="image-container"
+                      *ngIf="this.variable.mainImage"
+                    >
+                      <img                
+                        @dissolve
+                        appImageNotFound                
+                        class="mold-image"                        
+                        [src]="this.variable.mainImage"
+                        [alt]="this.variable.mainImage"            
+                        fill
+                      >      
+                    </div>
+                    <div
+                      *ngIf="!this.variable.mainImage"
+                      class="icon-container"
+                    >
+                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
+                    </div>    
+                  </div>
+                </div>                
+              </fieldset>              
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px"
+                [ngClass]="{
+                  'field__container--error':
+                    variableForm.controls.sigmaType.touched &&
+                    !variableForm.controls.sigmaType.valid
+                }"
+                [disabled]="variableForm.controls.sigmaType.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Tipo de variable</span>
+                  <span class="field__label" *ngIf="variableForm.controls.sigmaType?.value?.id">Id: {{ variableForm.controls.sigmaType?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='sigmaType'"
+                  [formField]="variableForm.controls.sigmaType"
+                  [list]="sigmaTypes.items"
+                  [totalCount]="sigmaTypes.totalCount"
+                  leftHint="Escriba el Tipo de variable a buscar"
+                  [catalog]="SystemTables.SIGMA_TYPES"
+                  [loading]="sigmaTypes.loading"
+                  noItemsError="No hay tipos de variable con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Tipo de la variable</span
+                >
+              </fieldset>
+            </div>            
+          </div>          
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[1] = true"
+          (closed)="panelOpenState[1] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[1]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[1]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
+              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[1]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px"
+                [ngClass]="{
+                  'field__container--error':
+                    variableForm.controls.uom.touched &&
+                    !variableForm.controls.uom.valid
+                }"
+                [disabled]="variableForm.controls.uom.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Unidad de medida para variable</span>
+                  <span class="field__label" *ngIf="variableForm.controls.uom?.value?.id">Id: {{ variableForm.controls.uom?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='uom'"
+                  [formField]="variableForm.controls.uom"
+                  [list]="uoms.items"
+                  [totalCount]="uoms.totalCount"
+                  leftHint="Escriba el nombre de la Unidad de medida a buscar"
+                  [catalog]="SystemTables.UOMS"
+                  [loading]="uoms.loading"
+                  noItemsError="No hay unidades de medida con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la Unidad de medida de la variable</span
+                >
+              </fieldset>
+            </div>   
+            <div class="field-items">
+              <app-select-field
+                [formField]="variableForm.controls.valueType"
+                [list]="valueTypes.items"
+                leftHint="Campo requerido"
+                [fieldRequired]="true"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                fieldHelp="Especifique el tipo de valor"
+              >
+                <span fieldTitle class="label field__label"
+                  >Tipo de valor a recolectar</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="variableForm.controls.minimum"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje el valor vacío para no aplicar el rango mínimo"
+                fieldHelp="Especifique el rango minimo para esta variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Rango mínimo</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="variableForm.controls.maximum"
+                leftHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje el valor vacío para no aplicar el rango máximo"
+                fieldHelp="Especifique el rango máximo para esta variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Rango mánimo</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="variableForm.controls.required"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si la variable es requerida"
+              >
+                <span fieldTitle class="label field__label"
+                  >La variable es requerida</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="variableForm.controls.resetValueMode"
+                [list]="resetValueModes.items"                
+                [fieldRequired]="true"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                fieldHelp="Modo de reseteo de la variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Modo de reseteo de la variable</span
+                >
+              </app-select-field>                
+            </div>
+          </div>
+        </mat-expansion-panel>        
+      </mat-accordion>
+    </form>
+    <div
+      *ngIf="variable.id"
+      class="catalog-footer"
+    >
+      <div class="grid-dates">
+        <div class="flex">
+          <div class="readonly-value item-id">{{ variable.id }}</div>
+          <div class="label-with-no-index">ID del registro</div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.createdAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de creación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ variable.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Creado por</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.updatedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de modificación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ variable.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="grid-inactive" *ngIf="variable.deletedById > 0">
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.deletedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de inactivación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ variable.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Inactivado por</div>
+          </div>
+        </div>
+        <div class="flex-inactive">
+          <div class="label-inactive">
+            <strong>El registro está INACTIVO</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

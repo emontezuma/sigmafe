@@ -516,7 +516,7 @@ form {
 }
 
 .field-items {
-  flex: 1 1 32%;
+  flex: 1 1 24%;
 }
 
 .label-inactive {  
@@ -635,7 +635,7 @@ table {
     }
   }
   &__no-data {
-    font-size: 1.8rem;  
+    font-size: 1.5rem;  
     text-align: center !important;
     padding: 10px;
   }
@@ -649,8 +649,26 @@ table {
   background-color: var(--z-colors-table-hover-background-color) !important;
 }
 
-.mat-column-date {
-  max-width: 170px !important;
+.mat-column-item {
+  max-width: 40px !important;
+  min-width: 40px !important;
+  width: 40px !important;
+  flex: 0 0 4% !important;  
+  padding: 10px;  
+}
+
+.mat-column-range {
+  max-width: 20% !important;
+  min-width: 20% !important;
+  width: 20% !important;  
+  flex: 0 0 20% !important;  
+  padding: 10px;  
+}
+
+.mat-column-actions {
+  max-width: 130px !important;
+  min-width: 130px !important;
+  width: 130px !important;
   flex: 0 0 10% !important;  
   padding: 10px;  
 }
@@ -658,7 +676,9 @@ table {
 .mat-column-provider {
   word-wrap: break-word !important;
   white-space: unset !important;
-  max-width: 450px !important;
+  max-width: 20% !important;
+  min-width: 20% !important;
+  width: 20% !important;  
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -671,17 +691,21 @@ table {
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;
-  max-width: 275px !important;
-  flex: 0 0 15% !important;  
+  max-width: 20% !important;
+  min-width: 20% !important;
+  width: 20% !important;  
+  flex: 0 0 20% !important;  
   padding: 10px;
 }
 
-.mat-column-state {
+.mat-column-friendlyState {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;  
-  max-width: 250px !important;
+  max-width: 15% !important;
+  min-width: 15% !important;
+  width: 15% !important;  
   flex: 0 0 15% !important;  
   padding: 10px;
 }
@@ -691,8 +715,10 @@ table {
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;
-  flex: 0 0 40% !important;  
-  max-width: 450px !important;
+  flex: 0 0 20% !important;  
+  max-width: 20% !important;
+  min-width: 20% !important;
+  width: 20% !important;  
   padding: 10px;
 }
 
@@ -837,4 +863,26 @@ td {
 .default-icon {
   width: 100%;
   height: 100%;
+}
+
+.spinner-regular-button {
+  color: var(--z-colors-page-button-disabled-fore);
+  position: absolute;
+  left: 0;
+  margin-left: -32px;
+  margin-top: -7px;
+  ::ng-deep circle {
+      stroke: var(--z-colors-page-button-disabled-fore);   
+  }    
+}
+
+.skeleton {
+  min-height: 61px;  
+  height: 61px;  
+}
+
+
+.box-row {
+  display: flex;
+  flex-direction: row;
 }

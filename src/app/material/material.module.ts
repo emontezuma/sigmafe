@@ -29,6 +29,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   exports: [
@@ -62,6 +63,7 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatAutocompleteModule, 
     MatFormFieldModule,
     MatBadgeModule,
+    MatCheckboxModule,
 ]
 })
 

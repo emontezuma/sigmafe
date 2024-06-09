@@ -1,12 +1,14 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatInput } from '@angular/material/input';
     
 @Component({
   selector: 'app-area-field',
   templateUrl: './area-field.component.html',
   styleUrls: ['./area-field.component.scss']
 })
-export class AreaFieldComponent {
+export class AreaFieldComponent implements OnChanges {
+  @ViewChild('selection', { static: false }) selection: MatInput;
   private _fieldInputType = '';
   private _autosize = true;
   private _minRows = 1;
@@ -49,13 +51,24 @@ export class AreaFieldComponent {
   @Input() showCloseButton: boolean;  
   @Input() fieldRequired: boolean;    
   @Input() fieldMaxLength: number;    
-  @Input() showRightHint: boolean;    
+  @Input() showRightHint: boolean; 
+  @Input() focused: boolean;
+  @Input() bordered: boolean;  
 
   @Output() inputKeydown = new EventEmitter<KeyboardEvent>();
 
 // Hooks ====================
+  
   ngOnDestroy() {
     if (this.inputKeydown) this.inputKeydown.unsubscribe();
+  }
+
+  ngOnChanges() {
+    if (this.focused) {
+      setTimeout(() => {
+        this.selection.focus();
+      }, 50)
+    }
   }
 
 // Functions ================

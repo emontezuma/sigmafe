@@ -4,15 +4,19 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ImageNotFoundModule, OptionsScrollModule, FocusInvalidInputModule } from '../shared/directives';
-import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent } from './pages';
 import { CatalogsRoutingModule } from './catalogs-routing.module'
-import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule } from '../shared/components';
+import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule, LazyLoadingListModule } from '../shared/components';
+import { MaintenanceHistoryDialogComponent } from './components/maintenance-history-dialog/maintenance-history-dialog.component';
 
 @NgModule({
   declarations: [
     CatalogMoldsListComponent,
     CatalogsHomeComponent,
     CatalogMoldEditionComponent,
+    MaintenanceHistoryDialogComponent,
+    CatalogVariableEditionComponent,
+    CatalogVariablesListComponent,
   ],
   imports: [
     CommonModule,
@@ -31,6 +35,7 @@ import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFi
     AreaFieldModule,
     SelectFieldModule,
     FocusInvalidInputModule,
+    LazyLoadingListModule,
   ],   
 })
 export class CatalogsModule { }

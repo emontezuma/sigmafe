@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
-import { CapitalizationMethod, DatesDifference } from '../models/helpers.models';
-import { GET_LANGUAGES_LAZY_LOADING, GET_MOLDS } from '../../graphql/graphql.queries';
+import { CapitalizationMethod, DatesDifference, RecordStatus } from '../models/helpers.models';
+import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_MOLDS } from '../../graphql/graphql.queries';
 import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
 import { AppState, updateMoldsHitsData } from 'src/app/state';
+import { GqlParameters } from 'src/app/catalogs/models/generics.models';
 
 @Injectable({
   providedIn: 'root',
@@ -390,7 +391,7 @@ export class SharedService {
     try {
       let socket = new WebSocket(host);
       socket.onopen  = (msg) => { 
-        socket.send("{ \"protocol\": \"json\", \"version\": 1 }\u001e");         
+        socket.send('{ \"protocol\": \"json\", \"version\": 1 }\u001e');         
       };
       socket.onmessage = (socketObject: any) => {
         if (socketObject?.data) {
@@ -411,31 +412,6 @@ export class SharedService {
       console.log(ex); 
     }
         
-  }
-
-  getHardcodedValues$(recosrdsToSkip: number = 0, recosrdsToTake: number = 50, orderBy: any = null) {
-    let variables = undefined;
-    if (recosrdsToSkip !== 0) {
-      variables = { recosrdsToSkip: recosrdsToSkip };
-    }
-    if (recosrdsToTake !== 0) {
-      if (variables) {         
-        variables = { ...variables, recosrdsToTake: recosrdsToTake };
-      } else {
-        variables = { recosrdsToTake: recosrdsToTake };
-      }      
-    }
-    if (orderBy) {
-      if (variables) {         
-        variables = { ...variables, orderBy: orderBy };
-      } else {
-        variables = { orderBy: orderBy };
-      }
-    }    
-    return this._apollo.watchQuery({ 
-      query: GET_MOLDS,
-      variables
-    }).valueChanges    
   }
 
   convertUtcTolocal(dateUtc: string): Date | string {
@@ -465,6 +441,43 @@ export class SharedService {
       query: GET_LANGUAGES_LAZY_LOADING,
       variables,
     }).valueChanges;
+  }
+
+  
+  requestHardcodedValuesData$(currentPage: number, skipRecords: number, takeRecords: number, order: any, catalog: string): Observable<any> {    
+    const filter = JSON.parse(`{ "and":  [ { "languageId": { "eq": 1 } }, { "customerId": { "eq": 1 } }, { "tableName": { "eq": "${catalog}" } }, { "status": { "eq": "${RecordStatus.ACTIVE}" } } ] }`);
+    // TODO Get language and customer from table
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords, 
+      filter, 
+      order,
+    }    
+    const variables = this.setGraphqlVariables(variableParameters);
+    return this._apollo.watchQuery({ 
+      query: GET_HARDCODED_VALUES, 
+      variables, 
+    }).valueChanges;  
+  }
+
+  setGraphqlVariables(variableParameters: GqlParameters): any {
+    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status} = variableParameters;
+
+    if (settingType === 'tables') {
+      return {
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
+        ...(order) && { orderBy: order },
+        ...(filter) && { filterBy: filter },
+      }
+    } else if (settingType === 'status') {
+      return { 
+        id,
+        customerId,
+        status
+      };      
+    }
   }
 
 // End ======================

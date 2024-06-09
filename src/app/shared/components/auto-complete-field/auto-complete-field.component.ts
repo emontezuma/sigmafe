@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { debounceTime, startWith, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { GeneralCatalogMappedItem, GeneralCatalogParams } from 'src/app/catalogs';
+import { SystemTables } from '../../models/helpers.models';
 
 @Component({
   selector: 'app-auto-complete-field',
@@ -10,6 +11,7 @@ import { GeneralCatalogMappedItem, GeneralCatalogParams } from 'src/app/catalogs
   styleUrls: ['./auto-complete-field.component.scss']
 })
 export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges {
+  @ViewChild('selection', { static: false }) selection: ElementRef;
   
   @Input() formField: FormControl;  
   // @Input() list: GeneralCatalogItem[];
@@ -21,7 +23,8 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   @Input() loading: boolean;
   @Input() noItemsError: string;  
   @Input() leftHint: string;  
-  @Input() showDataState: boolean;    
+  @Input() showDataState: boolean;   
+  @Input() focused: boolean;   
   
   // @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogItem}>();
   @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogMappedItem}>();
@@ -68,6 +71,11 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
     } else {
       this.formField.setErrors(null);
     }
+    if (this.focused) {
+      setTimeout(() => {
+        this.selection.nativeElement.focus();
+      }, 50)
+    }
   }
 
 // Functions ================
@@ -96,6 +104,10 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   }
 
   handleKeyDown(event: KeyboardEvent) { }
+
+  get SystemTables () {
+    return SystemTables;
+  }
   
 // End ======================
 }

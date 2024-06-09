@@ -31,8 +31,8 @@ export class SnackComponent implements OnInit, AfterViewInit{
 // Hooks ====================
 
   ngOnInit() {    
-    this.interval$ = interval(
-      this.data.duration > 0 ? this.data.duration : environment.snackByDefaultDuration / 100
+   this.interval$ = interval(
+      (this.data.duration > 0 ? this.data.duration : environment.snackByDefaultDuration) / 100
     ).pipe(
       tap((time) => {
         this.barValue = time;

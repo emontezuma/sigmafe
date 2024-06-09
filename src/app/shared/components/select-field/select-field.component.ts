@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, OnChanges } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { MatSelectChange } from '@angular/material/select';
+import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { Subscription } from 'rxjs';
 import { GeneralHardcodedValuesItem } from 'src/app/catalogs';
     
@@ -9,7 +9,9 @@ import { GeneralHardcodedValuesItem } from 'src/app/catalogs';
   templateUrl: './select-field.component.html',
   styleUrls: ['./select-field.component.scss']
 })
-export class SelectFieldComponent {
+export class SelectFieldComponent implements OnChanges {
+  @ViewChild('selection', { static: false }) selection: MatSelect;
+
   @Input() list: GeneralHardcodedValuesItem[];
   @Input() formField: FormControl;  
   @Input() leftHint: string;
@@ -20,6 +22,7 @@ export class SelectFieldComponent {
   @Input() fieldRequired: boolean;      
   @Input() showRightHint: boolean;  
   @Input() selectType: string;  
+  @Input() focused: boolean;  
 
   @Output() selectSelectionChange = new EventEmitter<MatSelectChange>();
 
@@ -37,7 +40,14 @@ export class SelectFieldComponent {
     })
   }
 
-// Hooks ====================
+  ngOnChanges(): void { 
+    if (this.focused) {
+      setTimeout(() => {
+        this.selection.focus();
+      }, 50)
+    }
+  }
+
   ngOnDestroy() {
     if (this.selectSelectionChange) this.selectSelectionChange.unsubscribe();
     if (this.formFieldSubscription) this.formFieldSubscription.unsubscribe();

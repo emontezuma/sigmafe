@@ -113,7 +113,7 @@
       class="drawer-container"
       (backdropClick)="sidenav.close()"
       [ngStyle]="{ 'height': outletHeight }"
-    >
+    >_
       <mat-sidenav #sidenav (keydown.escape)="sidenav.close()" disableClose>
         <mat-nav-list>
           <cdk-accordion>
@@ -125,6 +125,26 @@
               <a routerLink="molds" mat-list-item (click)="sidenav.close()">
                 <mat-icon>backup_table</mat-icon>
                 <span>Moldes</span>
+              </a>
+              <mat-divider></mat-divider>
+              <a
+                routerLink="checklists"
+                mat-list-item
+                (click)="sidenav.close()"
+              >
+                <mat-icon>checklist</mat-icon>
+                <span>Checklist específico</span>
+              </a>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel class="panel-main" hideToggle expanded="true">
+              <mat-expansion-panel-header>
+                <mat-icon class="panel-icon" svgIcon="file"></mat-icon>
+                <mat-panel-title class="accordion">MANTENIMIENTO</mat-panel-title>
+              </mat-expansion-panel-header>
+              <a routerLink="catalogs" mat-list-item (click)="sidenav.close()">
+                <mat-icon class="panel-icon" svgIcon="file"></mat-icon>
+                <span>Catálogos</span>
               </a>
               <mat-divider></mat-divider>
               <a

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -26,6 +26,21 @@ const routes: Routes = [
         path: 'molds/edit/:id',
         component: CatalogMoldEditionComponent,
         data: { animation: 'CatalogMoldEditionComponent' },
+      },
+      {
+        path: 'variables',
+        component: CatalogVariablesListComponent,
+        data: { animation: 'CatalogVariablesComponent' },
+      },
+      {
+        path: 'variables/create',
+        component: CatalogVariableEditionComponent,
+        data: { animation: 'CatalogVariableEditionComponent' },
+      },
+      {
+        path: 'variables/edit/:id',
+        component: CatalogVariableEditionComponent,
+        data: { animation: 'CatalogVariableEditionComponent' },
       },
       {
         path: '**',

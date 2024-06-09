@@ -5,7 +5,8 @@
   <ng-container *ngIf="textToSearch$ | async "></ng-container>   
   
   <mat-form-field appearance="fill" class="auto-complete__field">
-    <input      
+    <input
+      #selection
       matInput
       [matAutocomplete]="auto"
       [formControl]="formField"
@@ -23,7 +24,18 @@
     <mat-hint class="auto-complete__hint" align="end" *ngIf="showError">
       <span class="auto-complete__hint--error"><strong>{{ noItemsError }}</strong></span>
       <mat-icon class="auto-complete__small-icon--error" svgIcon="warn-line"></mat-icon>
-    </mat-hint>    
+    </mat-hint>
+    <mat-error
+        class="field__error field__required"
+    >
+      <!--<mat-icon
+        class="field__required-icon"
+        svgIcon="warn-line"
+      ></mat-icon>-->
+      <span class="field__required-label"
+        ><strong>El registro no existe o está inactivo</strong></span
+      >
+    </mat-error>
     <div *ngIf="loading" matSuffix
     >      
       <mat-progress-spinner      
@@ -51,7 +63,7 @@
         [value]="element"        
       >
         {{ 
-          catalog === 'partNumbers' && element.translatedReference ? 
+          catalog === SystemTables.PARTNUMBERS && element.translatedReference ? 
           ( element.translatedName + ' (' + element.translatedReference + ")" ) : 
           element.translatedName
         }}

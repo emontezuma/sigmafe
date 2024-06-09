@@ -1,5 +1,5 @@
 import { NgModule, isDevMode } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -19,7 +19,7 @@ import { NotFoundComponent } from './shared/pages';
 import { reducers } from '../app/state/app.state';
 import { MoldsHitsEffects, MoldsEffects, MoldEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects } from './state/effects';
 import { ImageNotFoundModule, OptionsScrollModule } from './shared/directives';
-import { SnackComponent, SpinnerModule, GenericDialogComponent, ToolbarComponent, SearchBoxComponent, ButtonMenuComponent, TranslationsDialogComponent, InputFieldModule, AreaFieldModule, SelectFieldModule } from './shared/components';
+import { SnackComponent, SpinnerModule, GenericDialogComponent, ToolbarComponent, SearchBoxComponent, ButtonMenuComponent, TranslationsDialogComponent, InputFieldModule, AreaFieldModule, SelectFieldModule, LazyLoadingListModule } from './shared/components';
 import { GraphQLModule } from './graphql.module';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './shared/services';
@@ -59,12 +59,14 @@ import { InterceptorInterceptor } from './interceptor.interceptor';
     InputFieldModule,
     AreaFieldModule,
     SelectFieldModule,
+    LazyLoadingListModule,
   ],
   providers: [
     DatePipe,
     { provide: MatPaginatorIntl, useClass: CustomPaginator},
     { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: "fill" }},
     { provide: HTTP_INTERCEPTORS, useClass: InterceptorInterceptor, multi: true },
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
   ],
   bootstrap: [AppComponent]
 })

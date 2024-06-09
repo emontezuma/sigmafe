@@ -1,11 +1,7 @@
 <div i18n class="container">
-  <div
-    mat-dialog-title
-    class="simple-flex title"
-    #genericDialog
-  >
-    <ng-container *ngIf="settingsData$ | async "></ng-container>  
-    <ng-container *ngIf="everySecond$ | async "></ng-container>      
+  <div mat-dialog-title class="simple-flex title" #genericDialog>
+    <ng-container *ngIf="settingsData$ | async"></ng-container>
+    <ng-container *ngIf="everySecond$ | async"></ng-container>
 
     <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
     <div class="title-text" [innerHTML]="data.title"></div>
@@ -24,63 +20,62 @@
     class="dialog-content"
     mat-dialog-content
     [innerHTML]="data.body.message"
-  >
-  </div>
+  ></div>
   <mat-divider class="divider"></mat-divider>
-  <div
-    class="simple-flex dialog-actions"
-    mat-dialog-actions
-    >
+  <div class="simple-flex dialog-actions" mat-dialog-actions>
     <div
       *ngIf="timeOutforDefaultButton > 0 && !closed"
       class="tab-spinner"
       [ngClass]="{ 'pulse-with-warn': timeOutforDefaultButton < 10 }"
     >
-      <app-spinner            
+      <app-spinner
         [legacy]="classLegacy"
         [diameter]="40"
-        [value]="timeOutforDefaultButton / timeOutFortDialog * 100"
+        [value]="(timeOutforDefaultButton / timeOutFortDialog) * 100"
         [countdown]="timeOutforDefaultButton"
         [showBackgound]="true"
         [suffix]="'s'"
         [limits]="limits"
-        [fonts]="fonts"        
+        [fonts]="fonts"
         [showPrefix]="true"
         [smallFont]="smallFont"
       >
-      </app-spinner> 
-    </div>    
-    <div class="toolbar-button-container" *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn">
+      </app-spinner>
+    </div>
+    <div
+      class="toolbar-button-container"
+      *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn"
+    >
       <button
-          mat-button                    
-          class="toolbar-button"    
-          aria-label="icon-button with menu icon"
-          [ngClass]="button.class"
-          [matTooltipDisabled]="!button.showTooltip"
-          [matTooltip]="button.tooltip"
-          matTooltipClass = "tooltip-general"
-          matTooltipShowDelay = "100"
-          [disabled]="button.disabled || button.loading"
-          (click)="handleClick(button.action)"
+        mat-button
+        class="toolbar-button"
+        aria-label="icon-button with menu icon"
+        [ngClass]="button.class"
+        [matTooltipDisabled]="!button.showTooltip"
+        [matTooltip]="button.tooltip"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
+        [disabled]="button.disabled || button.loading"
+        (click)="handleClick(button.action)"
       >
-          <mat-icon
-              *ngIf="button.showIcon"
-              class="svgicon icon-medium"
-              [ngStyle]="{ 'visibility': button.loading ? 'hidden' : 'visible' }"
-              [svgIcon]="button.icon"
-          >                   
-          </mat-icon>
-          <mat-progress-spinner
-              *ngIf="button.loading"
-              class="spinner-medium-button"
-              diameter="24"      
-              mode="indeterminate"                        
-          >
-          </mat-progress-spinner>           
-          <label class="button-label">{{ button.showCaption ? button.caption : '' }}</label>
-      </button>      
+        <mat-icon
+          *ngIf="button.showIcon"
+          class="svgicon icon-medium"
+          [ngStyle]="{ visibility: button.loading ? 'hidden' : 'visible' }"
+          [svgIcon]="button.icon"
+        >
+        </mat-icon>
+        <mat-progress-spinner
+          *ngIf="button.loading"
+          class="spinner-medium-button"
+          diameter="24"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+        <label class="button-label">{{
+          button.showCaption ? button.caption : ""
+        }}</label>
+      </button>
     </div>
   </div>
-</div> 
-    
-  
+</div>

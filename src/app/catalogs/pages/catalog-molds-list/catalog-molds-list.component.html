@@ -34,22 +34,22 @@
           <div *ngIf="!loading" class="card-image">
             <div
               class="image-container"
-              *ngIf="row.data.mainImagePath"
+              *ngIf="row.data.mainImage"
             >
               <img                
                 @dissolve
                 appImageNotFound                
                 class="mold-image"                        
-                [src]="row.data.mainImagePath"
-                [alt]="row.data.description"            
+                [src]="row.data.mainImage"
+                [alt]="row.data.mainImage"         
                 fill
               >      
             </div>
             <div
-              *ngIf="!row.data.mainImagePath"
+              *ngIf="!row.data.mainImage"
               class="icon-container"
             >
-              <mat-icon svgIcon="treasure-chest"></mat-icon>
+              <mat-icon [svgIcon]="catalogIcon"></mat-icon>
             </div>    
           </div>
           <ngx-skeleton-loader
@@ -85,7 +85,7 @@
       <ng-container matColumnDef="mainInfo">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Molde</th>
         <td class="main-info" mat-cell *matCellDef="let row">
-          <div><strong>{{ row.translatedDescription }}</strong></div>
+          <div><strong>{{ row.description }}</strong></div>
           <div>Serial: <strong>{{ row.data.serialNumber }}</strong></div>  
         </td>
       </ng-container>
@@ -190,7 +190,7 @@
 
     <div class="molds-table__paginator">
       <div class="molds-table__paginator--catalog-data">
-        <mat-icon class="small-icon" svgIcon="treasure-chest"></mat-icon>
+        <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
         <div>Total registros {{ pageInfo?.totalRecords}}</div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>

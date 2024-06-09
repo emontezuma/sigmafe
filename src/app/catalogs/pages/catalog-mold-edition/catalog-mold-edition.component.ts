@@ -3,35 +3,24 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, toolbarMode } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { AppState, loadMoldData, selectLoadingMoldState, selectMoldData, selectSettingsData, updateMoldTranslations } from 'src/app/state';
+import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, skip, startWith, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, map, skip, startWith, tap } from 'rxjs';
 import { MoldDetail, MoldItem, emptyMoldItem } from 'src/app/molds';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
-import { FormGroup, FormControl, Validators, NgForm } from '@angular/forms';
+import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { GeneralCatalogData, GeneralCatalogParams, GeneralHardcodedValuesData, MaintenanceHistoricalData, MaintenanceHistoricalDataItem, MoldControlStates, MoldThresoldTypes, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesData, emptyGeneralHardcodedValuesItem, emptyMaintenanceHistoricalData } from '../../models';
+import { GeneralCatalogData, GeneralCatalogParams, GeneralHardcodedValuesData, MaintenanceHistoricalData, MaintenanceHistoricalDataItem, MoldControlStates, MoldParameters, MoldThresoldTypes, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesData, emptyGeneralHardcodedValuesItem, emptyMaintenanceHistoricalData } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
-
-
-interface MoldParameters {
-  settingType: string,
-  recosrdsToSkip?: number,
-  recosrdsToTake?: number,
-  filterBy?: any,
-  orderBy?: any,
-  id?: number,
-  customerId?: number,
-  status?: string,
-}
+import { MaintenanceHistoryDialogComponent } from '../../components';
 
 @Component({
   selector: 'app-catalog-mold-edition',
@@ -41,6 +30,9 @@ interface MoldParameters {
 })
 export class CatalogMoldEditionComponent {
   @ViewChild('moldCatalogEdition') private moldCatalogEdition: ElementRef;
+  @ViewChild('startingDate') private startingDate: ElementRef; 
+  @ViewChild('manufacturingDate') private manufacturingDate: ElementRef;   
+  
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
 
@@ -69,7 +61,11 @@ export class CatalogMoldEditionComponent {
   mold$: Observable<MoldDetail>;
   translations$: Observable<any>;
   moldDataLoading$: Observable<boolean>;
-  updateMold$: Observable<boolean>;
+  updateMold$: Observable<any>;
+  updateMoldCatalog$: Observable<any>;
+  deleteMoldTranslations$: Observable<any>;  
+  deleteMoldMaintenanceHistory$: Observable<any>;  
+  addMoldTranslations$: Observable<any>;  
   
   moldFormChangesSubscription: Subscription;
   
@@ -87,24 +83,26 @@ export class CatalogMoldEditionComponent {
 
   uploadFiles: Subscription;
   
-  byDefaultIconPath: string = 'assets/icons/treasure-chest.svg';
+  catalogIcon: string = 'treasure-chest';
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
-  harcodeValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
-  orderMaintenance: any = JSON.parse(`{ "maintenanceDate": "${'DESC'}" }`);
-
+  harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
+  orderMaintenance: any = JSON.parse(`{ "data": { "id": "${'DESC'}" } }`);
+  storedTranslations: [];
+  translationChanged: boolean = false
+  imageChanged: boolean = false
+  submitControlled: boolean = false
+  loadingMaintenance: boolean = false
   loading: boolean;
   elements: ToolbarElement[] = [];  
   panelOpenState: boolean[] = [true, false, false];
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  filterMoldsBy: string;
   moldData: MoldItem;  
   goTopButtonTimer: any;
   takeRecords: number;
-
-  moldInitialValues: any = null;
+  focusThisField: string = '';
 
   moldForm = new FormGroup({
     description: new FormControl(
@@ -122,12 +120,13 @@ export class CatalogMoldEditionComponent {
     moldType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     moldClass: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     manufacturingDate: new FormControl(''),
-    thresholdType: new FormControl(''),
+    thresholdType: new FormControl(emptyGeneralHardcodedValuesItem),
+    timeZone: new FormControl(new Date().getTimezoneOffset() * 60),
     thresholdState: new FormControl(''),
     thresholdYellow: new FormControl(''),
     thresholdRed: new FormControl(''),
-    thresholdDaysYellow: new FormControl(''),
-    thresholdDaysRed: new FormControl(''),
+    thresholdDateYellow: new FormControl(''),
+    thresholdDateRed: new FormControl(''),
     partNumber: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     position: new FormControl(''),
     label: new FormControl(emptyGeneralHardcodedValuesItem),
@@ -138,7 +137,7 @@ export class CatalogMoldEditionComponent {
     reference: new FormControl(''),    
   });
 
-  maintenanceHistoricalTableColumns: string[] = ['date', 'provider', 'operator', 'state', 'notes', 'actions'];
+  maintenanceHistoricalTableColumns: string[] = ['item', 'provider', 'operator', 'friendlyState', 'notes', 'range', 'actions'];
   maintenanceHistorical = new MatTableDataSource<MaintenanceHistoricalDataItem>([]);
   pageInfo: PageInfo = {
     currentPage: 0,
@@ -149,10 +148,23 @@ export class CatalogMoldEditionComponent {
   }
   addHistoricalButtonClick: boolean = false;
   removeHistoricalButtonClick: boolean = false;
-  historicalItemsLabel: string = "";
+  historicalItemsLabel: string = '';
 
   // Temporal
-  tmpDays: number = 112;
+  tmpDate: number = 112;
+  emptyMaintenance = {
+    friendlyState: null,
+    data: {
+      id: null,
+      provider: {
+        translatedName: null,
+      },
+      startDate: null,
+      finishedDate: null,
+      notes: null,
+      operatorName: null,      
+    },
+  } 
 
   constructor(
     private _store: Store<AppState>,
@@ -169,11 +181,11 @@ export class CatalogMoldEditionComponent {
 // Hooks ====================
   ngOnInit() {
     // this.moldForm.get('name').disable();
+    console.log(Intl.DateTimeFormat().resolvedOptions());
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.MOLDS_CATALOG_EDITION,
       true,
     );
-    this.moldInitialValues = this.moldForm.value;
     this.showGoTop$ = this._sharedService.showGoTop.pipe(
       tap((goTop) => {
         if (goTop.status === 'temp') {
@@ -202,8 +214,7 @@ export class CatalogMoldEditionComponent {
         // this.requestManufacturersData(currentPage);
         // this.requestPartNumbersData(currentPage);
         // this.requestLinesData(currentPage);
-        // this.requestEquipmentsData(currentPage);
-        // this.requestMaintenancesData(currentPage);
+        // this.requestEquipmentsData(currentPage);        
         // this.requestMoldTypessData(currentPage);
         // this.requestMoldClassesData(currentPage);
         this.requestMoldThresholdTypesData(currentPage);
@@ -214,26 +225,26 @@ export class CatalogMoldEditionComponent {
     this.moldThresholdTypeChanges$ = this.moldForm.controls.thresholdType.valueChanges.pipe(
       startWith(''),
       tap(moldThresholdTypeChanges => {
-        if (moldThresholdTypeChanges?.value === MoldThresoldTypes.N_A) {
-          this.moldForm.get('moldThresholdYellow').disable();
-          this.moldForm.get('moldThresholdRed').disable();
-          this.moldForm.get('moldThresholdDaysYellow').disable();
-          this.moldForm.get('moldThresholdDaysRed').disable();
-        } else if (moldThresholdTypeChanges?.value === MoldThresoldTypes.HITS) {
-          this.moldForm.get('moldThresholdYellow').enable();
-          this.moldForm.get('moldThresholdRed').enable();
-          this.moldForm.get('moldThresholdDaysYellow').disable();
-          this.moldForm.get('moldThresholdDaysRed').disable();
-        } else if (moldThresholdTypeChanges?.value === MoldThresoldTypes.DAYS) {
-          this.moldForm.get('moldThresholdYellow').disable();
-          this.moldForm.get('moldThresholdRed').disable();
-          this.moldForm.get('moldThresholdDaysYellow').enable();
-          this.moldForm.get('moldThresholdDaysRed').enable();
-        } else if (moldThresholdTypeChanges?.value === MoldThresoldTypes.BOTH) {
-          this.moldForm.get('moldThresholdYellow').enable();
-          this.moldForm.get('moldThresholdRed').enable();
-          this.moldForm.get('moldThresholdDaysYellow').enable();
-          this.moldForm.get('moldThresholdDaysRed').enable();
+        if (moldThresholdTypeChanges === GeneralValues.N_A) {
+          this.moldForm.get('thresholdYellow').disable();
+          this.moldForm.get('thresholdRed').disable();
+          this.moldForm.get('thresholdDateYellow').disable();
+          this.moldForm.get('thresholdDateRed').disable();
+        } else if (moldThresholdTypeChanges === MoldThresoldTypes.HITS) {
+          this.moldForm.get('thresholdYellow').enable();
+          this.moldForm.get('thresholdRed').enable();
+          this.moldForm.get('thresholdDateYellow').disable();
+          this.moldForm.get('thresholdDateRed').disable();
+        } else if (moldThresholdTypeChanges === MoldThresoldTypes.DAYS) {
+          this.moldForm.get('thresholdYellow').disable();
+          this.moldForm.get('thresholdRed').disable();
+          this.moldForm.get('thresholdDateYellow').enable();
+          this.moldForm.get('thresholdDateRed').enable();
+        } else if (moldThresholdTypeChanges === MoldThresoldTypes.BOTH) {
+          this.moldForm.get('thresholdYellow').enable();
+          this.moldForm.get('thresholdRed').enable();
+          this.moldForm.get('thresholdDateYellow').enable();
+          this.moldForm.get('thresholdDateRed').enable();
         }
       })
     );
@@ -248,10 +259,10 @@ export class CatalogMoldEditionComponent {
       } else {
         this.moldForm.controls.thresholdYellow.setErrors(null);
       }
-      if (moldFormChanges.thresholdDaysYellow && moldFormChanges.thresholdDaysRed && (+moldFormChanges.thresholdDaysYellow >= +moldFormChanges.thresholdDaysRed)) {
-        this.moldForm.controls.thresholdDaysYellow.setErrors({ invalidValue: true });
+      if (moldFormChanges.thresholdDateYellow && moldFormChanges.thresholdDateRed && (+moldFormChanges.thresholdDateYellow >= +moldFormChanges.thresholdDateRed)) {
+        this.moldForm.controls.thresholdDateYellow.setErrors({ invalidValue: true });
       } else {
-        this.moldForm.controls.thresholdDaysYellow.setErrors(null);
+        this.moldForm.controls.thresholdDateYellow.setErrors(null);
       }
     });    
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
@@ -277,38 +288,14 @@ export class CatalogMoldEditionComponent {
           this.requestMoldData(+params['id']);
         }
       })
-    );
-    this.mold$ = this._store.select(selectMoldData).pipe(
-      skip(1),
-      tap((moldData) => {
-        this.mold = JSON.parse(JSON.stringify(moldData));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
-        this.updateFormFromData();
-        this.changeInactiveButton(this.mold.status);
-        const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
-        if (toolbarButton) {
-          toolbarButton.caption = moldData.translations.length > 0 ? $localize`Traducciones (${moldData.translations.length})` : $localize`Traducciones`;
-          toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = moldData.translations.length > 0 ? 'accent' : '';
-        }        
-        this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);      
-      })
-    );
-    this.moldDataLoading$ = this._store.select(selectLoadingMoldState).pipe(
-      tap( loading => {
-        this.loading = loading;
-        this._sharedService.setGeneralLoading(
-          ApplicationModules.MOLDS_CATALOG_EDITION,
-          loading,
-        );
-        this._sharedService.setGeneralProgressBar(
-          ApplicationModules.MOLDS_CATALOG_EDITION,
-          loading,
-        );         
-      })
-    );
+    );    
     this.calcElements();        
+    this.moldForm.controls.label.setValue(GeneralValues.N_A);
+    this.moldForm.controls.thresholdType.setValue(GeneralValues.N_A);
+    this.moldForm.controls.state.setValue(GeneralValues.N_A);
+    setTimeout(() => {
+      this.focusThisField = 'description';  
+    }, 200);    
     // this.moldForm.reset(this.mold);
   }
 
@@ -375,7 +362,7 @@ export class CatalogMoldEditionComponent {
       tap((data: any) => {                
         const mappedItems = data?.data?.genericsPaginated?.items.map((item) => {
           return {
-            isTranslated: item.isTranslated,            
+            isTranslated: item.isTranslated,
             translatedName: item.translatedName,
             translatedReference: item.translatedReference,
             id: item.data.id,
@@ -400,7 +387,7 @@ export class CatalogMoldEditionComponent {
       currentPage,
       loading: true,
     }        
-    this.moldThresholdTypes$ = this.requestHardcodedValuesData$(0, 0, 'mold-control-strategies')
+    this.moldThresholdTypes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.MOLD_CONTROL_STRATEGIES)
     .pipe(
       tap((data: any) => {                
         const accumulatedItems = this.moldThresholdTypes.items?.concat(data?.data?.hardcodedValues?.items);        
@@ -409,7 +396,7 @@ export class CatalogMoldEditionComponent {
           loading: false,
           pageInfo: data?.data?.hardcodedValues?.pageInfo,
           items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,          
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
         }        
       }),
       catchError(() => EMPTY)
@@ -422,7 +409,7 @@ export class CatalogMoldEditionComponent {
       currentPage,
       loading: true,
     }        
-    this.labelColors$ = this.requestHardcodedValuesData$(0, 0, 'mold-label-color')
+    this.labelColors$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.MOLD_LABEL_COLORS)
     .pipe(
       tap((data: any) => {                
         const accumulatedItems = this.labelColors.items?.concat(data?.data?.hardcodedValues?.items);        
@@ -431,7 +418,7 @@ export class CatalogMoldEditionComponent {
           loading: false,
           pageInfo: data?.data?.hardcodedValues?.pageInfo,
           items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,          
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
         }        
       }),
       catchError(() => EMPTY)
@@ -444,7 +431,7 @@ export class CatalogMoldEditionComponent {
       currentPage,
       loading: true,
     }        
-    this.states$ = this.requestHardcodedValuesData$(0, 0, 'mold-states')
+    this.states$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.MOLD_STATES)
     .pipe(
       tap((data: any) => {                
         const accumulatedItems = this.states.items?.concat(data?.data?.hardcodedValues?.items);        
@@ -453,7 +440,7 @@ export class CatalogMoldEditionComponent {
           loading: false,
           pageInfo: data?.data?.hardcodedValues?.pageInfo,
           items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,          
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
         }        
       }),
       catchError(() => EMPTY)
@@ -483,11 +470,11 @@ export class CatalogMoldEditionComponent {
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
-            disableClose: true,            
+            disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`Cambios sin guardar`,              
+              title: $localize`Cambios sin guardar`,  
               topIcon: 'warn-fill',
               defaultButtons: dialogByDefaultButton.ACCEPT,
               buttons: [],
@@ -501,7 +488,7 @@ export class CatalogMoldEditionComponent {
             this.elements.find(e => e.action === action.action).loading = false;
           });       
         } else {
-          this._location.replaceState("/catalogs/molds/create");
+          this._location.replaceState('/catalogs/molds/create');
           this.initForm();
           this.elements.find(e => e.action === action.action).loading = false;          
         }
@@ -514,13 +501,14 @@ export class CatalogMoldEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState("/catalogs/molds/create");        
+        this._location.replaceState('/catalogs/molds/create');        
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
         }, 750);        
       } else if (action.action === ButtonActions.SAVE) {        
         this.elements.find(e => e.action === action.action).loading = true;
+        this.submitControlled = true;        
         this.thisForm.ngSubmit.emit();
         setTimeout(() => {          
           this.elements.find(e => e.action === action.action).loading = false;
@@ -544,7 +532,7 @@ export class CatalogMoldEditionComponent {
             this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
           } else {
             this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
-          }          
+          }
           this.elements.find(e => e.action === action.action).loading = false;
         }, 200);
       } else if (action.action === ButtonActions.INACTIVATE) { 
@@ -552,11 +540,11 @@ export class CatalogMoldEditionComponent {
         if (this.mold?.id > 0 && this.mold.status === RecordStatus.ACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
-            disableClose: true,            
+            disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR MOLDE`,              
+              title: $localize`INACTIVAR MOLDE`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -574,7 +562,7 @@ export class CatalogMoldEditionComponent {
                 icon: 'cancel',
                 showCaption: true,
                 caption: $localize`Cancelar`,
-                showTooltip: true,                                
+                showTooltip: true,            
                 tooltip: $localize`Cancela la acción`,
                 default: false,
               }],
@@ -598,23 +586,23 @@ export class CatalogMoldEditionComponent {
                 customerId: this.mold.customerId,
                 status: RecordStatus.INACTIVE,
               }
-              const variables = this.setGraphqlVariables(moldParameters);
+              const variables = this._sharedService.setGraphqlVariables(moldParameters);
               this.updateMold$ = this._catalogsService.updateMoldStatus$(variables)
               .pipe(
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateMold.length > 0 && data?.data?.createOrUpdateMold[0].status === RecordStatus.INACTIVE) {
-                    setTimeout(() => {                      
+                    setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
                       const message = $localize`El Molde ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
                         progressBarColor: 'warn',
-                        icon: 'delete',        
+                        icon: 'delete',
                       });
                       this.elements.find(e => e.action === action.action).loading = false;
                     }, 200);
-                }
+                  }
                 })
               )
             }            
@@ -625,7 +613,7 @@ export class CatalogMoldEditionComponent {
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR MOLDE`,              
+              title: $localize`REACTIVAR MOLDE`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -643,7 +631,7 @@ export class CatalogMoldEditionComponent {
                 icon: 'cancel',
                 showCaption: true,
                 caption: $localize`Cancelar`,
-                showTooltip: true,                                
+                showTooltip: true,            
                 tooltip: $localize`Cancela la acción`,
                 default: false,
               }],
@@ -667,7 +655,7 @@ export class CatalogMoldEditionComponent {
                 customerId: this.mold.customerId,
                 status: RecordStatus.ACTIVE,
               }
-              const variables = this.setGraphqlVariables(moldParameters);
+              const variables = this._sharedService.setGraphqlVariables(moldParameters);
               this.updateMold$ = this._catalogsService.updateMoldStatus$(variables)
               .pipe(
                 tap((data: any) => {
@@ -679,7 +667,7 @@ export class CatalogMoldEditionComponent {
                         message,
                         snackClass: 'snack-primary',
                         progressBarColor: 'primary',
-                        icon: 'check',        
+                        icon: 'check',
                       });
                       this.elements.find(e => e.action === action.action).loading = false;
                     }, 200);
@@ -690,7 +678,7 @@ export class CatalogMoldEditionComponent {
           });        
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
-        if (this.mold?.id > 0 && this.mold.status === RecordStatus.ACTIVE) {
+        if (this.mold?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
             width: '500px',
             disableClose: true,
@@ -699,7 +687,7 @@ export class CatalogMoldEditionComponent {
               translationsUpdated: false,
               title: $localize`Traducciones del molde <strong>${this.mold.id}</strong>`,
               topIcon: 'world',
-              translations: JSON.parse(JSON.stringify(this.mold.translations)),
+              translations: this.mold.translations,
               buttons: [{
                 action: ButtonActions.SAVE,
                 showIcon: true,
@@ -717,8 +705,8 @@ export class CatalogMoldEditionComponent {
                 icon: 'cancel',
                 showCaption: true,
                 caption: $localize`Cancelar`,
-                showTooltip: true,                                                
-                tooltip: $localize`Cancela la edición actual`,                
+                showTooltip: true,                            
+                tooltip: $localize`Cancela la edición actual`,    
                 disabled: true,
               }, {
                 action: ButtonActions.DELETE,
@@ -726,9 +714,9 @@ export class CatalogMoldEditionComponent {
                 icon: 'garbage-can',
                 showCaption: true,
                 caption: $localize`Eliminar`,
-                showTooltip: true,                                
+                showTooltip: true,            
                 class: 'warn',
-                tooltip: $localize`Elimina la traducción`,                
+                tooltip: $localize`Elimina la traducción`,    
                 disabled: true,
               }, {
                 action: ButtonActions.CLOSE,
@@ -736,7 +724,7 @@ export class CatalogMoldEditionComponent {
                 icon: 'cross',
                 showCaption: true,
                 caption: $localize`Cerrar`,
-                showTooltip: true,                                
+                showTooltip: true,            
                 tooltip: $localize`Cierra ésta ventana`,
                 cancel: true,
               }],
@@ -747,10 +735,13 @@ export class CatalogMoldEditionComponent {
             },
           });
           dialogResponse.afterClosed().subscribe((response) => {
-            if (response.translationsUpdated) {
-              this._store.dispatch(updateMoldTranslations({ 
-                translations: response.translations,
-              }));
+            this.translationChanged = response.translationsUpdated
+            if (response.translationsUpdated) {              
+              //this._store.dispatch(updateMoldTranslations({ 
+              this.mold.translations = [...response.translations];
+              //}));
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });        
@@ -925,11 +916,113 @@ export class CatalogMoldEditionComponent {
   }
 
   onSubmit() {
-    setTimeout(() => {
-      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
-    }, 100);
-    this.moldForm.markAllAsTouched();
-    this.moldForm.updateValueAndValidity();
+    if (!this.submitControlled) return;
+    this.submitControlled = false;
+    this.validateTables();
+    this.moldForm.markAllAsTouched();        
+    this.moldForm.updateValueAndValidity();    
+    if (this.moldForm.valid) {      
+
+      if (JSON.parse(JSON.stringify(this.storedTranslations)) !== JSON.parse(JSON.stringify(this.mold.translations)) && this.translationChanged) {        
+        this.processTranslations()
+      } else  {
+        this.saveMold();      
+      }      
+    } else {
+      let fieldsMissing = '';
+      let fieldsMissingCounter = 0;
+      for (const controlName in this.moldForm.controls) {
+        if (this.moldForm.controls.hasOwnProperty(controlName)) {
+          const typedControl: AbstractControl = this.moldForm.controls[controlName];            
+          if (typedControl.invalid) {
+            fieldsMissingCounter++;
+            fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
+          }
+        }
+      }
+      const dialogResponse = this._dialog.open(GenericDialogComponent, {
+        width: '450px',
+        disableClose: true,
+        panelClass: 'warn-dialog',
+        autoFocus : true,
+        data: {
+          title: $localize`DATOS INVÁLIDOS`,
+          topIcon: 'warn-fill',
+          defaultButtons: dialogByDefaultButton.ACCEPT,
+          buttons: [],
+          body: {
+            message: $localize`El formulario contiene campos requeridos que deben llenarse o campos con datos incorrectos.<br>${fieldsMissing}`,
+          },
+          showCloseButton: true,
+        },
+      }); 
+      dialogResponse.afterClosed().subscribe((response) => {
+        let fieldFocused = false;
+        for (const controlName in this.moldForm.controls) {
+          if (this.moldForm.controls.hasOwnProperty(controlName)) {
+            const typedControl: AbstractControl = this.moldForm.controls[controlName];            
+            if (typedControl.invalid) {
+              if (!fieldFocused) {
+                if (controlName === 'startingDate') {
+                  setTimeout(() => {
+                    this.startingDate.nativeElement.focus();
+                  }, 50) ;
+                } else if (controlName === 'manufacturingDate') {
+                  setTimeout(() => {
+                    this.manufacturingDate.nativeElement.focus();
+                  }, 50) ;
+                } else {
+                  this.focusThisField = controlName;
+                }
+                
+                setTimeout(() => {
+                  this.focusThisField = '';
+                }, 100)
+                break;
+              }
+              fieldsMissingCounter++;
+              fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
+            }
+          }
+        }
+        setTimeout(() => {
+          this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+        }, 100);        
+      });   
+    }
+  }
+
+  saveMold() {
+    this.setViewLoading(true);
+    const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
+    const dataToSave = this.prepareRecordToAdd(newRecord);
+    this.updateMoldCatalog$ = this._catalogsService.updateMoldCatalog$(dataToSave)
+    .pipe(
+      tap((data: any) => {
+        if (data?.data?.createOrUpdateMold.length > 0) {
+          this.requestMoldData(data?.data?.createOrUpdateMold[0].id)          
+          setTimeout(() => {              
+            let message = $localize`El Molde ha sido actualizado`;
+            if (newRecord) {                
+              message = $localize`El Molde ha sido creado satisfactoriamente con el id <strong>${this.mold.id}</strong>`;
+              this._location.replaceState(`/catalogs/molds/edit/${this.mold.id}`);
+            }
+            this._sharedService.showSnackMessage({
+              message,
+              snackClass: 'snack-accent',
+              progressBarColor: 'accent',                
+            });
+            this.setViewLoading(false);
+            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
+          }, 200);
+        }        
+      }),
+      catchError(err => {
+        this.setViewLoading(false);
+        this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
+        return EMPTY;
+      })      
+    )
   }
 
   requestProvidersData(currentPage: number, filterStr: string = null) {    
@@ -953,7 +1046,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this.setGraphqlVariables(moldParameters);
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);
     this.providers$ = this._catalogsService.getProvidersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {
@@ -999,7 +1092,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this.setGraphqlVariables(moldParameters);    
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
     this.manufacturers$ = this._catalogsService.getManufacturersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1044,7 +1137,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
     this.partNumbers$ = this._catalogsService.getPartNumbersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1090,7 +1183,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
     this.lines$ = this._catalogsService.getLinesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1135,7 +1228,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
     this.equipments$ = this._catalogsService.getEquipmentsLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1161,6 +1254,11 @@ export class CatalogMoldEditionComponent {
   }
 
   requestMaintenancesData(currentPage: number, filterStr: string = null) {    
+    this.loadingMaintenance = true;
+    this.maintenances = {
+      items: new Array(12).fill(this.emptyMaintenance),
+    }
+    this.maintenanceHistorical = new MatTableDataSource<MaintenanceHistoricalDataItem>(this.maintenances.items);
     this.maintenances = {
       ...this.maintenances,
       currentPage,
@@ -1169,7 +1267,7 @@ export class CatalogMoldEditionComponent {
     filterStr = this.mold?.id?.toString(); 
     let filter = null;
     if (filterStr) {
-      filter = JSON.parse(`{ "moldId": { "eq": ${filterStr} }, "and": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+      filter = JSON.parse(`{ "and": [ { "data": { "moldId": { "eq": ${filterStr} } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] }`);
     }      
     const skipRecords = this.maintenances.items.length;    
     const moldParameters = {
@@ -1179,22 +1277,36 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.orderMaintenance
     }    
-    const variables = this.setGraphqlVariables(moldParameters);         
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);         
     this.maintenances$ = this._catalogsService.getMaintenancesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
-        const accumulatedItems = this.maintenances.items?.concat(data?.data?.maintenanceHistorical?.items);        
+        const mappedItems = data?.data?.maintenanceHistoricalsPaginated?.items.map((h) => {
+          return {
+            ...h.data,
+            provider: {
+              ...h.data.provider,
+              name: h.data.provider.translations.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
+              isTranslated: h.data.provider.translations.length > 0 && h.data.provider.translations[0].languageId > 0 ? true : false,
+            },
+            isTranslated: h.isTranslated,
+            friendlyState: h.friendlyState,
+          }
+        })
+        
         this.maintenances = {
           ...this.maintenances,
           loading: false,
-          pageInfo: data?.data?.maintenanceHistorical?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.maintenanceHistorical?.totalCount,          
+          pageInfo: data?.data?.maintenanceHistorical?.pageInfo,          
+          items: mappedItems,
+          totalCount: data?.data?.maintenanceHistorical?.totalCount,  
         }
         this.historicalItemsLabel = $localize`Hay ${this.maintenances.items?.length} registro(s)`;
-        this.maintenanceHistorical = new MatTableDataSource<MaintenanceHistoricalDataItem>(accumulatedItems);
+        this.maintenanceHistorical = new MatTableDataSource<MaintenanceHistoricalDataItem>(mappedItems);
         this.maintenanceHistorical.paginator = this.paginator;
-
+        setTimeout(() => {
+          this.loadingMaintenance = false;
+        }, 200)
       }),
       catchError(() => EMPTY)
     )    
@@ -1204,25 +1316,57 @@ export class CatalogMoldEditionComponent {
     let variables = undefined;
     variables = { moldId };
 
+    // this.requestMaintenancesData(currentPage);
+
     const skipRecords = 0;
     const filter = JSON.parse(`{ "moldId": { "eq": ${moldId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
-    const moldParameters = {
-      settingType: 'tables',
+    // let getData: boolean = false;
+    this.setViewLoading(true);
+    this.maintenances.items = [];
+    this.mold$ = this._catalogsService.getMoldDataGql$({ 
+      moldId, 
       skipRecords, 
       takeRecords: this.takeRecords, 
+      order, 
       filter, 
-      order
-    }
-    const translationsVariables = this.setGraphqlVariables(moldParameters);
-
-    this._store.dispatch(loadMoldData({ 
-      moldId,
-      skipRecords, 
-      takeRecords: this.takeRecords,
-      filter,
-      order,
-    }));    
+    }).pipe(
+      map(([ moldGqlData, moldGqlTranslationsData ]) => {
+        // if (!getData) {
+        //   getData = true;
+        // } else {
+        //   return null
+        // }
+        return this._catalogsService.mapOneMold({
+          moldGqlData,  
+          moldGqlTranslationsData,
+        })
+      }),
+      tap((moldData: MoldDetail) => {
+        if (!moldData) return;        
+        this.mold =  moldData;
+        this.requestMaintenancesData(0);
+        this.translationChanged = false;
+        this.imageChanged = false;        
+        this.storedTranslations = JSON.parse(JSON.stringify(this.mold.translations));
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
+        this.updateFormFromData();
+        this.changeInactiveButton(this.mold.status);
+        const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
+        if (toolbarButton) {
+          toolbarButton.caption = moldData.translations.length > 0 ? $localize`Traducciones (${moldData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
+          toolbarButton.class = moldData.translations.length > 0 ? 'accent' : '';
+        }        
+        this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
+        this.setViewLoading(false);
+      }),
+      catchError(err => {
+        this.setViewLoading(false);        
+        return EMPTY;
+      })      
+    ); 
   }  
 
   requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
@@ -1239,25 +1383,12 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order,
     }    
-    const variables = this.setGraphqlVariables(moldParameters);   
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);   
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
-  requestHardcodedValuesData$(currentPage: number, skipRecords: number, catalog: string): Observable<any> {    
-    const filter = JSON.parse(`{ "tableName": { "eq": "${catalog}" } }`);
-    const moldParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.harcodeValuesOrder,
-    }    
-    const variables = this.setGraphqlVariables(moldParameters);
-    return this._catalogsService.getHardcodedValuesDataGql$(variables).pipe();
-  }
-
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
-    if (getMoreDataParams.catalogName === 'providers') {
+    if (getMoreDataParams.catalogName === SystemTables.PROVIDERS) {
       if (getMoreDataParams.initArray) {
         this.providers.currentPage = 0;   
         this.providers.items = [];
@@ -1271,7 +1402,7 @@ export class CatalogMoldEditionComponent {
         getMoreDataParams.textToSearch,  
       );    
 
-    } else if (getMoreDataParams.catalogName === 'manufacturers') {
+    } else if (getMoreDataParams.catalogName === SystemTables.MANUFACTURERS) {
       if (getMoreDataParams.initArray) {
         this.manufacturers.currentPage = 0;   
         this.manufacturers.items = [];
@@ -1285,7 +1416,7 @@ export class CatalogMoldEditionComponent {
         getMoreDataParams.textToSearch,  
       ); 
 
-    } else if (getMoreDataParams.catalogName === 'lines') {
+    } else if (getMoreDataParams.catalogName === SystemTables.LINES) {
       if (getMoreDataParams.initArray) {
         this.lines.currentPage = 0;   
         this.lines.items = [];
@@ -1299,7 +1430,7 @@ export class CatalogMoldEditionComponent {
         getMoreDataParams.textToSearch,  
       );   
       
-    } else if (getMoreDataParams.catalogName === 'equipments') {
+    } else if (getMoreDataParams.catalogName === SystemTables.EQUIPMENTS) {
       if (getMoreDataParams.initArray) {
         this.equipments.currentPage = 0;   
         this.equipments.items = [];
@@ -1313,7 +1444,7 @@ export class CatalogMoldEditionComponent {
         getMoreDataParams.textToSearch,  
       );   
 
-    } else if (getMoreDataParams.catalogName === 'partNumbers') {
+    } else if (getMoreDataParams.catalogName === SystemTables.PARTNUMBERS) {
       if (getMoreDataParams.initArray) {
         this.partNumbers.currentPage = 0;   
         this.partNumbers.items = [];
@@ -1328,7 +1459,7 @@ export class CatalogMoldEditionComponent {
       );    
       
 
-    } else if (getMoreDataParams.catalogName === 'moldTypes') {
+    } else if (getMoreDataParams.catalogName === SystemTables.MOLD_TYPES) {
       if (getMoreDataParams.initArray) {
         this.moldTypes.currentPage = 0;   
         this.moldTypes.items = [];
@@ -1338,11 +1469,11 @@ export class CatalogMoldEditionComponent {
         this.moldTypes.currentPage++;
       }
       this.requestMoldTypessData(        
-        this.moldTypes.currentPage,        
+        this.moldTypes.currentPage,
         getMoreDataParams.textToSearch,  
       );        
       
-    } else if (getMoreDataParams.catalogName === 'moldClasses') {
+    } else if (getMoreDataParams.catalogName === SystemTables.MOLD_CLASSES) {
       if (getMoreDataParams.initArray) {
         this.moldClasses.currentPage = 0;   
         this.moldClasses.items = [];
@@ -1352,7 +1483,7 @@ export class CatalogMoldEditionComponent {
         this.moldClasses.currentPage++;
       }
       this.requestMoldClassesData(        
-        this.moldClasses.currentPage,        
+        this.moldClasses.currentPage,
         getMoreDataParams.textToSearch,  
       );    
     }
@@ -1361,25 +1492,32 @@ export class CatalogMoldEditionComponent {
 
   onFileSelected(event: any) {
     const fd = new FormData();
-    fd.append("image", event.target.files[0], event.target.files[0].name);
+    fd.append('image', event.target.files[0], event.target.files[0].name);
 
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/molds`)
     .set('processId', this.mold.id)
-    .set('process', 'catalogs-molds');
-
+    .set('process', originProcess.CATALOGS_MOLDS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
+        this.imageChanged = true;
         this.moldForm.controls.mainImageName.setValue(res.fileName);
-        this.mold.mainImagePath = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)
+        this.mold.mainImagePath = res.filePath;
         this.mold.mainImageGuid = res.fileGuid;
-        const message = $localize`El archivo ha sido subido satisfactoriamente`;
+        this.mold.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
         this._sharedService.showSnackMessage({
-          message,      
+          message,
+          duration: 5000,
           snackClass: 'snack-primary',
-          icon: 'check',        
+          icon: 'check',
         });
+        if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
+          this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+        } else {
+          this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+        }
       }      
     });
   }
@@ -1392,12 +1530,66 @@ export class CatalogMoldEditionComponent {
     console.log('[handleInputKeydown]', event)
   }
 
-  handleAddHistoricalButtonClick() {
-
+  handleAddHistoricalButtonClick(id: number) {
+    if (this.mold?.id > 0) {
+      let dialogTitle = $localize`Agregar un mantenimiento al molde <strong>${this.mold.id}</strong>`;
+      if (id !== 0) {
+        dialogTitle = $localize`Modificar un mantenimiento al molde <strong>${this.mold.id}</strong>`;
+      }
+      const dialogResponse = this._dialog.open(MaintenanceHistoryDialogComponent, {
+        width: '460px',
+        disableClose: true,
+        data: {
+          duration: 0,          
+          title: dialogTitle,
+          maintenanceUpdated: false,
+          topIcon: 'allow_list2',
+          moldId: this.mold.id,
+          translations: this.mold.translations,
+          id: id === 0 ? null : id,
+          buttons: [{
+            action: ButtonActions.SAVE,            
+            showIcon: true,
+            icon: 'save',
+            showCaption: true,
+            caption: $localize`Registrar`,
+            showTooltip: true,
+            class: 'primary',
+            tooltip: $localize`Registra el mantenimiento`,
+            default: true,
+            disabled: true,
+          }, {
+            action: ButtonActions.CANCEL,
+            showIcon: true,
+            icon: 'cancel',
+            showCaption: true,
+            caption: $localize`Cancelar`,
+            showTooltip: true,                            
+            tooltip: $localize`Cancela la edición actual`,    
+            disabled: true,
+          }, {
+            action: ButtonActions.CLOSE,
+            showIcon: true,
+            icon: 'cross',
+            showCaption: true,
+            caption: $localize`Cerrar`,
+            showTooltip: true,            
+            tooltip: $localize`Cierra ésta ventana`,
+            cancel: true,
+          }],          
+          showCloseButton: false,
+        },
+      });
+      dialogResponse.afterClosed().subscribe((response) => {     
+        if (response.maintenanceUpdated) {
+          this.requestMaintenancesData(0);
+        }
+      });        
+    }
   }
 
-  handleRemoveAllHistoricalButtonClick() {
-
+  handleUpdateHistoricalButtonClick() {
+    this.requestMaintenancesData(0)
   }
 
   editMaintenance(id: number) {
@@ -1406,42 +1598,6 @@ export class CatalogMoldEditionComponent {
 
   removeMaintenance(id: number) {
     
-  }
-
-  setGraphqlVariables(moldParameters: MoldParameters): any {
-    const { settingType, recosrdsToSkip, recosrdsToTake, filterBy, orderBy, id, customerId, status} = moldParameters;
-
-    let variables = undefined;    
-    if (settingType === 'tables') {
-      if (recosrdsToSkip !== 0) {
-        variables = { recosrdsToSkip };
-      }
-      if (recosrdsToTake !== 0) {
-        if (variables) {         
-          variables = { ...variables, recosrdsToTake };
-        } else {
-          variables = { recosrdsToTake };
-        }      
-      }
-      if (orderBy) {
-        if (variables) {         
-          variables = { ...variables, orderBy };
-        } else {
-          variables = { orderBy };
-        }
-      }        
-      if (filterBy) {
-        if (variables) {         
-          variables = { ...variables, filterBy };
-        } else {
-          variables = { filterBy };
-        }    
-      }
-    } else if (settingType === 'status') {
-      variables = { id, customerId, status };      
-    }
-    
-    return variables;
   }
 
   getMoldStateClass() {
@@ -1510,8 +1666,8 @@ export class CatalogMoldEditionComponent {
       moldClass: this.mold.moldClass,
       moldType: this.mold.moldType,
       position: this.mold.position?.toString(),
-      thresholdDaysRed: this.mold.thresholdDaysRed?.toString(),
-      thresholdDaysYellow: this.mold.thresholdDaysYellow?.toString(),
+      thresholdDateRed: this.mold.thresholdDateRed?.toString(),
+      thresholdDateYellow: this.mold.thresholdDateYellow?.toString(),
       thresholdRed: this.mold.thresholdRed?.toString(),
       thresholdYellow: this.mold.thresholdYellow?.toString(),      
       thresholdType: this.mold.thresholdType,      
@@ -1523,31 +1679,99 @@ export class CatalogMoldEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(): any {
+  prepareRecordToAdd(newRecord: boolean): any {
     const fc = this.moldForm.controls;
-    if (fc.startingDate) {
-      if (!this._sharedService.isDateValid(this._sharedService.formatDate(fc.startingDate))) {
-        fc.startingDate = null;
+    let startingDate = null;
+    let manufacturingDate = null;
+    if (fc.startingDate.value) {
+      if (!this._sharedService.isDateValid(this._sharedService.formatDate(fc.startingDate.value))) {
+        this.moldForm.controls.startingDate.setErrors({ invalidDate: true });
+      } else {
+        startingDate = this._sharedService.formatDate(fc.startingDate.value, 'yyyy-MM-dd');
       }
+    } else {
+      startingDate = null;
     }
+    if (fc.manufacturingDate.value) {
+      if (!this._sharedService.isDateValid(this._sharedService.formatDate(fc.manufacturingDate.value))) {
+        this.moldForm.controls.manufacturingDate.setErrors({ invalidDate: true });
+      } else {
+        manufacturingDate = this._sharedService.formatDate(fc.manufacturingDate.value, 'yyyy-MM-dd');
+      }
+    } else {
+      manufacturingDate = null;
+    }
+
     return  {
-      ...(fc.description.dirty) && { description: fc.description.value  },
-      ...(fc.serialNumber.dirty) && { serialNumber: fc.serialNumber.value },
-      ...(fc.reference.dirty) && { reference: fc.reference.value },
-      ...(fc.notes.dirty) && { notes: fc.notes.value },
-      ...(fc.startingDate.dirty) && { startingDate: fc.startingDate.value },
-      ...(fc.moldType.dirty) && { moldType: fc.moldType.value },      
-      ...(fc.moldClass.dirty) && { moldClass: fc.moldClass.value },      
-      ...(fc.moldType.dirty) && { moldType: fc.moldType.value },      
-      ...(fc.moldType.dirty) && { moldType: fc.moldType.value },      
-      ...(fc.moldType.dirty) && { moldType: fc.moldType.value },      
+        id: this.mold.id,
+        customerId: 1, // TODO: Get from profile
+        status: newRecord ? RecordStatus.ACTIVE : this.mold.status,
+      ...(fc.description.dirty || fc.description.touched || newRecord) && { description: fc.description.value  },
+      ...(fc.serialNumber.dirty || fc.serialNumber.touched || newRecord) && { serialNumber: fc.serialNumber.value },
+      ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
+      ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.startingDate.dirty || fc.startingDate.touched || newRecord) && { startingDate: startingDate },
+      ...(fc.moldType.dirty || fc.moldType.touched || newRecord) && { moldTypeId: fc.moldType.value.id },      
+      ...(fc.moldClass.dirty || fc.moldClass.touched || newRecord) && { moldClassId: fc.moldClass.value.id },
+      ...(fc.provider.dirty || fc.provider.touched || newRecord) && { providerId: fc.provider.value.id },
+      ...(fc.manufacturer.dirty || fc.manufacturer.touched || newRecord) && { manufacturerId: fc.manufacturer.value.id },
+      ...(fc.manufacturingDate.dirty || fc.manufacturingDate.touched || newRecord) && { manufacturingDate: manufacturingDate },
+      ...(fc.state.dirty || fc.state.touched || newRecord) && { state: fc.state.value },
+      ...(fc.label.dirty || fc.label.touched || newRecord) && { label: fc.label.value },
+      ...(fc.partNumber.dirty || fc.partNumber.touched || newRecord) && { partNumberId: fc.partNumber.value.id },
+      ...(fc.position.dirty || fc.position.touched || newRecord) && { position: +fc.position.value },
+      ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value.id },
+      ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value.id },
+      ...(fc.thresholdType.dirty || fc.thresholdType.touched || newRecord) && { thresholdType: fc.thresholdType.value },
+      ...(fc.thresholdYellow.dirty || fc.thresholdYellow.touched || newRecord) && { thresholdYellow: fc.thresholdYellow.value ? +fc.thresholdYellow.value : null },
+      ...(fc.thresholdRed.dirty || fc.thresholdRed.touched || newRecord) && { thresholdRed: fc.thresholdRed.value ? +fc.thresholdRed.value : null },
+      ...(fc.thresholdDateYellow.dirty || fc.thresholdDateYellow.touched || newRecord) && { thresholdDateYellow: fc.thresholdDateYellow.value ? +fc.thresholdDateYellow.value : null },
+      ...(fc.thresholdDateRed.dirty || fc.thresholdDateRed.touched || newRecord) && { thresholdDateRed: fc.thresholdDateRed.value ? +fc.thresholdDateRed.value : null },
+      ...(this.imageChanged) && { 
+        mainImageName: fc.mainImageName.value,
+        mainImagePath: this.mold.mainImagePath,
+        mainImageGuid: this.mold.mainImageGuid, },
     }
-  } 
+  }
+
+  removeImage() {
+    this.imageChanged = true;
+    this.moldForm.controls.mainImageName.setValue('');
+    this.mold.mainImagePath = '';
+    this.mold.mainImageGuid = '';
+    this.mold.mainImage = '';                
+    const message = $localize`Se ha quitado la imagen del molde<br>Guarde el molde para aplicar el cambio`;
+    this._sharedService.showSnackMessage({
+      message,
+      duration: 5000,
+      snackClass: 'snack-primary',
+      icon: 'check',
+    });
+    if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
 
   initForm(): void {
     this.moldForm.reset();
+    this.moldForm.controls.label.setValue(GeneralValues.N_A);
+    this.moldForm.controls.thresholdType.setValue(GeneralValues.N_A);
+    this.moldForm.controls.state.setValue(GeneralValues.N_A);
+    this.moldForm.controls.timeZone.setValue(new Date().getTimezoneOffset() * 60);
     this.maintenances.items = [];
-    this.mold = emptyMoldItem;    
+    this.storedTranslations = [];
+    this.translationChanged = false;
+    this.mold = emptyMoldItem;        
+    this.focusThisField = 'description';
+    setTimeout(() => {
+      this.moldCatalogEdition.nativeElement.scrollIntoView({            
+        behavior: 'smooth',
+        block: 'start',
+      });      
+      this.focusThisField = '';
+    }, 200);        
   }
 
   initUniqueField(): void {
@@ -1584,8 +1808,210 @@ export class CatalogMoldEditionComponent {
     }
   }
 
+  getFieldDescription(fieldControlName: string): string {
+    if (fieldControlName === 'description') {
+      return $localize`Descripción o nombre del molde`
+    } else if (fieldControlName === 'serialNumber') {
+      return $localize`Número de serie del molde`
+    } else if (fieldControlName === 'startingDate') {
+      return $localize`Fecha de inicio de operaciones`
+    } else if (fieldControlName === 'manufacturingDate') {
+      return $localize`Fecha de manufactura del molde`
+    } else if (fieldControlName === 'provider') {
+      return $localize`Proveedor del molde`
+    } else if (fieldControlName === 'manufacturer') {
+      return $localize`Fabricante del molde`
+    } else if (fieldControlName === 'equipment') {
+      return $localize`Máquina o equipo asignado`
+    } else if (fieldControlName === 'line') {
+      return $localize`Línea asignada`
+    } else if (fieldControlName === 'moldType') {
+      return $localize`Tipo de molde`
+    } else if (fieldControlName === 'moldClass') {
+      return $localize`Clase de molde`
+    } else if (fieldControlName === 'label') {
+      return $localize`Color de la etiqeta`
+    } else if (fieldControlName === 'state') {
+      return $localize`Estado del molde`
+    } else if (fieldControlName === 'partNumber') {
+      return $localize`Número de parte`
+    } else if (fieldControlName === 'thresholdType') {
+      return $localize`Tipo de control`
+    } else if (fieldControlName === 'state') {
+      return $localize`Estado del molde`
+    } else if (fieldControlName === 'thresholdYellow') {
+      return $localize`Umbral de golpes para Advertencia`
+    } else if (fieldControlName === 'thresholdRed') {
+      return $localize`Umbral de golpes para ALARMA`
+    } else if (fieldControlName === 'thresholdDateYellow') {
+      return $localize`Umbral de número de días para Advertencia`
+    } else if (fieldControlName === 'thresholdDateRed') {
+      return $localize`Umbral de número de días para ALARMA`
+    }
+    return '';
+  }
+
+  setViewLoading(loading: boolean): void {
+    this.loading = loading;
+    this._sharedService.setGeneralLoading(
+      ApplicationModules.MOLDS_CATALOG_EDITION,
+      loading,
+    );
+    this._sharedService.setGeneralProgressBar(
+      ApplicationModules.MOLDS_CATALOG_EDITION,
+      loading,
+    );         
+  }
+
+  validateTables(): void {
+    if (this.moldForm.controls.provider.value && this.moldForm.controls.provider.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.provider.setErrors({ inactive: true });      
+    }
+    if (this.moldForm.controls.manufacturer.value && this.moldForm.controls.manufacturer.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.manufacturer.setErrors({ inactive: true });      
+    }
+    if (this.moldForm.controls.equipment.value && this.moldForm.controls.equipment.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.equipment.setErrors({ inactive: true });      
+    }
+    if (this.moldForm.controls.line.value && this.moldForm.controls.line.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.line.setErrors({ inactive: true });      
+    }
+    if (this.moldForm.controls.moldClass.value && this.moldForm.controls.moldClass.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.moldClass.setErrors({ inactive: true });      
+    }
+    if (this.moldForm.controls.moldType.value && this.moldForm.controls.moldType.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.moldType.setErrors({ inactive: true });      
+    }    
+    if (this.moldForm.controls.partNumber.value && this.moldForm.controls.partNumber.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.partNumber.setErrors({ inactive: true });      
+    }        
+    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+  }
+
+  processTranslations() {
+    if (this.storedTranslations.length > 0) {
+      const translationsToDelete = this.storedTranslations.map((t: any) => {
+        return {
+          id: t.id,
+          deletePhysically: true,
+        }
+      });
+      const varToDelete = {
+        ids: translationsToDelete,
+        customerId: 1, // TODO: Get from profile
+      }
+      this.deleteMoldTranslations$ = this._catalogsService.deleteMoldTranslations$(varToDelete)
+      .pipe(
+        tap(() => {
+          if (this.mold.translations.length > 0) {
+            this.addTranslations();
+          } else {
+            this.saveMold();
+          }
+        })        
+      )
+    } else if (this.mold.translations.length > 0) {
+      this.addTranslations();
+    } else {
+      this.saveMold();
+    }
+  }
+
+  addTranslations() {
+    const translationsToAdd = this.mold.translations.map((t: any) => {
+      return {
+        id: null,
+        moldId: this.mold.id,
+        description: t.description,
+        reference: t.reference,
+        notes: t.notes,
+        languageId: t.languageId,
+        customerId: 1, // TODO: Get from profile
+        status: RecordStatus.ACTIVE,
+      }
+    });
+    const varToAdd = {
+      translations: translationsToAdd,
+    }
+    this.addMoldTranslations$ = this._catalogsService.addMoldTransations$(varToAdd)
+    .pipe(
+      tap(() => {        
+        this.saveMold();
+      })
+    )
+  }
+
+  handleRemoveAllHistoricalButtonClick(action: string, id: number = 0) {
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: id === 0 ? $localize`Eliminar todo el historial` : $localize`Eliminar mantenimiento`,  
+        topIcon: 'garbage-can',
+        defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
+        buttons: [],
+        body: {
+          message: id === 0 ? $localize`Esta acción eliminará todo el historial de mantenimiento de este molde.<br><br><strong>¿Desea continuar?</strong>` : $localize`Esta acción eliminará el historial con item: <strong>${id}</strong>.<br><br><strong>¿Desea continuar?</strong>`,
+        },
+        showCloseButton: true,
+      },
+    }); 
+    dialogResponse.afterClosed().subscribe((response) => {      
+      if (response.action === ButtonActions.OK) {
+        const idToDelete = {
+          id,
+          deletePhysically: false,
+        }
+         const historyToDelete = this.maintenances.items.map((t: any) => {
+          return {
+            id: t.id,
+            deletePhysically: false,
+          }
+        });
+        const varToDelete = {
+          ids: id === 0 ? historyToDelete : idToDelete,
+          customerId: 1, // TODO: Get from profile
+        }
+        this.deleteMoldMaintenanceHistory$ = this._catalogsService.deleteMoldMaintenanceHistory$(varToDelete)
+        .pipe(
+          tap(() => {              
+            this.requestMaintenancesData(0);
+          })        
+        )
+      } else {
+        this._sharedService.actionCancelledByTheUser();
+      }
+      this.elements.find(e => e.action === action).loading = false;
+    });       
+  }
+
+  getHours(): string {
+    const seconds = this.moldForm.controls.timeZone.value ? +this.moldForm.controls.timeZone.value : 0;
+    let timeStr = "";
+    if (seconds === 0) {
+      timeStr = '0' + $localize`min`;
+    } else if (Math.abs(seconds) > 0 && Math.abs(seconds) <= 60) {
+      timeStr = '1' + $localize`min`;
+    } else if (Math.abs(seconds / 3600) < 1) {
+      timeStr = (seconds / 60).toFixed(1) + $localize`min`;
+    } else {
+      timeStr = (seconds / 3600).toFixed(2) + $localize`h`;
+    }
+    return timeStr;
+  }
+
   get MoldControlStates() {
     return MoldControlStates;
+  }
+
+  get SystemTables () {
+    return SystemTables;
+  }
+
+  get ScreenDefaultValues () {
+    return ScreenDefaultValues;
   }
 
 // End ======================

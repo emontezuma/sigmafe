@@ -226,22 +226,13 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
   getLanguages() {
     const filterBy = JSON.parse(`{ "status": { "eq": "${RecordStatus.ACTIVE}" } }`);
     const orderBy = JSON.parse(`{ "id": "${'ASC'}" }`); 
-    let variables = undefined;
-    if (variables) {         
-      variables = { ...variables, recosrdsToTake: this.takeRecords };
-    } else {
-      variables = { recosrdsToTake: this.takeRecords };
-    }      
-    if (variables) {         
-      variables = { ...variables, orderBy };
-    } else {
-      variables = { orderBy  };
+    
+    const variables = {      
+      ...(this.takeRecords !== 0) && { recordsToTake: this.takeRecords },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
     }
-    if (variables) {         
-      variables = { ...variables, filterBy };
-    } else {
-      variables = { filterBy };
-    }    
+
     this.languages$ = this._sharedService.getlanguagesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {

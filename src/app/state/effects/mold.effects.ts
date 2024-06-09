@@ -18,7 +18,7 @@ export class MoldEffects {
     }).pipe(        
       map(([ moldGqlData, moldGqlTranslationsData ]) => {
         const moldDetail = this._catalogsService.mapOneMold({
-          moldGqlData, 
+          moldGqlData,  
           moldGqlTranslationsData,
         });      
         return {

@@ -38,7 +38,10 @@ export interface MoldHitsDetail {
     hits?: number;
     previousHits?: number;
     thresholdRed?: number;
+    mainImage?: string;
     mainImagePath?: string;
+    mainImageGuid?: string;
+    mainImageName?: string;
     position?: number;
     label?: string;
     lastMaintenance?: MoldLastMaintenance;

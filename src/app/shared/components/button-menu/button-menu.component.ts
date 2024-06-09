@@ -8,18 +8,10 @@ import { ButtonActions } from '../../models/screen.models';
   styleUrls: ['./button-menu.component.scss']
 })
 export class ButtonMenuComponent {
-  @Input()
-  options: SimpleMenuOption[] = [];
-
-  @Input()
-  animatingQuestion: boolean;
-
-  @Input()
-  caption: string;      
-
-  @Input()
-  tooltip: string;      
-
+  @Input() options: SimpleMenuOption[] = [];
+  @Input() animatingQuestion: boolean;
+  @Input() caption: string;      
+  @Input() tooltip: string;      
   @Output() selection = new EventEmitter< { index: number, selection: string } >();
 
   selectedOption: SimpleMenuOption;

@@ -5,6 +5,7 @@ import { map, catchError, mergeMap, } from 'rxjs/operators';
 
 import { MoldsService } from '../../molds/services/molds.service';
 import { MoldsHitsQueryData } from 'src/app/molds';
+import { environment } from 'src/environments/environment';
  
 @Injectable()
 export class MoldsHitsEffects {
@@ -12,10 +13,20 @@ export class MoldsHitsEffects {
     ofType('[Molds] Load Molds Hits Data'),
     mergeMap(() => this._moldsService.getMoldsHitsQueryDataGql$()
       .pipe(
-        map((moldsHitsQueryGqlData: any) => {          
+        map((moldsHitsQueryGqlData: any) => {
+          const dataMapped = moldsHitsQueryGqlData?.data?.moldsUnlimited.map((item) => {
+            const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';
+            return {
+              ...item,
+              data: {
+                ...item.data,                            
+                mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+              }
+            }
+          });
           const moldsHitsQueryData: MoldsHitsQueryData = {
             pageInfo: null,
-            data: moldsHitsQueryGqlData?.data?.moldsUnlimited,
+            data: dataMapped,
             totalCount: moldsHitsQueryGqlData?.data?.moldsUnlimited?.length,          }
           
           return {

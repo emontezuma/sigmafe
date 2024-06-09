@@ -1,0 +1,280 @@
+@use "../../../../assets/styles/mixins";
+
+.container-animated {
+    display: flex;
+    flex-direction: column;    
+    height: calc(100% - 60px);
+}
+
+table {
+  border: 1px solid var(--z-colors-table-border-color);
+  border-radius: 8px 8px 0px 0px;    
+}
+
+.variables-table {
+  width: calc(100% - 11px);
+  flex: 1;
+  min-height: 0;
+  overflow: auto;  
+  padding-right: 9px;
+  padding-bottom: 3px;
+  margin-bottom: 5px !important;
+  margin: 2px; 
+  &__paginator {
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - 2px);
+    font-size: 1.5rem;
+    border: 1px solid var(--z-colors-table-border-color);
+    border-radius: 0px 0px 8px 8px;
+    background-color: var(--z-colors-paginator-background-color);
+    color: var(--z-colors-paginator-fore-color);    
+    left: 0;
+    margin: 1px;    
+    @include mixins.flexbox(row, wrap, 10px, flex-start);
+    height: 60px;
+    &--mat {
+      font-size: 1.5rem;        
+      background-color: var(--z-colors-paginator-background-color);
+      color: var(--z-colors-paginator-fore-color);
+      position: absolute;
+      right: 0;
+      bottom: 0;    
+      margin: 5px;      
+    }
+    &--catalog-data {
+      padding-left: 10px;
+      display: flex;      
+      gap: 5px;      
+      align-items: center;
+    }
+  }
+  &__no-data {
+    font-size: 1.8rem;  
+    text-align: center !important;
+    padding: 10px;
+  }
+}
+
+::ng-deep .mat-mdc-paginator-icon {
+  fill: var(--z-colors-paginator-fore-color) !important;    
+}
+
+.mat-mdc-form-field {
+  font-size: 1.5rem;
+  width: 100%;
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--z-colors-table-hover-background-color) !important;
+}
+
+.mat-column-id {
+  width: 70px;
+  max-width: 70px !important;
+  min-width: 70px;
+  padding: 10px;
+  text-align: right;
+}
+
+.mat-column-mainImagePath {
+  width: 92px;
+  max-width: 92px !important;
+  min-width: 92px;
+  padding: 2px 5px;
+  margin: auto;
+}
+
+.mat-column-name {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 26%;
+  max-width: 26% !important;
+  min-width: 26%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
+
+.mat-column-uom {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;
+  overflow-wrap: break-word;  
+  width: 17%;
+  max-width: 17% !important;
+  min-width: 17%;
+  padding: 10px;
+}
+
+.mat-column-sigmaType {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;
+  overflow-wrap: break-word;  
+  width: 17%;
+  max-width: 17% !important;
+  min-width: 17%;
+  padding: 10px;
+}
+
+.mat-column-status {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;  
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
+}
+
+.mat-column-updatedAt {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;
+  overflow-wrap: break-word;  
+  width: 20%;
+  max-width: 20% !important;
+  min-width: 20%;
+}
+
+.mat-mdc-header-row {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background-color: var(--z-colors-table-header-background-color) !important;
+  color: var(--z-colors-table-header-fore-color) !important;
+}
+
+::ng-deep .mat-sort-header-arrow {
+  color: var(--z-colors-table-header-fore-color);
+}
+
+.mat-sort-header {
+  // padding: 5px 16px;
+}
+
+
+
+.mat-mdc-row {
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: var(--z-colors-table-row-fore-color);
+}
+
+tr:nth-child(2n) {
+  background-color: var(--z-colors-table-odd-background-color);  
+}
+
+tr:nth-child(2n+1) {
+  background-color: var(--z-colors-table-even-background-color);
+}
+
+.variable-image {
+  width: inherit;
+  max-width: calc(100% - 4px);
+  max-height: calc(100% - 4px);
+  margin: auto;
+  padding: 2px;
+}
+
+.image-container {    
+  max-height: 56px;    
+  max-width: 56px;    
+  min-height: 56px;    
+  min-width: 56px;    
+  position: relative;
+  display: flex;
+  margin: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.card-image {
+  display: flex;
+}
+
+tr {
+  max-height: 40px !important;
+  height: 40px !important;
+}
+
+td {
+  max-height: 40px !important;
+  height: 40px !important;
+}
+
+::ng-deep .mat-mdc-paginator-navigation-next {
+  &:disabled {
+    cursor: url("../../../../assets/icons/unable.png"), not-allowed;
+    .mat-mdc-paginator-icon {
+      fill: rgba(0, 0, 0, 0.2) !important;
+    }
+  }    
+}
+
+::ng-deep .mat-mdc-paginator-navigation-previous {
+  &:disabled {
+    cursor: url("../../../../assets/icons/unable.png"), not-allowed;
+    .mat-mdc-paginator-icon {
+      fill: rgba(0, 0, 0, 0.2) !important;
+    }
+  }    
+}
+
+::ng-deep .mat-mdc-paginator-navigation-first {
+  &:disabled {
+    cursor: url("../../../../assets/icons/unable.png"), not-allowed;
+    .mat-mdc-paginator-icon {
+      fill: rgba(0, 0, 0, 0.2) !important;
+    }
+  }    
+}
+
+::ng-deep .mat-mdc-paginator-navigation-last {
+  &:disabled {
+    cursor: url("../../../../assets/icons/unable.png"), not-allowed;
+    .mat-mdc-paginator-icon {
+      fill: rgba(0, 0, 0, 0.2) !important;
+    }
+  }    
+}
+
+.card-color {
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-radius: 50px;
+  width: 25px;
+  height: 25px;
+  margin: auto;
+}
+
+.card-description-minimun {
+  display: flex;
+  flex-direction: column;
+}
+
+mat-icon {
+  width: 48px;
+  height: 48px;
+  margin: auto;
+}
+
+.small-icon {
+  width: 24px;
+  height: 24px;  
+}
+
+.icon-container {    
+  max-height: 58px;
+  max-width: 58px;
+  min-height: 58px;
+  min-width: 58px;   
+  position: relative;
+  display: flex;
+  margin: 2px;  
+}
+
+.skeleton {
+  min-height: 61px;  
+  height: 61px;  
+}

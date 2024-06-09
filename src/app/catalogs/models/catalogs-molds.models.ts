@@ -1,3 +1,5 @@
+import { GeneralCatalogInternalData, GeneralCatalogTranslation } from "./generics.models";
+
 export enum CatalogsMolds {
   YES_NO = 'yesNo',
   YES_NO_NA = 'yesNoNa',
@@ -57,12 +59,13 @@ export interface GeneralCatalogItem {
   translatedPrefix: string;
   translatedNotes?: string;
   isTranslated?: boolean;
-  translations?: GeneralCatalogTranslations[];
+  translations?: GeneralCatalogTranslation[];
 }
 
 export interface GeneralCatalogMappedItem {  
   id?: number;
   status?: string;
+  selected?: boolean;
   isTranslated?: boolean;
   translatedName?: string;
   translatedDescription?: string;
@@ -87,16 +90,6 @@ export interface GeneralCatalogTranslationsItem {
   translatedPrefix?: string;  
 }
 
-export interface GeneralCatalogInternalData {  
-  id?: number;
-  name?: string;
-  description?: string;
-  reference?: string;
-  notes?: string;
-  prefix?: string;
-  status?: string;
-}
-
 export interface MaintenanceHistoricalDataItem {
   moldId?: number;
   id?: number;
@@ -116,22 +109,14 @@ export interface GeneralHardcodedValuesItem {
   used?: boolean;
   value: string;
   disabled: boolean;
-}
-
-export interface GeneralCatalogTranslations {
-  languageId?: number;
-  name?: string;
-  reference: string;
-  descripcion?: string;
-  notes?: string;
-  prefix?: string;
+  status?: string;
 }
 
 export interface GeneralTranslatedFields {
   isTranslated?: boolean;
   translatedName?: string;
   translatedReference: string;
-  translatedDescripcion?: string;
+  translateddescription?: string;
   translatedNotes?: string;
   translatedPrefix?: string;
 }
@@ -181,6 +166,7 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     friendlyText: '',
     value: '',
     disabled: false,
+    status: '',
   }  
 
   export const emptyMaintenanceHistoricalData: MaintenanceHistoricalData = {
@@ -203,7 +189,6 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
   }
 
   export enum MoldThresoldTypes {
-    N_A = 'n/a',
     HITS = 'hits',
     BOTH = 'both',
     DAYS = 'days',
@@ -214,4 +199,13 @@ export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
     YELLOW = 'yellow',
   } 
   
- 
+ export interface MoldParameters {
+  settingType: string,
+  skipRecords?: number,
+  takeRecords?: number,
+  filter?: any,
+  order?: any,
+  id?: number,
+  customerId?: number,
+  status?: string,
+}

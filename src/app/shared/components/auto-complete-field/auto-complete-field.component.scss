@@ -18,24 +18,21 @@
         align-items: center;
         font-weight: 300;  
         font-size: 1.1rem;
-        text-wrap: nowrap;
-        overflow: hidden;    
+        line-height: 13px;
+        padding: 3px 0px;   
         &--error {
             color: var(--z-colors-error-fore-color);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;            
+            line-height: 13px;
+            padding: 3px 0px;   
         }
         &--no-error {
             color: var(--z-colors-status-ok);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;            
+            line-height: 13px;
+            padding: 3px 0px;   
         }
         &--normal {            
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;            
+            line-height: 13px;
+            padding: 3px 0px;   
         }
     }
     &__small-icon {        
@@ -73,10 +70,10 @@ mat-option:nth-child(2n+1) {
 }
 
 mat-option:nth-child(1) {
-    border-top: 1px solid var(--theme-primary-300);
+    border-top: 1px solid var(--theme-primary-200);
     background-color: var(--z-colors-table-even-background-color) !important;  
 }
   
 mat-option {    
-    border-bottom: 1px solid var(--theme-primary-300);
+    border-bottom: 1px solid var(--theme-primary-200);
 }

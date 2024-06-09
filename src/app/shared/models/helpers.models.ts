@@ -51,4 +51,50 @@ export interface PageInfo {
     activeRecords?: number;
     forcedUpdate?: boolean;
   }
+ 
+  export enum originProcess {
+    CATALOGS_MOLDS = 'catalogs-molds',
+}
   
+export enum SystemTables {
+    PROVIDERS = 'providers',
+    MANUFACTURERS = 'manufacturers',
+    LINES = 'lines',
+    MOLD_MAINTENANCE_STATES = 'mold-maintenance-states',
+    EQUIPMENTS = 'equipments',
+    PARTNUMBERS = 'partNumbers',
+    MOLD_TYPES = 'moldTypes',
+    MOLD_CLASSES = 'moldClasses',
+    UOMS = 'uoms',
+    SIGMA_TYPES = 'sigmaTypes',
+    GEN_VALUES_YES_NO = 'gen-values-yes-no',
+    RESET_VALUE_MODES = 'variable-reset-value-modes',
+    VARIABLE_VALUE_TYPES = 'variable-value-types',
+    MOLD_LABEL_COLORS = 'mold-label-color',
+    MOLD_STATES = 'mold-states',
+    MOLD_CONTROL_STRATEGIES = 'mold-control-strategies',
+}
+
+export enum GeneralValues {
+    N_A = 'n/a',
+    YES = 'y',
+    NO = 'n',
+    FREE_TEXT = 'free-text',
+}
+
+export enum TemplatesHardcodedlValues {
+    BY_TYPE = 't',
+    BY_SETTING = 's',
+    ALL_TEMPLATES = 'y',
+    FREE_TEXT = 'free-text',
+}
+
+export enum ScreenDefaultValues {
+    N_A = 'N/A',
+}
+  
+export interface OptionData {  
+    label?: number;
+    value?: string;
+    disabled?: boolean;    
+  }

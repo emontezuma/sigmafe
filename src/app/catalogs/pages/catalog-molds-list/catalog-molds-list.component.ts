@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { Observable, skip, tap } from 'rxjs';
+import { Observable, map, skip, tap } from 'rxjs';
 import { MoldItem, Molds, MoldsData, emptyMoldCatalog } from 'src/app/molds';
 import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
@@ -16,6 +16,7 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-molds',
@@ -42,13 +43,13 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   allMoldsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  byDefaultIconPath: string = "assets/icons/treasure-chest.svg";
+  catalogIcon: string = "treasure-chest";
 
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  filterMoldsBy: string;
+  filterByText: string;
   allMoldsToCsv: any;
   moldsData: Molds = {
     items: new Array(5).fill(null),
@@ -116,7 +117,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       tap((searchBox: SearchBox) => {
         if (searchBox.from === ApplicationModules.MOLDS_CATALOG) {
           console.log(searchBox.textToSearch);
-          this.filterMoldsBy = searchBox.textToSearch;    
+          this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
         }
       })
@@ -138,6 +139,24 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     );
     this.moldsData$ = this._store.select(selectMoldsData).pipe(
       skip(1),
+      map((mold: any) => {        
+        return { 
+          ...mold,
+          moldsPaginated: {
+            ...mold.moldsPaginated,
+            items: mold.moldsPaginated.items.map((item) => {
+              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              return {
+                ...item,
+                data: {
+                  ...item.data,                  
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                }
+              }
+            })          
+          }
+        }
+      }),
       tap( moldsData => {        
         this.setPaginator(moldsData.moldsPaginated.totalCount);
         this.moldsData = JSON.parse(JSON.stringify(moldsData.moldsPaginated));
@@ -152,7 +171,12 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
         this.moldsCatalogData.paginator = this.paginator;
         // this.moldsCatalogData.sort = this.sort;
-        this.moldsCatalogData.sortData = () => this.moldsData.items;    
+        this.moldsCatalogData.sortData = () => this.moldsData.items;
+        if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
+          setTimeout(() => {
+            this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                          
+          }, 200);
+        }        
       })
     );
     this.moldsDataLoading$ = this._store.select(selectLoadingMoldsState).pipe(
@@ -237,8 +261,8 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       items: new Array(5).fill(emptyMoldCatalog),
     }
     let filter = null;
-    if (this.filterMoldsBy) {      
-      const cadFilter = ` { "or": [ { "translatedDescription": { "contains": "${this.filterMoldsBy}" } }, { "translatedReference": { "contains": "${this.filterMoldsBy}" } }, { "mold": { "serialNumber": { "contains": "${this.filterMoldsBy}" } } } ] }`;
+    if (this.filterByText) {      
+      const cadFilter = ` { "or": [ { "data": { "description": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "data": { "serialNumber": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
     this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
@@ -423,5 +447,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     window.URL.revokeObjectURL(url);
     link.remove();
   }
+
+// End ======================
 
 }
