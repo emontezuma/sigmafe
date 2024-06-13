@@ -1,6 +1,5 @@
-import { GeneralTranslatedFields } from "src/app/catalogs";
-import { MoldLastMaintenance } from "./molds.models";
-import { PageInfo } from "src/app/shared/models/helpers.models";
+import { GeneralTranslatedFields, MoldLastMaintenance } from 'src/app/shared/models';
+import { PageInfo } from 'src/app/shared/models';
 
 export interface MoldNextMaintenance {
     strategy: 'hits' | 'days' | 'hours' | 'specific-date' | 'hits-or-hours' | 'hits-or-days';    

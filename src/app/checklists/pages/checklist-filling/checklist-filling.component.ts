@@ -20,6 +20,7 @@ import { loadChecklistFillingData, updateChecklistQuestion } from 'src/app/state
 import { GenericDialogComponent } from 'src/app/shared/components';
 import { RecordStatus, CapitalizationMethod } from 'src/app/shared/models/helpers.models';
 
+
 @Component({
   selector: 'app-checklist-filling',
   templateUrl: './checklist-filling.component.html',

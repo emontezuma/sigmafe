@@ -1,5 +1,4 @@
-import { GeneralValues, PageInfo } from 'src/app/shared/models';
-import { GeneralCatalogInternalData, GeneralCatalogTranslation, GeneralTranslation } from './generics.models';
+import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
 export interface VariablesData {
   variablesPaginated?: Variables;
@@ -97,7 +96,6 @@ export const emptyVariableCatalog = {
     updatedAt: null,
   },
 };
-
 
 export const emptyVariableItem: VariableDetail = {  
   name: null,

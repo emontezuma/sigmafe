@@ -14,7 +14,7 @@ import { routingAnimation, dissolve } from '../../../shared/animations/shared.an
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 import { environment } from 'src/environments/environment';
-import { VariableItem, Variables, VariablesData, emptyVariableCatalog } from '../../models/catalogs-variables.models';
+import { VariableItem, Variables, VariablesData, emptyVariableCatalog } from '../../models';
 
 @Component({
   selector: 'app-catalog-variables',
@@ -60,7 +60,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   }
   order: any = null;
   pendingToolbarButtonIndex: number = null;
-  size: 'minimun' | 'medium' | 'high' | string;
+  size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
   currentTabIndex: number = 1;  

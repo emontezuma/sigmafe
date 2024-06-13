@@ -1118,8 +1118,8 @@ export const GET_VARIABLE = gql`
       valueType
       showNotes
       applyRange
-      minimun
-      maximun
+      minimum
+      maximum
       required
       byDefault
       allowNoCapture
@@ -1255,5 +1255,36 @@ export const INACTIVATE_VARIABLE = gql`
       id
       status
     } 
+  }
+`;
+
+export const GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING = gql`
+  query CatalogDetailChecklistTemplate (    
+    $recosrdsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailChecklistTemplate (
+    where: $filterBy, 
+    skip: $recosrdsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
   }
 `;

@@ -1,4 +1,4 @@
-import { GeneralCatalogInternalData, GeneralCatalogTranslation } from "./generics.models";
+import { GeneralCatalogInternalData, GeneralCatalogMappedItem, GeneralCatalogPageInfo, GeneralCatalogTranslation, GeneralHardcodedValuesItem } from "src/app/shared/models";
 
 export enum CatalogsMolds {
   YES_NO = 'yesNo',
@@ -37,20 +37,6 @@ export interface MaintenanceHistoricalData {
   cadRight?: string;
 }
 
-export interface GeneralHardcodedValuesData {
-  loading?: boolean;
-  totalCount?: number;
-  currentPage?: number;
-  pageInfo?: GeneralCatalogPageInfo;
-  items?: GeneralHardcodedValuesItem[];
-  cadRight?: string;
-}
-
-export interface GeneralCatalogPageInfo {
-  hasPreviousPage?: boolean;
-  hasNextPage?: boolean;
-}
-
 export interface GeneralCatalogItem {  
   data?: GeneralCatalogInternalData;
   translatedName?: string;
@@ -60,18 +46,6 @@ export interface GeneralCatalogItem {
   translatedNotes?: string;
   isTranslated?: boolean;
   translations?: GeneralCatalogTranslation[];
-}
-
-export interface GeneralCatalogMappedItem {  
-  id?: number;
-  status?: string;
-  selected?: boolean;
-  isTranslated?: boolean;
-  translatedName?: string;
-  translatedDescription?: string;
-  translatedReference?: string;  
-  translatedNotes?: string;  
-  translatedPrefix?: string;  
 }
 
 export interface GeneralCatalogTranslationsItem {  
@@ -101,31 +75,6 @@ export interface MaintenanceHistoricalDataItem {
   provider?: GeneralCatalogMappedItem
 }
 
-export interface GeneralHardcodedValuesItem {
-  id?: number;
-  languageId?: number;
-  mainImagePath?: string;
-  friendlyText?: string;
-  used?: boolean;
-  value: string;
-  disabled: boolean;
-  status?: string;
-}
-
-export interface GeneralTranslatedFields {
-  isTranslated?: boolean;
-  translatedName?: string;
-  translatedReference: string;
-  translateddescription?: string;
-  translatedNotes?: string;
-  translatedPrefix?: string;
-}
-
-export interface GeneralCatalogParams {
-  catalogName?: string;
-  textToSearch?: string;
-  initArray?: boolean;
-}
 
 export const emptyGeneralCatalogData: GeneralCatalogData = {
   loading: false,
@@ -147,18 +96,6 @@ export const emptyGeneralCatalogItem: GeneralCatalogMappedItem = {
   translatedDescription: '',
   translatedReference: '',
 }
-
-export const emptyGeneralHardcodedValuesData: GeneralHardcodedValuesData = {
-    loading: false,
-    totalCount: 0,
-    currentPage: 0,
-    pageInfo: {
-      hasPreviousPage: false,
-      hasNextPage: false,
-    },
-    items: [],
-    cadRight: '',
-  }
 
   export const emptyGeneralHardcodedValuesItem: GeneralHardcodedValuesItem = {
     id: 0,

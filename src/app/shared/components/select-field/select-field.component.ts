@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output, ViewChild, OnChanges } from '@a
 import { FormControl } from '@angular/forms';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { Subscription } from 'rxjs';
-import { GeneralHardcodedValuesItem } from 'src/app/catalogs';
+import { GeneralHardcodedValuesItem } from '../../models';
     
 @Component({
   selector: 'app-select-field',

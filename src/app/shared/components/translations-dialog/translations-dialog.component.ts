@@ -5,14 +5,11 @@ import { Store } from '@ngrx/store';
 
 import { AppState } from '../../../state/app.state'; 
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
-import { SettingsData } from '../../models/settings.models';
+import { GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, ButtonActions, dialogByDefaultButton, toolbarMode, SmallFont, SpinnerFonts, SpinnerLimits, RecordStatus, SettingsData } from '../../models';
 import { SharedService } from '../../services/shared.service';
-import { SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models';
-import { ButtonActions, dialogByDefaultButton, toolbarMode } from '../../models/screen.models';
+
 import { FormControl, FormGroup } from '@angular/forms';
 import { dissolve } from '../../../shared/animations/shared.animations';
-import {  GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData } from 'src/app/catalogs';
-import { RecordStatus } from '../../models/helpers.models';
 import { GenericDialogComponent } from '../generic-dialog';
 
 @Component({

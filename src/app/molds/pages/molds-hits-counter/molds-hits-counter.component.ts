@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, ViewChildren, QueryList } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { ScrollDispatcher, CdkScrollable } from "@angular/cdk/scrolling";
+import { ScrollDispatcher, CdkScrollable } from '@angular/cdk/scrolling';
 import { Observable, tap } from 'rxjs';
 
 import { routingAnimation, dissolve, fromLeft, listAnimation } from '../../../shared/animations/shared.animations';
@@ -76,6 +76,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
 // Hooks ====================
   ngOnInit() {
     // Dispatches
+    console.log('inciado');
     this._store.dispatch(loadMoldsHitsQueryData());  
 
     // Settings
@@ -252,7 +253,6 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
   }
 
   listAnimationFinished(e: any) {    
-    console.log(e.fromState, e.toState);
     this.animatingList = false;
     if (e.fromState == 'void') {
       this.showingMolds();

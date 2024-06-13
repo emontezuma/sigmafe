@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { SimpleMenuOption } from '../../models/screen.models';
-import { ButtonActions } from '../../models/screen.models';
+import { SimpleMenuOption, ButtonActions } from '../../models';
 
 @Component({
   selector: 'app-button-menu',

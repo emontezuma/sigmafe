@@ -11,4 +11,5 @@ export * from './input-field';
 export * from './area-fied';
 export * from './select-field';
 export * from './translations-dialog';
-export * from './lazy-loading-list';
+export * from './multiple-selection-list';
+export * from './maintenance-history-dialog';

@@ -4,7 +4,7 @@ import { CanDeactivateFn } from '@angular/router';
 import { formDeactivateGuard } from './form-deactivate.guard';
 
 describe('formDeactivateGuard', () => {
-  const executeGuard: CanDeactivateFn = (...guardParameters) => 
+  const executeGuard: CanDeactivateFn<any> = (...guardParameters) => 
       TestBed.runInInjectionContext(() => formDeactivateGuard(...guardParameters));
 
   beforeEach(() => {

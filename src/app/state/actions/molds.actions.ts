@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { MoldsData } from '../../molds/models';
+import { MoldsData } from 'src/app/shared/models';
 
 export const loadMoldsData = createAction(
     '[Molds] Load Molds Data',

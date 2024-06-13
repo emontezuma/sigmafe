@@ -1,12 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable, combineLatest, forkJoin, map } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS } from 'src/app/graphql/graphql.queries';
-import { MoldDetail } from 'src/app/molds';
+import { Observable, combineLatest, map } from 'rxjs';
+import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { GeneralCatalogMappedItem, VariableDetail } from '../models';
-import { GeneralTranslation } from '../models/generics.models';
+import { VariableDetail } from '../models';
+import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +43,20 @@ export class CatalogsService {
   getManufacturersLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.watchQuery({ 
       query: GET_MANUFACTURERS_LAZY_LOADING, 
+      variables,
+    }).valueChanges;
+  }
+
+  getChecklistTemplatesYellowLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, 
+      variables,
+    }).valueChanges;
+  }
+
+  getChecklistTemplatesRedLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, 
       variables,
     }).valueChanges;
   }

@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CustomPaginatorService } from './custom-paginator.service';
+import { CustomPaginator } from './custom-paginator.service';
 
-describe('CustomPaginatorService', () => {
-  let service: CustomPaginatorService;
+describe('CustomPaginator', () => {
+  let service: CustomPaginator;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(CustomPaginatorService);
+    service = TestBed.inject(CustomPaginator);
   });
 
   it('should be created', () => {

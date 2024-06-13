@@ -4,8 +4,13 @@ import { NotFoundComponent } from './shared/pages/not-found/not-found.component'
 
 const routes: Routes = [
   {
-    path: 'checklists',
-    loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule),
+    path: '',
+    redirectTo: '/molds',
+    pathMatch: 'full',
+  },
+  {
+    path: 'catalogs',
+    loadChildren: () => import('./catalogs/catalogs.module').then(m => m.CatalogsModule),    
     data: { animation: 'isTop' },
   },
   {
@@ -14,8 +19,8 @@ const routes: Routes = [
     data: { animation: 'isTop' },
   },
   {
-    path: 'catalogs',
-    loadChildren: () => import('./catalogs/catalogs.module').then(m => m.CatalogsModule),    
+    path: 'checklists',
+    loadChildren: () => import('./checklists/checklists.module').then(m => m.ChecklistsModule),
     data: { animation: 'isTop' },
   },
   {
@@ -25,7 +30,7 @@ const routes: Routes = [
   {
     path: '**',
     redirectTo: '404'
-  },
+  },  
 ];
 
 @NgModule({

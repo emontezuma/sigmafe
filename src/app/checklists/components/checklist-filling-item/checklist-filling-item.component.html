@@ -73,7 +73,7 @@
               [style.height.px]="miniChartHeight"
             >
             </div>
-            <div class="item-response">
+            <div class="item-response">              
               <mat-chip-listbox
                 (change)="setAnswer($event)"
                 [disabled]="item.status === ChecklistQuestionStatus.CANCELLED || inactive"

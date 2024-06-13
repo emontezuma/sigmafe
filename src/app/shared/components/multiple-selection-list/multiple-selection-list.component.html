@@ -1,0 +1,50 @@
+<div class="multiple-selection-lits__container" i18n>
+  <ng-container *ngIf="textToSearch$ | async"></ng-container>
+  <mat-form-field appearance="fill" class="multiple-selection-lits__field">
+    <mat-select
+      #selection
+      [formControl]="formField"
+      name="fieldControl"
+      (selectionChange)="handleSelectionChange($event)"
+    >
+      <mat-option
+        *ngFor="let selection of selections; let i = index"
+        [value]="selection.id"
+      >
+        <div class="option-container">
+          {{ selection.description }}
+        </div>
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+  <fieldset [disabled]="formField.value === 'y'">
+    <mat-selection-list
+    [disabled]="formField.value === 'y'"
+      #multipleSelection
+      name="multipleSelection"
+      (click)="chengeSelection($event)"
+      (keydown)="handleKeyDown($event)"
+    >
+      <mat-list-option
+        *ngFor="let item of list; let i = index"
+        [value]="item.id"
+        (click)="selectItem(item)"
+        [selected]="!!item.valueRight"
+        checkboxPosition="before"
+        (keydown)="handleKeyDown($event)"
+      >
+        <div class="columnaLista">
+          <div class="lineaLista">{{ item.translatedName }}</div>
+        </div>
+      </mat-list-option>
+    </mat-selection-list>
+    <mat-form-field>
+      <input        
+        #searchInput
+        matInput
+        [formControl]="multiSelectionForm.controls.searchInput"
+        (keydown)="handleKeyDown($event)"
+      />
+    </mat-form-field>
+  </fieldset>
+</div>

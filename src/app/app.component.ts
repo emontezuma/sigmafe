@@ -17,6 +17,7 @@ import { Observable, tap } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
 import { SnackComponent } from "./shared/components";
 import { environment } from 'src/environments/environment';
+// import { CatalogsHomeComponent } from './catalogs';
 
 @Component({
   selector: 'app-root',
@@ -124,6 +125,7 @@ export class AppComponent implements AfterViewInit {
 
 // Hooks ====================
   ngOnInit(): void {
+    // console.log(CatalogsHomeComponent)
     this._sharedService.connectToSocket();
     this.profileData$ = this._store.select(selectProfileData).pipe(
         tap( profileData => {

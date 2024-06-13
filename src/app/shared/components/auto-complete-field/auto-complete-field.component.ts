@@ -2,8 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, V
 import { FormControl } from '@angular/forms';
 import { debounceTime, startWith, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { GeneralCatalogMappedItem, GeneralCatalogParams } from 'src/app/catalogs';
-import { SystemTables } from '../../models/helpers.models';
+import { SystemTables, GeneralCatalogMappedItem, GeneralCatalogParams } from '../../models';
 
 @Component({
   selector: 'app-auto-complete-field',

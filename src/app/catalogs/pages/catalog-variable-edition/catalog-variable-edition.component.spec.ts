@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CatalogMoldEditionComponent } from './catalog-mold-edition.component';
+import { CatalogVariableEditionComponent } from './catalog-variable-edition.component';
 
-describe('CatalogMoldEditionComponent', () => {
-  let component: CatalogMoldEditionComponent;
-  let fixture: ComponentFixture<CatalogMoldEditionComponent>;
+describe('CatalogVariableEditionComponent', () => {
+  let component: CatalogVariableEditionComponent;
+  let fixture: ComponentFixture<CatalogVariableEditionComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CatalogMoldEditionComponent]
+      declarations: [CatalogVariableEditionComponent]
     });
-    fixture = TestBed.createComponent(CatalogMoldEditionComponent);
+    fixture = TestBed.createComponent(CatalogVariableEditionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

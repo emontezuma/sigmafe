@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, MoldDetail, MoldItem, emptyMoldItem, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -11,16 +11,14 @@ import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
 import { EMPTY, Observable, Subscription, catchError, map, skip, startWith, tap } from 'rxjs';
-import { MoldDetail, MoldItem, emptyMoldItem } from 'src/app/molds';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { GeneralCatalogData, GeneralCatalogParams, GeneralHardcodedValuesData, MaintenanceHistoricalData, MaintenanceHistoricalDataItem, MoldControlStates, MoldParameters, MoldThresoldTypes, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesData, emptyGeneralHardcodedValuesItem, emptyMaintenanceHistoricalData } from '../../models';
+import { GeneralCatalogData,  MaintenanceHistoricalData, MaintenanceHistoricalDataItem, MoldControlStates, MoldThresoldTypes, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem, emptyMaintenanceHistoricalData } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
-import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
-import { MaintenanceHistoryDialogComponent } from '../../components';
+import { MaintenanceHistoryDialogComponent, GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
 
 @Component({
   selector: 'app-catalog-mold-edition',
@@ -28,6 +26,7 @@ import { MaintenanceHistoryDialogComponent } from '../../components';
   animations: [ routingAnimation, dissolve, ],
   styleUrls: ['./catalog-mold-edition.component.scss']
 })
+
 export class CatalogMoldEditionComponent {
   @ViewChild('moldCatalogEdition') private moldCatalogEdition: ElementRef;
   @ViewChild('startingDate') private startingDate: ElementRef; 
@@ -46,6 +45,8 @@ export class CatalogMoldEditionComponent {
   manufacturers$: Observable<any>; 
   moldTypes$: Observable<any>;
   moldClasses$: Observable<any>;
+  checklistTemplatesYellow$: Observable<any>;
+  checklistTemplatesRed$: Observable<any>;
   moldThresholdTypes$: Observable<any>;
   labelColors$: Observable<any>;
   states$: Observable<any>;
@@ -80,6 +81,8 @@ export class CatalogMoldEditionComponent {
   lines: GeneralCatalogData = emptyGeneralCatalogData; 
   equipments: GeneralCatalogData = emptyGeneralCatalogData; 
   maintenances: MaintenanceHistoricalData = emptyMaintenanceHistoricalData; 
+  checklistTemplatesYellow: GeneralCatalogData = emptyGeneralCatalogData; 
+  checklistTemplatesRed: GeneralCatalogData = emptyGeneralCatalogData; 
 
   uploadFiles: Subscription;
   
@@ -135,6 +138,8 @@ export class CatalogMoldEditionComponent {
     line: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     equipment: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     reference: new FormControl(''),    
+    checklistTemplateYellow: new FormControl('y'),
+    checklistTemplateRed: new FormControl(''),
   });
 
   maintenanceHistoricalTableColumns: string[] = ['item', 'provider', 'operator', 'friendlyState', 'notes', 'range', 'actions'];
@@ -181,7 +186,6 @@ export class CatalogMoldEditionComponent {
 // Hooks ====================
   ngOnInit() {
     // this.moldForm.get('name').disable();
-    console.log(Intl.DateTimeFormat().resolvedOptions());
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.MOLDS_CATALOG_EDITION,
       true,
@@ -216,7 +220,8 @@ export class CatalogMoldEditionComponent {
         // this.requestLinesData(currentPage);
         // this.requestEquipmentsData(currentPage);        
         // this.requestMoldTypessData(currentPage);
-        // this.requestMoldClassesData(currentPage);
+        this.requestChecklistTemplateYellowData(currentPage);
+        // this.requestChecklistTemplateRedData(currentPage);
         this.requestMoldThresholdTypesData(currentPage);
         this.requestLabelColorsData(currentPage);
         this.requestStatesData(currentPage);
@@ -1117,6 +1122,98 @@ export class CatalogMoldEditionComponent {
     )    
   }
 
+  requestChecklistTemplateYellowData(currentPage: number, filterStr: string = null) {    
+    this.checklistTemplatesYellow = {
+      ...this.checklistTemplatesYellow,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    }
+    const skipRecords = this.checklistTemplatesYellow.items.length;
+
+    const processId = !!this.mold.id ? this.mold.id : 0;
+    const moldParameters = {
+      settingType: 'multiSelection',
+      skipRecords,
+      process: 'mold-checklist-template-yellow',
+      processId, 
+      takeRecords: this.takeRecords, 
+      filter,       
+    }    
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    this.checklistTemplatesYellow$ = this._catalogsService.getChecklistTemplatesYellowLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.id,
+            valueRight: item.value,
+          }
+        })
+        this.checklistTemplatesYellow = {
+          ...this.checklistTemplatesYellow,
+          loading: false,
+          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
+          items: this.checklistTemplatesYellow.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  requestChecklistTemplateRedData(currentPage: number, filterStr: string = null) {    
+    this.checklistTemplatesRed = {
+      ...this.checklistTemplatesRed,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.checklistTemplatesRed.items.length;
+
+    const moldParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    this.checklistTemplatesRed$ = this._catalogsService.getChecklistTemplatesRedLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            valueRight: item.data.value,
+          }
+        })
+        this.checklistTemplatesRed = {
+          ...this.checklistTemplatesRed,
+          loading: false,
+          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
+          items: this.checklistTemplatesRed.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   requestPartNumbersData(currentPage: number, filterStr: string = null) {    
     this.partNumbers = {
       ...this.partNumbers,
@@ -1486,8 +1583,33 @@ export class CatalogMoldEditionComponent {
         this.moldClasses.currentPage,
         getMoreDataParams.textToSearch,  
       );    
-    }
-    
+    } else if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATES_YELLOW) {
+      if (getMoreDataParams.initArray) {
+        this.checklistTemplatesYellow.currentPage = 0;   
+        this.checklistTemplatesYellow.items = [];
+      } else if (!this.checklistTemplatesYellow.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.checklistTemplatesYellow.currentPage++;
+      }
+      this.requestChecklistTemplateYellowData(        
+        this.checklistTemplatesYellow.currentPage,
+        getMoreDataParams.textToSearch,  
+      );    
+    } else if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATES_RED) {
+      if (getMoreDataParams.initArray) {
+        this.checklistTemplatesRed.currentPage = 0;   
+        this.checklistTemplatesRed.items = [];
+      } else if (!this.checklistTemplatesRed.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.checklistTemplatesRed.currentPage++;
+      }
+      this.requestChecklistTemplateRedData(        
+        this.checklistTemplatesRed.currentPage,
+        getMoreDataParams.textToSearch,  
+      );    
+    }    
   }
 
   onFileSelected(event: any) {

@@ -5,8 +5,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
 import { Observable, map, skip, tap } from 'rxjs';
-import { MoldItem, Molds, MoldsData, emptyMoldCatalog } from 'src/app/molds';
-import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus, MoldItem, emptyMoldCatalog, MoldsData, Molds } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 import { loadMoldsData } from 'src/app/state/actions/molds.actions';
 import { AppState } from 'src/app/state/app.state';
@@ -63,7 +62,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   }
   order: any = null;
   pendingToolbarButtonIndex: number = null;
-  size: 'minimun' | 'medium' | 'high' | string;
+  size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
   currentTabIndex: number = 1;  

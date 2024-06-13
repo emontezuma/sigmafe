@@ -8,7 +8,7 @@ import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
 import { AppState, updateMoldsHitsData } from 'src/app/state';
-import { GqlParameters } from 'src/app/catalogs/models/generics.models';
+import { GqlParameters } from '../models';
 
 @Injectable({
   providedIn: 'root',
@@ -462,9 +462,18 @@ export class SharedService {
   }
 
   setGraphqlVariables(variableParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status} = variableParameters;
+    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status, processId, process} = variableParameters;
 
-    if (settingType === 'tables') {
+    if (settingType === 'multiSelection') {
+      return {
+        processId,
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
+        ...(filter) && { filterBy: filter },        
+        ...(process) && { process },
+        
+      }
+    } else if (settingType === 'tables') {
       return {
         ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
         ...(takeRecords !== 0) && { recordsToTake: takeRecords },

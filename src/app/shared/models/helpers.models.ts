@@ -73,6 +73,8 @@ export enum SystemTables {
     MOLD_LABEL_COLORS = 'mold-label-color',
     MOLD_STATES = 'mold-states',
     MOLD_CONTROL_STRATEGIES = 'mold-control-strategies',
+    CHECKLIST_TEMPLATES_YELLOW = 'checklist-templates-yellow',
+    CHECKLIST_TEMPLATES_RED = 'checklist-templates-red',
 }
 
 export enum GeneralValues {
@@ -98,3 +100,4 @@ export interface OptionData {
     value?: string;
     disabled?: boolean;    
   }
+  

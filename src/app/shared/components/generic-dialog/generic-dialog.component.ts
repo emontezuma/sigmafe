@@ -7,8 +7,7 @@ import { AppState } from '../../../state/app.state';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { SettingsData } from '../../models/settings.models';
 import { SharedService } from '../../services/shared.service';
-import { SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models';
-import { ButtonActions, dialogByDefaultButton } from '../../models/screen.models';
+import { ButtonActions, dialogByDefaultButton, SmallFont, SpinnerFonts, SpinnerLimits } from '../../models';
 
 @Component({
   selector: 'app-generic-dialog',
@@ -147,7 +146,7 @@ export class GenericDialogComponent implements AfterViewInit {
   }
   
 // Functions ================
-  trackByFn(index: any, item: any) { 
+  trackByFn(index: any) { 
     return index; 
   }
 

@@ -1,17 +1,19 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, ElementRef } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime, startWith, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { GeneralCatalogMappedItem, GeneralCatalogParams } from 'src/app/catalogs';
-import { SystemTables } from '../../models/helpers.models';
+import { SystemTables, GeneralCatalogMappedItem, GeneralCatalogParams, SimpleTable, GeneralValues } from '../../models';
+import { MatSelectChange } from '@angular/material/select';
+import { MatSelectionList } from '@angular/material/list';
 
 @Component({
-  selector: 'app-lazy-loading-list',
-  templateUrl: './lazy-loading-list.component.html',
-  styleUrls: ['./lazy-loading-list.component.scss']
+  selector: 'app-multiple-selection-list',
+  templateUrl: './multiple-selection-list.component.html',
+  styleUrls: ['./multiple-selection-list.component.scss']
 })
-export class LazyLoadingListComponent implements OnInit, OnDestroy, OnChanges {
+export class MultipleSelectionListComponent {
   @ViewChild('selection', { static: false }) selection: ElementRef;
+  @ViewChild("multipleSelection", { static: false }) multipleSelection: MatSelectionList;
   
   @Input() formField: FormControl;  
   // @Input() list: GeneralCatalogItem[];
@@ -34,10 +36,15 @@ export class LazyLoadingListComponent implements OnInit, OnDestroy, OnChanges {
   private textToSearch: string;
   showError: boolean = false;
   selectedOption: boolean = false;
-
+  multiSelectionForm = new FormGroup({
+    searchInput: new FormControl(''),
+  });
+  selections: SimpleTable[] = [];
+  
 // Hooks ====================
   ngOnInit(): void {
-    this.textToSearch$ = this.formField.valueChanges.pipe(
+    this.selections = this.getSelectOptions();
+    this.textToSearch$ = this.multiSelectionForm.controls.searchInput.valueChanges.pipe(
       startWith(''),
       debounceTime(400),
       tap(textToSearch => {        
@@ -64,13 +71,7 @@ export class LazyLoadingListComponent implements OnInit, OnDestroy, OnChanges {
     if (this.getMoreData) this.getMoreData.unsubscribe();
   }
 
-  ngOnChanges() {
-    this.showError = (!this.loading && this.list.length === 0 && !this.formField.value?.id && this.formField.touched);
-    if (this.showError) {
-      this.formField.setErrors({ 'incorrect': true })
-    } else {
-      this.formField.setErrors(null);
-    }
+  ngOnChanges() {    
     if (this.focused) {
       setTimeout(() => {
         this.selection.nativeElement.focus();
@@ -79,6 +80,10 @@ export class LazyLoadingListComponent implements OnInit, OnDestroy, OnChanges {
   }
 
 // Functions ================
+handleSelectionChange(event: MatSelectChange) {
+  
+}
+
   onScroll() {
     this.getMoreData.emit({
       catalogName: this.catalog,
@@ -105,8 +110,27 @@ export class LazyLoadingListComponent implements OnInit, OnDestroy, OnChanges {
 
   handleKeyDown(event: KeyboardEvent) { }
 
+  chengeSelection(event: any) { }
+
   get SystemTables () {
     return SystemTables;
+  }
+
+  getSelectOptions(): SimpleTable[] {
+    if (this.catalog === SystemTables.CHECKLIST_TEMPLATES_YELLOW || this.catalog === SystemTables.CHECKLIST_TEMPLATES_RED) {
+      return [
+        { id: 'y', description: $localize`TODOS los Templates de checklist activos` },  
+        { id: 'n', description: $localize`Los Templates de checklist de la lista` },  
+      ]
+    }
+    return [];    
+  }
+
+  selectItem(item: any) {
+    if (this.formField.value !== GeneralValues.YES) {
+      item.valueRight = !!item.valueRight ? null : item.id;
+    }    
+    console.log(item);
   }
   
 // End ======================

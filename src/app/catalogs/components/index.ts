@@ -1,1 +1,1 @@
-export * from './maintenance-history-dialog';
+export * from '../../shared/components/maintenance-history-dialog';

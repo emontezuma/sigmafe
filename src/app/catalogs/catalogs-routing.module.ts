@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -46,11 +46,6 @@ const routes: Routes = [
         path: '**',
         component: CatalogsHomeComponent,
         data: { animation: 'CatalogsHomeComponent' },
-      },
-      {
-        path: '',
-        redirectTo: '',
-        pathMatch: 'full',
       },
     ]
   },

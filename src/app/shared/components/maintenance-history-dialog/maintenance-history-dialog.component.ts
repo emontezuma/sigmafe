@@ -5,10 +5,10 @@ import { Store } from '@ngrx/store';
 
 import { AppState } from '../../../state/app.state'; 
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
-import { AbstractControl, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
-import { dissolve } from '../../../shared/animations/shared.animations';
-import {  CatalogsService, CustomValidators, GeneralCatalogData, GeneralCatalogParams, GeneralHardcodedValuesData, MoldParameters, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesData } from 'src/app/catalogs';
-import { ButtonActions, RecordStatus, SettingsData, SmallFont, SpinnerFonts, SpinnerLimits, SystemTables, toolbarMode } from 'src/app/shared/models';
+import {  FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import { dissolve } from '../../animations/shared.animations';
+import {  CatalogsService, CustomValidators, GeneralCatalogData, MoldParameters, emptyGeneralCatalogData, emptyGeneralCatalogItem } from 'src/app/catalogs';
+import { ButtonActions, GeneralCatalogParams, GeneralHardcodedValuesData, RecordStatus, SettingsData, SmallFont, SpinnerFonts, SpinnerLimits, SystemTables, emptyGeneralHardcodedValuesData, toolbarMode } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 
 @Component({

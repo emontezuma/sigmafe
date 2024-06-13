@@ -5,10 +5,10 @@ import { MaterialModule } from '../material';
 import { MoldsHitsCounterComponent } from './pages';
 import { MoldsRoutingModule } from './molds-routing.module';
 import { MoldHitsCounterComponent } from './components';
-import { SpinnerModule } from '../shared/components/spinner';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { FilterPipe } from '../shared/pipes/filter.pipe';
 import { ImageNotFoundModule } from '../shared/directives/image-not-found.module';
+import { MultipleSelectionListModule, SpinnerModule } from '../shared/components';
 
 @NgModule({
   declarations: [
@@ -16,14 +16,15 @@ import { ImageNotFoundModule } from '../shared/directives/image-not-found.module
     MoldHitsCounterComponent,
     FilterPipe,
   ],
-  imports: [
-    CommonModule,
+  imports: [    
+    CommonModule,    
     MaterialModule,
-    MoldsRoutingModule,
+    MoldsRoutingModule,    
     NgOptimizedImage,
     NgxSkeletonLoaderModule.forRoot(),
     SpinnerModule,
-    ImageNotFoundModule,
-  ],  
+    ImageNotFoundModule,    
+    MultipleSelectionListModule,
+  ],
 })
 export class MoldsModule { }

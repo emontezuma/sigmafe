@@ -4,8 +4,7 @@ import { Observable, tap } from 'rxjs';
 
 import { AppState } from 'src/app/state/app.state';
 import { SharedService } from 'src/app/shared/services/shared.service';
-import { ButtonActions, ButtonState, ShowElement, ToolbarControl, Screen } from 'src/app/shared/models/screen.models';
-import { SmallFont, SpinnerFonts, SpinnerLimits } from '../../models/colors.models';
+import { SmallFont, SpinnerFonts, SpinnerLimits, ButtonActions, ButtonState, ShowElement, ToolbarControl, Screen } from 'src/app/shared/models';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 
 @Component({

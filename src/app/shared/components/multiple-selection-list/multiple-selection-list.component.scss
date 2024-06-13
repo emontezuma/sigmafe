@@ -1,0 +1,78 @@
+.multiple-selection-lits {
+    &__container {
+        position: relative; 
+    }
+    &__field {
+        width: 100%;
+    }
+    &__progress {
+        position: absolute;
+        margin-top: -14px;
+        margin-right: 5px;
+        top: 0;
+        right: 0;
+        z-index: 999;
+    }
+    &__hint {
+        display: flex !important;
+        align-items: center;
+        font-weight: 300;  
+        font-size: 1.1rem;
+        line-height: 13px;
+        padding: 3px 0px;   
+        &--error {
+            color: var(--z-colors-error-fore-color);
+            line-height: 13px;
+            padding: 3px 0px;   
+        }
+        &--no-error {
+            color: var(--z-colors-status-ok);
+            line-height: 13px;
+            padding: 3px 0px;   
+        }
+        &--normal {            
+            line-height: 13px;
+            padding: 3px 0px;   
+        }
+    }
+    &__small-icon {        
+        &--error {
+            fill: var(--z-colors-required-fore-color);
+            color: var(--z-colors-required-fore-color);
+            font-size: 20px;
+            margin-left: 5px;
+        }
+        &--no-error {
+            fill: var(--z-colors-status-ok);
+            color: var(--z-colors-status-ok);
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
+        }
+    }    
+    &__normal-icon {                
+        fill: var(--theme-primary-500);
+        color: var(--theme-primary-500);
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        margin-right: 5px;
+    }    
+}
+
+mat-option:nth-child(2n), mat-list-option:nth-child(2n) {
+    background-color: var(--z-colors-table-odd-background-color);  
+}
+  
+mat-option:nth-child(2n+1), mat-list-option:nth-child(2n+1) {
+    background-color: var(--z-colors-table-even-background-color);
+}
+
+mat-option:nth-child(1), mat-list-option:nth-child(1) {
+    background-color: var(--z-colors-table-even-background-color) !important;  
+}
+  
+mat-option {    
+    border-bottom: 1px solid var(--theme-primary-200);
+}

@@ -31,7 +31,9 @@
   <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>    
   <ng-container *ngIf="deleteMoldTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addMoldTranslations$ | async "></ng-container>   
-  <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>           
+  <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>       
+  <ng-container *ngIf="checklistTemplatesYellow$ | async "></ng-container>       
+  <ng-container *ngIf="checklistTemplatesRed$ | async "></ng-container>         
 
   <mat-card class="card">
     <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">
@@ -743,6 +745,21 @@
                     >Umbral de número de días para ALARMA</span
                   >
                 </app-input-field>
+              </div>
+              <div class="field-items">
+                <app-multiple-selection-list
+                  [formField]="moldForm.controls.checklistTemplateYellow"
+                  [list]="checklistTemplatesYellow.items"
+                  [totalCount]="checklistTemplatesYellow.totalCount"
+                  [loading]="checklistTemplatesYellow.loading"                  
+                  leftHint="Escriba el Tipo de molde"
+                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_YELLOW"
+                  noItemsError="No hay Tipos de molde con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-multiple-selection-list>                
               </div>
               <div class="field-items">
                 <app-select-field
