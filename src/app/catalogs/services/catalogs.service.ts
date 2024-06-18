@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
 import { VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
@@ -33,6 +33,13 @@ export class CatalogsService {
     }).valueChanges;
   }
 
+  getSensorsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_SENSORS_LAZY_LOADING,
+      variables,
+    }).valueChanges;
+  }
+
   getSigmaTypesLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.watchQuery({ 
       query: GET_SIGMA_TYPES_LAZY_LOADING,
@@ -48,17 +55,31 @@ export class CatalogsService {
   }
 
   getChecklistTemplatesYellowLazyLoadingDataGql$(variables: any): Observable<any> {
-    return this._apollo.watchQuery({ 
+    return this._apollo.query({ 
       query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, 
       variables,
-    }).valueChanges;
+    });
+  }
+
+  getMoldsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({ 
+      query: GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, 
+      variables,
+    });
+  }
+
+  getActionPlansLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({ 
+      query: GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING, 
+      variables,
+    });
   }
 
   getChecklistTemplatesRedLazyLoadingDataGql$(variables: any): Observable<any> {
-    return this._apollo.watchQuery({ 
+    return this._apollo.query({ 
       query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, 
       variables,
-    }).valueChanges;
+    });
   }
 
   getLinesLazyLoadingDataGql$(variables: any): Observable<any> {
@@ -101,7 +122,7 @@ export class CatalogsService {
     const moldId = { moldId: parameters.moldId};
 
     const variables = {
-      ...(parameters.skipRecords !== 0) && { recosrdsToSkip: parameters.skipRecords },
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
       ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
       ...(parameters.order) && { orderBy: parameters.order },
       ...(parameters.filter) && { filterBy: parameters.filter },
@@ -125,7 +146,7 @@ export class CatalogsService {
     const variableId = { variableId: parameters.variableId};
 
     const variables = {
-      ...(parameters.skipRecords !== 0) && { recosrdsToSkip: parameters.skipRecords },
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
       ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
       ...(parameters.order) && { orderBy: parameters.order },
       ...(parameters.filter) && { filterBy: parameters.filter },
@@ -177,7 +198,7 @@ export class CatalogsService {
       mutation: DELETE_MOLD_TRANSLATIONS, 
       variables,       
     });
-  }
+  }7
 
   deleteVariableTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
@@ -193,10 +214,23 @@ export class CatalogsService {
     });
   }
 
+  deleteCatalogDetails$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CATALOG_DETAILS, 
+      variables,       
+    });
+  }
 
   addMoldTransations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: ADD_MOLD_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  addOrUpdateCatalogDetails$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: CREATE_OR_UPDATE_CATALOG_DETAILS, 
       variables,       
     });
   }
@@ -256,7 +290,7 @@ export class CatalogsService {
     return items.map((t) => {
       return {
         id: t.id, 
-        customerId: t.id, 
+        customerId: t.customerId, 
         description: t.description, 
         name: t.name, 
         reference: t.reference, 
@@ -322,9 +356,9 @@ export class CatalogsService {
     );
   }
 
-  getMoldsDataGql$(recosrdsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
+  getMoldsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
     const variables = {      
-      ...(recosrdsToSkip !== 0) && { recosrdsToSkip },
+      ...(recordsToSkip !== 0) && { recordsToSkip },
       ...(recordsToTake !== 0) && { recordsToTake },
       ...(orderBy) && { orderBy },
       ...(filterBy) && { filterBy },
@@ -336,9 +370,9 @@ export class CatalogsService {
     }).valueChanges    
   }
 
-  getVariablesDataGql$(recosrdsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
+  getVariablesDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
     const variables = {      
-      ...(recosrdsToSkip !== 0) && { recosrdsToSkip },
+      ...(recordsToSkip !== 0) && { recordsToSkip },
       ...(recordsToTake !== 0) && { recordsToTake },
       ...(orderBy) && { orderBy },
       ...(filterBy) && { filterBy },

@@ -1,49 +1,51 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { debounceTime, startWith, tap } from 'rxjs/operators';
+import { debounceTime, startWith, tap, throttleTime } from 'rxjs/operators';
 import { Observable } from 'rxjs';
-import { SystemTables, GeneralCatalogMappedItem, GeneralCatalogParams, SimpleTable, GeneralValues } from '../../models';
+import { SystemTables, GeneralCatalogMappedItem, GeneralCatalogParams, SimpleTable, GeneralValues, GeneralMultipleSelcetionItems } from '../../models';
 import { MatSelectChange } from '@angular/material/select';
-import { MatSelectionList } from '@angular/material/list';
+import { CdkScrollable } from "@angular/cdk/scrolling";
 
 @Component({
   selector: 'app-multiple-selection-list',
   templateUrl: './multiple-selection-list.component.html',
   styleUrls: ['./multiple-selection-list.component.scss']
 })
-export class MultipleSelectionListComponent {
+export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   @ViewChild('selection', { static: false }) selection: ElementRef;
-  @ViewChild("multipleSelection", { static: false }) multipleSelection: MatSelectionList;
+  @ViewChild("multipleSelection", { read: ElementRef } ) multipleSelection: ElementRef;
+  @ViewChild(CdkScrollable) cdkScrollable: CdkScrollable;
   
   @Input() formField: FormControl;  
   // @Input() list: GeneralCatalogItem[];
   @Input() list: GeneralCatalogMappedItem[];  
+  @Input() currentSelections: GeneralMultipleSelcetionItems[];  
   @Input() defaultValue?: any;
   @Input() placeHolder: string;
   @Input() totalCount: number;
   @Input() catalog: string;
   @Input() loading: boolean;
-  @Input() noItemsError: string;  
-  @Input() leftHint: string;  
-  @Input() showDataState: boolean;   
   @Input() focused: boolean;   
+  @Input() bordered: boolean;   
+  @Input() showSelect: boolean;     
+  @Input() selectOptions: SimpleTable[];   
   
   // @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogItem}>();
-  @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogMappedItem}>();
+  @Output() multipleSelectionChanged = new EventEmitter<string>();
   @Output() getMoreData = new EventEmitter<GeneralCatalogParams>();
-
+  
   textToSearch$: Observable<any>;
+  scroll$: Observable<any>;
+
   private textToSearch: string;
-  showError: boolean = false;
   selectedOption: boolean = false;
   multiSelectionForm = new FormGroup({
     searchInput: new FormControl(''),
   });
-  selections: SimpleTable[] = [];
+  multipleSelectionHeight: number;
   
 // Hooks ====================
-  ngOnInit(): void {
-    this.selections = this.getSelectOptions();
+  ngOnInit(): void {    
     this.textToSearch$ = this.multiSelectionForm.controls.searchInput.valueChanges.pipe(
       startWith(''),
       debounceTime(400),
@@ -63,11 +65,11 @@ export class MultipleSelectionListComponent {
           initArray: true,
         });    
       })
-    )
+    );    
   }
   
   ngOnDestroy() {    
-    if (this.optionSelected) this.optionSelected.unsubscribe();
+    if (this.multipleSelectionChanged) this.multipleSelectionChanged.unsubscribe();
     if (this.getMoreData) this.getMoreData.unsubscribe();
   }
 
@@ -77,35 +79,66 @@ export class MultipleSelectionListComponent {
         this.selection.nativeElement.focus();
       }, 50)
     }
+    if (this.currentSelections.length > 0) {
+      for (const item of this.list) {        
+        const itemHasChanged = this.currentSelections.find(cs => cs.id === item.id && cs.valueRight !== item.valueRight)
+        if (itemHasChanged) {
+          item.valueRight = itemHasChanged.valueRight;
+        }
+        item.sortedField = item.valueRight ? `-${item.translatedName}`: item.translatedName;
+      }
+      this.list.sort((a, b) => {        
+        return a.sortedField < b.sortedField ? -1 : 1;        
+      })
+    }    
+  }
+
+  ngAfterViewInit() {
+    if (this.multipleSelection) {
+      this.multipleSelectionHeight = this.multipleSelection.nativeElement.offsetHeight;
+    }
+    this.scroll$ = this.cdkScrollable.elementScrolled()
+    .pipe(
+      throttleTime(300),
+      tap(data => { 
+        if ((this.multipleSelectionHeight + data.srcElement.scrollTop) >= data.srcElement.scrollHeight * 0.8) {
+          this.getMoreData.emit({
+            catalogName: this.catalog,
+            textToSearch: this.textToSearch,
+            initArray: false,
+          });          
+        }              
+      })
+    );
   }
 
 // Functions ================
-handleSelectionChange(event: MatSelectChange) {
-  
-}
-
-  onScroll() {
-    this.getMoreData.emit({
-      catalogName: this.catalog,
-      textToSearch: this.textToSearch,
-      initArray: false,
-    });
+  handleSelectionChange(event: MatSelectChange) {    
+    if (event.value === 's' || event.value === 'u') {    
+      this.loading = true;
+      this.list = this.list.map((r) => {
+        this.updateSelections(r, event.value);
+        return {
+          ...r,
+          valueRight: event.value === 's' ? r.id : null,
+        }
+      }).sort((a, b) => a.translatedName < b.translatedName ? -1 : 0);      
+      setTimeout(() => {
+        this.multipleSelectionChanged.emit(this.catalog);
+        this.formField.setValue('n');
+        this.loading = false;
+      }, 150);
+    }  
   }
 
-  onKey(event: any) {
-    console.log('[onKey]', event);
-  }
+  onKey(event: any) { }
 
   displayFn(data: any): string {
     return data && data.translatedName ? data.translatedName : '';
   }
 
   handleOptionSelected(event: any) {
-    this.selectedOption = true;
-    this.optionSelected.emit({ 
-      catalogName: this.catalog,
-      selectedData: event?.option?.value,      
-    });
+    this.selectedOption = true;    
   }
 
   handleKeyDown(event: KeyboardEvent) { }
@@ -116,21 +149,34 @@ handleSelectionChange(event: MatSelectChange) {
     return SystemTables;
   }
 
-  getSelectOptions(): SimpleTable[] {
-    if (this.catalog === SystemTables.CHECKLIST_TEMPLATES_YELLOW || this.catalog === SystemTables.CHECKLIST_TEMPLATES_RED) {
-      return [
-        { id: 'y', description: $localize`TODOS los Templates de checklist activos` },  
-        { id: 'n', description: $localize`Los Templates de checklist de la lista` },  
-      ]
+  selectItem(item: any) {
+    if (this.formField.value === GeneralValues.NO) {
+      // Update the general array to be stored
+      this.updateSelections(item);      
+      this.multipleSelectionChanged.emit(this.catalog);
     }
-    return [];    
   }
 
-  selectItem(item: any) {
-    if (this.formField.value !== GeneralValues.YES) {
+  updateSelections(item: any, action: string = '') {
+    const originalValueRight = item.valueRight;
+    if (action === 'u') {
+      item.valueRight = null;
+    } else if (action === 's') {
+      item.valueRight = item.id;
+    } else {
       item.valueRight = !!item.valueRight ? null : item.id;
-    }    
-    console.log(item);
+    }
+    
+    const itemIndexChanged = this.currentSelections.findIndex(r => r.id === item.id && r.valueRight !== item.valueRight)
+    if (itemIndexChanged !== -1) {
+      this.currentSelections[itemIndexChanged].valueRight = item.valueRight;
+    } else {
+      this.currentSelections.push( { id: item.id, valueRight: item.valueRight, originalValueRight, catalogDetailId: item.catalogDetailId });
+    }
+  }
+
+  getItemsSelected() {
+    return this.list.filter(r => r.valueRight).length;
   }
   
 // End ======================

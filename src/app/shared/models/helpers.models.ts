@@ -65,7 +65,10 @@ export enum SystemTables {
     PARTNUMBERS = 'partNumbers',
     MOLD_TYPES = 'moldTypes',
     MOLD_CLASSES = 'moldClasses',
+    MOLDS = 'molds',
+    ACTION_PLANS = 'action-plans',
     UOMS = 'uoms',
+    SENSORS = 'sensors',
     SIGMA_TYPES = 'sigmaTypes',
     GEN_VALUES_YES_NO = 'gen-values-yes-no',
     RESET_VALUE_MODES = 'variable-reset-value-modes',
@@ -73,8 +76,9 @@ export enum SystemTables {
     MOLD_LABEL_COLORS = 'mold-label-color',
     MOLD_STATES = 'mold-states',
     MOLD_CONTROL_STRATEGIES = 'mold-control-strategies',
-    CHECKLIST_TEMPLATES_YELLOW = 'checklist-templates-yellow',
-    CHECKLIST_TEMPLATES_RED = 'checklist-templates-red',
+    CHECKLIST_TEMPLATES_YELLOW = 'mold-checklist-templates-yellow',
+    CHECKLIST_TEMPLATES_RED = 'mold-checklist-templates-red',
+    CHECKLIST_TEMPLATES = 'checklist-templates',
 }
 
 export enum GeneralValues {

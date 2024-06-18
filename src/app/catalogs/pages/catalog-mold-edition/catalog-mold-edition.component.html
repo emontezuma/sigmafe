@@ -2,7 +2,9 @@
   class="container"
   #moldCatalogEdition
   @routingAnimation
+  name="catalog-mold-edition"
   (@routingAnimation.done)="pageAnimationFinished($event)"
+  cdkScrollable
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -28,9 +30,9 @@
   <ng-container *ngIf="moldDataLoading$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateMold$ | async "></ng-container>  
-  <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>    
-  <ng-container *ngIf="deleteMoldTranslations$ | async "></ng-container>      
-  <ng-container *ngIf="addMoldTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="deleteCatalogDetails$ | async "></ng-container>        
+  <ng-container *ngIf="updateMoldTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="addOrUpdateCatalogDetails$ | async "></ng-container>   
   <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>       
   <ng-container *ngIf="checklistTemplatesYellow$ | async "></ng-container>       
   <ng-container *ngIf="checklistTemplatesRed$ | async "></ng-container>         
@@ -204,7 +206,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.moldType.touched &&
@@ -236,7 +238,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.moldClass.touched &&
@@ -336,7 +338,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.provider.touched &&
@@ -370,7 +372,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.manufacturer.touched &&
@@ -504,7 +506,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.partNumber.touched &&
@@ -553,7 +555,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.line.touched &&
@@ -587,7 +589,7 @@
             <div class="field-items">
               <fieldset
                 class="field__container"
-                style="min-width: 350px"
+                style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
                     moldForm.controls.equipment.touched &&
@@ -748,17 +750,36 @@
               </div>
               <div class="field-items">
                 <app-multiple-selection-list
-                  [formField]="moldForm.controls.checklistTemplateYellow"
+                  [bordered]="true"
+                  [showSelect]="true"                  
+                  [selectOptions]="checklistTemplatesOptions"
+                  [currentSelections]="checklistYellowTemplatesCurrentSelection"        
+                  [formField]="moldForm.controls.templatesYellow"
                   [list]="checklistTemplatesYellow.items"
                   [totalCount]="checklistTemplatesYellow.totalCount"
-                  [loading]="checklistTemplatesYellow.loading"                  
-                  leftHint="Escriba el Tipo de molde"
-                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_YELLOW"
-                  noItemsError="No hay Tipos de molde con este nombre"
-                  [showDataState]="true"
-                  (optionSelected)="handleOptionSelected($event)"
+                  [loading]="checklistTemplatesYellow.loading"                                    
+                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_YELLOW"                  
+                  (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
                   (getMoreData)="getMoreData($event)"
                 >
+                <span fieldTitle class="label field__label">Checklist a generar en la advertencia</span>
+                </app-multiple-selection-list>                
+              </div>
+              <div class="field-items">
+                <app-multiple-selection-list
+                  [bordered]="true"
+                  [showSelect]="true"                  
+                  [selectOptions]="checklistTemplatesOptions"
+                  [currentSelections]="checklistRedTemplatesCurrentSelection"        
+                  [formField]="moldForm.controls.templatesRed"
+                  [list]="checklistTemplatesRed.items"
+                  [totalCount]="checklistTemplatesRed.totalCount"
+                  [loading]="checklistTemplatesRed.loading"                                    
+                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_RED"                  
+                  (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                <span fieldTitle class="label field__label">Checklist a generar en la ALARMA</span>
                 </app-multiple-selection-list>                
               </div>
               <div class="field-items">

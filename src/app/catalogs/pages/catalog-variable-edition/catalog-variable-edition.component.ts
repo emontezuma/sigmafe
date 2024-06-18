@@ -3,13 +3,13 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, map, skip, startWith, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
@@ -37,26 +37,32 @@ export class CatalogVariableEditionComponent {
   settingsData$: Observable<SettingsData>; 
 
   uoms$: Observable<any>; 
-  sigmaTypes$: Observable<any>;   
-  valueTypes$: Observable<any>;   
+  sensors$: Observable<any>; 
+  sigmaTypes$: Observable<any>;
+  valueTypes$: Observable<any>;
   resetValueModes$: Observable<any>;
   genYesNoValues$: Observable<any>;
+  molds: GeneralCatalogData = emptyGeneralCatalogData; 
+  molds$: Observable<any>;  
+  actionPlans: GeneralCatalogData = emptyGeneralCatalogData; 
+  actionPlans$: Observable<any>;  
 
   valueTypeChanges$: Observable<any>;
   // variableFormChanges$: Observable<any>;
-  toolbarClick$: Observable<ToolbarButtonClicked>;    
+  toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
   variable$: Observable<VariableDetail>;
   translations$: Observable<any>;
   updateVariable$: Observable<any>;
-  updateVariableCatalog$: Observable<any>;
+  updateVariableCatalog: Subscription;
   deleteVariableTranslations$: Observable<any>;  
   addVariableTranslations$: Observable<any>;  
   
   variableFormChangesSubscription: Subscription;
   
   uoms: GeneralCatalogData = emptyGeneralCatalogData; 
+  sensors: GeneralCatalogData = emptyGeneralCatalogData; 
   sigmaTypes: GeneralCatalogData = emptyGeneralCatalogData;
   valueTypes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   resetValueModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
@@ -90,14 +96,15 @@ export class CatalogVariableEditionComponent {
     ),
     sigmaType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     uom: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    sensor: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     valueType: new FormControl(emptyGeneralHardcodedValuesItem),
     resetValueMode: new FormControl(emptyGeneralHardcodedValuesItem),
     required: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowNoAnswer: new FormControl({
+    allowComments: new FormControl({
       ...emptyGeneralHardcodedValuesItem,
       value: GeneralValues.NO
     }),
-    allowComments: new FormControl({
+    allowNoCapture: new FormControl({
       ...emptyGeneralHardcodedValuesItem,
       value: GeneralValues.NO
     }),
@@ -128,6 +135,8 @@ export class CatalogVariableEditionComponent {
     showNotes: new FormControl(false),
     minimum:  new FormControl(''),
     maximum:  new FormControl(''),
+    molds:  new FormControl(''),
+    actionPlans:  new FormControl(''),
   });
 
   pageInfo: PageInfo = {
@@ -140,6 +149,18 @@ export class CatalogVariableEditionComponent {
   
   // Temporal
   tmpDate: number = 112;
+  loaded: boolean = false;
+
+  moldsOptions: SimpleTable[] = [
+    { id: '', description: $localize`No usar en Moldes` },  
+    { id: 'y', description: $localize`TODOS los Moldes activos` },  
+    { id: 'n', description: $localize`Los Moldes de lista` },  
+    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
+    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
+  ];
+
+  moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];
+  actionPlansCurrentSelection: GeneralMultipleSelcetionItems[] = [];
   
   constructor(
     private _store: Store<AppState>,
@@ -184,18 +205,20 @@ export class CatalogVariableEditionComponent {
         this.settingsData = settingsData;
         this.takeRecords = this.settingsData.catalog?.pageSize || 50
         const currentPage = 0;
-        // this.requestProvidersData(currentPage);      
+        // this.requestProvidersData(currentPage);   
         // this.requestManufacturersData(currentPage);
         // this.requestPartNumbersData(currentPage);
         // this.requestLinesData(currentPage);
-        // this.requestEquipmentsData(currentPage);        
+        // this.requestEquipmentsData(currentPage);
         // this.requestMoldTypessData(currentPage);
         // this.requestMoldClassesData(currentPage);
+        this.requestMoldsData(currentPage);
+        this.requestActionPlansData(currentPage);
         this.requestVariableValueTypesData(currentPage);
-        this.requestVariableResetValueModesData(currentPage);        
-        this.requestGenYesNoValuesData(currentPage);        
+        this.requestVariableResetValueModesData(currentPage);
+        this.requestGenYesNoValuesData(currentPage);
       })
-    );   
+    );
     this.valueTypeChanges$ = this.variableForm.controls.valueType.valueChanges.pipe(
       startWith(''),
       tap(valueTypeChanges => {
@@ -222,19 +245,30 @@ export class CatalogVariableEditionComponent {
         }
       })
     );
+    this.valueTypeChanges$ = this.variableForm.controls.allowAlarm.valueChanges.pipe(
+      startWith(''),
+      tap(valueTypeChanges => {
+        if (valueTypeChanges === GeneralValues.NO) {
+          this.variableForm.get('notifyAlarm').disable();          
+        } else {
+          this.variableForm.get('notifyAlarm').enable();          
+        }
+      })
+    );
     this.variableFormChangesSubscription = this.variableForm.valueChanges.subscribe((variableFormChanges: any) => {
+      if (!this.loaded) return;
       if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
         this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
       } else {
         this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
       }      
-    });    
+    }); 
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
           ApplicationModules.VARIABLES_CATALOG_EDITION,
           !animationFinished,
-        );         
+        ); 
       }
     ));
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
@@ -252,13 +286,14 @@ export class CatalogVariableEditionComponent {
           this.requestVariableData(+params['id']);
         }
       })
-    );    
-    this.calcElements();        
-    this.variableForm.controls.valueType.setValue(GeneralValues.N_A);    
-    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A);    
+    ); 
+    this.calcElements();
+    this.variableForm.controls.valueType.setValue(GeneralValues.N_A); 
+    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A); 
     setTimeout(() => {
-      this.focusThisField = 'name';  
-    }, 200);    
+      this.focusThisField = 'name';
+      this.loaded = true;
+    }, 200); 
     // this.variableForm.reset(this.mold);
   }
 
@@ -277,7 +312,7 @@ export class CatalogVariableEditionComponent {
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.variableFormChangesSubscription) this.variableFormChangesSubscription.unsubscribe();    
+    if (this.variableFormChangesSubscription) this.variableFormChangesSubscription.unsubscribe(); 
   }
   
 // Functions ================
@@ -290,7 +325,7 @@ export class CatalogVariableEditionComponent {
     this.valueTypes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.VARIABLE_VALUE_TYPES)
     .pipe(
       tap((data: any) => {                
-        const accumulatedItems = this.valueTypes.items?.concat(data?.data?.hardcodedValues?.items);        
+        const accumulatedItems = this.valueTypes.items?.concat(data?.data?.hardcodedValues?.items);
         this.valueTypes = {
           ...this.valueTypes,
           loading: false,
@@ -312,7 +347,7 @@ export class CatalogVariableEditionComponent {
     this.resetValueModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.RESET_VALUE_MODES)
     .pipe(
       tap((data: any) => {                
-        const accumulatedItems = this.resetValueModes.items?.concat(data?.data?.hardcodedValues?.items);        
+        const accumulatedItems = this.resetValueModes.items?.concat(data?.data?.hardcodedValues?.items);
         this.resetValueModes = {
           ...this.resetValueModes,
           loading: false,
@@ -334,7 +369,7 @@ export class CatalogVariableEditionComponent {
     this.genYesNoValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.GEN_VALUES_YES_NO)
     .pipe(
       tap((data: any) => {                
-        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);        
+        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);
         this.genYesNoValues = {
           ...this.genYesNoValues,
           loading: false,
@@ -345,6 +380,100 @@ export class CatalogVariableEditionComponent {
       }),
       catchError(() => EMPTY)
     )
+  }
+
+  requestMoldsData(currentPage: number, filterStr: string = null) {    
+    this.molds = {
+      ...this.molds,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    }
+    const skipRecords = this.molds.items.length;
+
+    const processId = !!this.variable.id ? this.variable.id : 0;
+    const moldParameters = {
+      settingType: 'multiSelection',
+      skipRecords,
+      process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
+      processId, 
+      takeRecords: this.takeRecords, 
+      filter,       
+    }    
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    this.molds$ = this._catalogsService.getMoldsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.id,
+            valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
+          }
+        })
+        this.molds = {
+          ...this.molds,
+          loading: false,
+          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
+          items: this.molds.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  requestActionPlansData(currentPage: number, filterStr: string = null) {    
+    this.actionPlans = {
+      ...this.actionPlans,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    }
+    const skipRecords = this.actionPlans.items.length;
+
+    const processId = !!this.variable.id ? this.variable.id : 0;
+    const moldParameters = {
+      settingType: 'multiSelection',
+      skipRecords,
+      process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
+      processId, 
+      takeRecords: this.takeRecords, 
+      filter,       
+    }    
+    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    this.actionPlans$ = this._catalogsService.getActionPlansLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.id,
+            valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
+          }
+        })
+        this.actionPlans = {
+          ...this.actionPlans,
+          loading: false,
+          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
+          items: this.actionPlans.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
   }
 
   pageAnimationFinished(e: any) {
@@ -358,7 +487,7 @@ export class CatalogVariableEditionComponent {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
+        });
       }, 500);
     }
   }
@@ -386,29 +515,29 @@ export class CatalogVariableEditionComponent {
           }); 
           dialogResponse.afterClosed().subscribe((response) => {
             this.elements.find(e => e.action === action.action).loading = false;
-          });       
+          });    
         } else {
           this._location.replaceState('/catalogs/variables/create');
           this.initForm();
-          this.elements.find(e => e.action === action.action).loading = false;          
+          this.elements.find(e => e.action === action.action).loading = false;  
         }
       } else if (action.action === ButtonActions.BACK) {               
-        this.elements.find(e => e.action === action.action).loading = true;        
+        this.elements.find(e => e.action === action.action).loading = true;
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
-          this._router.navigateByUrl('/catalogs/variables');    
+          this._router.navigateByUrl('/catalogs/variables'); 
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState('/catalogs/variables/create');        
+        this._location.replaceState('/catalogs/variables/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-        }, 750);        
+        }, 750);
       } else if (action.action === ButtonActions.SAVE) {        
         this.elements.find(e => e.action === action.action).loading = true;
-        this.submitControlled = true;        
+        this.submitControlled = true;
         this.thisForm.ngSubmit.emit();
         setTimeout(() => {          
           this.elements.find(e => e.action === action.action).loading = false;
@@ -477,7 +606,7 @@ export class CatalogVariableEditionComponent {
               setTimeout(() => {
                 this._sharedService.actionCancelledByTheUser();
                 this.elements.find(e => e.action === action.action).loading = false;
-              }, 200);    
+              }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
               const variableParameters = {
@@ -506,7 +635,7 @@ export class CatalogVariableEditionComponent {
                 })
               )
             }            
-          });        
+          });
         } else if (this.variable?.id > 0 && this.variable.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
@@ -546,7 +675,7 @@ export class CatalogVariableEditionComponent {
               setTimeout(() => {
                 this._sharedService.actionCancelledByTheUser();
                 this.elements.find(e => e.action === action.action).loading = false;
-              }, 200);    
+              }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
               const variableParameters = {
@@ -575,7 +704,7 @@ export class CatalogVariableEditionComponent {
                 })
               )
             }            
-          });        
+          });
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
         if (this.variable?.id > 0) {
@@ -641,10 +770,10 @@ export class CatalogVariableEditionComponent {
               this.variable.translations = [...response.translations];
               //}));
               this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';      
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
-          });        
+          });
         }
       }
     }
@@ -788,7 +917,7 @@ export class CatalogVariableEditionComponent {
   }
 
   getScrolling(data: CdkScrollable) {       
-    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
+    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0; 
     let status = 'inactive'
     if (scrollTop < 5) {
       status = 'inactive';
@@ -819,21 +948,16 @@ export class CatalogVariableEditionComponent {
     if (!this.submitControlled) return;
     this.submitControlled = false;
     this.validateTables();
-    this.variableForm.markAllAsTouched();        
-    this.variableForm.updateValueAndValidity();    
+    this.variableForm.markAllAsTouched();
+    this.variableForm.updateValueAndValidity(); 
     if (this.variableForm.valid) {      
-
-      if (JSON.parse(JSON.stringify(this.storedTranslations)) !== JSON.parse(JSON.stringify(this.variable.translations)) && this.translationChanged) {        
-        this.processTranslations()
-      } else  {
-        this.saveRecord();      
-      }      
+      this.saveRecord();   
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
       for (const controlName in this.variableForm.controls) {
         if (this.variableForm.controls.hasOwnProperty(controlName)) {
-          const typedControl: AbstractControl = this.variableForm.controls[controlName];            
+          const typedControl: AbstractControl = this.variableForm.controls[controlName]; 
           if (typedControl.invalid) {
             fieldsMissingCounter++;
             fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -860,7 +984,7 @@ export class CatalogVariableEditionComponent {
         let fieldFocused = false;
         for (const controlName in this.variableForm.controls) {
           if (this.variableForm.controls.hasOwnProperty(controlName)) {
-            const typedControl: AbstractControl = this.variableForm.controls[controlName];            
+            const typedControl: AbstractControl = this.variableForm.controls[controlName]; 
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
@@ -876,8 +1000,8 @@ export class CatalogVariableEditionComponent {
         }
         setTimeout(() => {
           this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-        }, 100);        
-      });   
+        }, 100);
+      });
     }
   }
 
@@ -885,15 +1009,17 @@ export class CatalogVariableEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.variable.id || this.variable.id === null || this.variable.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateVariableCatalog$ = this._catalogsService.updateVariableCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateVariable.length > 0) {
-          this.requestVariableData(data?.data?.createOrUpdateVariable[0].id)          
+    this.updateVariableCatalog = this._catalogsService.updateVariableCatalog$(dataToSave)
+    .subscribe((data: any) => {
+      const variableId = data?.data?.createOrUpdateMold[0].id;
+      if (variableId > 0) {        
+        this.processTranslations$(variableId)
+        .subscribe(() => {
+          this.requestVariableData(variableId);
           setTimeout(() => {              
-            let message = $localize`La variableha sido actualizado`;
+            let message = $localize`La variable ha sido actualizado`;
             if (newRecord) {                
-              message = $localize`La variableha sido creado satisfactoriamente con el id <strong>${this.variable.id}</strong>`;
+              message = $localize`La variable ha sido creado satisfactoriamente con el id <strong>${this.variable.id}</strong>`;
               this._location.replaceState(`/catalogs/variables/edit/${this.variable.id}`);
             }
             this._sharedService.showSnackMessage({
@@ -902,16 +1028,11 @@ export class CatalogVariableEditionComponent {
               progressBarColor: 'accent',                
             });
             this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
+            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
           }, 200);
-        }        
-      }),
-      catchError(err => {
-        this.setViewLoading(false);
-        this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
-        return EMPTY;
-      })      
-    )
+        });
+      }
+    });
   }
 
   requestUomsData(currentPage: number, filterStr: string = null) {    
@@ -922,7 +1043,7 @@ export class CatalogVariableEditionComponent {
     }    
     let filter = null;
     if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);      
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
     } else {
       filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
     }      
@@ -960,6 +1081,52 @@ export class CatalogVariableEditionComponent {
     )    
   }
 
+  requestSensorsData(currentPage: number, filterStr: string = null) {    
+    this.sensors = {
+      ...this.sensors,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }      
+    const skipRecords = this.sensors.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlVariables(variableParameters);
+    this.sensors$ = this._catalogsService.getSensorsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {
+        const mappedItems = data?.data?.sensorsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        });
+        this.sensors = {
+          ...this.sensors,
+          loading: false,
+          pageInfo: data?.data?.sensorsPaginated?.pageInfo,
+          items: this.sensors.items?.concat(mappedItems),
+          totalCount: data?.data?.sensorsPaginated?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   requestSigmaTypesData(currentPage: number, filterStr: string = null) {    
     this.sigmaTypes = {
       ...this.sigmaTypes,
@@ -981,7 +1148,7 @@ export class CatalogVariableEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(variableParameters);    
+    const variables = this._sharedService.setGraphqlVariables(variableParameters); 
     this.sigmaTypes$ = this._catalogsService.getSigmaTypesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1014,7 +1181,7 @@ export class CatalogVariableEditionComponent {
     const filter = JSON.parse(`{ "variableId": { "eq": ${variableId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
     // let getData: boolean = false;
-    this.setViewLoading(true);    
+    this.setViewLoading(true); 
     this.variable$ = this._catalogsService.getVariableDataGql$({ 
       variableId, 
       skipRecords, 
@@ -1029,13 +1196,13 @@ export class CatalogVariableEditionComponent {
         })
       }),
       tap((variableData: VariableDetail) => {
-        if (!variableData) return;        
+        if (!variableData) return;
         this.variable =  variableData;
         this.translationChanged = false;
-        this.imageChanged = false;        
+        this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.variable.translations));
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';      
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.variable.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
@@ -1046,9 +1213,10 @@ export class CatalogVariableEditionComponent {
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
+        this.loaded = true;
       }),
       catchError(err => {
-        this.setViewLoading(false);        
+        this.setViewLoading(false);
         return EMPTY;
       })      
     ); 
@@ -1068,28 +1236,28 @@ export class CatalogVariableEditionComponent {
       filter, 
       order: this.order,
     }    
-    const variables = this._sharedService.setGraphqlVariables(variableParameters);   
+    const variables = this._sharedService.setGraphqlVariables(variableParameters);
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
     if (getMoreDataParams.catalogName === SystemTables.UOMS) {
       if (getMoreDataParams.initArray) {
-        this.uoms.currentPage = 0;   
+        this.uoms.currentPage = 0;
         this.uoms.items = [];
       } else if (!this.uoms.pageInfo.hasNextPage) {
         return;
       } else {
         this.uoms.currentPage++;
       }
-      this.requestUomsData(        
+      this.requestSensorsData(        
         this.uoms.currentPage,
         getMoreDataParams.textToSearch,  
-      );    
+      ); 
 
     } else if (getMoreDataParams.catalogName === SystemTables.SIGMA_TYPES) {
       if (getMoreDataParams.initArray) {
-        this.sigmaTypes.currentPage = 0;   
+        this.sigmaTypes.currentPage = 0;
         this.sigmaTypes.items = [];
       } else if (!this.sigmaTypes.pageInfo.hasNextPage) {
         return;
@@ -1100,7 +1268,50 @@ export class CatalogVariableEditionComponent {
         this.sigmaTypes.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
-    }    
+    } if (getMoreDataParams.catalogName === SystemTables.SENSORS) {
+      if (getMoreDataParams.initArray) {
+        this.sensors.currentPage = 0;
+        this.sensors.items = [];
+      } else if (!this.sensors.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.sensors.currentPage++;
+      }
+      this.requestSensorsData(        
+        this.sensors.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+
+    } else if (getMoreDataParams.catalogName === SystemTables.MOLDS) {
+      if (this.molds.loading) return;
+      if (getMoreDataParams.initArray) {
+        this.molds.currentPage = 0;   
+        this.molds.items = [];
+      } else if (!this.molds.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.molds.currentPage++;
+      }
+      this.requestMoldsData(        
+        this.molds.currentPage,
+        getMoreDataParams.textToSearch,  
+      );    
+    }      
+    else if (getMoreDataParams.catalogName === SystemTables.ACTION_PLANS) {
+      if (this.actionPlans.loading) return;
+      if (getMoreDataParams.initArray) {
+        this.actionPlans.currentPage = 0;   
+        this.actionPlans.items = [];
+      } else if (!this.actionPlans.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.actionPlans.currentPage++;
+      }
+      this.requestMoldsData(        
+        this.actionPlans.currentPage,
+        getMoreDataParams.textToSearch,  
+      );    
+    }      
     
   }
 
@@ -1110,7 +1321,7 @@ export class CatalogVariableEditionComponent {
 
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
-    .set('destFolder', `${environment.uploadFolders.catalogs}/molds`)
+    .set('destFolder', `${environment.uploadFolders.catalogs}/variables`)
     .set('processId', this.variable.id)
     .set('process', originProcess.CATALOGS_MOLDS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
@@ -1120,7 +1331,7 @@ export class CatalogVariableEditionComponent {
         this.variable.mainImagePath = res.filePath;
         this.variable.mainImageGuid = res.fileGuid;
         this.variable.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la variable para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -1144,11 +1355,19 @@ export class CatalogVariableEditionComponent {
     console.log('[handleInputKeydown]', event)
   }
 
+  handleMultipleSelectionChanged(catalog: string){    
+    if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
+
   pageChange(event: any) {
     this.pageInfo = { 
       ...this.pageInfo, 
       currentPage: event?.pageIndex, 
-    };    
+    }; 
     //this.requestData(this.pageInfo.currentPage * this.pageInfo.pageSize, this.pageInfo.pageSize, this.order);
   }
 
@@ -1158,28 +1377,28 @@ export class CatalogVariableEditionComponent {
       if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
-      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;      
+      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
       if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
-      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;      
+      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
       if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
-      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;      
+      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = false;
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
       if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
-      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;      
+      this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     }    
@@ -1214,6 +1433,9 @@ export class CatalogVariableEditionComponent {
       ...(fc.valueType.dirty || fc.valueType.touched || newRecord) && { valueType: fc.valueType.value },
       ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? 'Y' : 'N' },
       ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
+      ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value },      
+      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
+      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.variable.mainImagePath,
@@ -1226,8 +1448,8 @@ export class CatalogVariableEditionComponent {
     this.variableForm.controls.mainImageName.setValue('');
     this.variable.mainImagePath = '';
     this.variable.mainImageGuid = '';
-    this.variable.mainImage = '';                
-    const message = $localize`Se ha quitado la imagen de la variable<br>Guarde el molde para aplicar el cambio`;
+    this.variable.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen de la variable<br>Guarde la variable para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -1249,24 +1471,24 @@ export class CatalogVariableEditionComponent {
     this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A)
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.variable = emptyVariableItem;        
+    this.variable = emptyVariableItem;
     this.focusThisField = 'description';
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
         behavior: 'smooth',
         block: 'start',
-      });      
+      });   
       this.focusThisField = '';
-    }, 200);        
+    }, 200);
   }
 
   initUniqueField(): void {
     this.variable.id = null;
-    this.variable.createdBy = null;        
+    this.variable.createdBy = null;
     this.variable.createdAt = null;
     this.variable.updatedBy = null;
-    this.variable.updatedAt = null;    
-    this.variable.status = RecordStatus.ACTIVE;    
+    this.variable.updatedAt = null; 
+    this.variable.status = RecordStatus.ACTIVE; 
     this.variable.translations.map((t) => {
       return {
         ...t,
@@ -1280,7 +1502,7 @@ export class CatalogVariableEditionComponent {
     if (toolbarOption) {
       toolbarOption.caption = status === RecordStatus.ACTIVE ? $localize`Inactivar` : $localize`Reactivar`;
       toolbarOption.tooltip = status === RecordStatus.ACTIVE ? $localize`Inactivar el registro...` : $localize`Reactivar el registro...`;
-      toolbarOption.icon = status === RecordStatus.ACTIVE ? 'delete' : 'check';      
+      toolbarOption.icon = status === RecordStatus.ACTIVE ? 'delete' : 'check';   
     }
   }
 
@@ -1308,18 +1530,27 @@ export class CatalogVariableEditionComponent {
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.VARIABLES_CATALOG_EDITION,
       loading,
-    );         
+    ); 
   }
 
   validateTables(): void {
     if (this.variableForm.controls.uom.value && this.variableForm.controls.uom.value.status === RecordStatus.INACTIVE) {
-      this.variableForm.controls.uom.setErrors({ inactive: true });      
+      this.variableForm.controls.uom.setErrors({ inactive: true });   
     }    
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations() {
-    if (this.storedTranslations.length > 0) {
+  processTranslations$(variableId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.variable.translations.length || this.storedTranslations.some((st: any) => {
+      return this.variable.translations.find((t: any) => {        
+        return st.languageId === t.languageId &&
+        st.id === t.id &&
+        (st.description !== t.description || 
+        st.reference !== t.reference || 
+        st.notes !== t.notes);
+      });
+    });
+    if (differences) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
@@ -1329,46 +1560,31 @@ export class CatalogVariableEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
+      }      
+      const translationsToAdd = this.variable.translations.map((t: any) => {
+        return {
+          id: null,
+          variableId,
+          description: t.description,
+          reference: t.reference,
+          notes: t.notes,
+          languageId: t.languageId,
+          customerId: 1, // TODO: Get from profile
+          status: RecordStatus.ACTIVE,
+        }
+      });
+      const varToAdd = {
+        translations: translationsToAdd,
       }
-      this.deleteVariableTranslations$ = this._catalogsService.deleteVariableTranslations$(varToDelete)
-      .pipe(
-        tap(() => {
-          if (this.variable.translations.length > 0) {
-            this.addTranslations();
-          } else {
-            this.saveRecord();
-          }
-        })        
-      )
-    } else if (this.variable.translations.length > 0) {
-      this.addTranslations();
+  
+      return combineLatest([ 
+        varToAdd.translations.length > 0 ? this._catalogsService.addVariableTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteVariableTranslations$(varToDelete) : of(null) 
+      ]);
     } else {
-      this.saveRecord();
+      return of(null);
     }
-  }
-
-  addTranslations() {
-    const translationsToAdd = this.variable.translations.map((t: any) => {
-      return {
-        id: null,
-        variableId: this.variable.id,
-        description: t.description,
-        reference: t.reference,
-        notes: t.notes,
-        languageId: t.languageId,
-        customerId: 1, // TODO: Get from profile
-        status: RecordStatus.ACTIVE,
-      }
-    });
-    const varToAdd = {
-      translations: translationsToAdd,
-    }
-    this.addVariableTranslations$ = this._catalogsService.addVariableTransations$(varToAdd)
-    .pipe(
-      tap(() => {        
-        this.saveRecord();
-      })
-    )
+    
   }
 
   get SystemTables () {
@@ -1377,6 +1593,10 @@ export class CatalogVariableEditionComponent {
 
   get ScreenDefaultValues () {
     return ScreenDefaultValues;
+  }
+
+  get GeneralValues() {
+    return GeneralValues; 
   }
 
 // End ======================

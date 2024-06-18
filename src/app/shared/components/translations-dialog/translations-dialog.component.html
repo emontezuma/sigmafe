@@ -56,7 +56,7 @@
             [formField]="translationsForm.controls.reference"
             leftHint="Campo requerido"
             [fieldMaxLength]="50"
-            [fieldRequired]="true"
+            [fieldRequired]="false"
             [showRightHint]="true"
             [showCloseButton]="true"
             fieldHelp="Traduzca la Referencia relacionada al registro"
@@ -69,6 +69,7 @@
         </div>
         <div class="field-items">
           <app-area-field
+            [bordered]="true"
             [formField]="translationsForm.controls.notes"
             [fieldMaxLength]="500"
             [showRightHint]="true"

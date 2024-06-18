@@ -39,7 +39,15 @@ export interface GeneralCatalogMappedItem {
     translatedDescription?: string;
     translatedReference?: string;  
     translatedNotes?: string;  
-    translatedPrefix?: string;  
+    translatedPrefix?: string;
+    sortedField?: string;
+  }
+
+  export interface GeneralMultipleSelcetionItems {    
+    id?: number;
+    valueRight?: number | null;    
+    originalValueRight?: number | null;
+    catalogDetailId?:  number;
   }
   
 export interface MoldDetail {
@@ -102,6 +110,8 @@ export interface MoldDetail {
     line?: GeneralCatalogMappedItem;
     equipment?: GeneralCatalogMappedItem;
     translations?: GeneralTranslation[];
+    templatesYellow?: string;
+    templatesRed?: string;
   }
   
   export interface GeneralTranslatedFields {
@@ -122,8 +132,8 @@ export interface MoldDetail {
     reference: string;
     description?: string;
     notes?: string;
-    prefix?: string;    
-    status?: string;    
+    prefix?: string;
+    status?: string;
   }
 
   export interface GeneralCatalogInternalData {  
@@ -227,6 +237,8 @@ export interface MoldDetail {
     lastResetting: null,
     lastMaintenance: null,
     manufacturer: null,
+    templatesRed: '',
+    templatesYellow: '',    
     translations: [],
   };
   

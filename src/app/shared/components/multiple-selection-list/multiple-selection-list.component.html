@@ -1,50 +1,143 @@
-<div class="multiple-selection-lits__container" i18n>
-  <ng-container *ngIf="textToSearch$ | async"></ng-container>
-  <mat-form-field appearance="fill" class="multiple-selection-lits__field">
-    <mat-select
-      #selection
-      [formControl]="formField"
-      name="fieldControl"
-      (selectionChange)="handleSelectionChange($event)"
+<div class="multiple-selection-list__container" i18n>
+  <fieldset
+    class="multiple-selection-list__field-container"
+    [ngClass]="{
+      'multiple-selection-list__field-container--error':
+        formField.touched && !formField.valid
+    }"
+    [disabled]="formField.disabled"
+    [ngClass]="{ 'not-bordered': !bordered }"
+  >
+    <ng-container *ngIf="textToSearch$ | async"></ng-container>
+    <ng-container *ngIf="scroll$ | async"></ng-container>  
+    <ng-content select="[fieldTitle]"></ng-content>
+    <div
+      class="multiple-selection-list__search-container"      
     >
-      <mat-option
-        *ngFor="let selection of selections; let i = index"
-        [value]="selection.id"
+      <mat-form-field        
+        appearance="fill"
+        class="multiple-selection-list__field"
+        style="flex: 3"
       >
-        <div class="option-container">
-          {{ selection.description }}
-        </div>
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-  <fieldset [disabled]="formField.value === 'y'">
-    <mat-selection-list
-    [disabled]="formField.value === 'y'"
-      #multipleSelection
-      name="multipleSelection"
-      (click)="chengeSelection($event)"
-      (keydown)="handleKeyDown($event)"
+        <mat-select
+          #selection
+          [formControl]="formField"
+          name="fieldControl"          
+          (selectionChange)="handleSelectionChange($event)"
+        >
+          <mat-option
+            *ngFor="let selection of selectOptions; let i = index"
+            [value]="selection.id"
+          >
+            <div
+              class="option-container"
+              [ngStyle]="{ 'border-bottom-width': i === 1 ? '3px' : '1.5px' }"
+            >
+              {{ selection.description }}
+            </div>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field
+        style="flex: 1"
+      >
+        <input
+          matInput
+          [formControl]="multiSelectionForm.controls.searchInput"
+          placeHolder="Filtrar..."          
+          (keydown)="handleKeyDown($event)"          
+        />
+      </mat-form-field>
+    </div>
+    <fieldset
+      [disabled]="formField.value === 'y' || formField.value === ''"
+      class="multiple-selection-list__list_options-no-border"
     >
-      <mat-list-option
-        *ngFor="let item of list; let i = index"
-        [value]="item.id"
-        (click)="selectItem(item)"
-        [selected]="!!item.valueRight"
-        checkboxPosition="before"
-        (keydown)="handleKeyDown($event)"
+      <div
+        class="multiple-selection-list__list-options-container"
+        [ngStyle]="{
+          'border-color':
+            formField.value === 'y' || formField.value === ''
+              ? 'var(--z-colors-page-button-disabled-border)'
+              : 'var(--theme-primary-300)'
+        }"
       >
-        <div class="columnaLista">
-          <div class="lineaLista">{{ item.translatedName }}</div>
+        <div
+          *ngIf="loading"
+          class="multiple-selection-list__progress-container"
+        >
+          <mat-progress-spinner
+            mode="indeterminate"
+            color="primary"
+            class="multiple-selection-list__progress"
+            diameter="64"
+          >
+          </mat-progress-spinner>
         </div>
-      </mat-list-option>
-    </mat-selection-list>
-    <mat-form-field>
-      <input        
-        #searchInput
-        matInput
-        [formControl]="multiSelectionForm.controls.searchInput"
-        (keydown)="handleKeyDown($event)"
-      />
-    </mat-form-field>
+        <div          
+          class="multiple-selection-list__list-options-box no-selections"
+          *ngIf="list.length === 0 && !loading"
+        >
+          <span>No hay elementos a mostrar...</span>
+        </div>
+        <mat-selection-list
+          *ngIf="list.length > 0 || loading"
+          class="multiple-selection-list__list-options-box"
+          [disabled]="
+            formField.value === 'y' || formField.value === '' || loading
+          "
+          #multipleSelection
+          name="multipleSelection"
+          (click)="chengeSelection($event)"
+          (keydown)="handleKeyDown($event)"          
+          cdkScrollable
+        >
+          <mat-list-option
+            *ngFor="let item of list; let i = index"            
+            [value]="item.id"
+            (click)="selectItem(item)"
+            [selected]="!!item.valueRight"
+            checkboxPosition="before"
+            (keydown)="handleKeyDown($event)"
+            color="primary"
+          >
+            <div class="multiple-selection-list__list-option-container">
+              <div class="multiple-selection-list__list-option">
+                {{ item.translatedName }}
+              </div>
+            </div>
+          </mat-list-option>
+        </mat-selection-list>
+      </div>
+      <div
+        class="multiple-selection-list__search-container"        
+      >
+        <mat-hint
+          class="auto-complete__hint"
+          align="start"          
+        >
+          <span
+            *ngIf="totalCount > 0"
+            class="auto-complete__hint--normal"
+          >
+            Item(s): {{ list.length }} de {{ totalCount }}
+          </span>
+          <span 
+            *ngIf="totalCount === 0"
+            class="auto-complete__hint--normal"
+          >
+            No hay items a mostrar...
+          </span>
+        </mat-hint>
+        <mat-hint
+          class="auto-complete__hint"
+          align="end"          
+        >
+          <span class="auto-complete__hint--normal">
+              Seleccionados en la lista: {{ getItemsSelected() }}
+          </span>
+        </mat-hint>
+      </div>
+    </fieldset>
   </fieldset>
 </div>

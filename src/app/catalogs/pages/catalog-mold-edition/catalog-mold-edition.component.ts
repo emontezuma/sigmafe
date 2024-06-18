@@ -3,14 +3,14 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, MoldDetail, MoldItem, emptyMoldItem, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, MoldDetail, MoldItem, emptyMoldItem, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, map, skip, startWith, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
@@ -37,9 +37,9 @@ export class CatalogMoldEditionComponent {
 
   // Variables ===============
   mold: MoldDetail = emptyMoldItem;
-  scroll$: Observable<any>;;
+  scroll$: Observable<any>;
   showGoTop$: Observable<GoTopButtonStatus>;
-  settingsData$: Observable<SettingsData>; 
+  settingsData$: Observable<SettingsData>;   
 
   providers$: Observable<any>; 
   manufacturers$: Observable<any>; 
@@ -63,8 +63,10 @@ export class CatalogMoldEditionComponent {
   translations$: Observable<any>;
   moldDataLoading$: Observable<boolean>;
   updateMold$: Observable<any>;
-  updateMoldCatalog$: Observable<any>;
-  deleteMoldTranslations$: Observable<any>;  
+  updateMoldCatalog: Subscription;
+  updateMoldTranslations$: Observable<any>;  
+  deleteCatalogDetails$: Observable<any>;  
+  addOrUpdateCatalogDetails$: Observable<any>;  
   deleteMoldMaintenanceHistory$: Observable<any>;  
   addMoldTranslations$: Observable<any>;  
   
@@ -138,8 +140,8 @@ export class CatalogMoldEditionComponent {
     line: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     equipment: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     reference: new FormControl(''),    
-    checklistTemplateYellow: new FormControl('y'),
-    checklistTemplateRed: new FormControl(''),
+    templatesYellow: new FormControl(''),
+    templatesRed: new FormControl(''),
   });
 
   maintenanceHistoricalTableColumns: string[] = ['item', 'provider', 'operator', 'friendlyState', 'notes', 'range', 'actions'];
@@ -170,6 +172,18 @@ export class CatalogMoldEditionComponent {
       operatorName: null,      
     },
   } 
+
+  checklistTemplatesOptions: SimpleTable[] = [
+    { id: '', description: $localize`No usar Templates de checklist` },  
+    { id: 'y', description: $localize`TODOS los Templates de checklist activos` },  
+    { id: 'n', description: $localize`Los Templates de checklist de la lista` },  
+    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
+    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
+  ];
+
+  checklistYellowTemplatesCurrentSelection: GeneralMultipleSelcetionItems[] = [];
+  checklistRedTemplatesCurrentSelection: GeneralMultipleSelcetionItems[] = [];
+  loaded: boolean = false;
 
   constructor(
     private _store: Store<AppState>,
@@ -220,8 +234,8 @@ export class CatalogMoldEditionComponent {
         // this.requestLinesData(currentPage);
         // this.requestEquipmentsData(currentPage);        
         // this.requestMoldTypessData(currentPage);
-        this.requestChecklistTemplateYellowData(currentPage);
-        // this.requestChecklistTemplateRedData(currentPage);
+        this.requestChecklistTemplatesYellowData(currentPage);
+        this.requestChecklistTemplatesRedData(currentPage);
         this.requestMoldThresholdTypesData(currentPage);
         this.requestLabelColorsData(currentPage);
         this.requestStatesData(currentPage);
@@ -254,6 +268,7 @@ export class CatalogMoldEditionComponent {
       })
     );
     this.moldFormChangesSubscription = this.moldForm.valueChanges.subscribe((moldFormChanges: any) => {
+      if (!this.loaded) return;
       if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
         this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
       } else {
@@ -299,7 +314,10 @@ export class CatalogMoldEditionComponent {
     this.moldForm.controls.thresholdType.setValue(GeneralValues.N_A);
     this.moldForm.controls.state.setValue(GeneralValues.N_A);
     setTimeout(() => {
-      this.focusThisField = 'description';  
+      this.focusThisField = 'description';
+      if (!this.mold) {
+        this.loaded = true;
+      }
     }, 200);    
     // this.moldForm.reset(this.mold);
   }
@@ -320,6 +338,7 @@ export class CatalogMoldEditionComponent {
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
     if (this.moldFormChangesSubscription) this.moldFormChangesSubscription.unsubscribe();    
+    if (this.updateMoldCatalog) this.updateMoldCatalog.unsubscribe();    
   }
   
 // Functions ================
@@ -893,31 +912,34 @@ export class CatalogMoldEditionComponent {
   }
 
   getScrolling(data: CdkScrollable) {       
-    const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
-    let status = 'inactive'
-    if (scrollTop < 5) {
-      status = 'inactive';
-    } else if (this.onTopStatus !== 'temp') {
-      status = 'active';
-      clearTimeout(this.goTopButtonTimer);
-      this.goTopButtonTimer = setTimeout(() => {
-        if (this.onTopStatus !== 'inactive') {
-          this.onTopStatus = 'inactive';
-          this._sharedService.setGoTopButton(
-            ApplicationModules.GENERAL,
-            'inactive',
-          );
-        }
-        return;
-      }, 2500);
-    }    
-    if (this.onTopStatus !== status) {
-      this.onTopStatus = status;
-      this._sharedService.setGoTopButton(
-        ApplicationModules.GENERAL,
-        status,
-      );
+    if (data.getElementRef().nativeElement.tagName === 'DIV') {
+      const scrollTop = data.getElementRef().nativeElement.scrollTop || 0;    
+      let status = 'inactive'
+      if (scrollTop < 5) {
+        status = 'inactive';
+      } else if (this.onTopStatus !== 'temp') {
+        status = 'active';
+        clearTimeout(this.goTopButtonTimer);
+        this.goTopButtonTimer = setTimeout(() => {
+          if (this.onTopStatus !== 'inactive') {
+            this.onTopStatus = 'inactive';
+            this._sharedService.setGoTopButton(
+              ApplicationModules.GENERAL,
+              'inactive',
+            );
+          }
+          return;
+        }, 2500);
+      }    
+      if (this.onTopStatus !== status) {
+        this.onTopStatus = status;
+        this._sharedService.setGoTopButton(
+          ApplicationModules.GENERAL,
+          status,
+        );
+      }
     }
+    
   }
 
   onSubmit() {
@@ -927,12 +949,7 @@ export class CatalogMoldEditionComponent {
     this.moldForm.markAllAsTouched();        
     this.moldForm.updateValueAndValidity();    
     if (this.moldForm.valid) {      
-
-      if (JSON.parse(JSON.stringify(this.storedTranslations)) !== JSON.parse(JSON.stringify(this.mold.translations)) && this.translationChanged) {        
-        this.processTranslations()
-      } else  {
-        this.saveMold();      
-      }      
+      this.saveMold();
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
@@ -1001,11 +1018,13 @@ export class CatalogMoldEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateMoldCatalog$ = this._catalogsService.updateMoldCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateMold.length > 0) {
-          this.requestMoldData(data?.data?.createOrUpdateMold[0].id)          
+    this.updateMoldCatalog = this._catalogsService.updateMoldCatalog$(dataToSave)
+    .subscribe((data: any) => {
+      if (data?.data?.createOrUpdateMold.length > 0) {
+        const moldId = data?.data?.createOrUpdateMold[0].id;
+        combineLatest([ this.processTranslations$(moldId), this.saveChecklistTemplates$(moldId) ])
+        .subscribe(() => {
+          this.requestMoldData(moldId);          
           setTimeout(() => {              
             let message = $localize`El Molde ha sido actualizado`;
             if (newRecord) {                
@@ -1020,14 +1039,10 @@ export class CatalogMoldEditionComponent {
             this.setViewLoading(false);
             this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
           }, 200);
-        }        
-      }),
-      catchError(err => {
-        this.setViewLoading(false);
-        this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
-        return EMPTY;
-      })      
-    )
+        })
+      }
+      
+    });    
   }
 
   requestProvidersData(currentPage: number, filterStr: string = null) {    
@@ -1122,7 +1137,7 @@ export class CatalogMoldEditionComponent {
     )    
   }
 
-  requestChecklistTemplateYellowData(currentPage: number, filterStr: string = null) {    
+  requestChecklistTemplatesYellowData(currentPage: number, filterStr: string = null) {    
     this.checklistTemplatesYellow = {
       ...this.checklistTemplatesYellow,
       currentPage,
@@ -1138,7 +1153,7 @@ export class CatalogMoldEditionComponent {
     const moldParameters = {
       settingType: 'multiSelection',
       skipRecords,
-      process: 'mold-checklist-template-yellow',
+      process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
       processId, 
       takeRecords: this.takeRecords, 
       filter,       
@@ -1154,6 +1169,7 @@ export class CatalogMoldEditionComponent {
             translatedReference: item.translatedReference,
             id: item.id,
             valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
           }
         })
         this.checklistTemplatesYellow = {
@@ -1168,7 +1184,7 @@ export class CatalogMoldEditionComponent {
     )    
   }
 
-  requestChecklistTemplateRedData(currentPage: number, filterStr: string = null) {    
+  requestChecklistTemplatesRedData(currentPage: number, filterStr: string = null) {    
     this.checklistTemplatesRed = {
       ...this.checklistTemplatesRed,
       currentPage,
@@ -1176,18 +1192,18 @@ export class CatalogMoldEditionComponent {
     }    
     let filter = null;
     if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
     }
     const skipRecords = this.checklistTemplatesRed.items.length;
 
+    const processId = !!this.mold.id ? this.mold.id : 0;
     const moldParameters = {
-      settingType: 'tables',
-      skipRecords, 
+      settingType: 'multiSelection',
+      skipRecords,
+      process: SystemTables.CHECKLIST_TEMPLATES_RED,
+      processId, 
       takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order
+      filter,       
     }    
     const variables = this._sharedService.setGraphqlVariables(moldParameters);    
     this.checklistTemplatesRed$ = this._catalogsService.getChecklistTemplatesRedLazyLoadingDataGql$(variables)
@@ -1198,8 +1214,9 @@ export class CatalogMoldEditionComponent {
             isTranslated: item.isTranslated,
             translatedName: item.translatedName,
             translatedReference: item.translatedReference,
-            id: item.data.id,
-            valueRight: item.data.value,
+            id: item.id,
+            valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
           }
         })
         this.checklistTemplatesRed = {
@@ -1442,6 +1459,16 @@ export class CatalogMoldEditionComponent {
       tap((moldData: MoldDetail) => {
         if (!moldData) return;        
         this.mold =  moldData;
+        //
+        this.checklistYellowTemplatesCurrentSelection = [];
+        this.checklistRedTemplatesCurrentSelection = [];
+        this.checklistTemplatesYellow.currentPage = 0;   
+        this.checklistTemplatesYellow.items = [];
+        this.checklistTemplatesRed.currentPage = 0;   
+        this.checklistTemplatesRed.items = [];
+        this.requestChecklistTemplatesYellowData(0);
+        this.requestChecklistTemplatesRedData(0);
+        //
         this.requestMaintenancesData(0);
         this.translationChanged = false;
         this.imageChanged = false;        
@@ -1455,7 +1482,8 @@ export class CatalogMoldEditionComponent {
           toolbarButton.caption = moldData.translations.length > 0 ? $localize`Traducciones (${moldData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
           toolbarButton.class = moldData.translations.length > 0 ? 'accent' : '';
-        }        
+        }
+        this.loaded = true;
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
       }),
@@ -1484,7 +1512,7 @@ export class CatalogMoldEditionComponent {
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
-  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {    
     if (getMoreDataParams.catalogName === SystemTables.PROVIDERS) {
       if (getMoreDataParams.initArray) {
         this.providers.currentPage = 0;   
@@ -1584,6 +1612,7 @@ export class CatalogMoldEditionComponent {
         getMoreDataParams.textToSearch,  
       );    
     } else if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATES_YELLOW) {
+      if (this.checklistTemplatesYellow.loading) return;
       if (getMoreDataParams.initArray) {
         this.checklistTemplatesYellow.currentPage = 0;   
         this.checklistTemplatesYellow.items = [];
@@ -1592,11 +1621,12 @@ export class CatalogMoldEditionComponent {
       } else {
         this.checklistTemplatesYellow.currentPage++;
       }
-      this.requestChecklistTemplateYellowData(        
+      this.requestChecklistTemplatesYellowData(        
         this.checklistTemplatesYellow.currentPage,
         getMoreDataParams.textToSearch,  
       );    
     } else if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATES_RED) {
+      if (this.checklistTemplatesRed.loading) return;
       if (getMoreDataParams.initArray) {
         this.checklistTemplatesRed.currentPage = 0;   
         this.checklistTemplatesRed.items = [];
@@ -1605,7 +1635,7 @@ export class CatalogMoldEditionComponent {
       } else {
         this.checklistTemplatesRed.currentPage++;
       }
-      this.requestChecklistTemplateRedData(        
+      this.requestChecklistTemplatesRedData(        
         this.checklistTemplatesRed.currentPage,
         getMoreDataParams.textToSearch,  
       );    
@@ -1646,6 +1676,14 @@ export class CatalogMoldEditionComponent {
 
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
+  }
+
+  handleMultipleSelectionChanged(catalog: string){    
+    if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
   }
 
   handleInputKeydown(event: KeyboardEvent) {
@@ -1758,7 +1796,6 @@ export class CatalogMoldEditionComponent {
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;      
@@ -1798,6 +1835,8 @@ export class CatalogMoldEditionComponent {
       label: this.mold.label,      
       state: this.mold.state,
       startingDate: this.mold.startingDate,
+      templatesYellow: this.mold.templatesYellow,
+      templatesRed: this.mold.templatesRed,
     });
   } 
 
@@ -1828,28 +1867,30 @@ export class CatalogMoldEditionComponent {
         id: this.mold.id,
         customerId: 1, // TODO: Get from profile
         status: newRecord ? RecordStatus.ACTIVE : this.mold.status,
-      ...(fc.description.dirty || fc.description.touched || newRecord) && { description: fc.description.value  },
-      ...(fc.serialNumber.dirty || fc.serialNumber.touched || newRecord) && { serialNumber: fc.serialNumber.value },
-      ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
-      ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-      ...(fc.startingDate.dirty || fc.startingDate.touched || newRecord) && { startingDate: startingDate },
-      ...(fc.moldType.dirty || fc.moldType.touched || newRecord) && { moldTypeId: fc.moldType.value.id },      
-      ...(fc.moldClass.dirty || fc.moldClass.touched || newRecord) && { moldClassId: fc.moldClass.value.id },
-      ...(fc.provider.dirty || fc.provider.touched || newRecord) && { providerId: fc.provider.value.id },
-      ...(fc.manufacturer.dirty || fc.manufacturer.touched || newRecord) && { manufacturerId: fc.manufacturer.value.id },
-      ...(fc.manufacturingDate.dirty || fc.manufacturingDate.touched || newRecord) && { manufacturingDate: manufacturingDate },
-      ...(fc.state.dirty || fc.state.touched || newRecord) && { state: fc.state.value },
-      ...(fc.label.dirty || fc.label.touched || newRecord) && { label: fc.label.value },
-      ...(fc.partNumber.dirty || fc.partNumber.touched || newRecord) && { partNumberId: fc.partNumber.value.id },
-      ...(fc.position.dirty || fc.position.touched || newRecord) && { position: +fc.position.value },
-      ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value.id },
-      ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value.id },
-      ...(fc.thresholdType.dirty || fc.thresholdType.touched || newRecord) && { thresholdType: fc.thresholdType.value },
-      ...(fc.thresholdYellow.dirty || fc.thresholdYellow.touched || newRecord) && { thresholdYellow: fc.thresholdYellow.value ? +fc.thresholdYellow.value : null },
-      ...(fc.thresholdRed.dirty || fc.thresholdRed.touched || newRecord) && { thresholdRed: fc.thresholdRed.value ? +fc.thresholdRed.value : null },
-      ...(fc.thresholdDateYellow.dirty || fc.thresholdDateYellow.touched || newRecord) && { thresholdDateYellow: fc.thresholdDateYellow.value ? +fc.thresholdDateYellow.value : null },
-      ...(fc.thresholdDateRed.dirty || fc.thresholdDateRed.touched || newRecord) && { thresholdDateRed: fc.thresholdDateRed.value ? +fc.thresholdDateRed.value : null },
-      ...(this.imageChanged) && { 
+        ...(fc.templatesYellow.dirty || fc.templatesYellow.touched || newRecord) && { templatesYellow: fc.templatesYellow.value  },
+        ...(fc.templatesRed.dirty || fc.templatesRed.touched || newRecord) && { templatesRed: fc.templatesRed.value  },
+        ...(fc.description.dirty || fc.description.touched || newRecord) && { description: fc.description.value  },
+        ...(fc.serialNumber.dirty || fc.serialNumber.touched || newRecord) && { serialNumber: fc.serialNumber.value },
+        ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
+        ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+        ...(fc.startingDate.dirty || fc.startingDate.touched || newRecord) && { startingDate: startingDate },
+        ...(fc.moldType.dirty || fc.moldType.touched || newRecord) && { moldTypeId: fc.moldType.value.id },      
+        ...(fc.moldClass.dirty || fc.moldClass.touched || newRecord) && { moldClassId: fc.moldClass.value.id },
+        ...(fc.provider.dirty || fc.provider.touched || newRecord) && { providerId: fc.provider.value.id },
+        ...(fc.manufacturer.dirty || fc.manufacturer.touched || newRecord) && { manufacturerId: fc.manufacturer.value.id },
+        ...(fc.manufacturingDate.dirty || fc.manufacturingDate.touched || newRecord) && { manufacturingDate: manufacturingDate },
+        ...(fc.state.dirty || fc.state.touched || newRecord) && { state: fc.state.value },
+        ...(fc.label.dirty || fc.label.touched || newRecord) && { label: fc.label.value },
+        ...(fc.partNumber.dirty || fc.partNumber.touched || newRecord) && { partNumberId: fc.partNumber.value.id },
+        ...(fc.position.dirty || fc.position.touched || newRecord) && { position: +fc.position.value },
+        ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value.id },
+        ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value.id },
+        ...(fc.thresholdType.dirty || fc.thresholdType.touched || newRecord) && { thresholdType: fc.thresholdType.value },
+        ...(fc.thresholdYellow.dirty || fc.thresholdYellow.touched || newRecord) && { thresholdYellow: fc.thresholdYellow.value ? +fc.thresholdYellow.value : null },
+        ...(fc.thresholdRed.dirty || fc.thresholdRed.touched || newRecord) && { thresholdRed: fc.thresholdRed.value ? +fc.thresholdRed.value : null },
+        ...(fc.thresholdDateYellow.dirty || fc.thresholdDateYellow.touched || newRecord) && { thresholdDateYellow: fc.thresholdDateYellow.value ? +fc.thresholdDateYellow.value : null },
+        ...(fc.thresholdDateRed.dirty || fc.thresholdDateRed.touched || newRecord) && { thresholdDateRed: fc.thresholdDateRed.value ? +fc.thresholdDateRed.value : null },
+        ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.mold.mainImagePath,
         mainImageGuid: this.mold.mainImageGuid, },
@@ -2010,8 +2051,17 @@ export class CatalogMoldEditionComponent {
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations() {
-    if (this.storedTranslations.length > 0) {
+  processTranslations$(moldId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.mold.translations.length || this.storedTranslations.some((st: any) => {
+      return this.mold.translations.find((t: any) => {        
+        return st.languageId === t.languageId &&
+        st.id === t.id &&
+        (st.description !== t.description || 
+        st.reference !== t.reference || 
+        st.notes !== t.notes);
+      });
+    });
+    if (differences) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
@@ -2021,46 +2071,88 @@ export class CatalogMoldEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
+      }      
+      const translationsToAdd = this.mold.translations.map((t: any) => {
+        return {
+          id: null,
+          moldId,
+          description: t.description,
+          reference: t.reference,
+          notes: t.notes,
+          languageId: t.languageId,
+          customerId: 1, // TODO: Get from profile
+          status: RecordStatus.ACTIVE,
+        }
+      });
+      const varToAdd = {
+        translations: translationsToAdd,
       }
-      this.deleteMoldTranslations$ = this._catalogsService.deleteMoldTranslations$(varToDelete)
-      .pipe(
-        tap(() => {
-          if (this.mold.translations.length > 0) {
-            this.addTranslations();
-          } else {
-            this.saveMold();
-          }
-        })        
-      )
-    } else if (this.mold.translations.length > 0) {
-      this.addTranslations();
+  
+      return combineLatest([ 
+        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteMoldTranslations$(varToDelete) : of(null) 
+      ]);
     } else {
-      this.saveMold();
+      return of(null);
     }
+    
   }
 
-  addTranslations() {
-    const translationsToAdd = this.mold.translations.map((t: any) => {
-      return {
-        id: null,
-        moldId: this.mold.id,
-        description: t.description,
-        reference: t.reference,
-        notes: t.notes,
-        languageId: t.languageId,
+  saveChecklistTemplates$(processId: number): Observable<any> {
+    if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistYellowTemplatesCurrentSelection.length > 0) {
+      const checklistTemplatesYellowToDelete = this.checklistYellowTemplatesCurrentSelection
+      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
+      .map(ct => {
+        return {
+          id: ct.catalogDetailId,
+          deletePhysically: true,
+        }
+      });
+      const checklistTemplatesRedToDelete = this.checklistRedTemplatesCurrentSelection
+      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
+      .map(ct => {
+        return {
+          id: ct.catalogDetailId,
+          deletePhysically: true,
+        }
+      });
+      const ctToDelete = {
+        ids: [...checklistTemplatesYellowToDelete, ...checklistTemplatesRedToDelete],
         customerId: 1, // TODO: Get from profile
-        status: RecordStatus.ACTIVE,
       }
-    });
-    const varToAdd = {
-      translations: translationsToAdd,
+      const checklistTemplatesYellowToAdd = this.checklistYellowTemplatesCurrentSelection
+      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
+      .map(ct => {
+        return {
+          process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
+          processId,
+          detailTableName: SystemTables.CHECKLIST_TEMPLATES,
+          value: ct.valueRight,
+          customerId: 1,  // TODO: Get from profile
+        }
+      });
+      const checklistTemplatesRedToAdd = this.checklistRedTemplatesCurrentSelection
+      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
+      .map(ct => {
+        return {
+          process: SystemTables.CHECKLIST_TEMPLATES_RED,
+          processId,
+          detailTableName: SystemTables.CHECKLIST_TEMPLATES,
+          value: ct.valueRight,
+          customerId: 1,  // TODO: Get from profile
+        }
+      });
+      const ctToAdd = {
+        catalogDetails: [...checklistTemplatesYellowToAdd, ...checklistTemplatesRedToAdd],
+      }
+
+      return combineLatest([ 
+        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
+        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
+      ]);
+    } else {
+      return of(null);
     }
-    this.addMoldTranslations$ = this._catalogsService.addMoldTransations$(varToAdd)
-    .pipe(
-      tap(() => {        
-        this.saveMold();
-      })
-    )
   }
 
   handleRemoveAllHistoricalButtonClick(action: string, id: number = 0) {

@@ -49,13 +49,13 @@ export interface VariableDetail {
   showNotes?: boolean;
   translations?: GeneralTranslation[];
   required?: string;
-  allowNoAnswer?: string;
+  allowNoCapture?: string;
   allowComments?: string;
   showChart?: string;
   allowAlarm?: string;
-  cumulative?: string;
-  automaticActionPlan?: string;
   notifyAlarm?: string;
+  cumulative?: string;
+  automaticActionPlan?: string;  
 }
 
 export interface VariablesState {
@@ -114,7 +114,7 @@ export const emptyVariableItem: VariableDetail = {
   createdBy: null,
   showNotes: false,
   required: GeneralValues.NO,
-  allowNoAnswer: GeneralValues.NO,
+  allowNoCapture: GeneralValues.NO,
   allowComments: GeneralValues.NO,
   showChart: GeneralValues.NO,
   allowAlarm: GeneralValues.NO,

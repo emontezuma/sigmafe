@@ -76,13 +76,13 @@ query MoldsUnlimited {
 
 export const GET_MOLDS = gql`
   query MoldsPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [FriendlyMoldSortInput!],
     $filterBy: FriendlyMoldFilterInput,
   ) {
   moldsPaginated (
-    skip: $recosrdsToSkip,
+    skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
     where: $filterBy
@@ -132,7 +132,7 @@ export const GET_MOLDS = gql`
 
 export const GET_HARDCODED_VALUES = gql`  
   query HardcodedValues (
-      $recosrdsToSkip: Int,
+      $recordsToSkip: Int,
       $recordsToTake: Int,
       $orderBy: [HardcodedValueSortInput!],
       $filterBy: HardcodedValueFilterInput
@@ -140,7 +140,7 @@ export const GET_HARDCODED_VALUES = gql`
   hardcodedValues(
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -161,7 +161,7 @@ export const GET_HARDCODED_VALUES = gql`
 
 export const GET_PROVIDERS_LAZY_LOADING = gql`
   query ProvidersPaginated (
-      $recosrdsToSkip: Int,
+      $recordsToSkip: Int,
       $recordsToTake: Int,
       $orderBy: [TranslatedProviderDtoSortInput!],
       $filterBy: TranslatedProviderDtoFilterInput
@@ -169,7 +169,7 @@ export const GET_PROVIDERS_LAZY_LOADING = gql`
   providersPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -193,7 +193,7 @@ export const GET_PROVIDERS_LAZY_LOADING = gql`
 
 export const GET_MANUFACTURERS_LAZY_LOADING = gql`
   query ManufacturersPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedManufacturerDtoSortInput!],
     $filterBy: TranslatedManufacturerDtoFilterInput
@@ -201,7 +201,7 @@ export const GET_MANUFACTURERS_LAZY_LOADING = gql`
   manufacturersPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -225,7 +225,7 @@ export const GET_MANUFACTURERS_LAZY_LOADING = gql`
 
 export const GET_LINES_LAZY_LOADING = gql`
   query LinesPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedLineDtoSortInput!],
     $filterBy: TranslatedLineDtoFilterInput
@@ -233,7 +233,7 @@ export const GET_LINES_LAZY_LOADING = gql`
   linesPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -257,7 +257,7 @@ export const GET_LINES_LAZY_LOADING = gql`
 
 export const GET_EQUIPMENTS_LAZY_LOADING = gql`
   query EquipmentsPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedEquipmentDtoSortInput!],
     $filterBy: TranslatedEquipmentDtoFilterInput
@@ -265,7 +265,7 @@ export const GET_EQUIPMENTS_LAZY_LOADING = gql`
   equipmentsPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -289,7 +289,7 @@ export const GET_EQUIPMENTS_LAZY_LOADING = gql`
 
 export const GET_PART_NUMBERS_LAZY_LOADING = gql`
   query PartNumbersPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedPartNumberDtoSortInput!],
     $filterBy: TranslatedPartNumberDtoFilterInput
@@ -297,7 +297,7 @@ export const GET_PART_NUMBERS_LAZY_LOADING = gql`
   partNumbersPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
     totalCount
@@ -321,7 +321,7 @@ export const GET_PART_NUMBERS_LAZY_LOADING = gql`
 
 export const GET_GENERICS_LAZY_LOADING = gql`
   query GenericsPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedGenericDtoSortInput!],
     $filterBy: TranslatedGenericDtoFilterInput
@@ -329,7 +329,7 @@ export const GET_GENERICS_LAZY_LOADING = gql`
   genericsPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
     totalCount
@@ -356,7 +356,7 @@ export const GET_GENERICS_LAZY_LOADING = gql`
 
 export const GET_MAINTENANCE_HISTORICAL_LAZY_LOADING = gql`
   query MaintenanceHistoricalsPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedMaintenanceHistoricalDtoSortInput!],
     $filterBy: TranslatedMaintenanceHistoricalDtoFilterInput
@@ -364,7 +364,7 @@ export const GET_MAINTENANCE_HISTORICAL_LAZY_LOADING = gql`
     maintenanceHistoricalsPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
     totalCount
@@ -459,6 +459,8 @@ export const GET_MOLD = gql`
         id
         customerId
         status
+        templatesYellow
+        templatesRed
         createdById
         createdAt
         updatedById
@@ -654,13 +656,13 @@ export const GET_MOLD = gql`
 
 export const GET_MOLD_TRANSLATIONS = gql`
   query MoldsTranslationsTable (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [MoldTranslationTableSortInput!],
     $filterBy: MoldTranslationTableFilterInput,
   ) {
   moldsTranslationsTable(
-    skip: $recosrdsToSkip,
+    skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
     where: $filterBy
@@ -701,7 +703,7 @@ export const GET_MOLD_TRANSLATIONS = gql`
 
 export const GET_LANGUAGES_LAZY_LOADING = gql`
   query Languages (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [LanguageSortInput!],
     $filterBy: LanguageFilterInput
@@ -709,7 +711,7 @@ export const GET_LANGUAGES_LAZY_LOADING = gql`
     languages (
       where: $filterBy, 
       order: $orderBy, 
-      skip: $recosrdsToSkip, 
+      skip: $recordsToSkip, 
       take: $recordsToTake
     ) {
       totalCount
@@ -773,7 +775,9 @@ export const UPDATE_MOLD = gql`
     $thresholdYellow: Long,
     $thresholdRed: Long,
     $thresholdDateYellow: Long,
-    $thresholdDateRed: Long        
+    $thresholdDateRed: Long,        
+    $templatesRed: String,        
+    $templatesYellow: String
   ) {
   createOrUpdateMold (
     inputs: [{
@@ -803,7 +807,9 @@ export const UPDATE_MOLD = gql`
       thresholdYellow: $thresholdYellow
       thresholdRed: $thresholdRed
       thresholdDateYellow: $thresholdDateYellow
-      thresholdDateRed: $thresholdDateRed        
+      thresholdDateRed: $thresholdDateRed
+      templatesRed: $templatesRed        
+      templatesYellow: $templatesYellow
     }]) {
       id
       createdAt
@@ -831,6 +837,30 @@ export const DELETE_MOLD_TRANSLATIONS = gql`
       ids: $ids,
       customerId: $customerId
     ) 
+  }
+`;
+
+export const DELETE_CATALOG_DETAILS = gql`
+  mutation DeleteCatalogsDetails (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  ) {
+    deleteCatalogsDetails (      
+      ids: $ids,
+      customerId: $customerId
+    ) 
+  }
+`;
+
+export const CREATE_OR_UPDATE_CATALOG_DETAILS = gql`
+  mutation CreateOrUpdateCatalogDetail ($catalogDetails: [CatalogDetailDtoInput!]!) {
+  createOrUpdateCatalogDetail (inputs: $catalogDetails) {
+      customerId
+      processId
+      process
+      detailTableName
+      value      
+    } 
   }
 `;
 
@@ -868,7 +898,7 @@ export const ADD_MAINTENANCE_HISTORY = gql`
     inputs: {
       id: $id,
       moldId: $moldId,
-      customerId: $customerId,            
+      customerId: $customerId,
       providerId: $providerId,
       state: $state,
       operatorName: $operatorName,
@@ -900,13 +930,13 @@ export const DELETE_MAINTENANCE_HISTORY = gql`
 
 export const GET_VARIABLES = gql`
   query VariablesPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedVariableDtoSortInput!],
     $filterBy: TranslatedVariableDtoFilterInput,
   ) {
   variablesPaginated (
-    skip: $recosrdsToSkip,
+    skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
     where: $filterBy
@@ -980,8 +1010,8 @@ export const UPDATE_VARIABLE = gql`
     $name: String,
     $reference: String,
     $notes: String,
-    $valueTypeId: Long,
-    $resetValueModeId: Long,
+    $valueType: String,
+    $resetValueMode: String,
     $umoId: Long,
     $sigmaTypeId: Long,
     $mainImageGuid: String,
@@ -996,13 +1026,13 @@ export const UPDATE_VARIABLE = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
-      valueTypeId: $valueTypeId,
-      resetValueModeId: $resetValueModeId,
+      valueType: $valueType,
+      resetValueMode: $resetValueMode,
       umoId: $umoId,
       sigmaTypeId: $sigmaTypeId,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
-      mainImagePath: $mainImagePath,      
+      mainImagePath: $mainImagePath,
     }]) {
       id
       createdAt
@@ -1035,7 +1065,7 @@ export const DELETE_VARIABLE_TRANSLATIONS = gql`
 
 export const GET_UOMS_LAZY_LOADING = gql`
   query UomsPaginated (
-      $recosrdsToSkip: Int,
+      $recordsToSkip: Int,
       $recordsToTake: Int,
       $orderBy: [TranslatedUomDtoSortInput!],
       $filterBy: TranslatedUomDtoFilterInput
@@ -1043,7 +1073,39 @@ export const GET_UOMS_LAZY_LOADING = gql`
     uomsPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_SENSORS_LAZY_LOADING = gql`
+  query SensorsPaginated (
+      $recordsToSkip: Int,
+      $recordsToTake: Int,
+      $orderBy: [TranslatedUomDtoSortInput!],
+      $filterBy: TranslatedUomDtoFilterInput
+  ) {
+    sensorsPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
   ) {
       totalCount
@@ -1067,7 +1129,7 @@ export const GET_UOMS_LAZY_LOADING = gql`
 
 export const GET_SIGMA_TYPES_LAZY_LOADING = gql`
   query SigmaTypesPaginated (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [TranslatedSigmaTypeDtoSortInput!],
     $filterBy: TranslatedSigmaTypeDtoFilterInput
@@ -1075,7 +1137,7 @@ export const GET_SIGMA_TYPES_LAZY_LOADING = gql`
     sigmaTypesPaginated (
     where: $filterBy, 
     order: $orderBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake
     ) {
       totalCount
@@ -1195,13 +1257,13 @@ export const GET_VARIABLE = gql`
 
 export const GET_VARIABLE_TRANSLATIONS = gql`
   query VariablesTranslationsTable (
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $orderBy: [VariableTranslationTableSortInput!],
     $filterBy: VariableTranslationTableFilterInput,
   ) {
     variablesTranslationsTable(
-    skip: $recosrdsToSkip,
+    skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
     where: $filterBy
@@ -1260,7 +1322,7 @@ export const INACTIVATE_VARIABLE = gql`
 
 export const GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING = gql`
   query CatalogDetailChecklistTemplate (    
-    $recosrdsToSkip: Int,
+    $recordsToSkip: Int,
     $recordsToTake: Int,
     $filterBy: MultipleCatalogSelectionDtoFilterInput,
     $process: String,
@@ -1268,7 +1330,7 @@ export const GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING = gql`
   ) {
     catalogDetailChecklistTemplate (
     where: $filterBy, 
-    skip: $recosrdsToSkip, 
+    skip: $recordsToSkip, 
     take: $recordsToTake,
     process: $process,
     processId: $processId
@@ -1276,6 +1338,71 @@ export const GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING = gql`
       totalCount
       items {
         id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING = gql`
+  query CatalogDetailMold (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailMold (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING = gql`
+  query CatalogDetailActionPlan (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailActionPlan (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
         translatedName
         translatedReference
         isTranslated
