@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ImageNotFoundModule, OptionsScrollModule, FocusInvalidInputModule } from '../shared/directives';
-import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent } from './pages';
 import { CatalogsRoutingModule } from './catalogs-routing.module'
 import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule, MultipleSelectionListModule } from '../shared/components';
 
@@ -15,6 +15,8 @@ import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFi
     CatalogMoldEditionComponent,
     CatalogVariableEditionComponent,
     CatalogVariablesListComponent,
+    CatalogCustomersListComponent,
+    CatalogCustomerEditionComponent,
   ],
   imports: [
     CommonModule,

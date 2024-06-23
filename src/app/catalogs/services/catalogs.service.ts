@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { VariableDetail } from '../models';
+import { CustomerDetail, VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 
 @Injectable({
@@ -382,6 +382,92 @@ export class CatalogsService {
       query: GET_VARIABLES,
       variables
     }).valueChanges    
+  }
+
+  
+
+  //customers
+  
+  getAllCustomersToCsv$(): Observable<any> {
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+  getAllCustomersCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+  getCustomersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_CUSTOMERS,
+      variables
+    }).valueChanges    
+  }
+
+  
+  
+  addCustomerTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_CUSTOMER_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getCustomerDataGql$(parameters: any): Observable<any> {
+    const customerId = { customerId: parameters.customerId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_CUSTOMER, 
+      variables: customerId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_CUSTOMER_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updateCustomerCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_CUSTOMER, 
+      variables,      
+    })
+  }
+  
+  mapOneCustomer(paramsData: any): CustomerDetail {
+    const { oneCustomer } = paramsData?.customerGqlData?.data;
+    const { data } = oneCustomer;
+    const translations = paramsData?.customerGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteCustomerTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CUSTOMER_TRANSLATIONS, 
+      variables,       
+    });
   }
 
 // End ======================  

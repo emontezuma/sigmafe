@@ -148,6 +148,9 @@ export enum ApplicationModules {
   MOLDS_CATALOG_EDITION = 'molds-catalog-edition',
   VARIABLES_CATALOG = 'variables-catalog',
   VARIABLES_CATALOG_EDITION = 'variables-catalog-edition',
+  CUSTOMERS_CATALOG = 'customers-catalog',
+  CUSTOMERS_CATALOG_EDITION='customers-catalog-edition',
+
 }
 
 export enum ScreenSizes {
