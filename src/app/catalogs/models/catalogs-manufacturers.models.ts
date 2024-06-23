@@ -1,27 +1,27 @@
 import {  GeneralTranslation,  PageInfo} from 'src/app/shared/models';
 
-export interface CustomersData {
-  customersPaginated?: Customers;
+export interface ManufacturersData {
+  manufacturersPaginated?: Manufacturers;
 }
 
-export interface CustomerData {
-  oneCustomer?: CustomerItem;
+export interface ManufacturerData {
+  oneManufacturer?: ManufacturerItem;
   translations?: any;
 }
 
-export interface Customers {
-  items?: CustomerItem[];
+export interface Manufacturers {
+  items?: ManufacturerItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface CustomerItem {
+export interface ManufacturerItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: CustomerDetail;
+  data: ManufacturerDetail;
 }
 
-export interface CustomerDetail {
+export interface ManufacturerDetail {
   name?: string;
   reference?: string;
   notes?: string;
@@ -41,24 +41,24 @@ export interface CustomerDetail {
   translations?: GeneralTranslation[];
 }
 
-export interface CustomersState {
+export interface ManufacturersState {
   loading: boolean;
-  customersData: CustomersData;
+  manufacturersData: ManufacturersData;
 }
 
-export interface CustomerState {//warning remove
+export interface ManufacturerState {//warning remove
   loading: boolean;
-  moldDetail: CustomerDetail;
+  moldDetail: ManufacturerDetail;
 }
 
-export interface CustomerCatalog {
+export interface ManufacturerCatalog {
   id: string;
   name: string;
   status: string;
   updatedAt: string;
 }
 
-export const emptyCustomerCatalog = {
+export const emptyManufacturerCatalog = {
   friendlyStatus: null,
   data: {
     id: null,
@@ -69,7 +69,7 @@ export const emptyCustomerCatalog = {
   },
 };
 
-export const emptyCustomerItem: CustomerDetail = {
+export const emptyManufacturerItem: ManufacturerDetail = {
   name: null,
   id: null,
   prefix: null,
