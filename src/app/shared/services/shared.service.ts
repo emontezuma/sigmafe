@@ -461,6 +461,8 @@ export class SharedService {
     }).valueChanges;  
   }
 
+
+  //all this are repeated==============================
   setGraphqlVariables(variableParameters: GqlParameters): any {
     const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status, processId, process} = variableParameters;
 
@@ -571,5 +573,32 @@ export class SharedService {
     }
   }
 
+
+  setGraphqlCompanies(companyParameters: GqlParameters): any {
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = companyParameters;
+
+    if (settingType === 'multiSelection') {
+      return {
+        processId,
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
+        ...(filter) && { filterBy: filter },        
+        ...(process) && { process },
+        
+      }
+    } else if (settingType === 'tables') {
+      return {
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
+        ...(order) && { orderBy: order },
+        ...(filter) && { filterBy: filter },
+      }
+    } else if (settingType === 'status') {
+      return { 
+        id,
+        status
+      };      
+    }
+  }
 // End ======================
 }

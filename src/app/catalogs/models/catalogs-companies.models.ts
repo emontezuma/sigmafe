@@ -1,27 +1,27 @@
 import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
-export interface PlantsData {
-  plantsPaginated?: Plants;
+export interface CompaniesData {
+  companiesPaginated?: Companies;
 }
 
-export interface PlantData {
-  onePlant?: PlantItem;
+export interface CompanyData {
+  oneCompany?: CompanyItem;
   translations?: any;
 }
 
-export interface Plants {
-  items?: PlantItem[];
+export interface Companies {
+  items?: CompanyItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface PlantItem {
+export interface CompanyItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: PlantDetail;
+  data: CompanyDetail;
 }
 
-export interface PlantDetail {
+export interface CompanyDetail {
   name?: string;
   reference?: string;
   notes?: string;
@@ -32,7 +32,6 @@ export interface PlantDetail {
   mainImage?: string;
   id?: number;
   customerId?: number;
-  companyId?: number;
   status?: string;
   createdById?: any;
   createdAt?: string;
@@ -48,17 +47,17 @@ export interface PlantDetail {
   
 }
 
-export interface PlantsState {
+export interface CompaniesState {
   loading: boolean;
-  plantsData: PlantsData;
+  companiesData: CompaniesData;
 }
 
-export interface PlantState {//warning
+export interface CompanyState {//warning
   loading: boolean;
-  moldDetail: PlantDetail;
+  moldDetail: CompanyDetail;
 }
 
-export interface PlantCatalog {
+export interface CompanyCatalog {
   id: string;
   name: string;
   mainImagePath: string;
@@ -69,12 +68,11 @@ export interface PlantCatalog {
 
 
 
-export const emptyPlantCatalog = {  
+export const emptyCompanyCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
     customerId: null,
-    companyId:null,
     name: null,
     mainImagePath: null,    
     updatedBy: null,
@@ -83,11 +81,10 @@ export const emptyPlantCatalog = {
   },
 };
 
-export const emptyPlantItem: PlantDetail = {  
+export const emptyCompanyItem: CompanyDetail = {  
   name: null,
   id: null,
   customerId: null,
-  companyId:null,
   prefix: null,
   status: null,
   createdById: null,

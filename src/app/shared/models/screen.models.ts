@@ -153,7 +153,9 @@ export enum ApplicationModules {
   MANUFACTURERS_CATALOG = 'manufacturers-catalog',
   MANUFACTURERS_CATALOG_EDITION = 'manufacturers-catalog-edition',
   PLANTS_CATALOG = 'plants-catalog',
-  PLANTS_CATALOG_EDITION='plants-catalog-edition',
+  PLANTS_CATALOG_EDITION = 'plants-catalog-edition',
+  COMPANIES_CATALOG = 'companies-catalog',
+  COMPANIES_CATALOG_EDITION='companies-catalog-edition',
 
 }
 

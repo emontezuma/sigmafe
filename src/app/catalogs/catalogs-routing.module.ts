@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -88,11 +88,25 @@ const routes: Routes = [
         data: { animation: 'CatalogPlantEditionComponent' },
       },
       {
+        path: 'companies',
+        component: CatalogCompaniesListComponent,
+        data: { animation: 'CatalogCompaniesComponent' },
+      },
+      {
+        path: 'companies/create',
+        component: CatalogCompanyEditionComponent,
+        data: { animation: 'CatalogCompanyEditionComponent' },
+      },
+      {
+        path: 'companies/edit/:id',
+        component: CatalogCompanyEditionComponent,
+        data: { animation: 'CatalogCompanyEditionComponent' },
+      },
+      {
         path: '**',
         component: CatalogsHomeComponent,
         data: { animation: 'CatalogsHomeComponent' },
       },
-      
     ]
   },
 ];

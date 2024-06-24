@@ -1734,10 +1734,10 @@ export const DELETE_MANUFACTURER_TRANSLATIONS = gql`
 
 export const GET_PLANT = gql`
   query OnePlant (
-    $variableId: Long!,
+    $plantId: Long!,
   ) {
   onePlant (
-    id: $variableId        
+    id: $plantId        
   ) {
     data {
       name
@@ -1749,6 +1749,7 @@ export const GET_PLANT = gql`
       mainImageName
       id
       customerId
+      companyId
       status
       createdById
       createdAt
@@ -1780,7 +1781,7 @@ export const GET_PLANTS = gql`
     $orderBy: [TranslatedPlantDtoSortInput!],
     $filterBy: TranslatedPlantDtoFilterInput,
   ) {
-  variablesPaginated (
+  plantsPaginated (
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -1795,6 +1796,7 @@ export const GET_PLANTS = gql`
           mainImageGuid
           id
           customerId
+          companyId
           status
           updatedAt
           updatedBy {
@@ -1818,7 +1820,7 @@ export const GET_PLANT_TRANSLATIONS = gql`
     $orderBy: [PlantTranslationTableSortInput!],
     $filterBy: PlantTranslationTableFilterInput,
   ) {
-    variablesTranslationsTable(
+    plantsTranslationsTable(
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -1867,7 +1869,7 @@ export const ADD_PLANT_TRANSLATIONS = gql`
       inputs: $translations
     ) {
       id,
-      variableId,
+      plantId,
       languageId      
     }
   }
@@ -1876,6 +1878,7 @@ export const ADD_PLANT_TRANSLATIONS = gql`
 export const UPDATE_PLANT = gql`
   mutation CreateOrUpdatePlant (
     $customerId: Long,
+    $companyId: Long,
     $id: Long,
     $status: String    
     $name: String,
@@ -1888,6 +1891,7 @@ export const UPDATE_PLANT = gql`
   createOrUpdatePlant (
     inputs: [{
       customerId: $customerId
+      companyId: $companyId
       id: $id      
       status: $status
       name: $name,
@@ -1918,14 +1922,216 @@ export const DELETE_PLANT_TRANSLATIONS = gql`
   mutation DeletePlantsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
     $customerId: Long!
+    $companyId: Long!
   ) {
     deletePlantsTranslationsTable (      
       ids: $ids,
-      customerId: $customerId
+      customerId: $customerId,
+      companyId: $companyId
     ) 
   }
 `;
 
 
+//companies===========================
 
+export const GET_COMPANY = gql`
+  query OneCompany (
+    $companyId: Long!,
+  ) {
+  oneCompany (
+    id: $companyId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+    friendlyResetValueMode
+    friendlyValueType      
+  }
+}
+`;
+
+export const GET_COMPANIES = gql`
+  query CompaniesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedCompanyDtoSortInput!],
+    $filterBy: TranslatedCompanyDtoFilterInput,
+  ) {
+  companiesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+       
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_COMPANY_TRANSLATIONS = gql`
+  query CompaniesTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [CompanyTranslationTableSortInput!],
+    $filterBy: CompanyTranslationTableFilterInput,
+  ) {
+    companiesTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        companyId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_COMPANY_TRANSLATIONS = gql`
+  mutation CreateOrUpdateCompanyTranslationTable (
+    $translations: [CompanyTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateCompanyTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      companyId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_COMPANY = gql`
+  mutation CreateOrUpdateCompany (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdateCompany (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_COMPANY_TRANSLATIONS = gql`
+  mutation DeleteCompaniesTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteCompaniesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
 //=========END

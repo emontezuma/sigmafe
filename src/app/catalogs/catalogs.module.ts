@@ -4,14 +4,14 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ImageNotFoundModule, OptionsScrollModule, FocusInvalidInputModule } from '../shared/directives';
-import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent } from './pages';
 import { CatalogsRoutingModule } from './catalogs-routing.module'
 import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule, MultipleSelectionListModule } from '../shared/components';
 
 const manufacturer=[CatalogManufacturersListComponent,CatalogManufacturerEditionComponent]
 const customer = [CatalogCustomersListComponent, CatalogCustomerEditionComponent]
 const variable = [CatalogVariableEditionComponent, CatalogVariablesListComponent]
-const plant=[]
+const plant=[CatalogPlantEditionComponent,CatalogPlantsListComponent,]
 
 @NgModule({
   declarations: [
@@ -21,8 +21,9 @@ const plant=[]
     ...variable,
     ...customer,
     ...manufacturer,
-    CatalogPlantEditionComponent,
-    CatalogPlantsListComponent,
+    ...plant,
+    CatalogCompaniesListComponent,
+    CatalogCompanyEditionComponent
 
   ],
   imports: [

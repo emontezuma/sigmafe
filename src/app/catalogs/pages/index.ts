@@ -13,4 +13,7 @@ export * from './catalog-manufacturers-list';
 export * from './catalog-plant-edition';
 export * from './catalog-plants-list';
 
+export * from './catalog-companies-list';
+export * from './catalog-company-edition';
+
 export * from './catalogs-home';
