@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -71,6 +71,21 @@ const routes: Routes = [
         path: 'manufacturers/edit/:id',
         component: CatalogManufacturerEditionComponent,
         data: { animation: 'CatalogManufacturerEditionComponent' },
+      },
+      {
+        path: 'plants',
+        component: CatalogPlantsListComponent,
+        data: { animation: 'CatalogPlantsComponent' },
+      },
+      {
+        path: 'plants/create',
+        component: CatalogPlantEditionComponent,
+        data: { animation: 'CatalogPlantEditionComponent' },
+      },
+      {
+        path: 'plants/edit/:id',
+        component: CatalogPlantEditionComponent,
+        data: { animation: 'CatalogPlantEditionComponent' },
       },
       {
         path: '**',

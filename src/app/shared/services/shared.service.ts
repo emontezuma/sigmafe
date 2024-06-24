@@ -542,7 +542,34 @@ export class SharedService {
           status
         };      
       }
+  }
+  
+  setGraphqlPlants(plantParameters: GqlParameters): any {
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = plantParameters;
+
+    if (settingType === 'multiSelection') {
+      return {
+        processId,
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
+        ...(filter) && { filterBy: filter },        
+        ...(process) && { process },
+        
+      }
+    } else if (settingType === 'tables') {
+      return {
+        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
+        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
+        ...(order) && { orderBy: order },
+        ...(filter) && { filterBy: filter },
+      }
+    } else if (settingType === 'status') {
+      return { 
+        id,
+        status
+      };      
     }
+  }
 
 // End ======================
 }

@@ -150,8 +150,10 @@ export enum ApplicationModules {
   VARIABLES_CATALOG_EDITION = 'variables-catalog-edition',
   CUSTOMERS_CATALOG = 'customers-catalog',
   CUSTOMERS_CATALOG_EDITION = 'customers-catalog-edition',
-  MANUFACTURERS_CATALOG = 'customers-catalog',
-  MANUFACTURERS_CATALOG_EDITION='customers-catalog-edition',
+  MANUFACTURERS_CATALOG = 'manufacturers-catalog',
+  MANUFACTURERS_CATALOG_EDITION = 'manufacturers-catalog-edition',
+  PLANTS_CATALOG = 'plants-catalog',
+  PLANTS_CATALOG_EDITION='plants-catalog-edition',
 
 }
 

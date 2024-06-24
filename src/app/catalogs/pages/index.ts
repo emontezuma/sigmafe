@@ -10,4 +10,7 @@ export * from './catalog-customer-edition';
 export * from './catalog-manufacturer-edition';
 export * from './catalog-manufacturers-list';
 
+export * from './catalog-plant-edition';
+export * from './catalog-plants-list';
+
 export * from './catalogs-home';
