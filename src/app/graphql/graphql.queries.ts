@@ -1357,6 +1357,25 @@ export const INACTIVATE_VARIABLE = gql`
   }
 `;
 
+export const INACTIVATE_COMPANY = gql`
+  mutation CreateOrUpdateCompany (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateCompany (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+
 export const INACTIVATE_CUSTOMER = gql`
   mutation CreateOrUpdateCustomer (
     $id: Long,    
@@ -2148,6 +2167,7 @@ export const UPDATE_COMPANY = gql`
     $id: Long,
     $status: String    
     $name: String,
+    $prefix: String,
     $reference: String,
     $notes: String,
     $mainImageGuid: String,
@@ -2160,6 +2180,7 @@ export const UPDATE_COMPANY = gql`
       id: $id      
       status: $status
       name: $name,
+      prefix: $prefix,
       reference: $reference,
       notes: $notes,
       mainImageGuid: $mainImageGuid,

@@ -179,7 +179,7 @@ export class CatalogCompanyEditionComponent {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.VARIABLES_CATALOG,
+      from: ApplicationModules.COMPANIES_CATALOG_EDITION,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -188,7 +188,7 @@ export class CatalogCompanyEditionComponent {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG_EDITION,
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
@@ -298,7 +298,7 @@ export class CatalogCompanyEditionComponent {
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR VARIABLE`,  
+              title: $localize`INACTIVAR COMPAÑÍA`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -349,6 +349,7 @@ export class CatalogCompanyEditionComponent {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
                       const message = $localize`La compañía ha sido inhabilitada`;
+                      this.company.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -368,7 +369,7 @@ export class CatalogCompanyEditionComponent {
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR VARIABLE`,  
+              title: $localize`REACTIVAR COMPAÑÍA`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -419,6 +420,7 @@ export class CatalogCompanyEditionComponent {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
                       const message = $localize`La compañía ha sido reactivada`;
+                      this.company.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
