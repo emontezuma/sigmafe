@@ -148,6 +148,17 @@ export enum ApplicationModules {
   MOLDS_CATALOG_EDITION = 'molds-catalog-edition',
   VARIABLES_CATALOG = 'variables-catalog',
   VARIABLES_CATALOG_EDITION = 'variables-catalog-edition',
+  CUSTOMERS_CATALOG = 'customers-catalog',
+  CUSTOMERS_CATALOG_EDITION = 'customers-catalog-edition',
+  MANUFACTURERS_CATALOG = 'manufacturers-catalog',
+  MANUFACTURERS_CATALOG_EDITION = 'manufacturers-catalog-edition',
+  PLANTS_CATALOG = 'plants-catalog',
+  PLANTS_CATALOG_EDITION = 'plants-catalog-edition',
+  COMPANIES_CATALOG = 'companies-catalog',
+  COMPANIES_CATALOG_EDITION = 'companies-catalog-edition',
+  PROVIDERS_CATALOG = 'providers-catalog',
+  PROVIDERS_CATALOG_EDITION='providers-catalog-edition',
+
 }
 
 export enum ScreenSizes {

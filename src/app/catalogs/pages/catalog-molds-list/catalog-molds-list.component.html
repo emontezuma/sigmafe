@@ -94,7 +94,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Información general</th>
         <td class="general-info" mat-cell *matCellDef="let row">  
           <div>Estado: {{ row.friendlyState  }}</div>
-          <div>Estatus: <strong>{{ row.friendlyStatus }}</strong></div>  
+          <div>Status: <strong>{{ row.friendlyStatus }}</strong></div>  
           <div>Últ.actualización: <span>{{ row.data.updatedAt  | date:'medium' }}</span></div>
         </td>
       </ng-container>
@@ -151,7 +151,7 @@
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
             {{ row.friendlyStatus }}

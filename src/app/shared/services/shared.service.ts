@@ -454,15 +454,18 @@ export class SharedService {
       filter, 
       order,
     }    
-    const variables = this.setGraphqlVariables(variableParameters);
+    const variables = this.setGraphqlGen(variableParameters);
     return this._apollo.watchQuery({ 
       query: GET_HARDCODED_VALUES, 
       variables, 
     }).valueChanges;  
   }
 
-  setGraphqlVariables(variableParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status, processId, process} = variableParameters;
+
+  //all this are repeated==============================
+  
+  setGraphqlGen(genParameters: GqlParameters): any {
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = genParameters;
 
     if (settingType === 'multiSelection') {
       return {
@@ -483,11 +486,12 @@ export class SharedService {
     } else if (settingType === 'status') {
       return { 
         id,
-        customerId,
         status
       };      
     }
   }
 
+
+  
 // End ======================
 }

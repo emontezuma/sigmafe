@@ -1191,6 +1191,8 @@ export const GET_SIGMA_TYPES_LAZY_LOADING = gql`
   }
 `;
 
+//variables=======================================
+
 export const GET_VARIABLE = gql`
   query OneVariable (
     $variableId: Long!,
@@ -1450,3 +1452,915 @@ export const GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING = gql`
     }
   }
 `;
+
+//customers================================================
+
+export const GET_CUSTOMERS = gql`
+  query CustomersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedCustomerDtoSortInput!],
+    $filterBy: TranslatedCustomerDtoFilterInput,
+  ) {
+  customersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          id         
+          status
+          updatedAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_CUSTOMER = gql`
+  query OneCustomer (
+    $customerId: Long!,
+  ) {
+  oneCustomer (
+    id: $customerId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      id
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt      
+     
+    }
+    friendlyStatus
+ 
+  }
+}
+`;
+
+export const GET_CUSTOMER_TRANSLATIONS = gql`
+  query CustomersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [CustomerTranslationTableSortInput!],
+    $filterBy: CustomerTranslationTableFilterInput,
+  ) {
+    customersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const ADD_CUSTOMER_TRANSLATIONS = gql`
+  mutation CreateOrUpdateCustomerTranslationTable (
+    $translations: [CustomerTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateCustomerTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      customerId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_CUSTOMER = gql`
+  mutation CreateOrUpdateCustomer (
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,   
+  ) {
+  createOrUpdateCustomer (
+    inputs: [{
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+     
+    } 
+  }
+`;
+
+export const DELETE_CUSTOMER_TRANSLATIONS = gql`
+  mutation DeleteCustomersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+  ) {
+    deleteCustomersTranslationsTable (      
+      ids: $ids,
+    ) 
+  }
+`;
+
+//manufacturers================================================
+
+export const GET_MANUFACTURERS = gql`
+  query ManufacturersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedManufacturerDtoSortInput!],
+    $filterBy: TranslatedManufacturerDtoFilterInput,
+  ) {
+  customersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          id         
+          status
+          updatedAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_MANUFACTURER = gql`
+  query OneManufacturer (
+    $customerId: Long!,
+  ) {
+  oneManufacturer (
+    id: $customerId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      id
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt      
+     
+    }
+    friendlyStatus
+ 
+  }
+}
+`;
+
+export const GET_MANUFACTURER_TRANSLATIONS = gql`
+  query ManufacturersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ManufacturerTranslationTableSortInput!],
+    $filterBy: ManufacturerTranslationTableFilterInput,
+  ) {
+    customersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const ADD_MANUFACTURER_TRANSLATIONS = gql`
+  mutation CreateOrUpdateManufacturerTranslationTable (
+    $translations: [ManufacturerTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateManufacturerTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      customerId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_MANUFACTURER = gql`
+  mutation CreateOrUpdateManufacturer (
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,   
+  ) {
+  createOrUpdateManufacturer (
+    inputs: [{
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+     
+    } 
+  }
+`;
+
+export const DELETE_MANUFACTURER_TRANSLATIONS = gql`
+  mutation DeleteManufacturersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+  ) {
+    deleteManufacturersTranslationsTable (      
+      ids: $ids,
+    ) 
+  }
+`;
+
+//plants===========================
+
+export const GET_PLANT = gql`
+  query OnePlant (
+    $plantId: Long!,
+  ) {
+  onePlant (
+    id: $plantId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      id
+      customerId
+      companyId
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+    friendlyResetValueMode
+    friendlyValueType      
+  }
+}
+`;
+
+export const GET_PLANTS = gql`
+  query PlantsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedPlantDtoSortInput!],
+    $filterBy: TranslatedPlantDtoFilterInput,
+  ) {
+  plantsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+          companyId
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_PLANT_TRANSLATIONS = gql`
+  query PlantsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [PlantTranslationTableSortInput!],
+    $filterBy: PlantTranslationTableFilterInput,
+  ) {
+    plantsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        variableId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_PLANT_TRANSLATIONS = gql`
+  mutation CreateOrUpdatePlantTranslationTable (
+    $translations: [PlantTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdatePlantTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      plantId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_PLANT = gql`
+  mutation CreateOrUpdatePlant (
+    $customerId: Long,
+    $companyId: Long,
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdatePlant (
+    inputs: [{
+      customerId: $customerId
+      companyId: $companyId
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_PLANT_TRANSLATIONS = gql`
+  mutation DeletePlantsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+    $companyId: Long!
+  ) {
+    deletePlantsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+      companyId: $companyId
+    ) 
+  }
+`;
+
+
+//companies===========================
+
+export const GET_COMPANY = gql`
+  query OneCompany (
+    $companyId: Long!,
+  ) {
+  oneCompany (
+    id: $companyId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+    friendlyResetValueMode
+    friendlyValueType      
+  }
+}
+`;
+
+export const GET_COMPANIES = gql`
+  query CompaniesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedCompanyDtoSortInput!],
+    $filterBy: TranslatedCompanyDtoFilterInput,
+  ) {
+  companiesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+       
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_COMPANY_TRANSLATIONS = gql`
+  query CompaniesTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [CompanyTranslationTableSortInput!],
+    $filterBy: CompanyTranslationTableFilterInput,
+  ) {
+    companiesTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        companyId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_COMPANY_TRANSLATIONS = gql`
+  mutation CreateOrUpdateCompanyTranslationTable (
+    $translations: [CompanyTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateCompanyTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      companyId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_COMPANY = gql`
+  mutation CreateOrUpdateCompany (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdateCompany (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_COMPANY_TRANSLATIONS = gql`
+  mutation DeleteCompaniesTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteCompaniesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
+
+//providers===========================
+
+export const GET_PROVIDER = gql`
+  query OneProvider (
+    $providerId: Long!,
+  ) {
+  oneProvider (
+    id: $providerId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+     
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+    friendlyResetValueMode
+    friendlyValueType      
+  }
+}
+`;
+
+export const GET_PROVIDERS = gql`
+  query ProvidersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedProviderDtoSortInput!],
+    $filterBy: TranslatedProviderDtoFilterInput,
+  ) {
+  providersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+       
+          id
+          customerId
+       
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_PROVIDER_TRANSLATIONS = gql`
+  query ProvidersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ProviderTranslationTableSortInput!],
+    $filterBy: ProviderTranslationTableFilterInput,
+  ) {
+    providersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        providerId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_PROVIDER_TRANSLATIONS = gql`
+  mutation CreateOrUpdateProviderTranslationTable (
+    $translations: [ProviderTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateProviderTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      providerId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_PROVIDER = gql`
+  mutation CreateOrUpdateProvider (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+   
+  ) {
+  createOrUpdateProvider (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+   
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_PROVIDER_TRANSLATIONS = gql`
+  mutation DeleteProvidersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteProvidersTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
+//=========END

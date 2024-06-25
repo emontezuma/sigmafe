@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE } from 'src/app/graphql/graphql.queries';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { VariableDetail } from '../models';
+import { CompanyDetail, CustomerDetail, PlantDetail, VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 
 @Injectable({
@@ -333,7 +333,7 @@ export class CatalogsService {
     }
   }
 
-  getAllMoldsToCsv$(): Observable<any> {
+  getAllMoldsToCsv$(): Observable<any> {//warning repeated
     return this._apollo.watchQuery({ 
       query: GET_ALL_MOLDS_TO_CSV,       
     }).valueChanges;
@@ -345,7 +345,7 @@ export class CatalogsService {
     );
   }
 
-  getAllVariablesToCsv$(): Observable<any> {
+  getAllVariablesToCsv$(): Observable<any> {//warning repeated
     return this._apollo.watchQuery({ 
       query: GET_ALL_MOLDS_TO_CSV,       
     }).valueChanges;
@@ -383,6 +383,459 @@ export class CatalogsService {
       query: GET_VARIABLES,
       variables
     }).valueChanges    
+  }
+
+  
+
+  //====customers
+  
+  getAllCustomersToCsv$(): Observable<any> { //warning repeated
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+  getAllCustomersCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+  getCustomersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_CUSTOMERS,
+      variables
+    }).valueChanges    
+  }
+
+  
+  
+  addCustomerTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_CUSTOMER_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getCustomerDataGql$(parameters: any): Observable<any> {
+    const customerId = { customerId: parameters.customerId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_CUSTOMER, 
+      variables: customerId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_CUSTOMER_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updateCustomerCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_CUSTOMER, 
+      variables,      
+    })
+  }
+  
+  mapOneCustomer(paramsData: any): CustomerDetail {
+    const { oneCustomer } = paramsData?.customerGqlData?.data;
+    const { data } = oneCustomer;
+    const translations = paramsData?.customerGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteCustomerTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CUSTOMER_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+
+  //manufacturers=================================
+  
+  getAllManufacturersToCsv$(): Observable<any> {//warning repeated
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+  getAllManufacturersCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+  getManufacturersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_MANUFACTURERS,
+      variables
+    }).valueChanges    
+  }
+
+  
+  
+  addManufacturerTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_MANUFACTURER_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getManufacturerDataGql$(parameters: any): Observable<any> {
+    const manufacturerId = { manufacturerId: parameters.manufacturerId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_MANUFACTURER, 
+      variables: manufacturerId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_MANUFACTURER_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updateManufacturerCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_MANUFACTURER, 
+      variables,      
+    })
+  }
+  
+  mapOneManufacturer(paramsData: any): CustomerDetail {
+    const { oneManufacturer } = paramsData?.manufacturerGqlData?.data;
+    const { data } = oneManufacturer;
+    const translations = paramsData?.manufacturerGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteManufacturerTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_MANUFACTURER_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  updateManufacturerStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_MOLD, 
+      variables,       
+    });
+  }
+
+  //======plants
+
+  getAllPlantsToCsv$(): Observable<any> {//warning repeated
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+
+  getAllPlantsCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+
+  getPlantsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_PLANTS,
+      variables
+    }).valueChanges    
+  }
+  
+  addPlantTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_PLANT_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getPlantDataGql$(parameters: any): Observable<any> {
+    const plantId = { plantId: parameters.plantId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_PLANT, 
+      variables: plantId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_PLANT_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updatePlantCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_PLANT, 
+      variables,      
+    })
+  }
+  
+  mapOnePlant(paramsData: any): PlantDetail {
+    const { onePlant } = paramsData?.plantGqlData?.data;
+    const { data } = onePlant;
+    const translations = paramsData?.plantGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deletePlantTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_PLANT_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  updatePlantStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_MOLD, 
+      variables,       
+    });
+  }
+  
+  
+  //======companies
+
+  getAllCompaniesToCsv$(): Observable<any> {//warning repeated
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+
+  getAllCompaniesCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+
+  getCompaniesDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_COMPANIES,
+      variables
+    }).valueChanges    
+  }
+  
+  addCompanyTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_COMPANY_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getCompanyDataGql$(parameters: any): Observable<any> {
+    const companyId = { companyId: parameters.companyId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_COMPANY, 
+      variables: companyId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_COMPANY_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updateCompanyCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_COMPANY, 
+      variables,      
+    })
+  }
+  
+  mapOneCompany(paramsData: any): CompanyDetail {
+    const { oneCompany } = paramsData?.companyGqlData?.data;
+    const { data } = oneCompany;
+    const translations = paramsData?.companyGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteCompanyTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_COMPANY_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  updateCompanyStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_MOLD, 
+      variables,       
+    });
+  }
+  
+  //======providers
+
+
+  getAllProvidersToCsv$(): Observable<any> {//warning repeated
+    return this._apollo.watchQuery({ 
+      query: GET_ALL_MOLDS_TO_CSV,       
+    }).valueChanges;
+  }
+
+  getAllProvidersCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+
+  getProvidersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_PROVIDERS,
+      variables
+    }).valueChanges    
+  }
+  
+  addProviderTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_PROVIDER_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getProviderDataGql$(parameters: any): Observable<any> {
+    const providerId = { providerId: parameters.providerId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_PROVIDER, 
+      variables: providerId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_PROVIDER_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updateProviderCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_PROVIDER, 
+      variables,      
+    })
+  }
+  
+  mapOneProvider(paramsData: any): CompanyDetail {
+    const { oneProvider } = paramsData?.providerGqlData?.data;
+    const { data } = oneProvider;
+    const translations = paramsData?.providerGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteProviderTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_PROVIDER_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  updateProviderStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_MOLD, 
+      variables,       
+    });
   }
 
 // End ======================  

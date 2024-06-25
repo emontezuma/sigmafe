@@ -3,7 +3,7 @@
   (@routingAnimation.done)="pageAnimationFinished($event)"
   @routingAnimation
 >
-  <ng-container *ngIf="variablesData$ | async "></ng-container>
+  <ng-container *ngIf="companiesData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>
   <ng-container *ngIf="settingsData$ | async "></ng-container>
@@ -11,12 +11,12 @@
   <ng-container *ngIf="searchBox$ | async "></ng-container>
   <ng-container *ngIf="screenData$ | async "></ng-container>
   <ng-container *ngIf="animationData$ | async "></ng-container>
-  <ng-container *ngIf="allVariablesToCsv$ | async "></ng-container>  
+  <ng-container *ngIf="allCompaniesToCsv$ | async "></ng-container>  
 
   <div
-    class="variables-table"    
+    class="companies-table"    
   >
-    <table mat-table [dataSource]="variablesCatalogData" matSort>
+    <table mat-table [dataSource]="companiesCatalogData" matSort>
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
@@ -38,7 +38,7 @@
               <img                
                 @dissolve
                 appImageNotFound                
-                class="variable-image"                        
+                class="company-image"                        
                 [src]="row.data.mainImage"
                 [alt]="row.data.mainImage"         
                 fill
@@ -62,7 +62,7 @@
       </ng-container>
       
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la variable</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la company</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.name }}</strong>
@@ -71,21 +71,6 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="uom">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Unidad de medida</th>
-        <td mat-cell *matCellDef="let row">
-          <ng-container *ngIf="!loading">{{ row.data.uom.name }}</ng-container>        
-          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
-        </td>
-      </ng-container>
-
-      <ng-container matColumnDef="sigmaType">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo de variable</th>
-        <td mat-cell *matCellDef="let row">
-          <ng-container *ngIf="!loading">{{ row.data.sigmaType.name }}</ng-container>        
-          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
-        </td>
-      </ng-container>
 
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
@@ -108,25 +93,25 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="variablesTableColumns; sticky: 1"></tr>
+      <tr mat-header-row *matHeaderRowDef="companiesTableColumns; sticky: 1"></tr>
       <tr
         class="table-row"
         mat-row *matRowDef="let row;
-        columns: variablesTableColumns"
-        [routerLink]="['/catalogs/variables/edit/', row.data.id]"
+        columns: companiesTableColumns"
+        [routerLink]="['/catalogs/companies/edit/', row.data.id]"
       >
       </tr>
       <div *ngIf="!loading">
-        <tr class="variables-table-mat-row" *matNoDataRow>
-          <td class="variables-table__no-data" colspan="10">
+        <tr class="companies-table-mat-row" *matNoDataRow>
+          <td class="companies-table__no-data" colspan="10">
             No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="variables-table__paginator">
-      <div class="variables-table__paginator--catalog-data">
+    <div class="companies-table__paginator">
+      <div class="companies-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
         <div>Total registros {{ pageInfo?.totalRecords}}</div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
@@ -134,7 +119,7 @@
       </div>
       <mat-paginator
         #paginator
-        class="variables-table__paginator--mat"
+        class="companies-table__paginator--mat"
         [length]="pageInfo?.totalRecords"
         [pageSize]="50"
         (page)="pageChange($event)"

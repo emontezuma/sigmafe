@@ -316,8 +316,8 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
     },{
       type: 'button-menu',
       field: 'mold-status',
-      caption: $localize`Estatus del molde`,
-      tooltip:  $localize`FIltrar el estatus del molde`,
+      caption: $localize`Status del molde`,
+      tooltip:  $localize`FIltrar el Status del molde`,
       disabled: false,
       options: [{
         caption: $localize`(Todos los moldes)`,
