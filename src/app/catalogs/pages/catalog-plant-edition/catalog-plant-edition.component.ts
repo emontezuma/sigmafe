@@ -349,7 +349,7 @@ export class CatalogPlantEditionComponent {
                 companyId:this.plant.companyId,
                 status: RecordStatus.INACTIVE,
               }
-              const plants = this._sharedService.setGraphqlPlants(plantParameters);
+              const plants = this._sharedService.setGraphqlGen(plantParameters);
               this.updatePlant$ = this._catalogsService.updatePlantStatus$(plants)
               .pipe(
                 tap((data: any) => {
@@ -419,7 +419,7 @@ export class CatalogPlantEditionComponent {
                 companyId:this.plant.companyId,            //warning get from ???
                 status: RecordStatus.ACTIVE,
               }
-              const plants = this._sharedService.setGraphqlPlants(plantParameters);
+              const plants = this._sharedService.setGraphqlGen(plantParameters);
               this.updatePlant$ = this._catalogsService.updatePlantStatus$(plants)
               .pipe(
                 tap((data: any) => {
@@ -838,7 +838,7 @@ export class CatalogPlantEditionComponent {
       filter, 
       order: this.order,
     }    
-    const plants = this._sharedService.setGraphqlPlants(plantParameters);
+    const plants = this._sharedService.setGraphqlGen(plantParameters);
     return this._catalogsService.getGenericsLazyLoadingDataGql$(plants).pipe();
   }
 

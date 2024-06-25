@@ -454,7 +454,7 @@ export class SharedService {
       filter, 
       order,
     }    
-    const variables = this.setGraphqlVariables(variableParameters);
+    const variables = this.setGraphqlGen(variableParameters);
     return this._apollo.watchQuery({ 
       query: GET_HARDCODED_VALUES, 
       variables, 
@@ -463,91 +463,9 @@ export class SharedService {
 
 
   //all this are repeated==============================
-  setGraphqlVariables(variableParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status, processId, process} = variableParameters;
-
-    if (settingType === 'multiSelection') {
-      return {
-        processId,
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
-        ...(filter) && { filterBy: filter },        
-        ...(process) && { process },
-        
-      }
-    } else if (settingType === 'tables') {
-      return {
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
-        ...(order) && { orderBy: order },
-        ...(filter) && { filterBy: filter },
-      }
-    } else if (settingType === 'status') {
-      return { 
-        id,
-        customerId,
-        status
-      };      
-    }
-  }
-
-  /*setGraphqlCustomers(variableParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, customerId, status, processId, process} = variableParameters;
-
-    if (settingType === 'multiSelection') {
-      return {
-        processId,
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
-        ...(filter) && { filterBy: filter },        
-        ...(process) && { process },
-        
-      }
-    } else if (settingType === 'tables') {
-      return {
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
-        ...(order) && { orderBy: order },
-        ...(filter) && { filterBy: filter },
-      }
-    } else if (settingType === 'status') {
-      return { 
-        id,
-        customerId,
-        status
-      };      
-    }
-  }*/
   
-    setGraphqlManufacturers(variableParameters: GqlParameters): any {
-      const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = variableParameters;
-  
-      if (settingType === 'multiSelection') {
-        return {
-          processId,
-          ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-          ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
-          ...(filter) && { filterBy: filter },        
-          ...(process) && { process },
-          
-        }
-      } else if (settingType === 'tables') {
-        return {
-          ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-          ...(takeRecords !== 0) && { recordsToTake: takeRecords },
-          ...(order) && { orderBy: order },
-          ...(filter) && { filterBy: filter },
-        }
-      } else if (settingType === 'status') {
-        return { 
-          id,
-          status
-        };      
-      }
-  }
-  
-  setGraphqlPlants(plantParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = plantParameters;
+  setGraphqlGen(genParameters: GqlParameters): any {
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = genParameters;
 
     if (settingType === 'multiSelection') {
       return {
@@ -574,31 +492,6 @@ export class SharedService {
   }
 
 
-  setGraphqlCompanies(companyParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process} = companyParameters;
-
-    if (settingType === 'multiSelection') {
-      return {
-        processId,
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },                
-        ...(filter) && { filterBy: filter },        
-        ...(process) && { process },
-        
-      }
-    } else if (settingType === 'tables') {
-      return {
-        ...(skipRecords !== 0) && { recordsToSkip: skipRecords },
-        ...(takeRecords !== 0) && { recordsToTake: takeRecords },
-        ...(order) && { orderBy: order },
-        ...(filter) && { filterBy: filter },
-      }
-    } else if (settingType === 'status') {
-      return { 
-        id,
-        status
-      };      
-    }
-  }
+  
 // End ======================
 }

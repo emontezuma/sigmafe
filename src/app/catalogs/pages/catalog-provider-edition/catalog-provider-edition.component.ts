@@ -9,49 +9,50 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {ManufacturerDetail, ManufacturerItem, emptyGeneralHardcodedValuesItem, emptyManufacturerItem } from '../../models';
-
-import { HttpClient } from '@angular/common/http';
-
-
+import { GeneralCatalogData, MoldThresoldTypes, ProviderDetail, ProviderItem, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem, emptyProviderItem } from '../../models';
+import { environment } from 'src/environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { CustomValidators } from '../../custom-validators';
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
 
 @Component({
-  selector: 'app-catalog-manufacturer-edition',
-  templateUrl: './catalog-manufacturer-edition.component.html',
+  selector: 'app-catalog-provider-edition',
+  templateUrl: './catalog-provider-edition.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-manufacturer-edition.component.scss']
+  styleUrls: ['./catalog-provider-edition.component.scss']
 })
-export class CatalogManufacturerEditionComponent {
+export class CatalogProviderEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
 
-  // Manufacturers ===============
-  manufacturer: ManufacturerDetail = emptyManufacturerItem;
+  // Providers ===============
+  provider: ProviderDetail = emptyProviderItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
 
 
 
-  // manufacturerFormChanges$: Observable<any>;
+  
+  // providerFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  manufacturer$: Observable<ManufacturerDetail>;
+  provider$: Observable<ProviderDetail>;
   translations$: Observable<any>;
-  updateManufacturer$: Observable<any>;
-  updateManufacturerCatalog: Subscription;
-  deleteManufacturerTranslations$: Observable<any>;  
-  addManufacturerTranslations$: Observable<any>;  
+  updateProvider$: Observable<any>;
+  updateProviderCatalog: Subscription;
+  deleteProviderTranslations$: Observable<any>;  
+  addProviderTranslations$: Observable<any>;  
   
-  manufacturerFormChangesSubscription: Subscription;
+  providerFormChangesSubscription: Subscription;
   
+
   
   uploadFiles: Subscription;
   
@@ -69,28 +70,23 @@ export class CatalogManufacturerEditionComponent {
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  manufacturerData: ManufacturerItem;  
+  providerData: ProviderItem;  
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
 
-  manufacturerForm = new FormGroup({
+  providerForm = new FormGroup({
     name: new FormControl(
       '', 
       Validators.required,      
     ),
-
-  
- 
-
-    required: new FormControl(emptyGeneralHardcodedValuesItem),
    
-
     notes: new FormControl(''),
-  
+   
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
-  
+
+
   });
 
   pageInfo: PageInfo = {
@@ -105,9 +101,8 @@ export class CatalogManufacturerEditionComponent {
   tmpDate: number = 112;
   loaded: boolean = false;
 
-
-
-
+ 
+  actionPlansCurrentSelection: GeneralMultipleSelcetionItems[] = [];
   
   constructor(
     private _store: Store<AppState>,
@@ -123,9 +118,9 @@ export class CatalogManufacturerEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-    // this.manufacturerForm.get('name').disable();
+   
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
+      ApplicationModules.VARIABLES_CATALOG_EDITION,
       true,
     );
     this.showGoTop$ = this._sharedService.showGoTop.pipe(
@@ -151,60 +146,55 @@ export class CatalogManufacturerEditionComponent {
       tap(settingsData => {
         this.settingsData = settingsData;
         this.takeRecords = this.settingsData.catalog?.pageSize || 50
-        const currentPage = 0;
     
-
       })
     );
-  
-   
-    this.manufacturerFormChangesSubscription = this.manufacturerForm.valueChanges.subscribe((manufacturerFormChanges: any) => {
+
+
+    this.providerFormChangesSubscription = this.providerForm.valueChanges.subscribe((providerFormChanges: any) => {
       if (!this.loaded) return;
-      if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
+      if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
         this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
       } else {
         this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
       }      
     }); 
-
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
-          ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
+          ApplicationModules.VARIABLES_CATALOG_EDITION,
           !animationFinished,
         ); 
       }
-      ));
-    
+    ));
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       skip(1),
       tap((buttonClicked: ToolbarButtonClicked) => {      
-        if (buttonClicked.from !== ApplicationModules.MANUFACTURERS_CATALOG_EDITION) {
+        if (buttonClicked.from !== ApplicationModules.VARIABLES_CATALOG_EDITION) {
             return
         }
         this.toolbarAction(buttonClicked);
       }
-      ));
-    
+    ));
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestManufacturerData(+params['id']);
+          this.requestProviderData(+params['id']);
         }
       })
     ); 
     this.calcElements();
- 
+
     setTimeout(() => {
       this.focusThisField = 'name';
       this.loaded = true;
     }, 200); 
-
+    
   }
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.MANUFACTURERS_CATALOG,
+      from: ApplicationModules.VARIABLES_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -213,21 +203,14 @@ export class CatalogManufacturerEditionComponent {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.MANUFACTURERS_CATALOG,
+      ApplicationModules.VARIABLES_CATALOG,
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.manufacturerFormChangesSubscription) this.manufacturerFormChangesSubscription.unsubscribe(); 
+    if (this.providerFormChangesSubscription) this.providerFormChangesSubscription.unsubscribe(); 
   }
   
 // Functions ================
-
-
-
-
-
-
- 
 
 
 
@@ -235,7 +218,7 @@ export class CatalogManufacturerEditionComponent {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
-          from: ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
+          from: ApplicationModules.VARIABLES_CATALOG_EDITION,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -248,7 +231,7 @@ export class CatalogManufacturerEditionComponent {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.MANUFACTURERS_CATALOG_EDITION && this.elements.length > 0) {
+    if (action.from === ApplicationModules.VARIABLES_CATALOG_EDITION && this.elements.length > 0) {
       if (action.action === ButtonActions.NEW) {        
         this.elements.find(e => e.action === action.action).loading = true;
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
@@ -272,7 +255,7 @@ export class CatalogManufacturerEditionComponent {
             this.elements.find(e => e.action === action.action).loading = false;
           });    
         } else {
-          this._location.replaceState('/catalogs/manufacturers/create');
+          this._location.replaceState('/catalogs/providers/create');
           this.initForm();
           this.elements.find(e => e.action === action.action).loading = false;  
         }
@@ -280,12 +263,12 @@ export class CatalogManufacturerEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
-          this._router.navigateByUrl('/catalogs/manufacturers'); 
+          this._router.navigateByUrl('/catalogs/providers'); 
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState('/catalogs/manufacturers/create');
+        this._location.replaceState('/catalogs/providers/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
@@ -300,11 +283,11 @@ export class CatalogManufacturerEditionComponent {
       } else if (action.action === ButtonActions.CANCEL) {         
         this.elements.find(e => e.action === action.action).loading = true;
         let noData = true;
-        if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
+        if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
           this.initForm();
         } else {
           noData = false;
-          this.requestManufacturerData(this.manufacturer.id);
+          this.requestProviderData(this.provider.id);
         }
         const message = $localize`Edición cancelada`;
           this._sharedService.showSnackMessage({
@@ -321,14 +304,14 @@ export class CatalogManufacturerEditionComponent {
         }, 200);
       } else if (action.action === ButtonActions.INACTIVATE) { 
         this.elements.find(e => e.action === action.action).loading = true;
-        if (this.manufacturer?.id > 0 && this.manufacturer.status === RecordStatus.ACTIVE) {
+        if (this.provider?.id > 0 && this.provider.status === RecordStatus.ACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR FABRICANTE`,  
+              title: $localize`INACTIVAR VARIABLE`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -351,7 +334,7 @@ export class CatalogManufacturerEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará al fabricante con el Id <strong>${this.manufacturer.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al proveedor con el Id <strong>${this.provider.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -364,20 +347,20 @@ export class CatalogManufacturerEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const manufacturerParameters = {
+              const providerParameters = {
                 settingType: 'status',
-                id: this.manufacturer.id,
-
+                id: this.provider.id,
+                customerId: this.provider.customerId,
                 status: RecordStatus.INACTIVE,
               }
-              const manufacturers = this._sharedService.setGraphqlGen(manufacturerParameters);
-              this.updateManufacturer$ = this._catalogsService.updateManufacturerStatus$(manufacturers)
+              const providers = this._sharedService.setGraphqlGen(providerParameters);
+              this.updateProvider$ = this._catalogsService.updateProviderStatus$(providers)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateManufacturer.length > 0 && data?.data?.createOrUpdateManufacturer[0].status === RecordStatus.INACTIVE) {
+                  if (data?.data?.createOrUpdateProvider.length > 0 && data?.data?.createOrUpdateProvider[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`El fabricante ha sido inhabilitado`;
+                      const message = $localize`El proveedor ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -391,13 +374,13 @@ export class CatalogManufacturerEditionComponent {
               )
             }            
           });
-        } else if (this.manufacturer?.id > 0 && this.manufacturer.status === RecordStatus.INACTIVE) {
+        } else if (this.provider?.id > 0 && this.provider.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR FABRICANTE`,  
+              title: $localize`REACTIVAR VARIABLE`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -420,7 +403,7 @@ export class CatalogManufacturerEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará al fabricante con el Id <strong>${this.manufacturer.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará al proveedor con el Id <strong>${this.provider.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -433,20 +416,20 @@ export class CatalogManufacturerEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const manufacturerParameters = {
+              const providerParameters = {
                 settingType: 'status',
-                id: this.manufacturer.id,
-            
+                id: this.provider.id,
+                customerId: this.provider.customerId,
                 status: RecordStatus.ACTIVE,
               }
-              const manufacturers = this._sharedService.setGraphqlGen(manufacturerParameters);
-              this.updateManufacturer$ = this._catalogsService.updateManufacturerStatus$(manufacturers)
+              const providers = this._sharedService.setGraphqlGen(providerParameters);
+              this.updateProvider$ = this._catalogsService.updateProviderStatus$(providers)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateManufacturer.length > 0 && data?.data?.createOrUpdateManufacturer[0].status === RecordStatus.ACTIVE) {
+                  if (data?.data?.createOrUpdateProvider.length > 0 && data?.data?.createOrUpdateProvider[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`El fabricante ha sido reactivado`;
+                      const message = $localize`El Proveedor ha sido reactivado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -462,16 +445,16 @@ export class CatalogManufacturerEditionComponent {
           });
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
-        if (this.manufacturer?.id > 0) {
+        if (this.provider?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
             width: '500px',
             disableClose: true,
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones del fabricante <strong>${this.manufacturer.id}</strong>`,
+              title: $localize`Traducciones del proveedor <strong>${this.provider.id}</strong>`,
               topIcon: 'world',
-              translations: this.manufacturer.translations,
+              translations: this.provider.translations,
               buttons: [{
                 action: ButtonActions.SAVE,
                 showIcon: true,
@@ -513,7 +496,7 @@ export class CatalogManufacturerEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará al fabricante ${this.manufacturer.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al proveedor ${this.provider.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -522,10 +505,10 @@ export class CatalogManufacturerEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.manufacturer.translations = [...response.translations];
+              this.provider.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.manufacturer.translations.length > 0 ? $localize`Traducciones (${this.manufacturer.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.manufacturer.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.provider.translations.length > 0 ? $localize`Traducciones (${this.provider.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.provider.translations.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -538,7 +521,7 @@ export class CatalogManufacturerEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de fabricantes`,
+      tooltip:  $localize`Regresar a la lista de proveedores`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -639,7 +622,7 @@ export class CatalogManufacturerEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: this.manufacturer?.status !== RecordStatus.ACTIVE,
+      disabled: this.provider?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
     },{
       type: 'divider',
@@ -666,7 +649,7 @@ export class CatalogManufacturerEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: !!!this.manufacturer.id,
+      disabled: !!!this.provider.id,
       action: ButtonActions.TRANSLATIONS,      
     },];
   }
@@ -703,16 +686,16 @@ export class CatalogManufacturerEditionComponent {
     if (!this.submitControlled) return;
     this.submitControlled = false;
     this.validateTables();
-    this.manufacturerForm.markAllAsTouched();
-    this.manufacturerForm.updateValueAndValidity(); 
-    if (this.manufacturerForm.valid) {      
+    this.providerForm.markAllAsTouched();
+    this.providerForm.updateValueAndValidity(); 
+    if (this.providerForm.valid) {      
       this.saveRecord();   
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
-      for (const controlName in this.manufacturerForm.controls) {
-        if (this.manufacturerForm.controls.hasOwnProperty(controlName)) {
-          const typedControl: AbstractControl = this.manufacturerForm.controls[controlName]; 
+      for (const controlName in this.providerForm.controls) {
+        if (this.providerForm.controls.hasOwnProperty(controlName)) {
+          const typedControl: AbstractControl = this.providerForm.controls[controlName]; 
           if (typedControl.invalid) {
             fieldsMissingCounter++;
             fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -737,9 +720,9 @@ export class CatalogManufacturerEditionComponent {
       }); 
       dialogResponse.afterClosed().subscribe((response) => {
         let fieldFocused = false;
-        for (const controlName in this.manufacturerForm.controls) {
-          if (this.manufacturerForm.controls.hasOwnProperty(controlName)) {
-            const typedControl: AbstractControl = this.manufacturerForm.controls[controlName]; 
+        for (const controlName in this.providerForm.controls) {
+          if (this.providerForm.controls.hasOwnProperty(controlName)) {
+            const typedControl: AbstractControl = this.providerForm.controls[controlName]; 
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
@@ -762,20 +745,20 @@ export class CatalogManufacturerEditionComponent {
 
   saveRecord() {
     this.setViewLoading(true);
-    const newRecord = !this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0;
+    const newRecord = !this.provider.id || this.provider.id === null || this.provider.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateManufacturerCatalog = this._catalogsService.updateManufacturerCatalog$(dataToSave)
+    this.updateProviderCatalog = this._catalogsService.updateProviderCatalog$(dataToSave)
     .subscribe((data: any) => {
-      const manufacturerId = data?.data?.createOrUpdateMold[0].id;
-      if (manufacturerId > 0) {        
-        this.processTranslations$(manufacturerId)
+      const providerId = data?.data?.createOrUpdateMold[0].id;
+      if (providerId > 0) {        
+        this.processTranslations$(providerId)
         .subscribe(() => {
-          this.requestManufacturerData(manufacturerId);
+          this.requestProviderData(providerId);
           setTimeout(() => {              
-            let message = $localize`El fabricante ha sido actualizado`;
+            let message = $localize`El proveedor ha sido actualizado`;
             if (newRecord) {                
-              message = $localize`El fabricante ha sido creado satisfactoriamente con el id <strong>${this.manufacturer.id}</strong>`;
-              this._location.replaceState(`/catalogs/manufacturers/edit/${this.manufacturer.id}`);
+              message = $localize`El proveedor ha sido creado satisfactoriamente con el id <strong>${this.provider.id}</strong>`;
+              this._location.replaceState(`/catalogs/providers/edit/${this.provider.id}`);
             }
             this._sharedService.showSnackMessage({
               message,
@@ -795,44 +778,43 @@ export class CatalogManufacturerEditionComponent {
 
 
 
-
-  requestManufacturerData(manufacturerId: number): void { 
-    let manufacturers = undefined;
-    manufacturers = { manufacturerId };
+  requestProviderData(providerId: number): void { 
+    let providers = undefined;
+    providers = { providerId };
 
     const skipRecords = 0;
-    const filter = JSON.parse(`{ "manufacturerId": { "eq": ${manufacturerId} } }`);
+    const filter = JSON.parse(`{ "providerId": { "eq": ${providerId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
     // let getData: boolean = false;
     this.setViewLoading(true); 
-    this.manufacturer$ = this._catalogsService.getManufacturerDataGql$({ 
-      manufacturerId, 
+    this.provider$ = this._catalogsService.getProviderDataGql$({ 
+      providerId, 
       skipRecords, 
       takeRecords: this.takeRecords, 
       order, 
       filter, 
     }).pipe(
-      map(([ manufacturerGqlData, manufacturerGqlTranslationsData ]) => {
-        return this._catalogsService.mapOneManufacturer({
-          manufacturerGqlData,  
-          manufacturerGqlTranslationsData,
+      map(([ providerGqlData, providerGqlTranslationsData ]) => {
+        return this._catalogsService.mapOneProvider({
+          providerGqlData,  
+          providerGqlTranslationsData,
         })
       }),
-      tap((manufacturerData: ManufacturerDetail) => {
-        if (!manufacturerData) return;
-        this.manufacturer =  manufacturerData;
+      tap((providerData: ProviderDetail) => {
+        if (!providerData) return;
+        this.provider =  providerData;
         this.translationChanged = false;
         this.imageChanged = false;
-        this.storedTranslations = JSON.parse(JSON.stringify(this.manufacturer.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.manufacturer.translations.length > 0 ? $localize`Traducciones (${this.manufacturer.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.manufacturer.translations.length > 0 ? 'accent' : '';   
+        this.storedTranslations = JSON.parse(JSON.stringify(this.provider.translations));
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.provider.translations.length > 0 ? $localize`Traducciones (${this.provider.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.provider.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
-        this.changeInactiveButton(this.manufacturer.status);
+        this.changeInactiveButton(this.provider.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = manufacturerData.translations.length > 0 ? $localize`Traducciones (${manufacturerData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = providerData.translations.length > 0 ? $localize`Traducciones (${providerData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = manufacturerData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = providerData.translations.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -852,15 +834,15 @@ export class CatalogManufacturerEditionComponent {
     } else {
       filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
     }
-    const manufacturerParameters = {
+    const providerParameters = {
       settingType: 'tables',
       skipRecords, 
       takeRecords: this.takeRecords, 
       filter, 
       order: this.order,
     }    
-    const manufacturers = this._sharedService.setGraphqlGen(manufacturerParameters);
-    return this._catalogsService.getGenericsLazyLoadingDataGql$(manufacturers).pipe();
+    const providers = this._sharedService.setGraphqlGen(providerParameters);
+    return this._catalogsService.getGenericsLazyLoadingDataGql$(providers).pipe();
   }
 
 
@@ -876,7 +858,7 @@ export class CatalogManufacturerEditionComponent {
   }
 
   handleMultipleSelectionChanged(catalog: string){    
-    if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
+    if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
       this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
     } else {
       this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
@@ -925,25 +907,24 @@ export class CatalogManufacturerEditionComponent {
   }
 
   updateFormFromData(): void {    
-    this.manufacturerForm.patchValue({
-      name: this.manufacturer.name,
-      reference: this.manufacturer.reference,      
-      prefix: this.manufacturer.prefix,      
-      notes: this.manufacturer.notes,      
-
+    this.providerForm.patchValue({
+      name: this.provider.name,
+      reference: this.provider.reference,      
+      prefix: this.provider.prefix,      
+      notes: this.provider.notes,      
+    
     });
   } 
 
   prepareRecordToAdd(newRecord: boolean): any {
-    const fc = this.manufacturerForm.controls;
+    const fc = this.providerForm.controls;
     return  {
-        id: this.manufacturer.id,
+        id: this.provider.id,
         customerId: 1, // TODO: Get from profile
-        status: newRecord ? RecordStatus.ACTIVE : this.manufacturer.status,
+        status: newRecord ? RecordStatus.ACTIVE : this.provider.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-   
 
     }
   }
@@ -951,13 +932,12 @@ export class CatalogManufacturerEditionComponent {
 
 
   initForm(): void {
-    this.manufacturerForm.reset();
+    this.providerForm.reset();
     // Default values
-    this.manufacturerForm.controls.required.setValue(GeneralValues.NO);
 
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.manufacturer = emptyManufacturerItem;
+    this.provider = emptyProviderItem;
     this.focusThisField = 'description';
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
@@ -969,13 +949,13 @@ export class CatalogManufacturerEditionComponent {
   }
 
   initUniqueField(): void {
-    this.manufacturer.id = null;
-    this.manufacturer.createdBy = null;
-    this.manufacturer.createdAt = null;
-    this.manufacturer.updatedBy = null;
-    this.manufacturer.updatedAt = null; 
-    this.manufacturer.status = RecordStatus.ACTIVE; 
-    this.manufacturer.translations.map((t) => {
+    this.provider.id = null;
+    this.provider.createdBy = null;
+    this.provider.createdAt = null;
+    this.provider.updatedBy = null;
+    this.provider.updatedAt = null; 
+    this.provider.status = RecordStatus.ACTIVE; 
+    this.provider.translations.map((t) => {
       return {
         ...t,
         id: null,
@@ -994,7 +974,7 @@ export class CatalogManufacturerEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del fabricante`
+      return $localize`Descripción o nombre del proveedor`
     } 
     return '';
   }
@@ -1002,23 +982,23 @@ export class CatalogManufacturerEditionComponent {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
+      ApplicationModules.VARIABLES_CATALOG_EDITION,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
+      ApplicationModules.VARIABLES_CATALOG_EDITION,
       loading,
     ); 
   }
 
   validateTables(): void {
-    
+   
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations$(manufacturerId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.manufacturer.translations.length || this.storedTranslations.some((st: any) => {
-      return this.manufacturer.translations.find((t: any) => {        
+  processTranslations$(providerId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.provider.translations.length || this.storedTranslations.some((st: any) => {
+      return this.provider.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
         (st.description !== t.description || 
@@ -1035,17 +1015,17 @@ export class CatalogManufacturerEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-       
+        customerId: 1, // TODO: Get from profile
       }      
-      const translationsToAdd = this.manufacturer.translations.map((t: any) => {
+      const translationsToAdd = this.provider.translations.map((t: any) => {
         return {
           id: null,
-          manufacturerId,
+          providerId,
           description: t.description,
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-   
+          customerId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });
@@ -1054,8 +1034,8 @@ export class CatalogManufacturerEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addManufacturerTransations$(varToAdd) : of(null),
-        varToDelete.ids.length > 0 ? this._catalogsService.deleteManufacturerTranslations$(varToDelete) : of(null) 
+        varToAdd.translations.length > 0 ? this._catalogsService.addProviderTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteProviderTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);

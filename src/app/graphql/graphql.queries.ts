@@ -2134,4 +2134,198 @@ export const DELETE_COMPANY_TRANSLATIONS = gql`
     ) 
   }
 `;
+
+//providers===========================
+
+export const GET_PROVIDER = gql`
+  query OneProvider (
+    $providerId: Long!,
+  ) {
+  oneProvider (
+    id: $providerId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+     
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+    friendlyResetValueMode
+    friendlyValueType      
+  }
+}
+`;
+
+export const GET_PROVIDERS = gql`
+  query ProvidersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedProviderDtoSortInput!],
+    $filterBy: TranslatedProviderDtoFilterInput,
+  ) {
+  providersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+       
+          id
+          customerId
+       
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_PROVIDER_TRANSLATIONS = gql`
+  query ProvidersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ProviderTranslationTableSortInput!],
+    $filterBy: ProviderTranslationTableFilterInput,
+  ) {
+    providersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        providerId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_PROVIDER_TRANSLATIONS = gql`
+  mutation CreateOrUpdateProviderTranslationTable (
+    $translations: [ProviderTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateProviderTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      providerId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_PROVIDER = gql`
+  mutation CreateOrUpdateProvider (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+   
+  ) {
+  createOrUpdateProvider (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+   
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_PROVIDER_TRANSLATIONS = gql`
+  mutation DeleteProvidersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteProvidersTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
 //=========END

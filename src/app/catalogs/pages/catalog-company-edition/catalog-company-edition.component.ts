@@ -349,7 +349,7 @@ export class CatalogCompanyEditionComponent {
        
                 status: RecordStatus.INACTIVE,
               }
-              const companies = this._sharedService.setGraphqlCompanies(companyParameters);
+              const companies = this._sharedService.setGraphqlGen(companyParameters);
               this.updateCompany$ = this._catalogsService.updateCompanyStatus$(companies)
               .pipe(
                 tap((data: any) => {
@@ -419,7 +419,7 @@ export class CatalogCompanyEditionComponent {
 
                 status: RecordStatus.ACTIVE,
               }
-              const companies = this._sharedService.setGraphqlCompanies(companyParameters);
+              const companies = this._sharedService.setGraphqlGen(companyParameters);
               this.updateCompany$ = this._catalogsService.updateCompanyStatus$(companies)
               .pipe(
                 tap((data: any) => {
@@ -838,7 +838,7 @@ export class CatalogCompanyEditionComponent {
       filter, 
       order: this.order,
     }    
-    const companies = this._sharedService.setGraphqlCompanies(companyParameters);
+    const companies = this._sharedService.setGraphqlGen(companyParameters);
     return this._catalogsService.getGenericsLazyLoadingDataGql$(companies).pipe();
   }
 

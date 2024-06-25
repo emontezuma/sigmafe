@@ -933,7 +933,7 @@ export class CatalogCustomerEditionComponent {
       order: this.order,
     };
     const customers =
-      this._sharedService.setGraphqlVariables(customerParameters);
+      this._sharedService.setGraphqlGen(customerParameters);
     return this._catalogsService
       .getGenericsLazyLoadingDataGql$(customers)
       .pipe();

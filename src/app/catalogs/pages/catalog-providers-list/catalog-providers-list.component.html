@@ -1,0 +1,106 @@
+<div
+  class="container-animated"
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  @routingAnimation
+>
+  <ng-container *ngIf="providersData$ | async "></ng-container>
+  <ng-container *ngIf="sort$ | async "></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>
+  <ng-container *ngIf="settingsData$ | async "></ng-container>
+  <ng-container *ngIf="profileData$ | async "></ng-container>
+  <ng-container *ngIf="searchBox$ | async "></ng-container>
+  <ng-container *ngIf="screenData$ | async "></ng-container>
+  <ng-container *ngIf="animationData$ | async "></ng-container>
+  <ng-container *ngIf="allProvidersToCsv$ | async "></ng-container>  
+
+  <div
+    class="providers-table"    
+  >
+    <table mat-table [dataSource]="providersCatalogData" matSort>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.id }}</ng-container>
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+      
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del proveedor</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.data.name }}</strong>
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">
+            {{ row.friendlyStatus }}
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="updatedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Últ. actualización</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">
+            <div>{{ row.data.updatedBy?.name }}</div>   
+            <div>{{ row.data.updatedAt | date:"medium" }}</div>   
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="providersTableColumns; sticky: 1"></tr>
+      <tr
+        class="table-row"
+        mat-row *matRowDef="let row;
+        columns: providersTableColumns"
+        [routerLink]="['/catalogs/providers/edit/', row.data.id]"
+      >
+      </tr>
+      <div *ngIf="!loading">
+        <tr class="providers-table-mat-row" *matNoDataRow>
+          <td class="providers-table__no-data" colspan="10">
+            No hay registros a mostrar
+          </td>
+        </tr>
+      </div>
+    </table>
+
+    <div class="providers-table__paginator">
+      <div class="providers-table__paginator--catalog-data">
+        <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
+        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
+        <mat-divider vertical></mat-divider>
+      </div>
+      <mat-paginator
+        #paginator
+        class="providers-table__paginator--mat"
+        [length]="pageInfo?.totalRecords"
+        [pageSize]="50"
+        (page)="pageChange($event)"
+        showFirstLastButtons
+        [hidePageSize]="size === 'small'"
+      > 
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+<ng-template #skeleton>
+  <ngx-skeleton-loader
+    *ngIf="loading"
+    class="skeleton"
+    [theme]="{ height: '24px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', }"
+    count="1"
+  >
+  </ngx-skeleton-loader>
+</ng-template>

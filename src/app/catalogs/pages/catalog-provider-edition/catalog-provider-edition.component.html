@@ -1,0 +1,245 @@
+<div
+  class="container"
+  #catalogEdition
+  @routingAnimation
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  i18n
+>
+  <ng-container *ngIf="scroll$ | async"></ng-container>
+
+  <ng-container *ngIf="showGoTop$ | async"></ng-container>
+
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+     
+
+  <mat-card class="card">
+    <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="providerForm"
+        #f="ngForm"
+      >
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DE LA VARIABLE</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='name'"
+                [bordered]="true"
+                [formField]="providerForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="300"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignado al proveedor"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Descripción/Nombre del proveedor</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='prefix'"
+                [bordered]="true"
+                [formField]="providerForm.controls.prefix"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="50"
+                [showRightHint]="true"                
+                [showCloseButton]="true"
+                fieldHelp="Especifique la abreviación del proveedor"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Abreviación del proveedor</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="providerForm.controls.reference"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="100"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                fieldHelp="Especifique la referencia del proveedor"
+              >
+                <span fieldTitle class="label field__label"
+                  >Referencia</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items field-items--bordered">
+              <app-area-field
+                [bordered]="false"
+                [formField]="providerForm.controls.notes"
+                [fieldMaxLength]="500"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique las notas referentes a este proveedor"
+              >
+                <span fieldTitle class="label field__label"
+                  >Notas referentes al proveedor</span
+                >
+              </app-area-field>
+              <mat-checkbox
+                style="margin-top: -10px"
+                class="field__check-label"
+                formControlName="showNotes"
+                color="primary"
+              >
+                <span class="check-span">Utilizar éstas notas como título/pregunta en el checklist</span>
+              </mat-checkbox>
+            </div>                     
+           
+                      
+          </div>          
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[1] = true"
+          (closed)="panelOpenState[1] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[1]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[1]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
+              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[1]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+        
+        </mat-expansion-panel>        
+      </mat-accordion>
+    </form>
+    <div
+      *ngIf="provider.id"
+      class="catalog-footer"
+    >
+      <div class="grid-dates">
+        <div class="flex">
+          <div class="readonly-value item-id">{{ provider.id }}</div>
+          <div class="label-with-no-index">ID del registro</div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(provider.createdAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de creación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ provider.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Creado por</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(provider.updatedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de modificación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ provider.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="grid-inactive" *ngIf="provider.deletedById > 0">
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(provider.deletedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de inactivación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ provider.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Inactivado por</div>
+          </div>
+        </div>
+        <div class="flex-inactive">
+          <div class="label-inactive">
+            <strong>El registro está INACTIVO</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

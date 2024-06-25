@@ -610,7 +610,7 @@ export class CatalogMoldEditionComponent {
                 customerId: this.mold.customerId,
                 status: RecordStatus.INACTIVE,
               }
-              const variables = this._sharedService.setGraphqlVariables(moldParameters);
+              const variables = this._sharedService.setGraphqlGen(moldParameters);
               this.updateMold$ = this._catalogsService.updateMoldStatus$(variables)
               .pipe(
                 tap((data: any) => {
@@ -679,7 +679,7 @@ export class CatalogMoldEditionComponent {
                 customerId: this.mold.customerId,
                 status: RecordStatus.ACTIVE,
               }
-              const variables = this._sharedService.setGraphqlVariables(moldParameters);
+              const variables = this._sharedService.setGraphqlGen(moldParameters);
               this.updateMold$ = this._catalogsService.updateMoldStatus$(variables)
               .pipe(
                 tap((data: any) => {
@@ -1066,7 +1066,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);
+    const variables = this._sharedService.setGraphqlGen(moldParameters);
     this.providers$ = this._catalogsService.getProvidersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {
@@ -1112,7 +1112,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    const variables = this._sharedService.setGraphqlGen(moldParameters);    
     this.manufacturers$ = this._catalogsService.getManufacturersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1158,7 +1158,7 @@ export class CatalogMoldEditionComponent {
       takeRecords: this.takeRecords, 
       filter,       
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    const variables = this._sharedService.setGraphqlGen(moldParameters);    
     this.checklistTemplatesYellow$ = this._catalogsService.getChecklistTemplatesYellowLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1205,7 +1205,7 @@ export class CatalogMoldEditionComponent {
       takeRecords: this.takeRecords, 
       filter,       
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    const variables = this._sharedService.setGraphqlGen(moldParameters);    
     this.checklistTemplatesRed$ = this._catalogsService.getChecklistTemplatesRedLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1251,7 +1251,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlGen(moldParameters);     
     this.partNumbers$ = this._catalogsService.getPartNumbersLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1297,7 +1297,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlGen(moldParameters);     
     this.lines$ = this._catalogsService.getLinesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1342,7 +1342,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);     
+    const variables = this._sharedService.setGraphqlGen(moldParameters);     
     this.equipments$ = this._catalogsService.getEquipmentsLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1391,7 +1391,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.orderMaintenance
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);         
+    const variables = this._sharedService.setGraphqlGen(moldParameters);         
     this.maintenances$ = this._catalogsService.getMaintenancesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1508,7 +1508,7 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order,
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);   
+    const variables = this._sharedService.setGraphqlGen(moldParameters);   
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
