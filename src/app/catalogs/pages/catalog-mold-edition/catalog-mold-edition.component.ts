@@ -1779,14 +1779,14 @@ export class CatalogMoldEditionComponent {
   setToolbarMode(mode: toolbarMode) {
     if (this.elements.length === 0) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {      
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;      
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;      
@@ -1799,7 +1799,7 @@ export class CatalogMoldEditionComponent {
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = false;
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;      
@@ -2227,6 +2227,10 @@ export class CatalogMoldEditionComponent {
 
   get ScreenDefaultValues () {
     return ScreenDefaultValues;
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
 // End ======================

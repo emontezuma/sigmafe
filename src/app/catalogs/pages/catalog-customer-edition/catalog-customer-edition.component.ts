@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import {  routingAnimation,  dissolve,} from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, originProcess, } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -14,8 +14,9 @@ import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import {  FormGroup,  FormControl,  Validators,  NgForm,  AbstractControl,} from '@angular/forms';
 import { CatalogsService } from '../../services';
 import {  CustomerDetail,  CustomerItem,  emptyGeneralHardcodedValuesItem,  emptyCustomerItem,} from '../../models';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {  GenericDialogComponent,  TranslationsDialogComponent,} from 'src/app/shared/components';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-customer-edition',
@@ -40,12 +41,12 @@ export class CatalogCustomerEditionComponent {
   customer$: Observable<CustomerDetail>;
   translations$: Observable<any>;
   updateCustomer$: Observable<any>;
-  updateCustomerCatalog: Subscription;
+  updateCustomerCatalog$: Observable<any>;
   deleteCustomerTranslations$: Observable<any>;
   addCustomerTranslations$: Observable<any>;
   customerFormChangesSubscription: Subscription;
   uploadFiles: Subscription;
-  catalogIcon: string = 'equation';
+  catalogIcon: string = 'our_costumers';
   today = new Date();
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -79,7 +80,7 @@ export class CatalogCustomerEditionComponent {
     notes: new FormControl(''),
     reference: new FormControl(''),
     prefix: new FormControl(''),
-    showNotes: new FormControl(false),
+    mainImageName: new FormControl(''),    
   });
 
   pageInfo: PageInfo = {
@@ -99,6 +100,7 @@ export class CatalogCustomerEditionComponent {
     public _sharedService: SharedService,
     private _catalogsService: CatalogsService,
     private _router: Router,
+    private _http: HttpClient,
     public _scrollDispatcher: ScrollDispatcher,
     private _route: ActivatedRoute,
     public _dialog: MatDialog,
@@ -138,15 +140,7 @@ export class CatalogCustomerEditionComponent {
     this.customerFormChangesSubscription =
       this.customerForm.valueChanges.subscribe((customerFormChanges: any) => {
         if (!this.loaded) return;
-        if (
-          !this.customer.id ||
-          this.customer.id === null ||
-          this.customer.id === 0
-        ) {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-        } else {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-        }
+        this.setEditionButtonsState();
       });
     this.toolbarAnimationFinished$ =
       this._sharedService.toolbarAnimationFinished.pipe(
@@ -265,8 +259,12 @@ export class CatalogCustomerEditionComponent {
         this.elements.find((e) => e.action === action.action).loading = true;
         this.initUniqueField();
         this._location.replaceState('/catalogs/customers/create');
+        this.focusThisField = 'name';
         setTimeout(() => {
-          this.elements.find((e) => e.action === action.action).loading = false;
+          this.focusThisField = '';
+        }, 100);
+        setTimeout(() => {
+          this.elements.find((e) => e.action === action.action).loading = false;          
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
         }, 750);
       } else if (action.action === ButtonActions.SAVE) {
@@ -352,44 +350,43 @@ export class CatalogCustomerEditionComponent {
                 this.elements.find((e) => e.action === action.action).loading =
                   false;
               }, 200);
-            } else {
-              console.log("mold?")
-            //   this.elements.find((e) => e.action === action.action).loading =
-            //     true;
-            //   const customerParameters = {
-            //     settingType: 'status',
-            //     id: this.customer.id,
+            } else {            
+              this.elements.find((e) => e.action === action.action).loading =
+                true;
+              const customerParameters = {
+                settingType: 'status',
+                id: this.customer.id,
 
-            //     status: RecordStatus.INACTIVE,
-            //   };
-            //   const customers =
-            //     this._sharedService.setGraphqlVariables(customerParameters);
+                status: RecordStatus.INACTIVE,
+              };
+              const customers =
+                this._sharedService.setGraphqlGen(customerParameters);
               
-            //   this.updateCustomer$ = this._catalogsService
-            //     .updateCustomerStatus$(customers)
-            //     .pipe(
-            //       tap((data: any) => {
-            //         if (
-            //           data?.data?.createOrUpdateCustomer.length > 0 &&
-            //           data?.data?.createOrUpdateCustomer[0].status ===
-            //             RecordStatus.INACTIVE
-            //         ) {
-            //           setTimeout(() => {
-            //             this.changeInactiveButton(RecordStatus.INACTIVE);
-            //             const message = $localize`El cliente ha sido inhabilitado`;
-            //             this._sharedService.showSnackMessage({
-            //               message,
-            //               snackClass: 'snack-warn',
-            //               progressBarColor: 'warn',
-            //               icon: 'delete',
-            //             });
-            //             this.elements.find(
-            //               (e) => e.action === action.action
-            //             ).loading = false;
-            //           }, 200);
-            //         }
-            //       })
-            //     );
+              this.updateCustomer$ = this._catalogsService
+                .updateCustomerStatus$(customers)
+                .pipe(
+                  tap((data: any) => {
+                    if (
+                      data?.data?.createOrUpdateCustomer.length > 0 &&
+                      data?.data?.createOrUpdateCustomer[0].status ===
+                        RecordStatus.INACTIVE
+                    ) {
+                      setTimeout(() => {
+                        this.changeInactiveButton(RecordStatus.INACTIVE);
+                        const message = $localize`El cliente ha sido inhabilitado`;
+                        this._sharedService.showSnackMessage({
+                          message,
+                          snackClass: 'snack-warn',
+                          progressBarColor: 'warn',
+                          icon: 'delete',
+                        });
+                        this.elements.find(
+                          (e) => e.action === action.action
+                        ).loading = false;
+                      }, 200);
+                    }
+                  })
+                );
             }
           });
         } else if (
@@ -441,41 +438,41 @@ export class CatalogCustomerEditionComponent {
               }, 200);
             } else {
               console.log("molds?")
-              // this.elements.find((e) => e.action === action.action).loading =
-              //   true;
-              // const customerParameters = {
-              //   settingType: 'status',
-              //   id: this.customer.id,
+              this.elements.find((e) => e.action === action.action).loading =
+                true;
+              const customerParameters = {
+                settingType: 'status',
+                id: this.customer.id,
 
-              //   status: RecordStatus.ACTIVE,
-              // };
-              // const customers =
-              //   this._sharedService.setGraphqlVariables(customerParameters);
-              // this.updateCustomer$ = this._catalogsService
-              //   .updateCustomerStatus$(customers)
-              //   .pipe(
-              //     tap((data: any) => {
-              //       if (
-              //         data?.data?.createOrUpdateCustomer.length > 0 &&
-              //         data?.data?.createOrUpdateCustomer[0].status ===
-              //           RecordStatus.ACTIVE
-              //       ) {
-              //         setTimeout(() => {
-              //           this.changeInactiveButton(RecordStatus.ACTIVE);
-              //           const message = $localize`El cliente ha sido reactivado`;
-              //           this._sharedService.showSnackMessage({
-              //             message,
-              //             snackClass: 'snack-primary',
-              //             progressBarColor: 'primary',
-              //             icon: 'check',
-              //           });
-              //           this.elements.find(
-              //             (e) => e.action === action.action
-              //           ).loading = false;
-              //         }, 200);
-              //       }
-              //     })
-              //   );
+                status: RecordStatus.ACTIVE,
+              };
+              const customers =
+                this._sharedService.setGraphqlGen(customerParameters);
+              this.updateCustomer$ = this._catalogsService
+                .updateCustomerStatus$(customers)
+                .pipe(
+                  tap((data: any) => {
+                    if (
+                      data?.data?.createOrUpdateCustomer.length > 0 &&
+                      data?.data?.createOrUpdateCustomer[0].status ===
+                        RecordStatus.ACTIVE
+                    ) {
+                      setTimeout(() => {
+                        this.changeInactiveButton(RecordStatus.ACTIVE);
+                        const message = $localize`El cliente ha sido reactivado`;
+                        this._sharedService.showSnackMessage({
+                          message,
+                          snackClass: 'snack-primary',
+                          progressBarColor: 'primary',
+                          icon: 'check',
+                        });
+                        this.elements.find(
+                          (e) => e.action === action.action
+                        ).loading = false;
+                      }, 200);
+                    }
+                  })
+                );
             }
           });
         }
@@ -812,19 +809,19 @@ export class CatalogCustomerEditionComponent {
     const newRecord =
       !this.customer.id || this.customer.id === null || this.customer.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateCustomerCatalog = this._catalogsService
-      .updateCustomerCatalog$(dataToSave)
-      .subscribe((data: any) => {
-        const customerId = data?.data?.createOrUpdateMold[0].id;
-        if (customerId > 0) {
+    this.updateCustomerCatalog$ = this._catalogsService.updateCustomerCatalog$(dataToSave)
+    .pipe(
+      tap((data: any) => {
+        if (data?.data?.createOrUpdateCustomer.length > 0) {
+          const customerId = data?.data?.createOrUpdateCustomer[0].id;        
           this.processTranslations$(customerId).subscribe(() => {
             this.requestCustomerData(customerId);
             setTimeout(() => {
               let message = $localize`El cliente ha sido actualizado`;
               if (newRecord) {
-                message = $localize`El cliente ha sido creado satisfactoriamente con el id <strong>${this.customer.id}</strong>`;
+                message = $localize`El cliente ha sido creado satisfactoriamente con el id <strong>${customerId}</strong>`;
                 this._location.replaceState(
-                  `/catalogs/customers/edit/${this.customer.id}`
+                  `/catalogs/customers/edit/${customerId}`
                 );
               }
               this._sharedService.showSnackMessage({
@@ -839,7 +836,8 @@ export class CatalogCustomerEditionComponent {
             }, 200);
           });
         }
-      });
+      })
+    )
   }
 
   requestCustomerData(customerId: number): void {
@@ -939,24 +937,65 @@ export class CatalogCustomerEditionComponent {
       .pipe();
   }
 
-  handleOptionSelected(getMoreDataParams: any) {
-    console.log('[handleOptionSelected]', getMoreDataParams);
+  onFileSelected(event: any) {
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/customers`)
+    .set('processId', this.customer.id)
+    .set('process', originProcess.CATALOGS_CUSTOMERS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        this.imageChanged = true;
+        this.customerForm.controls.mainImageName.setValue(res.fileName);
+        this.customer.mainImagePath = res.filePath;
+        this.customer.mainImageGuid = res.fileGuid;
+        this.customer.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el cliente para aplicar el cambio`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 5000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.setEditionButtonsState();
+      }      
+    });
   }
+
+  setEditionButtonsState() {
+    if (!this.customer.id || this.customer.id === null || this.customer.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
+
+  removeImage() {
+    this.imageChanged = true;
+    this.customerForm.controls.mainImageName.setValue('');
+    this.customer.mainImagePath = '';
+    this.customer.mainImageGuid = '';
+    this.customer.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen del cliente<br>Guarde el cliente para aplicar el cambio`;
+    this._sharedService.showSnackMessage({
+      message,
+      duration: 5000,
+      snackClass: 'snack-primary',
+      icon: 'check',
+    });
+    this.setEditionButtonsState();
+  }
+
 
   handleInputKeydown(event: KeyboardEvent) {
     console.log('[handleInputKeydown]', event);
   }
 
   handleMultipleSelectionChanged(catalog: string) {
-    if (
-      !this.customer.id ||
-      this.customer.id === null ||
-      this.customer.id === 0
-    ) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   pageChange(event: any) {
@@ -964,14 +1003,12 @@ export class CatalogCustomerEditionComponent {
       ...this.pageInfo,
       currentPage: event?.pageIndex,
     };
-    //this.requestData(this.pageInfo.currentPage * this.pageInfo.pageSize, this.pageInfo.pageSize, this.order);
   }
 
   setToolbarMode(mode: toolbarMode) {
     if (this.elements.length === 0) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {
-      if (!this.elements.find((e) => e.action === ButtonActions.SAVE).disabled)
-        return;
+      // if (!this.elements.find((e) => e.action === ButtonActions.SAVE).disabled) return;
       this.elements.find((e) => e.action === ButtonActions.SAVE).disabled =
         false;
       this.elements.find((e) => e.action === ButtonActions.CANCEL).disabled =
@@ -985,8 +1022,7 @@ export class CatalogCustomerEditionComponent {
       this.elements.find((e) => e.action === ButtonActions.COPY).disabled =
         true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
-      if (!this.elements.find((e) => e.action === ButtonActions.SAVE).disabled)
-        return;
+      // if (!this.elements.find((e) => e.action === ButtonActions.SAVE).disabled) return;
       this.elements.find((e) => e.action === ButtonActions.SAVE).disabled =
         false;
       this.elements.find((e) => e.action === ButtonActions.CANCEL).disabled =
@@ -1000,8 +1036,6 @@ export class CatalogCustomerEditionComponent {
       this.elements.find((e) => e.action === ButtonActions.COPY).disabled =
         true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
-      if (this.elements.find((e) => e.action === ButtonActions.SAVE).disabled)
-        return;
       this.elements.find((e) => e.action === ButtonActions.SAVE).disabled =
         true;
       this.elements.find((e) => e.action === ButtonActions.CANCEL).disabled =
@@ -1015,8 +1049,7 @@ export class CatalogCustomerEditionComponent {
       this.elements.find((e) => e.action === ButtonActions.COPY).disabled =
         false;
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
-      if (this.elements.find((e) => e.action === ButtonActions.SAVE).disabled)
-        return;
+      // if (this.elements.find((e) => e.action === ButtonActions.SAVE).disabled) return;
       this.elements.find((e) => e.action === ButtonActions.SAVE).disabled =
         true;
       this.elements.find((e) => e.action === ButtonActions.CANCEL).disabled =
@@ -1035,6 +1068,7 @@ export class CatalogCustomerEditionComponent {
   updateFormFromData(): void {
     this.customerForm.patchValue({
       name: this.customer.name,
+      mainImageName: this.customer.mainImageName,
       reference: this.customer.reference,
       prefix: this.customer.prefix,
       notes: this.customer.notes,
@@ -1056,14 +1090,13 @@ export class CatalogCustomerEditionComponent {
       ...((fc.notes.dirty || fc.notes.touched || newRecord) && {
         notes: fc.notes.value,
       }),
-
-      ...((fc.showNotes.dirty || fc.showNotes.touched || newRecord) && {
-        showNotes: fc.showNotes.value ? 'Y' : 'N',
+      ...((fc.prefix.dirty || fc.prefix.touched || newRecord) && {
+        prefix: fc.prefix.value,
       }),
-
-      ...((fc.showNotes.dirty || fc.showNotes.touched || newRecord) && {
-        showNotes: fc.showNotes.value,
-      }),
+      ...(this.imageChanged) && { 
+        mainImageName: fc.mainImageName.value,
+        mainImagePath: this.customer.mainImagePath,
+        mainImageGuid: this.customer.mainImageGuid, },
     };
   }
 
@@ -1148,7 +1181,7 @@ export class CatalogCustomerEditionComponent {
           return (
             st.languageId === t.languageId &&
             st.id === t.id &&
-            (st.description !== t.description ||
+            (st.name !== t.name ||
               st.reference !== t.reference ||
               st.notes !== t.notes)
           );
@@ -1169,11 +1202,10 @@ export class CatalogCustomerEditionComponent {
         return {
           id: null,
           customerId,
-          description: t.description,
+          name: t.name,          
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-
           status: RecordStatus.ACTIVE,
         };
       });
@@ -1204,6 +1236,10 @@ export class CatalogCustomerEditionComponent {
 
   get GeneralValues() {
     return GeneralValues;
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
   // End ======================

@@ -11,7 +11,7 @@ table {
   border-radius: 8px 8px 0px 0px;    
 }
 
-.variables-table {
+.customers-table {
   width: calc(100% - 11px);
   flex: 1;
   min-height: 0;
@@ -97,29 +97,6 @@ table {
   padding: 10px;
 }
 
-
-.mat-column-uom {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
-.mat-column-sigmaType {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;
@@ -153,8 +130,6 @@ table {
 .mat-sort-header {
   // padding: 5px 16px;
 }
-
-
 
 .mat-mdc-row {
   font-size: 1.3rem;
@@ -253,4 +228,28 @@ mat-icon {
 .skeleton {
   min-height: 61px;  
   height: 61px;  
+}
+
+.record-image {
+  width: inherit;
+  max-width: calc(100% - 4px);
+  max-height: calc(100% - 4px);
+  margin: auto;
+  padding: 2px;
+}
+
+.card-image {
+  display: flex;  
+}
+
+.image-container {    
+  max-height: 56px;    
+  max-width: 56px;    
+  min-height: 56px;    
+  min-width: 56px;    
+  position: relative;
+  display: flex;
+  margin: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
 }

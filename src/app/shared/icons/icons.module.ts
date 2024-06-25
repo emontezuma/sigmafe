@@ -228,6 +228,9 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       'equation',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation.svg`)
+    );iconRegistry.addSvgIcon(
+      'our_costumers',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/our_costumers.svg`)
     );
   }
   

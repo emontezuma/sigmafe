@@ -27,7 +27,7 @@ export class CatalogCustomersListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Customers ===============
-  customersTableColumns: string[] = ['id', 'name', 'status', 'updatedAt'];
+  customersTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   customersCatalogData = new MatTableDataSource<CustomerItem>([]);      
   
   customersData$: Observable<CustomersData>;
@@ -40,7 +40,7 @@ export class CatalogCustomersListComponent implements AfterViewInit {
   allCustomersToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "our_costumers";  
 
   loading: boolean;
   onTopStatus: string;
@@ -207,10 +207,12 @@ export class CatalogCustomersListComponent implements AfterViewInit {
           customersPaginated: {
             ...data.customersPaginated,
             items: data.customersPaginated.items.map((item) => { 
+              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
               return {
                 ...item,
                 data: {
                   ...item.data,                  
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
                 }
               }
             })          
@@ -231,13 +233,13 @@ export class CatalogCustomersListComponent implements AfterViewInit {
         this.customersCatalogData = new MatTableDataSource<CustomerItem>(this.customersData.items);
         this.customersCatalogData.paginator = this.paginator;
         // this.customersCatalogData.sort = this.sort;
-        this.customersCatalogData.sortData = () => this.customersData.items;        
-        if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
-          setTimeout(() => {
+        this.customersCatalogData.sortData = () => this.customersData.items;                
+        setTimeout(() => {
+          if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
-          }, 200);
-        }
-        this.setViewLoading(false);        
+          }
+          this.setViewLoading(false);
+        }, 500);
       })
     );
   }
@@ -391,7 +393,7 @@ export class CatalogCustomersListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.customersTableColumns = ['id', 'name', 'status', 'updatedAt'];
+    this.customersTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

@@ -1357,6 +1357,23 @@ export const INACTIVATE_VARIABLE = gql`
   }
 `;
 
+export const INACTIVATE_CUSTOMER = gql`
+  mutation CreateOrUpdateCustomer (
+    $id: Long,    
+    $status: String
+  ) {
+  createOrUpdateCustomer (
+    inputs: {
+      id: $id      
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+
 export const GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING = gql`
   query CatalogDetailChecklistTemplate (    
     $recordsToSkip: Int,
@@ -1471,7 +1488,11 @@ export const GET_CUSTOMERS = gql`
       items {
         friendlyStatus
         data {
-          name          
+          name
+          reference
+          mainImagePath
+          mainImageName
+          mainImageGuid
           id         
           status
           updatedAt
@@ -1498,6 +1519,9 @@ export const GET_CUSTOMER = gql`
       reference
       notes
       prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName      
       id
       status
       createdById
@@ -1581,6 +1605,10 @@ export const UPDATE_CUSTOMER = gql`
     $name: String,
     $reference: String,
     $notes: String,   
+    $prefix: String,  
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,          
   ) {
   createOrUpdateCustomer (
     inputs: [{
@@ -1589,6 +1617,10 @@ export const UPDATE_CUSTOMER = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
+      prefix: $prefix,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath, 
     }]) {
       id
       createdAt

@@ -1473,7 +1473,7 @@ export class CatalogVariableEditionComponent {
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/variables`)
-    //.set('processId', this.variable.id)
+    .set('processId', this.variable.id)
     .set('process', originProcess.CATALOGS_VARIABLES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
@@ -1513,14 +1513,14 @@ export class CatalogVariableEditionComponent {
   setToolbarMode(mode: toolbarMode) {
     if (this.elements.length === 0) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {      
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
@@ -1534,7 +1534,7 @@ export class CatalogVariableEditionComponent {
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = false;
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   

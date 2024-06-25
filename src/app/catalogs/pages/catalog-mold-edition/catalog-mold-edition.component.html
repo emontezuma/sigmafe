@@ -1118,7 +1118,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="mold.deletedById > 0">
+      <div class="grid-inactive" *ngIf="mold.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(mold.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">

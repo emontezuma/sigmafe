@@ -26,6 +26,10 @@ export interface CustomerDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
+  mainImageGuid?: string;
+  mainImagePath?: string;
+  mainImageName?: string;
+  mainImage?: string;
   id?: number;
   status?: string;
   createdById?: any;
@@ -74,6 +78,7 @@ export const emptyCustomerItem: CustomerDetail = {
   id: null,
   prefix: null,
   status: null,
+  mainImagePath: null,    
   createdById: null,
   createdAt: null,
   updatedById: null,

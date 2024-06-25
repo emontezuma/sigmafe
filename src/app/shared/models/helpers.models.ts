@@ -53,8 +53,9 @@ export interface PageInfo {
   }
  
   export enum originProcess {
-    CATALOGS_MOLDS = 'catalogs-molds',
+    CATALOGS_MOLDS = 'catalogs-molds',    
     CATALOGS_VARIABLES = 'catalogs-variables',
+    CATALOGS_CUSTOMERS = 'catalogs-custmomers',
 }
   
 export enum SystemTables {

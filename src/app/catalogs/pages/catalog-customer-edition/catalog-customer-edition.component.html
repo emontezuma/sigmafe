@@ -14,6 +14,7 @@
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateCustomer$ | async "></ng-container>    
+  <ng-container *ngIf="updateCustomerCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deleteCustomerTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addCustomerTranslations$ | async "></ng-container>   
 
@@ -128,17 +129,71 @@
                 <span fieldTitle class="label field__label"
                   >Notas referentes al cliente</span
                 >
-              </app-area-field>
-              <mat-checkbox
-                style="margin-top: -10px"
-                class="field__check-label"
-                formControlName="showNotes"
-                color="primary"
-              >
-                <span class="check-span">Utilizar éstas notas como título/pregunta en el checklist</span>
-              </mat-checkbox>
+              </app-area-field>              
             </div>                     
-           
+            <div class="field-items">
+              <fieldset class="field__container">
+                <div class="image-and-field">
+                  <div class="field-components">
+                    <span class="label field__label">Imagen a mostrar</span>                
+                    <mat-form-field appearance="fill" class="field__field">
+                      <input
+                        class="field__input"
+                        matInput
+                        [formControl]="customerForm.controls.mainImageName"                        
+                        [readonly]="true"
+                      />
+                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept="*.png,*.jpg,*.jpeg,*.svg,*.bmp" #fileInput> 
+                      <button
+                        matSuffix
+                        mat-icon-button
+                        (click)="fileInput.click()"
+                        style="margin-right: 5px;"
+                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>search</mat-icon>
+                      </button>
+                      <button
+                        *ngIf="customer.mainImage"
+                        matSuffix
+                        mat-icon-button
+                        (click)="removeImage()"
+                        style="margin-right: 5px;"
+                        matTooltip="Remueve la imagen del cliente"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>          
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este cliente</span>
+                  </div>                  
+                  <div *ngIf="!loading" class="card-image">
+                    <div
+                      class="image-container"
+                      *ngIf="this.customer.mainImage"
+                    >
+                      <img                
+                        @dissolve
+                        appImageNotFound                
+                        class="mold-image"                        
+                        [src]="this.customer.mainImage"
+                        [alt]="this.customer.mainImage"            
+                        fill
+                      >      
+                    </div>
+                    <div
+                      *ngIf="!this.customer.mainImage"
+                      class="icon-container"
+                    >
+                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
+                    </div>    
+                  </div>
+                </div>                
+              </fieldset>              
+            </div>
                      
           </div>          
         </mat-expansion-panel>
@@ -186,7 +241,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="customer.deletedById > 0">
+      <div class="grid-inactive" *ngIf="customer.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(customer.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
