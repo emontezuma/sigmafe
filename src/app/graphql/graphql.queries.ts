@@ -2018,8 +2018,7 @@ export const GET_COMPANY = gql`
       mainImageGuid
       mainImageName
       id
-      customerId
-     
+      customerId     
       status
       createdById
       createdAt
@@ -2037,9 +2036,7 @@ export const GET_COMPANY = gql`
         name
       }      
     }
-    friendlyStatus
-    friendlyResetValueMode
-    friendlyValueType      
+    friendlyStatus    
   }
 }
 `;
@@ -2060,13 +2057,13 @@ export const GET_COMPANIES = gql`
       items {
         friendlyStatus
         data {
-          name          
+          name
+          reference
           mainImagePath
           mainImageName
           mainImageGuid
           id
-          customerId
-       
+          customerId       
           status
           updatedAt
           updatedBy {
@@ -2147,8 +2144,7 @@ export const ADD_COMPANY_TRANSLATIONS = gql`
 
 export const UPDATE_COMPANY = gql`
   mutation CreateOrUpdateCompany (
-    $customerId: Long,
-  
+    $customerId: Long,  
     $id: Long,
     $status: String    
     $name: String,
@@ -2160,8 +2156,7 @@ export const UPDATE_COMPANY = gql`
   ) {
   createOrUpdateCompany (
     inputs: [{
-      customerId: $customerId
-     
+      customerId: $customerId     
       id: $id      
       status: $status
       name: $name,

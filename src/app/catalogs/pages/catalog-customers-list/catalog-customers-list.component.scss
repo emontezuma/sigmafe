@@ -97,6 +97,19 @@ table {
   padding: 10px;
 }
 
+
+.mat-column-reference {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 26%;
+  max-width: 26% !important;
+  min-width: 26%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;

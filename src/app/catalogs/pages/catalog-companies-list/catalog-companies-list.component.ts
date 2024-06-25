@@ -27,7 +27,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Companies ===============
-  companiesTableColumns: string[] = ['id', 'mainImagePath', 'name', 'status', 'updatedAt'];
+  companiesTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   companiesCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   companiesData$: Observable<CompaniesData>;
@@ -40,7 +40,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   allCompaniesToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "company";  
 
   loading: boolean;
   onTopStatus: string;
@@ -75,11 +75,11 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +112,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.PLANTS_CATALOG) {
+        if (searchBox.from === ApplicationModules.COMPANIES_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +128,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.PLANTS_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.COMPANIES_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +139,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.PLANTS_CATALOG,
+      from: ApplicationModules.COMPANIES_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +148,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG,
       false,
     );        
   }
@@ -209,8 +209,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
-                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
                 }
               }
             })          
@@ -246,7 +245,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.PLANTS_CATALOG,
+          from: ApplicationModules.COMPANIES_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -267,7 +266,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.PLANTS_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.COMPANIES_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -390,7 +389,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.companiesTableColumns = ['id', 'mainImagePath', 'name', 'status', 'updatedAt'];
+    this.companiesTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -415,11 +414,11 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.COMPANIES_CATALOG,
       loading,
     );         
   }

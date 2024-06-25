@@ -733,10 +733,12 @@ export class CatalogsService {
     const { oneCompany } = paramsData?.companyGqlData?.data;
     const { data } = oneCompany;
     const translations = paramsData?.companyGqlTranslationsData?.data;
-    
+    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
     
     return {
       ...data,
+      mainImage,
       translations: this.mapTranslations(translations),
     }
   }

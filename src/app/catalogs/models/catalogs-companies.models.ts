@@ -42,7 +42,6 @@ export interface CompanyDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
-
   translations?: GeneralTranslation[];  
   
 }
@@ -61,18 +60,15 @@ export interface CompanyCatalog {
   id: string;
   name: string;
   mainImagePath: string;
-
   status: string;
   updatedAt: string;
 }
-
-
 
 export const emptyCompanyCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
-    customerId: null,
+    customerId: null,    
     name: null,
     mainImagePath: null,    
     updatedBy: null,
@@ -85,6 +81,7 @@ export const emptyCompanyItem: CompanyDetail = {
   name: null,
   id: null,
   customerId: null,
+  mainImagePath: null,    
   prefix: null,
   status: null,
   createdById: null,

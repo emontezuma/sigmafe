@@ -44,7 +44,7 @@ export class CatalogCompanyEditionComponent {
   company$: Observable<CompanyDetail>;
   translations$: Observable<any>;
   updateCompany$: Observable<any>;
-  updateCompanyCatalog: Subscription;
+  updateCompanyCatalog$: Observable<any>;
   deleteCompanyTranslations$: Observable<any>;  
   addCompanyTranslations$: Observable<any>;  
   
@@ -52,7 +52,7 @@ export class CatalogCompanyEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "company";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -75,13 +75,11 @@ export class CatalogCompanyEditionComponent {
     name: new FormControl(
       '', 
       Validators.required,      
-    ),
-   
+    ),   
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
-    prefix: new FormControl(''),    
-   
+    prefix: new FormControl(''),       
   });
 
   pageInfo: PageInfo = {
@@ -111,9 +109,8 @@ export class CatalogCompanyEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.COMPANIES_CATALOG_EDITION,
       true,
     );
     this.showGoTop$ = this._sharedService.showGoTop.pipe(
@@ -143,31 +140,22 @@ export class CatalogCompanyEditionComponent {
 
       })
     );
-    
-
-    
     this.companyFormChangesSubscription = this.companyForm.valueChanges.subscribe((companyFormChanges: any) => {
       if (!this.loaded) return;
-      if (!this.company.id || this.company.id === null || this.company.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-      }      
+      this.setEditionButtonsState();
     }); 
-
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
-          ApplicationModules.VARIABLES_CATALOG_EDITION,
+          ApplicationModules.COMPANIES_CATALOG_EDITION,
           !animationFinished,
         ); 
       }
-      ));
-    
+    ));    
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       skip(1),
       tap((buttonClicked: ToolbarButtonClicked) => {      
-        if (buttonClicked.from !== ApplicationModules.VARIABLES_CATALOG_EDITION) {
+        if (buttonClicked.from !== ApplicationModules.COMPANIES_CATALOG_EDITION) {
             return
         }
         this.toolbarAction(buttonClicked);
@@ -213,7 +201,7 @@ export class CatalogCompanyEditionComponent {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
-          from: ApplicationModules.VARIABLES_CATALOG_EDITION,
+          from: ApplicationModules.COMPANIES_CATALOG_EDITION,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -226,7 +214,7 @@ export class CatalogCompanyEditionComponent {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.VARIABLES_CATALOG_EDITION && this.elements.length > 0) {
+    if (action.from === ApplicationModules.COMPANIES_CATALOG_EDITION && this.elements.length > 0) {
       if (action.action === ButtonActions.NEW) {        
         this.elements.find(e => e.action === action.action).loading = true;
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
@@ -264,6 +252,10 @@ export class CatalogCompanyEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
         this._location.replaceState('/catalogs/companies/create');
+        this.focusThisField = 'name';
+        setTimeout(() => {
+          this.focusThisField = '';
+        }, 100);
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
@@ -329,7 +321,7 @@ export class CatalogCompanyEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará la companya con el Id <strong>${this.company.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará la compañía con el Id <strong>${this.company.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -356,7 +348,7 @@ export class CatalogCompanyEditionComponent {
                   if (data?.data?.createOrUpdateCompany.length > 0 && data?.data?.createOrUpdateCompany[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`La Companya ha sido inhabilitada`;
+                      const message = $localize`La compañía ha sido inhabilitada`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -399,7 +391,7 @@ export class CatalogCompanyEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará la companya con el Id <strong>${this.company.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará la compañía con el Id <strong>${this.company.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -426,7 +418,7 @@ export class CatalogCompanyEditionComponent {
                   if (data?.data?.createOrUpdateCompany.length > 0 && data?.data?.createOrUpdateCompany[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`La Companya ha sido reactivada`;
+                      const message = $localize`La compañía ha sido reactivada`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -449,7 +441,7 @@ export class CatalogCompanyEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones de la companya <strong>${this.company.id}</strong>`,
+              title: $localize`Traducciones de la compañía <strong>${this.company.id}</strong>`,
               topIcon: 'world',
               translations: this.company.translations,
               buttons: [{
@@ -493,7 +485,7 @@ export class CatalogCompanyEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la companya ${this.company.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará la compañía ${this.company.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -518,7 +510,7 @@ export class CatalogCompanyEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de companyas`,
+      tooltip:  $localize`Regresar a la lista de compañías`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -744,36 +736,32 @@ export class CatalogCompanyEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.company.id || this.company.id === null || this.company.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateCompanyCatalog = this._catalogsService.updateCompanyCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const companyId = data?.data?.createOrUpdateMold[0].id;
-      if (companyId > 0) {        
-        this.processTranslations$(companyId)
-        .subscribe(() => {
-          this.requestCompanyData(companyId);
-          setTimeout(() => {              
-            let message = $localize`La companya ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`La companya ha sido creado satisfactoriamente con el id <strong>${this.company.id}</strong>`;
-              this._location.replaceState(`/catalogs/companies/edit/${this.company.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
-            });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
-      }
-    });
+    this.updateCompanyCatalog$ = this._catalogsService.updateCompanyCatalog$(dataToSave)
+    .pipe(
+      tap((data: any) => {
+        if (data?.data?.createOrUpdateCompany.length > 0) {
+          const companyId = data?.data?.createOrUpdateCompany[0].id;          
+          this.processTranslations$(companyId).subscribe(() => {
+            this.requestCompanyData(companyId);
+            setTimeout(() => {              
+              let message = $localize`La compañía ha sido actualizado`;
+              if (newRecord) {                
+                message = $localize`La compañía ha sido creado satisfactoriamente con el id <strong>${this.company.id}</strong>`;
+                this._location.replaceState(`/catalogs/companies/edit/${companyId}`);
+              }
+              this._sharedService.showSnackMessage({
+                message,
+                snackClass: 'snack-accent',
+                progressBarColor: 'accent',                
+              });
+              this.setViewLoading(false);
+              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+            }, 200);
+          });
+        }
+      })
+    )
   }
-
-
-
-
-
 
   requestCompanyData(companyId: number): void { 
     let companies = undefined;
@@ -824,26 +812,6 @@ export class CatalogCompanyEditionComponent {
     ); 
   }  
 
-  requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "tableName": { "eq": "${catalog}" } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
-    }
-    const companyParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order,
-    }    
-    const companies = this._sharedService.setGraphqlGen(companyParameters);
-    return this._catalogsService.getGenericsLazyLoadingDataGql$(companies).pipe();
-  }
-
-
-
   onFileSelected(event: any) {
     const fd = new FormData();
     fd.append('image', event.target.files[0], event.target.files[0].name);
@@ -860,19 +828,14 @@ export class CatalogCompanyEditionComponent {
         this.company.mainImagePath = res.filePath;
         this.company.mainImageGuid = res.fileGuid;
         this.company.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la companya??? para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la compañía para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
           snackClass: 'snack-primary',
           icon: 'check',
         });
-        if (!this.company.id || this.company.id === null || this.company.id === 0) {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-        } else {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-        }
-      }      
+        this.setEditionButtonsState();      }      
     });
   }
 
@@ -882,14 +845,6 @@ export class CatalogCompanyEditionComponent {
 
   handleInputKeydown(event: KeyboardEvent) {
     console.log('[handleInputKeydown]', event)
-  }
-
-  handleMultipleSelectionChanged(catalog: string){    
-    if (!this.company.id || this.company.id === null || this.company.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
   }
 
   pageChange(event: any) {
@@ -903,28 +858,28 @@ export class CatalogCompanyEditionComponent {
   setToolbarMode(mode: toolbarMode) {
     if (this.elements.length === 0) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {      
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
-      if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = false;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = false;
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
@@ -937,6 +892,7 @@ export class CatalogCompanyEditionComponent {
     this.companyForm.patchValue({
       name: this.company.name,
       reference: this.company.reference,      
+      mainImageName: this.company.mainImageName,
       prefix: this.company.prefix,      
       notes: this.company.notes,      
 
@@ -953,11 +909,20 @@ export class CatalogCompanyEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.company.mainImagePath,
         mainImageGuid: this.company.mainImageGuid, },
+    }
+  }
+
+  setEditionButtonsState() {
+    if (!this.company.id || this.company.id === null || this.company.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
     }
   }
   
@@ -967,18 +932,14 @@ export class CatalogCompanyEditionComponent {
     this.company.mainImagePath = '';
     this.company.mainImageGuid = '';
     this.company.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la companya<br>Guarde la companya?? para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen de la compañía<br>Guarde la compañía para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
       snackClass: 'snack-primary',
       icon: 'check',
     });
-    if (!this.company.id || this.company.id === null || this.company.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();    
   }
 
   initForm(): void {
@@ -988,7 +949,7 @@ export class CatalogCompanyEditionComponent {
     this.storedTranslations = [];
     this.translationChanged = false;
     this.company = emptyCompanyItem;
-    this.focusThisField = 'description';
+    this.focusThisField = 'name';
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
         behavior: 'smooth',
@@ -1024,7 +985,7 @@ export class CatalogCompanyEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la companya`
+      return $localize`Descripción o nombre de la compañía`
     }
     return '';
   }
@@ -1032,11 +993,11 @@ export class CatalogCompanyEditionComponent {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.COMPANIES_CATALOG_EDITION,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.COMPANIES_CATALOG_EDITION,
       loading,
     ); 
   }
@@ -1051,7 +1012,7 @@ export class CatalogCompanyEditionComponent {
       return this.company.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
-        (st.description !== t.description || 
+        (st.name !== t.name || 
         st.reference !== t.reference || 
         st.notes !== t.notes);
       });
@@ -1072,7 +1033,7 @@ export class CatalogCompanyEditionComponent {
         return {
           id: null,
           companyId,
-          description: t.description,
+          name: t.name,
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
@@ -1105,6 +1066,10 @@ export class CatalogCompanyEditionComponent {
 
   get GeneralValues() {
     return GeneralValues; 
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
 // End ======================

@@ -67,16 +67,6 @@ export class CatalogCustomerEditionComponent {
 
   customerForm = new FormGroup({
     name: new FormControl('', Validators.required),
-    required: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowComments: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO,
-    }),
-    allowNoCapture: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO,
-    }),
-
     notes: new FormControl(''),
     reference: new FormControl(''),
     prefix: new FormControl(''),
@@ -354,7 +344,7 @@ export class CatalogCustomerEditionComponent {
               this.elements.find((e) => e.action === action.action).loading =
                 true;
               const customerParameters = {
-                settingType: 'status',
+                settingType: 'statusCustomer',
                 id: this.customer.id,
 
                 status: RecordStatus.INACTIVE,
@@ -374,6 +364,7 @@ export class CatalogCustomerEditionComponent {
                       setTimeout(() => {
                         this.changeInactiveButton(RecordStatus.INACTIVE);
                         const message = $localize`El cliente ha sido inhabilitado`;
+                        this.customer.status = RecordStatus.INACTIVE;
                         this._sharedService.showSnackMessage({
                           message,
                           snackClass: 'snack-warn',
@@ -441,7 +432,7 @@ export class CatalogCustomerEditionComponent {
               this.elements.find((e) => e.action === action.action).loading =
                 true;
               const customerParameters = {
-                settingType: 'status',
+                settingType: 'statusCustomer',
                 id: this.customer.id,
 
                 status: RecordStatus.ACTIVE,
@@ -459,6 +450,7 @@ export class CatalogCustomerEditionComponent {
                     ) {
                       setTimeout(() => {
                         this.changeInactiveButton(RecordStatus.ACTIVE);
+                        this.customer.status = RecordStatus.ACTIVE;
                         const message = $localize`El cliente ha sido reactivado`;
                         this._sharedService.showSnackMessage({
                           message,
@@ -1103,8 +1095,7 @@ export class CatalogCustomerEditionComponent {
   initForm(): void {
     this.customerForm.reset();
     // Default values
-    this.customerForm.controls.required.setValue(GeneralValues.NO);
-
+    
     this.storedTranslations = [];
     this.translationChanged = false;
     this.customer = emptyCustomerItem;

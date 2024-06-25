@@ -200,8 +200,6 @@ export class CatalogCustomersListComponent implements AfterViewInit {
     .pipe(
       map((customers: any) => {
         const { data } = customers;
-        console.log("here")
-        console.log(data)
         return { 
           ...data,
           customersPaginated: {

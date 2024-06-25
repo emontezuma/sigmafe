@@ -98,28 +98,6 @@ table {
 }
 
 
-.mat-column-uom {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
-.mat-column-sigmaType {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;
@@ -139,6 +117,19 @@ table {
   min-width: 20%;
 }
 
+.mat-column-reference {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 26%;
+  max-width: 26% !important;
+  min-width: 26%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
+
 .mat-mdc-header-row {
   font-size: 1.5rem;
   font-weight: 700;
@@ -153,8 +144,6 @@ table {
 .mat-sort-header {
   // padding: 5px 16px;
 }
-
-
 
 .mat-mdc-row {
   font-size: 1.3rem;

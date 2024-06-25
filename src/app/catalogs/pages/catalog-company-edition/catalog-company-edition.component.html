@@ -8,21 +8,15 @@
   <ng-container *ngIf="scroll$ | async"></ng-container>
   <ng-container *ngIf="company$ | async"></ng-container>  
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
-
-
-
   <ng-container *ngIf="settingsData$ | async"></ng-container>
-
-
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
-  <ng-container *ngIf="updateCompany$ | async "></ng-container>    
+  <ng-container *ngIf="updateCompany$ | async "></ng-container>
+  <ng-container *ngIf="updateCompanyCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deleteCompanyTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addCompanyTranslations$ | async "></ng-container>   
-   
-       
 
   <mat-card class="card">
     <form
@@ -81,11 +75,11 @@
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado a la companya"
+                fieldHelp="Especifique el nombre asignado a la compañía"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre de la companya</span
+                  >Descripción/Nombre de la compañía</span
                 >
               </app-input-field>
             </div>
@@ -98,11 +92,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación de la companya"
+                fieldHelp="Especifique la abreviación de la compañía"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación de la companya</span
+                  >Abreviación de la compañía</span
                 >
               </app-input-field>
             </div>
@@ -114,7 +108,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia de la companya"
+                fieldHelp="Especifique la referencia de la compañía"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -130,10 +124,10 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a esta companya"
+                fieldHelp="Especifique las notas referentes a esta compañía"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes a la companya</span
+                  >Notas referentes a la compañía</span
                 >
               </app-area-field>              
             </div>                     
@@ -167,14 +161,14 @@
                         mat-icon-button
                         (click)="removeImage()"
                         style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen de la companya"
+                        matTooltip="Remueve la imagen de la compañía"
                         matTooltipClass="tooltip-general"
                         matTooltipShowDelay="100"
                       >
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta companya</span>
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta compañía</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
@@ -202,42 +196,6 @@
             </div>
                    
           </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DE LA COMPANIA</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
-              >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
-            </div>
-          </mat-expansion-panel-header>
-       
         </mat-expansion-panel>        
       </mat-accordion>
     </form>
@@ -280,7 +238,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="company.deletedById > 0">
+      <div class="grid-inactive" *ngIf="company.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(company.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
