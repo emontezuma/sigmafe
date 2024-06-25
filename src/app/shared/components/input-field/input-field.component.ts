@@ -43,8 +43,7 @@ export class InputFieldComponent implements OnChanges {
   ngOnChanges(): void { 
     if (this.focused) {
       setTimeout(() => {
-        this.selection.nativeElement.focus();
-        console.log('focused')
+        this.selection.nativeElement.focus();    
       }, 100)
     }
   }

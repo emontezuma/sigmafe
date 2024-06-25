@@ -3,21 +3,22 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, switchMap, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { GeneralCatalogData, MoldThresoldTypes, VariableDetail, VariableItem, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem, emptyVariableItem } from '../../models';
+import { GeneralCatalogData, MoldThresoldTypes, VariableDetail, VariableItem, VariablePossibleValue, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem, emptyVariableItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-catalog-variable-edition',
@@ -29,6 +30,7 @@ export class CatalogVariableEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
+  @ViewChild('possibleValue', { static: false }) possibleValue: ElementRef;  
 
   // Variables ===============
   variable: VariableDetail = emptyVariableItem;
@@ -42,10 +44,12 @@ export class CatalogVariableEditionComponent {
   valueTypes$: Observable<any>;
   resetValueModes$: Observable<any>;
   genYesNoValues$: Observable<any>;
+  variableByDefaultDate$: Observable<any>;
+
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
   molds$: Observable<any>;  
-  actionPlans: GeneralCatalogData = emptyGeneralCatalogData; 
-  actionPlans$: Observable<any>;  
+  actionPlansToGenerate: GeneralCatalogData = emptyGeneralCatalogData; 
+  actionPlansToGenerate$: Observable<any>;  
 
   valueTypeChanges$: Observable<any>;
   // variableFormChanges$: Observable<any>;
@@ -55,7 +59,7 @@ export class CatalogVariableEditionComponent {
   variable$: Observable<VariableDetail>;
   translations$: Observable<any>;
   updateVariable$: Observable<any>;
-  updateVariableCatalog: Subscription;
+  updateVariableCatalog$: Observable<any>;
   deleteVariableTranslations$: Observable<any>;  
   addVariableTranslations$: Observable<any>;  
   
@@ -67,13 +71,23 @@ export class CatalogVariableEditionComponent {
   valueTypes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   resetValueModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  variableByDefaultDate: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  valuesList: VariablePossibleValue[] = []; 
+  possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
+  possibleValuesTable = new MatTableDataSource<VariablePossibleValue>([]);
+  possibleValuePositions = [
+    { id: 'l', description: $localize`Al final de la lista` },  
+    { id: 'f', description: $localize`Al prncipio de la lista` }, 
+  ];
+  editingValue: number = -1;
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "equation";  
+  catalogIcon: string = 'equation';  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
+  harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   storedTranslations: [];
   translationChanged: boolean = false
   imageChanged: boolean = false
@@ -88,6 +102,9 @@ export class CatalogVariableEditionComponent {
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
+  byDefaultValueType: string = '';
+  tmpValueType: string = '';
+  multipleSearchDefaultValue: string = '';
 
   variableForm = new FormGroup({
     name: new FormControl(
@@ -96,38 +113,17 @@ export class CatalogVariableEditionComponent {
     ),
     sigmaType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     uom: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
-    sensor: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    // sensor: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     valueType: new FormControl(emptyGeneralHardcodedValuesItem),
     resetValueMode: new FormControl(emptyGeneralHardcodedValuesItem),
     required: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowComments: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    allowNoCapture: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    showChart: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    allowAlarm: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    cumulative: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    automaticActionPlan: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
-    notifyAlarm: new FormControl({
-      ...emptyGeneralHardcodedValuesItem,
-      value: GeneralValues.NO
-    }),
+    allowComments: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowNoCapture: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
+    showChart: new FormControl(emptyGeneralHardcodedValuesItem),
+    accumulative: new FormControl(emptyGeneralHardcodedValuesItem),
+    automaticActionPlan: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
@@ -136,7 +132,12 @@ export class CatalogVariableEditionComponent {
     minimum:  new FormControl(''),
     maximum:  new FormControl(''),
     molds:  new FormControl(''),
-    actionPlans:  new FormControl(''),
+    actionPlansToGenerate:  new FormControl(''),
+    byDefault:  new FormControl(''),    
+    possibleValue: new FormControl(''),
+    possibleValues: new FormControl(''),
+    possibleValuePosition: new FormControl('l'),
+    byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),    
   });
 
   pageInfo: PageInfo = {
@@ -152,15 +153,25 @@ export class CatalogVariableEditionComponent {
   loaded: boolean = false;
 
   moldsOptions: SimpleTable[] = [
-    { id: '', description: $localize`No usar en Moldes` },  
+    { id: '', description: $localize`No permitir la variable en ningún Molde` },  
     { id: 'y', description: $localize`TODOS los Moldes activos` },  
     { id: 'n', description: $localize`Los Moldes de lista` },  
     { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
     { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
   ];
 
+  actionPlansToGenerateOptions: SimpleTable[] = [
+    { id: '', description: $localize`No generar ningún Plan de acción` },  
+    { id: 'y', description: $localize`TODOS los Planes de acción activos` },  
+    { id: 'n', description: $localize`Los Planes de acción de lista` },  
+    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
+    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
+  ];
+
+  valuesByDefault: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+
   moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];
-  actionPlansCurrentSelection: GeneralMultipleSelcetionItems[] = [];
+  actionPlansToGenerateCurrentSelection: GeneralMultipleSelcetionItems[] = [];
   
   constructor(
     private _store: Store<AppState>,
@@ -212,57 +223,86 @@ export class CatalogVariableEditionComponent {
         // this.requestEquipmentsData(currentPage);
         // this.requestMoldTypessData(currentPage);
         // this.requestMoldClassesData(currentPage);
-        this.requestMoldsData(currentPage);
-        this.requestActionPlansData(currentPage);
+        // this.requestMoldsData(currentPage);
+        this.requestActionPlansToGenerateData(currentPage);
         this.requestVariableValueTypesData(currentPage);
         this.requestVariableResetValueModesData(currentPage);
         this.requestGenYesNoValuesData(currentPage);
+        this.requestVariableByDefaultDateValuesData(currentPage);        
       })
     );
-    this.valueTypeChanges$ = this.variableForm.controls.valueType.valueChanges.pipe(
-      startWith(''),
-      tap(valueTypeChanges => {
-        if (valueTypeChanges === GeneralValues.N_A) {
-          this.variableForm.get('thresholdYellow').disable();
-          this.variableForm.get('thresholdRed').disable();
-          this.variableForm.get('thresholdDateYellow').disable();
-          this.variableForm.get('thresholdDateRed').disable();
-        } else if (valueTypeChanges === MoldThresoldTypes.HITS) {
-          this.variableForm.get('thresholdYellow').enable();
-          this.variableForm.get('thresholdRed').enable();
-          this.variableForm.get('thresholdDateYellow').disable();
-          this.variableForm.get('thresholdDateRed').disable();
-        } else if (valueTypeChanges === MoldThresoldTypes.DAYS) {
-          this.variableForm.get('thresholdYellow').disable();
-          this.variableForm.get('thresholdRed').disable();
-          this.variableForm.get('thresholdDateYellow').enable();
-          this.variableForm.get('thresholdDateRed').enable();
-        } else if (valueTypeChanges === MoldThresoldTypes.BOTH) {
-          this.variableForm.get('thresholdYellow').enable();
-          this.variableForm.get('thresholdRed').enable();
-          this.variableForm.get('thresholdDateYellow').enable();
-          this.variableForm.get('thresholdDateRed').enable();
-        }
-      })
-    );
-    this.valueTypeChanges$ = this.variableForm.controls.allowAlarm.valueChanges.pipe(
-      startWith(''),
-      tap(valueTypeChanges => {
-        if (valueTypeChanges === GeneralValues.NO) {
-          this.variableForm.get('notifyAlarm').disable();          
-        } else {
-          this.variableForm.get('notifyAlarm').enable();          
-        }
-      })
-    );
-    this.variableFormChangesSubscription = this.variableForm.valueChanges.subscribe((variableFormChanges: any) => {
+        
+    this.variableFormChangesSubscription = this.variableForm.valueChanges
+    .subscribe(() => {
       if (!this.loaded) return;
-      if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+      this.setEditionButtonsState();      
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.automaticActionPlan.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (value === GeneralValues.NO) {
+        if (this.variableForm.get('actionPlansToGenerate').enabled) this.variableForm.get('actionPlansToGenerate').disable();
+      } else if (value === GeneralValues.YES) { 
+        if (this.variableForm.get('actionPlansToGenerate').disabled) this.variableForm.get('actionPlansToGenerate').enable();
       }      
-    }); 
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.minimum.valueChanges
+    .subscribe((value: any) => {
+      if (value && this.variableForm.controls.maximum.value && (+value > +this.variableForm.controls.maximum.value)) {
+        this.variableForm.controls.minimum.setErrors({ invalidValue: true });
+      } else {
+        this.variableForm.controls.minimum.setErrors(null);
+      }      
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.maximum.valueChanges
+    .subscribe((value: any) => {
+      if (value && this.variableForm.controls.minimum.value && (+value < +this.variableForm.controls.minimum.value)) {
+        this.variableForm.controls.minimum.setErrors({ invalidValue: true });
+      } else {
+        this.variableForm.controls.minimum.setErrors(null);
+      }      
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.valueType.valueChanges
+    .subscribe((value: any) => {
+      if (value === HarcodedVariableValueType.NUMERIC_RANGE) {
+        if (this.variableForm.get('minimum').disabled) this.variableForm.get('minimum').enable();
+        if (this.variableForm.get('maximum').disabled) this.variableForm.get('maximum').enable();
+      } else if (value !== HarcodedVariableValueType.NUMERIC_RANGE) {
+        if (this.variableForm.get('minimum').enabled) this.variableForm.get('minimum').disable();
+        if (this.variableForm.get('maximum').enabled) this.variableForm.get('maximum').disable();
+      }
+      if (value === HarcodedVariableValueType.NUMERIC_RANGE || value === HarcodedVariableValueType.NUMBER) {
+        this.byDefaultValueType = 'number'
+      } else if (value === HarcodedVariableValueType.YES_NO) {
+        this.valuesByDefault = {
+          ...this.valuesByDefault,
+          items: yesNoByDefaultValue,          
+        }
+        if (!this.variableForm.controls.byDefault.value) {
+          this.variableForm.controls.byDefault.setValue('-');
+        }        
+      } else if (value === HarcodedVariableValueType.YES_NO_NA) {
+        this.valuesByDefault = {
+          ...this.valuesByDefault,
+          items: yesNoNaByDefaultValue,          
+        }
+        if (!this.variableForm.controls.byDefault.value) {
+          this.variableForm.controls.byDefault.setValue('-');
+        }
+      } else if (value === HarcodedVariableValueType.DATE || value === HarcodedVariableValueType.DATE_AND_TIME) {        
+        this.variableForm.controls.byDefaultDateType.setValue(GeneralValues.DASH);        
+      } else {
+        this.byDefaultValueType = 'text'
+        if (this.variableForm.controls.byDefault.value === '-') {
+          this.variableForm.controls.byDefault.setValue('');
+        }
+      }
+    });
+
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
@@ -287,14 +327,23 @@ export class CatalogVariableEditionComponent {
         }
       })
     ); 
+    this.parameters$ = this._route.params.pipe(
+      tap((params: Params) => {
+        if (params['id']) {
+          this.requestVariableData(+params['id']);
+        }
+      })
+    ); 
     this.calcElements();
     this.variableForm.controls.valueType.setValue(GeneralValues.N_A); 
     this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A); 
     setTimeout(() => {
       this.focusThisField = 'name';
-      this.loaded = true;
-    }, 200); 
-    // this.variableForm.reset(this.mold);
+      if (!this.variable.id) {
+        this.loaded = true;
+        this.initForm();
+      }      
+    }, 200);         
   }
 
   ngOnDestroy() : void {
@@ -382,6 +431,28 @@ export class CatalogVariableEditionComponent {
     )
   }
 
+  requestVariableByDefaultDateValuesData(currentPage: number) {
+    this.variableByDefaultDate = {
+      ...this.variableByDefaultDate,
+      currentPage,
+      loading: true,
+    }        
+    this.variableByDefaultDate$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrderById, SystemTables.VARIABLE_BY_DEFAULT_DATE)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.variableByDefaultDate.items?.concat(data?.data?.hardcodedValues?.items);
+        this.variableByDefaultDate = {
+          ...this.genYesNoValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+
   requestMoldsData(currentPage: number, filterStr: string = null) {    
     this.molds = {
       ...this.molds,
@@ -395,19 +466,19 @@ export class CatalogVariableEditionComponent {
     const skipRecords = this.molds.items.length;
 
     const processId = !!this.variable.id ? this.variable.id : 0;
-    const moldParameters = {
+    const variableParameters = {
       settingType: 'multiSelection',
       skipRecords,
-      process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
+      process: SystemTables.MOLDS,
       processId, 
       takeRecords: this.takeRecords, 
       filter,       
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
+    const variables = this._sharedService.setGraphqlVariables(variableParameters);    
     this.molds$ = this._catalogsService.getMoldsLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
-        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+        const mappedItems = data?.data?.catalogDetailMold?.items.map((item) => {
           return {
             isTranslated: item.isTranslated,
             translatedName: item.translatedName,
@@ -420,18 +491,18 @@ export class CatalogVariableEditionComponent {
         this.molds = {
           ...this.molds,
           loading: false,
-          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
+          pageInfo: data?.data?.catalogDetailMold?.pageInfo,
           items: this.molds.items?.concat(mappedItems),
-          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+          totalCount: data?.data?.catalogDetailMold?.totalCount,
         }
       }),
       catchError(() => EMPTY)
     )    
   }
 
-  requestActionPlansData(currentPage: number, filterStr: string = null) {    
-    this.actionPlans = {
-      ...this.actionPlans,
+  requestActionPlansToGenerateData(currentPage: number, filterStr: string = null) {    
+    this.actionPlansToGenerate = {
+      ...this.actionPlansToGenerate,
       currentPage,
       loading: true,
     }    
@@ -439,22 +510,22 @@ export class CatalogVariableEditionComponent {
     if (filterStr) {
       filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
     }
-    const skipRecords = this.actionPlans.items.length;
+    const skipRecords = this.actionPlansToGenerate.items.length;
 
     const processId = !!this.variable.id ? this.variable.id : 0;
-    const moldParameters = {
+    const variableParameters = {
       settingType: 'multiSelection',
       skipRecords,
-      process: SystemTables.CHECKLIST_TEMPLATES_YELLOW,
+      process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
       processId, 
       takeRecords: this.takeRecords, 
       filter,       
     }    
-    const variables = this._sharedService.setGraphqlVariables(moldParameters);    
-    this.actionPlans$ = this._catalogsService.getActionPlansLazyLoadingDataGql$(variables)
+    const variables = this._sharedService.setGraphqlVariables(variableParameters);    
+    this.actionPlansToGenerate$ = this._catalogsService.getActionPlansToGenerateLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
-        const mappedItems = data?.data?.catalogDetailChecklistTemplate?.items.map((item) => {
+        const mappedItems = data?.data?.catalogDetailTemplateActionPlan?.items.map((item) => {
           return {
             isTranslated: item.isTranslated,
             translatedName: item.translatedName,
@@ -464,12 +535,12 @@ export class CatalogVariableEditionComponent {
             catalogDetailId: item.catalogDetailId,
           }
         })
-        this.actionPlans = {
-          ...this.actionPlans,
+        this.actionPlansToGenerate = {
+          ...this.actionPlansToGenerate,
           loading: false,
-          pageInfo: data?.data?.catalogDetailChecklistTemplate?.pageInfo,
-          items: this.actionPlans.items?.concat(mappedItems),
-          totalCount: data?.data?.catalogDetailChecklistTemplate?.totalCount,
+          pageInfo: data?.data?.catalogDetailTemplateActionPlan?.pageInfo,
+          items: this.actionPlansToGenerate.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailTemplateActionPlan?.totalCount,
         }
       }),
       catchError(() => EMPTY)
@@ -621,8 +692,9 @@ export class CatalogVariableEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateVariable.length > 0 && data?.data?.createOrUpdateVariable[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`La Variable ha sido inhabilitado`;
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.variable.status = RecordStatus.INACTIVE;
+                      const message = $localize`La Variable ha sido inhabilitada`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -634,7 +706,7 @@ export class CatalogVariableEditionComponent {
                   }
                 })
               )
-            }            
+            }  
           });
         } else if (this.variable?.id > 0 && this.variable.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
@@ -689,7 +761,8 @@ export class CatalogVariableEditionComponent {
               .pipe(
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateVariable.length > 0 && data?.data?.createOrUpdateVariable[0].status === RecordStatus.ACTIVE) {
-                    setTimeout(() => {                      
+                    setTimeout(() => {
+                      this.variable.status = RecordStatus.ACTIVE;
                       this.changeInactiveButton(RecordStatus.ACTIVE)
                       const message = $localize`La Variable ha sido reactivado`;
                       this._sharedService.showSnackMessage({
@@ -703,7 +776,7 @@ export class CatalogVariableEditionComponent {
                   }
                 })
               )
-            }            
+            }  
           });
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
@@ -1009,30 +1082,96 @@ export class CatalogVariableEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.variable.id || this.variable.id === null || this.variable.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateVariableCatalog = this._catalogsService.updateVariableCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const variableId = data?.data?.createOrUpdateMold[0].id;
-      if (variableId > 0) {        
-        this.processTranslations$(variableId)
-        .subscribe(() => {
-          this.requestVariableData(variableId);
-          setTimeout(() => {              
-            let message = $localize`La variable ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`La variable ha sido creado satisfactoriamente con el id <strong>${this.variable.id}</strong>`;
-              this._location.replaceState(`/catalogs/variables/edit/${this.variable.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
-            });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
+    this.updateVariableCatalog$ = this._catalogsService.updateVariableCatalog$(dataToSave)
+    .pipe(
+      tap((data: any) => {
+        if (data?.data?.createOrUpdateVariable.length > 0) {
+          const variableId = data?.data?.createOrUpdateVariable[0].id;
+          combineLatest([ 
+            this.processTranslations$(variableId), 
+            this.saveCatalogDetails$(variableId)             
+          ])      
+          .subscribe((data: any) => {
+            this.requestVariableData(variableId);
+            setTimeout(() => {              
+              let message = $localize`La variable ha sido actualizada`;
+              if (newRecord) {                
+                message = $localize`La variable ha sido creada satisfactoriamente con el id <strong>${variableId}</strong>`;
+                this._location.replaceState(`/catalogs/variables/edit/${variableId}`);
+              }
+              this._sharedService.showSnackMessage({
+                message,
+                snackClass: 'snack-accent',
+                progressBarColor: 'accent',                
+              });
+              this.setViewLoading(false);
+              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+            }, 200);
+          })
+        }        
+      }),
+      catchError(() => {
+        this.setViewLoading(false);
+        return of(null);        
+      })
+    )    
+  }
+
+  saveCatalogDetails$(processId: number): Observable<any> {
+    if (this.moldsCurrentSelection.length > 0 || this.actionPlansToGenerateCurrentSelection.length > 0) {
+      const moldsToDelete = this.moldsCurrentSelection
+      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
+      .map(ct => {
+        return {
+          id: ct.catalogDetailId,
+          deletePhysically: true,
+        }
+      });
+      const actionPlansToGenerateToDelete = this.actionPlansToGenerateCurrentSelection
+      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
+      .map(ct => {
+        return {
+          id: ct.catalogDetailId,
+          deletePhysically: true,
+        }
+      });
+      const ctToDelete = {
+        ids: [...moldsToDelete, ...actionPlansToGenerateToDelete],
+        customerId: 1, // TODO: Get from profile
       }
-    });
+      const moldsToAdd = this.moldsCurrentSelection
+      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
+      .map(ct => {
+        return {
+          process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
+          processId,
+          detailTableName: SystemTables.TEMPLATE_ACTION_PLANS,
+          value: ct.valueRight,
+          customerId: 1,  // TODO: Get from profile
+        }
+      });
+      const actionPlansToGenerateToAdd = this.actionPlansToGenerateCurrentSelection
+      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
+      .map(ct => {
+        return {
+          process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
+          processId,
+          detailTableName: SystemTables.TEMPLATE_ACTION_PLANS,
+          value: ct.valueRight,
+          customerId: 1,  // TODO: Get from profile
+        }
+      });
+      const ctToAdd = {
+        catalogDetails: [...moldsToAdd, ...actionPlansToGenerateToAdd],
+      }
+
+      return combineLatest([ 
+        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
+        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
+      ]);
+    } else {
+      return of(null);
+    }
   }
 
   requestUomsData(currentPage: number, filterStr: string = null) {    
@@ -1198,12 +1337,24 @@ export class CatalogVariableEditionComponent {
       tap((variableData: VariableDetail) => {
         if (!variableData) return;
         this.variable =  variableData;
+
+        this.moldsCurrentSelection = [];
+        this.actionPlansToGenerateCurrentSelection = [];
+
+        this.molds.currentPage = 0;   
+        this.molds.items = [];
+        this.actionPlansToGenerate.currentPage = 0;   
+        this.actionPlansToGenerate.items = [];
+        // this.requestMoldsData(0);
+        this.requestActionPlansToGenerateData(0);
+        
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.variable.translations));
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
+        this.prepareListOfValues();
         this.changeInactiveButton(this.variable.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
@@ -1250,7 +1401,7 @@ export class CatalogVariableEditionComponent {
       } else {
         this.uoms.currentPage++;
       }
-      this.requestSensorsData(        
+      this.requestUomsData(        
         this.uoms.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
@@ -1297,18 +1448,18 @@ export class CatalogVariableEditionComponent {
         getMoreDataParams.textToSearch,  
       );    
     }      
-    else if (getMoreDataParams.catalogName === SystemTables.ACTION_PLANS) {
-      if (this.actionPlans.loading) return;
+    else if (getMoreDataParams.catalogName === SystemTables.TEMPLATE_ACTION_PLANS) {
+      if (this.actionPlansToGenerate.loading) return;
       if (getMoreDataParams.initArray) {
-        this.actionPlans.currentPage = 0;   
-        this.actionPlans.items = [];
-      } else if (!this.actionPlans.pageInfo.hasNextPage) {
+        this.actionPlansToGenerate.currentPage = 0;   
+        this.actionPlansToGenerate.items = [];
+      } else if (!this.actionPlansToGenerate.pageInfo.hasNextPage) {
         return;
       } else {
-        this.actionPlans.currentPage++;
+        this.actionPlansToGenerate.currentPage++;
       }
-      this.requestMoldsData(        
-        this.actionPlans.currentPage,
+      this.requestActionPlansToGenerateData(        
+        this.actionPlansToGenerate.currentPage,
         getMoreDataParams.textToSearch,  
       );    
     }      
@@ -1322,8 +1473,8 @@ export class CatalogVariableEditionComponent {
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/variables`)
-    .set('processId', this.variable.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    //.set('processId', this.variable.id)
+    .set('process', originProcess.CATALOGS_VARIABLES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1338,11 +1489,7 @@ export class CatalogVariableEditionComponent {
           snackClass: 'snack-primary',
           icon: 'check',
         });
-        if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-        } else {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-        }
+        this.setEditionButtonsState();
       }      
     });
   }
@@ -1353,14 +1500,6 @@ export class CatalogVariableEditionComponent {
 
   handleInputKeydown(event: KeyboardEvent) {
     console.log('[handleInputKeydown]', event)
-  }
-
-  handleMultipleSelectionChanged(catalog: string){    
-    if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
   }
 
   pageChange(event: any) {
@@ -1388,7 +1527,7 @@ export class CatalogVariableEditionComponent {
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
-      if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
+      // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.CANCEL).disabled = true;
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
@@ -1414,8 +1553,21 @@ export class CatalogVariableEditionComponent {
       valueType: this.variable.valueType,
       resetValueMode: this.variable.resetValueMode,
       required: this.variable.required,
+      allowAlarm: this.variable.allowAlarm,
+      allowNoCapture: this.variable.allowComments,
+      allowComments: this.variable.allowComments,
+      showChart: this.variable.showChart,      
+      notifyAlarm: this.variable.notifyAlarm,
+      accumulative: this.variable.accumulative,
+      automaticActionPlan: this.variable.automaticActionPlan,    
+      byDefault: this.variable.byDefault,    
+      byDefaultDateType: this.variable.byDefaultDateType,    
+      actionPlansToGenerate: this.variable.actionPlansToGenerate,    
+      mainImageName: this.variable.mainImageName,      
       sigmaType: this.variable.sigmaType,
-      showNotes: this.variable.showNotes,
+      showNotes: this.variable.showNotes === GeneralValues.YES,
+      minimum: this.variable.minimum,
+      maximum: this.variable.maximum,      
     });
   } 
 
@@ -1425,17 +1577,29 @@ export class CatalogVariableEditionComponent {
         id: this.variable.id,
         customerId: 1, // TODO: Get from profile
         status: newRecord ? RecordStatus.ACTIVE : this.variable.status,
+        possibleValues: JSON.stringify(this.valuesList),
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
+      ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value.id },      
       ...(fc.sigmaType.dirty || fc.sigmaType.touched || newRecord) && { sigmaTypeId: fc.sigmaType.value.id },
       ...(fc.valueType.dirty || fc.valueType.touched || newRecord) && { valueType: fc.valueType.value },
-      ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? 'Y' : 'N' },
-      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
-      ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value },      
-      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
-      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },      
+      ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? 'y' : 'n' },
+      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },
+      ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value ? 'y' : 'n' },
+      ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value ? 'y' : 'n' },
+      ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value ? 'y' : 'n' },
+      ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value ? 'y' : 'n' },
+      ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value ? 'y' : 'n' },
+      ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value ? 'y' : 'n' },
+      ...(fc.byDefaultDateType.dirty || fc.byDefaultDateType.touched || newRecord) && { byDefaultDateType: fc.byDefaultDateType.value },
+      ...(fc.automaticActionPlan.dirty || fc.automaticActionPlan.touched || newRecord) && { automaticActionPlan: fc.automaticActionPlan.value ? 'y' : 'n' },
+      ...(fc.accumulative.dirty || fc.accumulative.touched || newRecord) && { accumulative: fc.accumulative.value ? 'y' : 'n' },      
+      ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value ? 'y' : 'n' },            
+      ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
+      ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },
+      ...(fc.actionPlansToGenerate.dirty || fc.actionPlansToGenerate.touched || newRecord) && { actionPlansToGenerate: fc.actionPlansToGenerate.value },
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.variable.mainImagePath,
@@ -1456,23 +1620,39 @@ export class CatalogVariableEditionComponent {
       snackClass: 'snack-primary',
       icon: 'check',
     });
-    if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   initForm(): void {
     this.variableForm.reset();
+    this.actionPlansToGenerateCurrentSelection = [];
+    this.multipleSearchDefaultValue = '';
     // Default values
     this.variableForm.controls.required.setValue(GeneralValues.NO);
+    this.variableForm.controls.notifyAlarm.setValue(GeneralValues.NO);
+    this.variableForm.controls.allowAlarm.setValue(GeneralValues.NO);
+    this.variableForm.controls.allowNoCapture.setValue(GeneralValues.NO);        
+    this.variableForm.controls.allowComments.setValue(GeneralValues.NO);
+    this.variableForm.controls.showChart.setValue(GeneralValues.NO);    
     this.variableForm.controls.valueType.setValue(GeneralValues.FREE_TEXT)
-    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A)
+    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A);
+    this.variableForm.controls.automaticActionPlan.setValue(GeneralValues.NO);
+    this.variableForm.controls.byDefault.setValue(GeneralValues.NO);
+    this.variableForm.controls.byDefaultDateType.setValue(GeneralValues.DASH);    
+    this.variableForm.controls.molds.setValue('');       
+    this.variableForm.controls.possibleValuePosition.setValue('l');
+    this.variableForm.controls.possibleValue.setValue('');
+    this.variableForm.controls.actionPlansToGenerate.setValue('');    
+    this.variableForm.controls.minimum.setValue(null);    
+    this.variableForm.controls.maximum.setValue(null);    
+    this.valuesList = [];
     this.storedTranslations = [];
     this.translationChanged = false;
     this.variable = emptyVariableItem;
-    this.focusThisField = 'description';
+    this.focusThisField = 'name';
+    // this.requestMoldsData(0);
+    this.requestActionPlansToGenerateData(0);
+        
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
         behavior: 'smooth',
@@ -1517,7 +1697,11 @@ export class CatalogVariableEditionComponent {
       return $localize`Tipo de valor`
     } else if (fieldControlName === 'resetValueMode') {
       return $localize`Modo de reseteo de la variable`    
-    }
+    } else if (fieldControlName === 'minimum') {
+      return $localize`Rango de valores incorrecto`    
+    } else if (fieldControlName === 'possibleValues') {
+      return $localize`Agregue al menos un valor a la lista de posibles valores de la variable`    
+    }    
     return '';
   }
 
@@ -1537,6 +1721,15 @@ export class CatalogVariableEditionComponent {
     if (this.variableForm.controls.uom.value && this.variableForm.controls.uom.value.status === RecordStatus.INACTIVE) {
       this.variableForm.controls.uom.setErrors({ inactive: true });   
     }    
+    if (this.variableForm.controls.valueType.value === HarcodedVariableValueType.LIST) {
+      if (this.valuesList.length === 0) {
+        this.variableForm.controls.possibleValues.setErrors({ inactive: true });   
+      } else {
+        this.variableForm.controls.possibleValues.setErrors(null);   
+      }
+    } else {
+      this.variableForm.controls.possibleValues.setErrors(null);   
+    }
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
@@ -1545,8 +1738,8 @@ export class CatalogVariableEditionComponent {
       return this.variable.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
-        (st.description !== t.description || 
-        st.reference !== t.reference || 
+        (st.reference !== t.reference || 
+        st.name !== t.name || 
         st.notes !== t.notes);
       });
     });
@@ -1565,7 +1758,7 @@ export class CatalogVariableEditionComponent {
         return {
           id: null,
           variableId,
-          description: t.description,
+          name: t.name,
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
@@ -1587,6 +1780,183 @@ export class CatalogVariableEditionComponent {
     
   }
 
+  handleMoveToFirst(id: number) {
+    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
+    this.valuesList.splice(valueIndex, 1);
+    this.valuesList.unshift({
+      order: 0,
+      value: tmpValue.value,
+      byDefault: tmpValue.byDefault,
+      alarmedValue: tmpValue.alarmedValue,
+    })
+    let index = 1;
+    this.valuesList.forEach((v: VariablePossibleValue) => {
+      v.order = index++;
+    });
+    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+    this.setEditionButtonsState();
+  }
+
+  handleMoveToUp(id: number) {
+    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
+    const editingItem = this.valuesList[valueIndex - 1];
+
+    if (editingItem) {      
+      this.valuesList[valueIndex].value = editingItem.value;
+      this.valuesList[valueIndex].byDefault = editingItem.byDefault;
+      this.valuesList[valueIndex].alarmedValue = editingItem.alarmedValue;
+
+      editingItem.value = tmpValue.value;
+      editingItem.byDefault = tmpValue.byDefault;
+      editingItem.alarmedValue = tmpValue.alarmedValue;
+      
+      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleMoveToDown(id: number) {
+    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
+    const editingItem = this.valuesList[valueIndex + 1];
+    
+    if (editingItem) {      
+      this.valuesList[valueIndex].value = editingItem.value;
+      this.valuesList[valueIndex].byDefault = editingItem.byDefault;
+      this.valuesList[valueIndex].alarmedValue = editingItem.alarmedValue;      
+
+      editingItem.value = tmpValue.value;
+      editingItem.byDefault = tmpValue.byDefault;
+      editingItem.alarmedValue = tmpValue.alarmedValue;      
+      
+      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleEdit(id: number) {
+    this.editingValue = id;
+    this.variableForm.controls.possibleValue.setValue(this.valuesList.find((v: VariablePossibleValue) => v.order === id).value);
+    this.possibleValuePositions.push(
+      { id: 's', description: $localize`Orden original` },       
+    )
+    if (this.variableForm.controls.possibleValuePosition.enabled) this.variableForm.controls.possibleValuePosition.disable();
+    this.variableForm.controls.possibleValuePosition.setValue('s');
+  }
+
+  handleRemove(id: number) {
+    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    this.valuesList.splice(valueIndex, 1);
+    let index = 1;
+    this.valuesList.forEach((v: VariablePossibleValue) => {
+      v.order = index++;
+    });
+    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);
+    if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
+    this.setEditionButtonsState();
+  }
+
+  handleAlarmed(id: number) {
+    const value = this.valuesList.find((v: VariablePossibleValue) => v.order === id);
+    value.alarmedValue = !value.alarmedValue;
+    this.setEditionButtonsState();
+  }
+
+  handleByDefault(id: number) {
+    if (this.valuesList.length === 1 && this.valuesList[0].byDefault) {
+      this.valuesList[0].byDefault = false;
+    } else {
+      this.valuesList.forEach((v: VariablePossibleValue) => {
+        v.byDefault = v.order === id;
+      });    
+    }
+    
+    this.setEditionButtonsState();
+  }
+
+  setEditionButtonsState() {
+    if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
+
+  handleEditPossibleValue() {
+    if (this.editingValue > -1) {
+      const editingItem = this.valuesList.find((v: VariablePossibleValue) => v.order === this.editingValue);
+      if (editingItem) {
+        editingItem.value = this.variableForm.controls.possibleValue.value;
+        this.possibleValuePositions.pop();
+      }        
+    } else {
+      if (this.variableForm.controls.possibleValuePosition.value === 'l') {
+        this.valuesList.push({
+          order: this.valuesList.length + 1,
+          value: this.variableForm.controls.possibleValue.value,
+          byDefault: false,
+          alarmedValue: false,
+        })
+      } else {
+        this.addPossibleValueAtFirst();
+      }
+      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);      
+    }
+    this.editingValue = -1;   
+    this.variableForm.controls.possibleValue.setValue('');
+    this.variableForm.controls.possibleValuePosition.setValue('l');      
+    setTimeout(() => {
+      if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
+      this.possibleValue.nativeElement.focus();      
+    }, 100)
+  }
+
+  addPossibleValueAtFirst() {
+    this.valuesList.unshift({
+      order: 0,
+      value: this.variableForm.controls.possibleValue.value,
+      byDefault: false,
+      alarmedValue: false,
+    })
+    let index = 1;
+    this.valuesList.forEach((v: VariablePossibleValue) => {
+      v.order = index++;
+    })
+  }
+
+  handleKeyDown(event: KeyboardEvent) {     
+    if (event.key === 'Enter' && this.variableForm.controls.possibleValue.value) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.handleEditPossibleValue();      
+    }    
+  }
+
+  handleCancelPossibleValue() {
+    this.variableForm.controls.possibleValue.setValue('');
+    this.variableForm.controls.possibleValuePosition.setValue('l');
+    if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
+    this.editingValue = -1;
+    setTimeout(() => {
+      this.possibleValue.nativeElement.focus();    
+    }, 100)
+  }
+
+  prepareListOfValues() {
+    if (this.variable.possibleValues) {
+      try {
+        this.valuesList = JSON.parse(this.variable.possibleValues);
+      } catch (error) {
+        this.valuesList = null;
+      }          
+    } else {
+      this.valuesList = null;
+    }
+    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);        
+  }
+
   get SystemTables () {
     return SystemTables;
   }
@@ -1598,6 +1968,14 @@ export class CatalogVariableEditionComponent {
   get GeneralValues() {
     return GeneralValues; 
   }
+  
+  get HarcodedVariableValueType() {
+    return HarcodedVariableValueType; 
+  }
 
+  get RecordStatus() {
+    return RecordStatus; 
+  }
+  
 // End ======================
 }

@@ -283,7 +283,6 @@ export interface MoldDetail {
     status?: string;
   }
  
-    
   export interface GeneralHardcodedValuesData {
     loading?: boolean;
     totalCount?: number;
@@ -310,3 +309,17 @@ export interface MoldDetail {
     textToSearch?: string;
     initArray?: boolean;
   }
+
+  export const yesNoNaByDefaultValue: GeneralHardcodedValuesItem[] = [
+   { friendlyText: $localize`Sin valor por defecto`, disabled: false, value: '-'},
+   { friendlyText: $localize`Valor Sí`, disabled: false, value: 'y'},
+   { friendlyText: $localize`Valor No`, disabled: false, value: 'n'},
+   { friendlyText: $localize`Valor No Aplica`, disabled: false, value: 'n/a'},
+  ]
+
+  export const yesNoByDefaultValue: GeneralHardcodedValuesItem[] = [
+    { friendlyText: $localize`Sin valor por defecto`, disabled: false, value: '-'},
+    { friendlyText: $localize`Valor Sí`, disabled: false, value: 'y'},
+    { friendlyText: $localize`Valor No`, disabled: false, value: 'n'},    
+   ]
+  

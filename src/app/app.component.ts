@@ -138,7 +138,7 @@ export class AppComponent implements AfterViewInit {
       }, 0);      
     });
     this._sharedService.showToolbar.subscribe((toolbar) => {
-      this.toolbarData = toolbar;
+      this.toolbarData = toolbar;      
       this.calculateOutletPosition();   
     });
     this._sharedService.showScrollBar.subscribe((scrollbarData) => {

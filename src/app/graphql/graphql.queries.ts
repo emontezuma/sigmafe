@@ -1011,8 +1011,24 @@ export const UPDATE_VARIABLE = gql`
     $reference: String,
     $notes: String,
     $valueType: String,
+    $prefix: String,
+    $required: String,
+    $allowComments: String,
+    $allowNoCapture: String,
+    $allowAlarm: String,
     $resetValueMode: String,
-    $umoId: Long,
+    $notifyAlarm: String,    
+    $accumulative: String,
+    $showChart: String,
+    $possibleValues: String,
+    $minimum: String,
+    $maximum: String,
+    $showNotes: String,
+    $automaticActionPlan: String,
+    $actionPlansToGenerate: String,
+    $byDefaultDateType: String,
+    $byDefault: String,
+    $uomId: Long,
     $sigmaTypeId: Long,
     $mainImageGuid: String,
     $mainImageName: String,
@@ -1026,9 +1042,25 @@ export const UPDATE_VARIABLE = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
+      showNotes: $showNotes,
+      prefix: $prefix,
       valueType: $valueType,
+      minimum: $minimum,
+      maximum: $maximum,
+      required: $required,
       resetValueMode: $resetValueMode,
-      umoId: $umoId,
+      allowComments: $allowComments,
+      notifyAlarm: $notifyAlarm,      
+      allowNoCapture: $allowNoCapture,
+      automaticActionPlan: $automaticActionPlan,
+      actionPlansToGenerate: $actionPlansToGenerate,
+      possibleValues: $possibleValues,
+      byDefaultDateType: $byDefaultDateType,
+      byDefault: $byDefault,
+      allowAlarm: $allowAlarm,
+      showChart: $showChart,
+      accumulative: $accumulative,
+      uomId: $uomId,
       sigmaTypeId: $sigmaTypeId,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
@@ -1099,10 +1131,10 @@ export const GET_SENSORS_LAZY_LOADING = gql`
   query SensorsPaginated (
       $recordsToSkip: Int,
       $recordsToTake: Int,
-      $orderBy: [TranslatedUomDtoSortInput!],
-      $filterBy: TranslatedUomDtoFilterInput
+      $orderBy: [TranslatedSensorDtoSortInput!],
+      $filterBy: TranslatedSensorDtoFilterInput
   ) {
-    sensorsPaginated (
+  sensorsPaginated (
     where: $filterBy, 
     order: $orderBy, 
     skip: $recordsToSkip, 
@@ -1205,8 +1237,11 @@ export const GET_VARIABLE = gql`
       resetValue
       resetValueDate
       resetValueChecklistId
+      automaticActionPlan
+      actionPlansToGenerate
       resetValueById
       alarmed
+      possibleValues
       id
       customerId
       status
@@ -1360,7 +1395,7 @@ export const GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING = gql`
     $process: String,
     $processId: Long
   ) {
-    catalogDetailMold (
+  catalogDetailMold (
     where: $filterBy, 
     skip: $recordsToSkip, 
     take: $recordsToTake,
@@ -1384,15 +1419,15 @@ export const GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING = gql`
   }
 `;
 
-export const GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING = gql`
-  query CatalogDetailActionPlan (    
+export const GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING = gql`
+  query CatalogDetailTemplateActionPlan (    
     $recordsToSkip: Int,
     $recordsToTake: Int,
     $filterBy: MultipleCatalogSelectionDtoFilterInput,
     $process: String,
     $processId: Long
   ) {
-    catalogDetailActionPlan (
+  catalogDetailTemplateActionPlan (
     where: $filterBy, 
     skip: $recordsToSkip, 
     take: $recordsToTake,

@@ -20,7 +20,7 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
   // @Input() list: GeneralCatalogItem[];
   @Input() list: GeneralCatalogMappedItem[];  
   @Input() currentSelections: GeneralMultipleSelcetionItems[];  
-  @Input() defaultValue?: any;
+  @Input() defaultValue?: string;
   @Input() placeHolder: string;
   @Input() totalCount: number;
   @Input() catalog: string;
@@ -54,18 +54,16 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
           this.selectedOption = false;
           return;
         }
-
         if (this.textToSearch === (textToSearch?.translatedName ?? textToSearch)) return;
-
-        this.textToSearch = textToSearch?.translatedName ?? textToSearch;
-        
+        this.textToSearch = textToSearch?.translatedName ?? textToSearch;        
         this.getMoreData.emit({ 
           catalogName: this.catalog,
           textToSearch: this.textToSearch,
           initArray: true,
         });    
       })
-    );    
+    );
+    this.multiSelectionForm.controls.searchInput.setValue(this.defaultValue);
   }
   
   ngOnDestroy() {    
@@ -78,7 +76,7 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
       setTimeout(() => {
         this.selection.nativeElement.focus();
       }, 50)
-    }
+    }    
     if (this.currentSelections.length > 0) {
       for (const item of this.list) {        
         const itemHasChanged = this.currentSelections.find(cs => cs.id === item.id && cs.valueRight !== item.valueRight)
@@ -143,13 +141,14 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
 
   handleKeyDown(event: KeyboardEvent) { }
 
-  chengeSelection(event: any) { }
-
-  get SystemTables () {
-    return SystemTables;
+  chengeSelection(event: any) { 
+    if (this.formField.disabled) {
+      event.option.selected = false;
+    }
   }
 
   selectItem(item: any) {
+    if (this.formField.disabled) return;
     if (this.formField.value === GeneralValues.NO) {
       // Update the general array to be stored
       this.updateSelections(item);      
@@ -176,7 +175,15 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
   }
 
   getItemsSelected() {
-    return this.list.filter(r => r.valueRight).length;
+    if (this.list.length > 0 && this.list[0]) {
+      return this.list.filter(r => r.valueRight).length;
+    }
+
+    return 0;    
+  }
+
+  get SystemTables () {
+    return SystemTables;
   }
   
 // End ======================

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
 import { VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
@@ -68,9 +68,9 @@ export class CatalogsService {
     });
   }
 
-  getActionPlansLazyLoadingDataGql$(variables: any): Observable<any> {
+  getActionPlansToGenerateLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.query({ 
-      query: GET_CATALOG_DETAILS_ACTION_PLANS_LAZY_LOADING, 
+      query: GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, 
       variables,
     });
   }
@@ -174,7 +174,7 @@ export class CatalogsService {
 
   updateVariableStatus$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: INACTIVATE_MOLD, 
+      mutation: INACTIVATE_VARIABLE, 
       variables,       
     });
   }
@@ -288,11 +288,12 @@ export class CatalogsService {
     const graphqlDataObjectName = Object.keys(data)[0];    
     const { items } = data[graphqlDataObjectName];
     return items.map((t) => {
+      const name = t.description ? t.description : t.name;
       return {
         id: t.id, 
         customerId: t.customerId, 
-        description: t.description, 
-        name: t.name, 
+        description: name, 
+        name, 
         reference: t.reference, 
         notes: t.notes, 
         languageId: t.languageId, 

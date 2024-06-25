@@ -44,7 +44,7 @@
         <input
           matInput
           [formControl]="multiSelectionForm.controls.searchInput"
-          placeHolder="Filtrar..."          
+          [placeholder]="placeHolder"          
           (keydown)="handleKeyDown($event)"          
         />
       </mat-form-field>
@@ -84,12 +84,12 @@
           *ngIf="list.length > 0 || loading"
           class="multiple-selection-list__list-options-box"
           [disabled]="
-            formField.value === 'y' || formField.value === '' || loading
+            formField.value === 'y' || formField.value === '' || loading || formField.disabled
           "
           #multipleSelection
           name="multipleSelection"
           (click)="chengeSelection($event)"
-          (keydown)="handleKeyDown($event)"          
+          (keydown)="handleKeyDown($event)"
           cdkScrollable
         >
           <mat-list-option

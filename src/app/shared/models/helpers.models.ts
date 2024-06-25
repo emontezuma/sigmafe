@@ -54,6 +54,7 @@ export interface PageInfo {
  
   export enum originProcess {
     CATALOGS_MOLDS = 'catalogs-molds',
+    CATALOGS_VARIABLES = 'catalogs-variables',
 }
   
 export enum SystemTables {
@@ -65,12 +66,14 @@ export enum SystemTables {
     PARTNUMBERS = 'partNumbers',
     MOLD_TYPES = 'moldTypes',
     MOLD_CLASSES = 'moldClasses',
-    MOLDS = 'molds',
-    ACTION_PLANS = 'action-plans',
+    MOLDS = 'variable-molds',
+    VARIABLE_TEMPLATE_ACTION_PLANS = 'variable-template-action-plans',
+    TEMPLATE_ACTION_PLANS = 'template-action-plans',
     UOMS = 'uoms',
     SENSORS = 'sensors',
     SIGMA_TYPES = 'sigmaTypes',
     GEN_VALUES_YES_NO = 'gen-values-yes-no',
+    VARIABLE_BY_DEFAULT_DATE = 'variable-by-default-date',
     RESET_VALUE_MODES = 'variable-reset-value-modes',
     VARIABLE_VALUE_TYPES = 'variable-value-types',
     MOLD_LABEL_COLORS = 'mold-label-color',
@@ -86,6 +89,8 @@ export enum GeneralValues {
     YES = 'y',
     NO = 'n',
     FREE_TEXT = 'free-text',
+    SPECIFIC = 'specific',
+    DASH = '-',
 }
 
 export enum TemplatesHardcodedlValues {
@@ -105,3 +110,14 @@ export interface OptionData {
     disabled?: boolean;    
   }
   
+  export enum HarcodedVariableValueType {
+    NUMERIC_RANGE = 'numeric-range',
+    YES_NO = 'yes-no',
+    YES_NO_NA = 'yes-no-na',
+    LIST = 'list',
+    FREE_TEXT = 'free-text',
+    NUMBER = 'number',
+    DATE = 'date',
+    DATE_AND_TIME = 'date-and-time',
+    TIME = 'time',
+}

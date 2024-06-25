@@ -35,7 +35,8 @@
   <ng-container *ngIf="addOrUpdateCatalogDetails$ | async "></ng-container>   
   <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>       
   <ng-container *ngIf="checklistTemplatesYellow$ | async "></ng-container>       
-  <ng-container *ngIf="checklistTemplatesRed$ | async "></ng-container>         
+  <ng-container *ngIf="checklistTemplatesRed$ | async "></ng-container>   
+  <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>           
 
   <mat-card class="card">
     <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">

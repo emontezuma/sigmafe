@@ -34,9 +34,25 @@ export interface VariableDetail {
   customerId?: number;
   uom?: GeneralCatalogInternalData,
   sigmaType?: GeneralCatalogInternalData,
-  resetValueMode?: string,
   valueType?: string,
   status?: string;
+  showNotes?: string;
+  translations?: GeneralTranslation[];
+  required?: string;
+  allowNoCapture?: string;
+  allowComments?: string;
+  showChart?: string;
+  allowAlarm?: string;
+  notifyAlarm?: string;
+  accumulative?: string;
+  automaticActionPlan?: string;  
+  actionPlansToGenerate?: string;  
+  possibleValues?: string;  
+  byDefault?: string; 
+  byDefaultDateType?: string; 
+  resetValueMode?: string; 
+  minimum?: string; 
+  maximum?: string; 
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -46,16 +62,7 @@ export interface VariableDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
-  showNotes?: boolean;
-  translations?: GeneralTranslation[];
-  required?: string;
-  allowNoCapture?: string;
-  allowComments?: string;
-  showChart?: string;
-  allowAlarm?: string;
-  notifyAlarm?: string;
-  cumulative?: string;
-  automaticActionPlan?: string;  
+  
 }
 
 export interface VariablesState {
@@ -103,6 +110,8 @@ export const emptyVariableItem: VariableDetail = {
   customerId: null,
   prefix: null,
   status: null,
+  maximum: null,
+  minimum: null,
   createdById: null,
   createdAt: null,
   updatedById: null,
@@ -112,14 +121,23 @@ export const emptyVariableItem: VariableDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
-  showNotes: false,
+  showNotes: GeneralValues.NO,
   required: GeneralValues.NO,
   allowNoCapture: GeneralValues.NO,
   allowComments: GeneralValues.NO,
   showChart: GeneralValues.NO,
   allowAlarm: GeneralValues.NO,
-  cumulative: GeneralValues.NO,
+  accumulative: GeneralValues.NO,
   automaticActionPlan: GeneralValues.NO,
   notifyAlarm: GeneralValues.NO,
   translations: [],
+  byDefault: '',
+  byDefaultDateType: '-',
 };
+
+export interface VariablePossibleValue {
+  order?: number;
+  value?: string;
+  byDefault?: boolean;
+  alarmedValue?: boolean;  
+}

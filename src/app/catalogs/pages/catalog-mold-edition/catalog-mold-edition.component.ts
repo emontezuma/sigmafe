@@ -63,7 +63,7 @@ export class CatalogMoldEditionComponent {
   translations$: Observable<any>;
   moldDataLoading$: Observable<boolean>;
   updateMold$: Observable<any>;
-  updateMoldCatalog: Subscription;
+  updateMoldCatalog$: Observable<any>;
   updateMoldTranslations$: Observable<any>;  
   deleteCatalogDetails$: Observable<any>;  
   addOrUpdateCatalogDetails$: Observable<any>;  
@@ -241,38 +241,40 @@ export class CatalogMoldEditionComponent {
         this.requestStatesData(currentPage);
       })
     );   
-    this.moldThresholdTypeChanges$ = this.moldForm.controls.thresholdType.valueChanges.pipe(
-      startWith(''),
-      tap(moldThresholdTypeChanges => {
-        if (moldThresholdTypeChanges === GeneralValues.N_A) {
-          this.moldForm.get('thresholdYellow').disable();
-          this.moldForm.get('thresholdRed').disable();
-          this.moldForm.get('thresholdDateYellow').disable();
-          this.moldForm.get('thresholdDateRed').disable();
-        } else if (moldThresholdTypeChanges === MoldThresoldTypes.HITS) {
-          this.moldForm.get('thresholdYellow').enable();
-          this.moldForm.get('thresholdRed').enable();
-          this.moldForm.get('thresholdDateYellow').disable();
-          this.moldForm.get('thresholdDateRed').disable();
-        } else if (moldThresholdTypeChanges === MoldThresoldTypes.DAYS) {
-          this.moldForm.get('thresholdYellow').disable();
-          this.moldForm.get('thresholdRed').disable();
-          this.moldForm.get('thresholdDateYellow').enable();
-          this.moldForm.get('thresholdDateRed').enable();
-        } else if (moldThresholdTypeChanges === MoldThresoldTypes.BOTH) {
-          this.moldForm.get('thresholdYellow').enable();
-          this.moldForm.get('thresholdRed').enable();
-          this.moldForm.get('thresholdDateYellow').enable();
-          this.moldForm.get('thresholdDateRed').enable();
-        }
-      })
-    );
-    this.moldFormChangesSubscription = this.moldForm.valueChanges.subscribe((moldFormChanges: any) => {
-      if (!this.loaded) return;
-      if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    
+    this.moldFormChangesSubscription = this.moldForm.valueChanges
+    .subscribe((moldFormChanges: any) => {
+      if (this.loaded) {
+        this.setEditionButtonsState();
+      }
+      if (moldFormChanges.thresholdType === GeneralValues.N_A) {
+        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable();
+        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable();
+        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable();
+        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable();
+        if (this.moldForm.get('templatesYellow').enabled) this.moldForm.get('templatesYellow').disable();        
+        if (this.moldForm.get('templatesRed').enabled) this.moldForm.get('templatesRed').disable();        
+      } else if (moldFormChanges.thresholdType === MoldThresoldTypes.HITS) {
+        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable();
+        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable();
+        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable();
+        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable();
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();        
+      } else if (moldFormChanges.thresholdType === MoldThresoldTypes.DAYS) {
+        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable();
+        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable();
+        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable();
+        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable();
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();        
+      } else if (moldFormChanges.thresholdType === MoldThresoldTypes.BOTH) {
+        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable();
+        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable();
+        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable();
+        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable();
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();         
       }
       if (moldFormChanges.thresholdYellow && moldFormChanges.thresholdRed && (+moldFormChanges.thresholdYellow >= +moldFormChanges.thresholdRed)) {
         this.moldForm.controls.thresholdYellow.setErrors({ invalidValue: true });
@@ -315,7 +317,7 @@ export class CatalogMoldEditionComponent {
     this.moldForm.controls.state.setValue(GeneralValues.N_A);
     setTimeout(() => {
       this.focusThisField = 'description';
-      if (!this.mold) {
+      if (!this.mold.id) {
         this.loaded = true;
       }
     }, 200);    
@@ -337,8 +339,7 @@ export class CatalogMoldEditionComponent {
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.moldFormChangesSubscription) this.moldFormChangesSubscription.unsubscribe();    
-    if (this.updateMoldCatalog) this.updateMoldCatalog.unsubscribe();    
+    if (this.moldFormChangesSubscription) this.moldFormChangesSubscription.unsubscribe();        
   }
   
 // Functions ================
@@ -1018,31 +1019,35 @@ export class CatalogMoldEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateMoldCatalog = this._catalogsService.updateMoldCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      if (data?.data?.createOrUpdateMold.length > 0) {
-        const moldId = data?.data?.createOrUpdateMold[0].id;
-        combineLatest([ this.processTranslations$(moldId), this.saveChecklistTemplates$(moldId) ])
-        .subscribe(() => {
-          this.requestMoldData(moldId);          
-          setTimeout(() => {              
-            let message = $localize`El Molde ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`El Molde ha sido creado satisfactoriamente con el id <strong>${this.mold.id}</strong>`;
-              this._location.replaceState(`/catalogs/molds/edit/${this.mold.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
-            });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
-          }, 200);
-        })
-      }
-      
-    });    
+    this.updateMoldCatalog$ = this._catalogsService.updateMoldCatalog$(dataToSave)
+    .pipe(
+      tap((data: any) => {
+        if (data?.data?.createOrUpdateMold.length > 0) {
+          const moldId = data?.data?.createOrUpdateMold[0].id;
+          combineLatest([ 
+            this.processTranslations$(moldId), 
+            this.saveCatalogDetails$(moldId) 
+          ])
+          .subscribe(() => {
+            this.requestMoldData(moldId);          
+            setTimeout(() => {              
+              let message = $localize`El Molde ha sido actualizado`;
+              if (newRecord) {                
+                message = $localize`El Molde ha sido creado satisfactoriamente con el id <strong>${moldId}</strong>`;
+                this._location.replaceState(`/catalogs/molds/edit/${moldId}`);
+              }
+              this._sharedService.showSnackMessage({
+                message,
+                snackClass: 'snack-accent',
+                progressBarColor: 'accent',                
+              });
+              this.setViewLoading(false);
+              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
+            }, 200);
+          })
+        }      
+      })
+    )
   }
 
   requestProvidersData(currentPage: number, filterStr: string = null) {    
@@ -1665,11 +1670,7 @@ export class CatalogMoldEditionComponent {
           snackClass: 'snack-primary',
           icon: 'check',
         });
-        if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-        } else {
-          this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-        }
+        this.setEditionButtonsState();
       }      
     });
   }
@@ -1679,11 +1680,7 @@ export class CatalogMoldEditionComponent {
   }
 
   handleMultipleSelectionChanged(catalog: string){    
-    if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   handleInputKeydown(event: KeyboardEvent) {
@@ -1910,11 +1907,7 @@ export class CatalogMoldEditionComponent {
       snackClass: 'snack-primary',
       icon: 'check',
     });
-    if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   initForm(): void {
@@ -2098,7 +2091,7 @@ export class CatalogMoldEditionComponent {
     
   }
 
-  saveChecklistTemplates$(processId: number): Observable<any> {
+  saveCatalogDetails$(processId: number): Observable<any> {
     if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistYellowTemplatesCurrentSelection.length > 0) {
       const checklistTemplatesYellowToDelete = this.checklistYellowTemplatesCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
@@ -2214,6 +2207,14 @@ export class CatalogMoldEditionComponent {
       timeStr = (seconds / 3600).toFixed(2) + $localize`h`;
     }
     return timeStr;
+  }
+
+  setEditionButtonsState() {
+    if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
   }
 
   get MoldControlStates() {

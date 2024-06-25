@@ -29,6 +29,7 @@ export class ToolbarComponent implements AfterViewInit {
   // TEMP
   stopTimer: boolean = false;
   firstTime: boolean = true;
+  showSpinner: boolean = true;
   timeOutforTimer: number = 0;
   timeOutCountdown: number = 0;
   everySecond$: Observable<boolean>;
@@ -69,7 +70,7 @@ export class ToolbarComponent implements AfterViewInit {
     this.screenData$ = this._store.select(selectSharedScreen).pipe(
       tap(screenData => {
         this.screenWidth = screenData.innerWidth;
-        this.validateScrollbar();
+        this.validateScrollbar();        
       })
     );
     this.showSearch$ = this._sharedService.showSearch.pipe(
@@ -118,6 +119,10 @@ export class ToolbarComponent implements AfterViewInit {
       this.totalElementsWidth = this.totalElementsWidth + element.clientWidth;
     });    
     this.validateScrollbar();
+  }
+
+  ngOnChanges(): void {
+    this.showSpinner = this.toolbar.showSpinner;
   }
   
 // Functions ================

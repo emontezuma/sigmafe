@@ -35,6 +35,7 @@ export class SnackComponent implements OnInit, AfterViewInit{
       (this.data.duration > 0 ? this.data.duration : environment.snackByDefaultDuration) / 100
     ).pipe(
       tap((time) => {
+        console.log(time);
         this.barValue = time;
       })
     ) 

@@ -17,7 +17,7 @@
       [ngStyle]="{ 'width': scrollbarActivated ? 'unset' : '100%' }"
     >
       <div
-        *ngIf="toolbar.showSpinner"
+        *ngIf="showSpinner"
         class="tab-spinner"
         [ngClass]="{ 'pulse-with-accent': stopTimer }"
       >

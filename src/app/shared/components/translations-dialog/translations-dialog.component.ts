@@ -142,6 +142,7 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
           translation = this.data.translations.find(f => f.languageId === this.translationsForm.controls.language.value);
         }
         translation.description = this.translationsForm.controls.description.value;
+        translation.name = this.translationsForm.controls.description.value;
         translation.reference = this.translationsForm.controls.reference.value;
         translation.notes = this.translationsForm.controls.notes.value;
         translation.updatedAt = this._sharedService.formatDate(new Date());
