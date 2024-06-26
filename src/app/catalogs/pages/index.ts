@@ -22,4 +22,7 @@ export * from './catalog-provider-edition';
 export * from './catalog-equipments-list';
 export * from './catalog-equipment-edition';
 
+export * from './catalog-departments-list';
+export * from './catalog-department-edition';
+
 export * from './catalogs-home';

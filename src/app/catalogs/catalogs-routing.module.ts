@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -116,6 +116,21 @@ const routes: Routes = [
         path: 'equipments/edit/:id',
         component: CatalogEquipmentEditionComponent,
         data: { animation: 'CatalogEquipmentEditionComponent' },
+      },
+      {
+        path: 'departments',
+        component: CatalogDepartmentsListComponent,
+        data: { animation: 'CatalogDepartmentsComponent' },
+      },
+      {
+        path: 'departments/create',
+        component: CatalogDepartmentEditionComponent,
+        data: { animation: 'CatalogDepartmentEditionComponent' },
+      },
+      {
+        path: 'departments/edit/:id',
+        component: CatalogDepartmentEditionComponent,
+        data: { animation: 'CatalogDepartmentEditionComponent' },
       },
       {
         path: '**',

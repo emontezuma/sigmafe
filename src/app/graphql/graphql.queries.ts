@@ -2635,4 +2635,246 @@ export const INACTIVATE_EQUIPMENT = gql`
     } 
   }
 `;
+
+//departments===========================
+
+export const GET_DEPARTMENT = gql`
+  query OneDepartment (
+    $departmentId: Long!,
+  ) {
+  oneDepartment (
+    id: $departmentId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      id
+      customerId
+      recipientId
+  approverId
+      plantId     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_DEPARTMENTS = gql`
+  query DepartmentsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedDepartmentDtoSortInput!],
+    $filterBy: TranslatedDepartmentDtoFilterInput,
+  ) {
+  departmentsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+          plantId
+          recipientId
+          approverId
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_DEPARTMENT_TRANSLATIONS = gql`
+  query DepartmentsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [DepartmentTranslationTableSortInput!],
+    $filterBy: DepartmentTranslationTableFilterInput,
+  ) {
+    departmentsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        departmentId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        plantId
+        recipientId
+        approverId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_DEPARTMENT_TRANSLATIONS = gql`
+  mutation CreateOrUpdateDepartmentTranslationTable (
+    $translations: [DepartmentTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateDepartmentTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      departmentId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_DEPARTMENT = gql`
+  mutation CreateOrUpdateDepartment (
+    $customerId: Long,
+    $plantId: Long,
+    $recipientId: Long;
+    $approverId: Long;   
+    $id: Long,
+    $status: String    
+    $name: String,
+    $prefix: String,
+    $reference: String,
+    $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdateDepartment (
+    inputs: [{
+      customerId: $customerId
+      plantId: $plantId 
+      recipientId: $recipientId
+      approverId: $approverId     
+      id: $id      
+      status: $status
+      name: $name,
+      prefix: $prefix,
+      reference: $reference,
+      notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_DEPARTMENT_TRANSLATIONS = gql`
+  mutation DeleteDepartmentsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+    $recipientId: Long!
+      $approverId: Long!   
+  $plantId: Long!
+  ) {
+    deleteDepartmentsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+      recipientId: $recipientId,
+      approverId: $approverId,   
+    plantId: $plantId,
+    ) 
+  }
+`;
+
+export const INACTIVATE_DEPARTMENT = gql`
+  mutation CreateOrUpdateDepartment (
+    $id: Long,
+    $customerId: Long,
+    $recipientId: Long,
+      $approverId: Long,   
+    $plantId: Long,
+    $status: String
+  ) {
+  createOrUpdateDepartment (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      recipientId: $recipientId,
+      approverId: $approverId,   
+      plantId: $plantId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
 //=========END

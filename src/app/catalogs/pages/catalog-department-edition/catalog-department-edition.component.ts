@@ -13,25 +13,25 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {  EquipmentDetail, EquipmentItem,    emptyEquipmentItem } from '../../models';
+import {  DepartmentDetail, DepartmentItem,    emptyDepartmentItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
 
 @Component({
-  selector: 'app-catalog-equipment-edition',
-  templateUrl: './catalog-equipment-edition.component.html',
+  selector: 'app-catalog-department-edition',
+  templateUrl: './catalog-department-edition.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-equipment-edition.component.scss']
+  styleUrls: ['./catalog-department-edition.component.scss']
 })
-export class CatalogEquipmentEditionComponent {
+export class CatalogDepartmentEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
 
-  // Equipments ===============
-  equipment: EquipmentDetail = emptyEquipmentItem;
+  // Departments ===============
+  department: DepartmentDetail = emptyDepartmentItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
@@ -41,18 +41,18 @@ export class CatalogEquipmentEditionComponent {
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  equipment$: Observable<EquipmentDetail>;
+  department$: Observable<DepartmentDetail>;
   translations$: Observable<any>;
-  updateEquipment$: Observable<any>;
-  updateEquipmentCatalog$: Observable<any>;
-  deleteEquipmentTranslations$: Observable<any>;  
-  addEquipmentTranslations$: Observable<any>;  
+  updateDepartment$: Observable<any>;
+  updateDepartmentCatalog$: Observable<any>;
+  deleteDepartmentTranslations$: Observable<any>;  
+  addDepartmentTranslations$: Observable<any>;  
   
-  equipmentFormChangesSubscription: Subscription;
+  departmentFormChangesSubscription: Subscription;
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "equipment";  
+  catalogIcon: string = "department";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -66,12 +66,12 @@ export class CatalogEquipmentEditionComponent {
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  equipmentData: EquipmentItem;  
+  departmentData: DepartmentItem;  
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
 
-  equipmentForm = new FormGroup({
+  departmentForm = new FormGroup({
     name: new FormControl(
       '', 
       Validators.required,      
@@ -140,7 +140,7 @@ export class CatalogEquipmentEditionComponent {
 
       })
     );
-    this.equipmentFormChangesSubscription = this.equipmentForm.valueChanges.subscribe((equipmentFormChanges: any) => {
+    this.departmentFormChangesSubscription = this.departmentForm.valueChanges.subscribe((departmentFormChanges: any) => {
       if (!this.loaded) return;
       this.setEditionButtonsState();
     }); 
@@ -164,7 +164,7 @@ export class CatalogEquipmentEditionComponent {
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestEquipmentData(+params['id']);
+          this.requestDepartmentData(+params['id']);
         }
       })
     ); 
@@ -192,7 +192,7 @@ export class CatalogEquipmentEditionComponent {
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.equipmentFormChangesSubscription) this.equipmentFormChangesSubscription.unsubscribe(); 
+    if (this.departmentFormChangesSubscription) this.departmentFormChangesSubscription.unsubscribe(); 
   }
   
 // Functions ================
@@ -238,7 +238,7 @@ export class CatalogEquipmentEditionComponent {
             this.elements.find(e => e.action === action.action).loading = false;
           });    
         } else {
-          this._location.replaceState('/catalogs/equipments/create');
+          this._location.replaceState('/catalogs/departments/create');
           this.initForm();
           this.elements.find(e => e.action === action.action).loading = false;  
         }
@@ -246,12 +246,12 @@ export class CatalogEquipmentEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
-          this._router.navigateByUrl('/catalogs/equipments'); 
+          this._router.navigateByUrl('/catalogs/departments'); 
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState('/catalogs/equipments/create');
+        this._location.replaceState('/catalogs/departments/create');
         this.focusThisField = 'name';
         setTimeout(() => {
           this.focusThisField = '';
@@ -270,11 +270,11 @@ export class CatalogEquipmentEditionComponent {
       } else if (action.action === ButtonActions.CANCEL) {         
         this.elements.find(e => e.action === action.action).loading = true;
         let noData = true;
-        if (!this.equipment.id || this.equipment.id === null || this.equipment.id === 0) {
+        if (!this.department.id || this.department.id === null || this.department.id === 0) {
           this.initForm();
         } else {
           noData = false;
-          this.requestEquipmentData(this.equipment.id);
+          this.requestDepartmentData(this.department.id);
         }
         const message = $localize`Edición cancelada`;
           this._sharedService.showSnackMessage({
@@ -291,14 +291,14 @@ export class CatalogEquipmentEditionComponent {
         }, 200);
       } else if (action.action === ButtonActions.INACTIVATE) { 
         this.elements.find(e => e.action === action.action).loading = true;
-        if (this.equipment?.id > 0 && this.equipment.status === RecordStatus.ACTIVE) {
+        if (this.department?.id > 0 && this.department.status === RecordStatus.ACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR EQUIPAMENTO`,  
+              title: $localize`INACTIVAR DEPARTAMENTO`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -321,7 +321,7 @@ export class CatalogEquipmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.equipment.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.department.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -334,22 +334,22 @@ export class CatalogEquipmentEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const equipmentParameters = {
+              const departmentParameters = {
                 settingType: 'status',
-                id: this.equipment.id,
-                customerId: this.equipment.customerId,
-                plantId: this.equipment.plantId,
+                id: this.department.id,
+                customerId: this.department.customerId,
+                plantId: this.department.plantId,
                 status: RecordStatus.INACTIVE,
               }
-              const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
-              this.updateEquipment$ = this._catalogsService.updateEquipmentStatus$(equipments)
+              const departments = this._sharedService.setGraphqlGen(departmentParameters);
+              this.updateDepartment$ = this._catalogsService.updateDepartmentStatus$(departments)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateEquipment.length > 0 && data?.data?.createOrUpdateEquipment[0].status === RecordStatus.INACTIVE) {
+                  if (data?.data?.createOrUpdateDepartment.length > 0 && data?.data?.createOrUpdateDepartment[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
                       const message = $localize`El equipamento ha sido inhabilitada`;
-                      this.equipment.status = RecordStatus.INACTIVE;
+                      this.department.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -363,13 +363,13 @@ export class CatalogEquipmentEditionComponent {
               )
             }            
           });
-        } else if (this.equipment?.id > 0 && this.equipment.status === RecordStatus.INACTIVE) {
+        } else if (this.department?.id > 0 && this.department.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR EQUIPAMENTO`,  
+              title: $localize`REACTIVAR DEPARTAMENTO`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -392,7 +392,7 @@ export class CatalogEquipmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará el equipamento con el Id <strong>${this.equipment.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el equipamento con el Id <strong>${this.department.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -405,22 +405,22 @@ export class CatalogEquipmentEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const equipmentParameters = {
+              const departmentParameters = {
                 settingType: 'status',
-                id: this.equipment.id,
-                customerId: this.equipment.customerId,
-                plantId: this.equipment.plantId,
+                id: this.department.id,
+                customerId: this.department.customerId,
+                plantId: this.department.plantId,
                 status: RecordStatus.ACTIVE,
               }
-              const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
-              this.updateEquipment$ = this._catalogsService.updateEquipmentStatus$(equipments)
+              const departments = this._sharedService.setGraphqlGen(departmentParameters);
+              this.updateDepartment$ = this._catalogsService.updateDepartmentStatus$(departments)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateEquipment.length > 0 && data?.data?.createOrUpdateEquipment[0].status === RecordStatus.ACTIVE) {
+                  if (data?.data?.createOrUpdateDepartment.length > 0 && data?.data?.createOrUpdateDepartment[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
                       const message = $localize`El equipamento ha sido reactivada`;
-                      this.equipment.status = RecordStatus.ACTIVE;
+                      this.department.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -436,16 +436,16 @@ export class CatalogEquipmentEditionComponent {
           });
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
-        if (this.equipment?.id > 0) {
+        if (this.department?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
             width: '500px',
             disableClose: true,
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones del equipamento <strong>${this.equipment.id}</strong>`,
+              title: $localize`Traducciones del equipamento <strong>${this.department.id}</strong>`,
               topIcon: 'world',
-              translations: this.equipment.translations,
+              translations: this.department.translations,
               buttons: [{
                 action: ButtonActions.SAVE,
                 showIcon: true,
@@ -487,7 +487,7 @@ export class CatalogEquipmentEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará al equipamento ${this.equipment.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al equipamento ${this.department.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -496,10 +496,10 @@ export class CatalogEquipmentEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.equipment.translations = [...response.translations];
+              this.department.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.equipment.translations.length > 0 ? $localize`Traducciones (${this.equipment.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.equipment.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations.length > 0 ? $localize`Traducciones (${this.department.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -613,7 +613,7 @@ export class CatalogEquipmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: this.equipment?.status !== RecordStatus.ACTIVE,
+      disabled: this.department?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
     },{
       type: 'divider',
@@ -640,7 +640,7 @@ export class CatalogEquipmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: !!!this.equipment.id,
+      disabled: !!!this.department.id,
       action: ButtonActions.TRANSLATIONS,      
     },];
   }
@@ -677,16 +677,16 @@ export class CatalogEquipmentEditionComponent {
     if (!this.submitControlled) return;
     this.submitControlled = false;
     this.validateTables();
-    this.equipmentForm.markAllAsTouched();
-    this.equipmentForm.updateValueAndValidity(); 
-    if (this.equipmentForm.valid) {      
+    this.departmentForm.markAllAsTouched();
+    this.departmentForm.updateValueAndValidity(); 
+    if (this.departmentForm.valid) {      
       this.saveRecord();   
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
-      for (const controlName in this.equipmentForm.controls) {
-        if (this.equipmentForm.controls.hasOwnProperty(controlName)) {
-          const typedControl: AbstractControl = this.equipmentForm.controls[controlName]; 
+      for (const controlName in this.departmentForm.controls) {
+        if (this.departmentForm.controls.hasOwnProperty(controlName)) {
+          const typedControl: AbstractControl = this.departmentForm.controls[controlName]; 
           if (typedControl.invalid) {
             fieldsMissingCounter++;
             fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -711,9 +711,9 @@ export class CatalogEquipmentEditionComponent {
       }); 
       dialogResponse.afterClosed().subscribe((response) => {
         let fieldFocused = false;
-        for (const controlName in this.equipmentForm.controls) {
-          if (this.equipmentForm.controls.hasOwnProperty(controlName)) {
-            const typedControl: AbstractControl = this.equipmentForm.controls[controlName]; 
+        for (const controlName in this.departmentForm.controls) {
+          if (this.departmentForm.controls.hasOwnProperty(controlName)) {
+            const typedControl: AbstractControl = this.departmentForm.controls[controlName]; 
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
@@ -736,20 +736,20 @@ export class CatalogEquipmentEditionComponent {
 
   saveRecord() {
     this.setViewLoading(true);
-    const newRecord = !this.equipment.id || this.equipment.id === null || this.equipment.id === 0;
+    const newRecord = !this.department.id || this.department.id === null || this.department.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateEquipmentCatalog$ = this._catalogsService.updateEquipmentCatalog$(dataToSave)
+    this.updateDepartmentCatalog$ = this._catalogsService.updateDepartmentCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
-        if (data?.data?.createOrUpdateEquipment.length > 0) {
-          const equipmentId = data?.data?.createOrUpdateEquipment[0].id;          
-          this.processTranslations$(equipmentId).subscribe(() => {
-            this.requestEquipmentData(equipmentId);
+        if (data?.data?.createOrUpdateDepartment.length > 0) {
+          const departmentId = data?.data?.createOrUpdateDepartment[0].id;          
+          this.processTranslations$(departmentId).subscribe(() => {
+            this.requestDepartmentData(departmentId);
             setTimeout(() => {              
               let message = $localize`El equipamento ha sido actualizado`;
               if (newRecord) {                
-                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.equipment.id}</strong>`;
-                this._location.replaceState(`/catalogs/equipments/edit/${equipmentId}`);
+                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.department.id}</strong>`;
+                this._location.replaceState(`/catalogs/departments/edit/${departmentId}`);
               }
               this._sharedService.showSnackMessage({
                 message,
@@ -765,43 +765,43 @@ export class CatalogEquipmentEditionComponent {
     )
   }
 
-  requestEquipmentData(equipmentId: number): void { 
-    let equipments = undefined;
-    equipments = { equipmentId };
+  requestDepartmentData(departmentId: number): void { 
+    let departments = undefined;
+    departments = { departmentId };
 
     const skipRecords = 0;
-    const filter = JSON.parse(`{ "equipmentId": { "eq": ${equipmentId} } }`);
+    const filter = JSON.parse(`{ "departmentId": { "eq": ${departmentId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
     // let getData: boolean = false;
     this.setViewLoading(true); 
-    this.equipment$ = this._catalogsService.getEquipmentDataGql$({ 
-      equipmentId, 
+    this.department$ = this._catalogsService.getDepartmentDataGql$({ 
+      departmentId, 
       skipRecords, 
       takeRecords: this.takeRecords, 
       order, 
       filter, 
     }).pipe(
-      map(([ equipmentGqlData, equipmentGqlTranslationsData ]) => {
-        return this._catalogsService.mapOneEquipment({
-          equipmentGqlData,  
-          equipmentGqlTranslationsData,
+      map(([ departmentGqlData, departmentGqlTranslationsData ]) => {
+        return this._catalogsService.mapOneDepartment({
+          departmentGqlData,  
+          departmentGqlTranslationsData,
         })
       }),
-      tap((equipmentData: EquipmentDetail) => {
-        if (!equipmentData) return;
-        this.equipment =  equipmentData;
+      tap((departmentData: DepartmentDetail) => {
+        if (!departmentData) return;
+        this.department =  departmentData;
         this.translationChanged = false;
         this.imageChanged = false;
-        this.storedTranslations = JSON.parse(JSON.stringify(this.equipment.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.equipment.translations.length > 0 ? $localize`Traducciones (${this.equipment.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.equipment.translations.length > 0 ? 'accent' : '';   
+        this.storedTranslations = JSON.parse(JSON.stringify(this.department.translations));
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations.length > 0 ? $localize`Traducciones (${this.department.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
-        this.changeInactiveButton(this.equipment.status);
+        this.changeInactiveButton(this.department.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = equipmentData.translations.length > 0 ? $localize`Traducciones (${equipmentData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = departmentData.translations.length > 0 ? $localize`Traducciones (${departmentData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = equipmentData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = departmentData.translations.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -820,16 +820,16 @@ export class CatalogEquipmentEditionComponent {
 
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
-    .set('destFolder', `${environment.uploadFolders.catalogs}/equipments`)
-    .set('processId', this.equipment.id)
+    .set('destFolder', `${environment.uploadFolders.catalogs}/departments`)
+    .set('processId', this.department.id)
     .set('process', originProcess.CATALOGS_MOLDS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
-        this.equipmentForm.controls.mainImageName.setValue(res.fileName);
-        this.equipment.mainImagePath = res.filePath;
-        this.equipment.mainImageGuid = res.fileGuid;
-        this.equipment.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.departmentForm.controls.mainImageName.setValue(res.fileName);
+        this.department.mainImagePath = res.filePath;
+        this.department.mainImageGuid = res.fileGuid;
+        this.department.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -891,23 +891,23 @@ export class CatalogEquipmentEditionComponent {
   }
 
   updateFormFromData(): void {    
-    this.equipmentForm.patchValue({
-      name: this.equipment.name,
-      reference: this.equipment.reference,      
-      mainImageName: this.equipment.mainImageName,
-      prefix: this.equipment.prefix,      
-      notes: this.equipment.notes,      
+    this.departmentForm.patchValue({
+      name: this.department.name,
+      reference: this.department.reference,      
+      mainImageName: this.department.mainImageName,
+      prefix: this.department.prefix,      
+      notes: this.department.notes,      
 
     });
   } 
 
   prepareRecordToAdd(newRecord: boolean): any {
-    const fc = this.equipmentForm.controls;
+    const fc = this.departmentForm.controls;
     return  {
-        id: this.equipment.id,
+        id: this.department.id,
       customerId: 1, // TODO: Get from profile
       plantId: 1, // TODO: Get from profile
-        status: newRecord ? RecordStatus.ACTIVE : this.equipment.status,
+        status: newRecord ? RecordStatus.ACTIVE : this.department.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
@@ -915,13 +915,13 @@ export class CatalogEquipmentEditionComponent {
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
-        mainImagePath: this.equipment.mainImagePath,
-        mainImageGuid: this.equipment.mainImageGuid, },
+        mainImagePath: this.department.mainImagePath,
+        mainImageGuid: this.department.mainImageGuid, },
     }
   }
 
   setEditionButtonsState() {
-    if (!this.equipment.id || this.equipment.id === null || this.equipment.id === 0) {
+    if (!this.department.id || this.department.id === null || this.department.id === 0) {
       this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
     } else {
       this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
@@ -930,10 +930,10 @@ export class CatalogEquipmentEditionComponent {
   
   removeImage() {
     this.imageChanged = true;
-    this.equipmentForm.controls.mainImageName.setValue('');
-    this.equipment.mainImagePath = '';
-    this.equipment.mainImageGuid = '';
-    this.equipment.mainImage = '';     
+    this.departmentForm.controls.mainImageName.setValue('');
+    this.department.mainImagePath = '';
+    this.department.mainImageGuid = '';
+    this.department.mainImage = '';     
     const message = $localize`Se ha quitado la imagen del equipamento<br>Guarde el equipamento para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
@@ -945,12 +945,12 @@ export class CatalogEquipmentEditionComponent {
   }
 
   initForm(): void {
-    this.equipmentForm.reset();
+    this.departmentForm.reset();
     // Default values
 
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.equipment = emptyEquipmentItem;
+    this.department = emptyDepartmentItem;
     this.focusThisField = 'name';
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
@@ -962,13 +962,13 @@ export class CatalogEquipmentEditionComponent {
   }
 
   initUniqueField(): void {
-    this.equipment.id = null;
-    this.equipment.createdBy = null;
-    this.equipment.createdAt = null;
-    this.equipment.updatedBy = null;
-    this.equipment.updatedAt = null; 
-    this.equipment.status = RecordStatus.ACTIVE; 
-    this.equipment.translations.map((t) => {
+    this.department.id = null;
+    this.department.createdBy = null;
+    this.department.createdAt = null;
+    this.department.updatedBy = null;
+    this.department.updatedAt = null; 
+    this.department.status = RecordStatus.ACTIVE; 
+    this.department.translations.map((t) => {
       return {
         ...t,
         id: null,
@@ -1009,9 +1009,9 @@ export class CatalogEquipmentEditionComponent {
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations$(equipmentId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.equipment.translations.length || this.storedTranslations.some((st: any) => {
-      return this.equipment.translations.find((t: any) => {        
+  processTranslations$(departmentId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.department.translations.length || this.storedTranslations.some((st: any) => {
+      return this.department.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
         (st.name !== t.name || 
@@ -1031,10 +1031,10 @@ export class CatalogEquipmentEditionComponent {
         customerId: 1, // TODO: Get from profile
         plantId: 1, // TODO: Get from profile
       }      
-      const translationsToAdd = this.equipment.translations.map((t: any) => {
+      const translationsToAdd = this.department.translations.map((t: any) => {
         return {
           id: null,
-          equipmentId,
+          departmentId,
           name: t.name,
           reference: t.reference,
           notes: t.notes,
@@ -1049,8 +1049,8 @@ export class CatalogEquipmentEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addEquipmentTransations$(varToAdd) : of(null),
-        varToDelete.ids.length > 0 ? this._catalogsService.deleteEquipmentTranslations$(varToDelete) : of(null) 
+        varToAdd.translations.length > 0 ? this._catalogsService.addDepartmentTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteDepartmentTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);

@@ -6,23 +6,23 @@
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
-  <ng-container *ngIf="equipment$ | async"></ng-container>  
+  <ng-container *ngIf="department$ | async"></ng-container>  
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
   <ng-container *ngIf="settingsData$ | async"></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
-  <ng-container *ngIf="updateEquipment$ | async "></ng-container>
-  <ng-container *ngIf="updateEquipmentCatalog$ | async "></ng-container>      
-  <ng-container *ngIf="deleteEquipmentTranslations$ | async "></ng-container>      
-  <ng-container *ngIf="addEquipmentTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="updateDepartment$ | async "></ng-container>
+  <ng-container *ngIf="updateDepartmentCatalog$ | async "></ng-container>      
+  <ng-container *ngIf="deleteDepartmentTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addDepartmentTranslations$ | async "></ng-container>   
 
   <mat-card class="card">
     <form
         class="layout"
         (ngSubmit)="onSubmit()"
-        [formGroup]="equipmentForm"
+        [formGroup]="departmentForm"
         #f="ngForm"
       >
       <mat-accordion multi>
@@ -44,7 +44,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DEL EQUIPAMENTO</label
+                >INFORMACIÓN PRINCIPAL DEL DEPARTAMENTO</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -68,18 +68,18 @@
               <app-input-field
                 [focused]="focusThisField==='name'"
                 [bordered]="true"
-                [formField]="equipmentForm.controls.name"
+                [formField]="departmentForm.controls.name"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="300"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado al equipamento"
+                fieldHelp="Especifique el nombre asignado al departamento"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre del equipamento</span
+                  >Descripción/Nombre del departamento</span
                 >
               </app-input-field>
             </div>
@@ -87,28 +87,28 @@
               <app-input-field
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
-                [formField]="equipmentForm.controls.prefix"
+                [formField]="departmentForm.controls.prefix"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación del equipamento"
+                fieldHelp="Especifique la abreviación del departamento"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación del equipamento</span
+                  >Abreviación del departamento</span
                 >
               </app-input-field>
             </div>
             <div class="field-items">
               <app-input-field
                 [bordered]="true"
-                [formField]="equipmentForm.controls.reference"
+                [formField]="departmentForm.controls.reference"
                 leftHint="Campo opcional"
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia del equipamento"
+                fieldHelp="Especifique la referencia del departamento"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -118,16 +118,16 @@
             <div class="field-items field-items--bordered">
               <app-area-field
                 [bordered]="false"
-                [formField]="equipmentForm.controls.notes"
+                [formField]="departmentForm.controls.notes"
                 [fieldMaxLength]="500"
                 [showRightHint]="true"
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a este equipamento"
+                fieldHelp="Especifique las notas referentes a este departamento"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes al equipamento</span
+                  >Notas referentes al departamento</span
                 >
               </app-area-field>              
             </div>                     
@@ -140,7 +140,7 @@
                       <input
                         class="field__input"
                         matInput
-                        [formControl]="equipmentForm.controls.mainImageName"                        
+                        [formControl]="departmentForm.controls.mainImageName"                        
                         [readonly]="true"
                       />
                       <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
@@ -156,36 +156,36 @@
                         <mat-icon>search</mat-icon>
                       </button>
                       <button
-                        *ngIf="equipment.mainImage"
+                        *ngIf="department.mainImage"
                         matSuffix
                         mat-icon-button
                         (click)="removeImage()"
                         style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen del equipamento"
+                        matTooltip="Remueve la imagen del departamento"
                         matTooltipClass="tooltip-general"
                         matTooltipShowDelay="100"
                       >
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este equipamento</span>
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este departamento</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
-                      *ngIf="this.equipment.mainImage"
+                      *ngIf="this.department.mainImage"
                     >
                       <img                
                         @dissolve
                         appImageNotFound                
                         class="mold-image"                        
-                        [src]="this.equipment.mainImage"
-                        [alt]="this.equipment.mainImage"            
+                        [src]="this.department.mainImage"
+                        [alt]="this.department.mainImage"            
                         fill
                       >      
                     </div>
                     <div
-                      *ngIf="!this.equipment.mainImage"
+                      *ngIf="!this.department.mainImage"
                       class="icon-container"
                     >
                       <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
@@ -200,37 +200,37 @@
       </mat-accordion>
     </form>
     <div
-      *ngIf="equipment.id"
+      *ngIf="department.id"
       class="catalog-footer"
     >
       <div class="grid-dates">
         <div class="flex">
-          <div class="readonly-value item-id">{{ equipment.id }}</div>
+          <div class="readonly-value item-id">{{ department.id }}</div>
           <div class="label-with-no-index">ID del registro</div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(equipment.createdAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(department.createdAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de creación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ equipment.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ department.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Creado por</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(equipment.updatedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(department.updatedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de modificación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ equipment.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ department.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
@@ -238,16 +238,16 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="equipment.status === RecordStatus.INACTIVE">
+      <div class="grid-inactive" *ngIf="department.status === RecordStatus.INACTIVE">
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(equipment.deletedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(department.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de inactivación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ equipment.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ department.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Inactivado por</div>
