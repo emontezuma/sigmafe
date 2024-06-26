@@ -1,7 +1,7 @@
 import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
 export interface ChecklistTemplatesData {
-  ChecklistTemplatesPaginated?: ChecklistTemplates;
+  checklistTemplatesPaginated?: ChecklistTemplates;
 }
 
 export interface ChecklistTemplateData {
@@ -32,10 +32,27 @@ export interface ChecklistTemplateDetail {
   mainImage?: string;
   id?: number;
   customerId?: number;
-  allowDiscard?: string,
-  templateType?: GeneralCatalogInternalData,
-  status?: string;  
+  uom?: GeneralCatalogInternalData,
+  sigmaType?: GeneralCatalogInternalData,
+  valueType?: string,
+  status?: string;
+  showNotes?: string;
   translations?: GeneralTranslation[];
+  required?: string;
+  allowNoCapture?: string;
+  allowComments?: string;
+  showChart?: string;
+  allowAlarm?: string;
+  notifyAlarm?: string;
+  accumulative?: string;
+  automaticActionPlan?: string;  
+  actionPlansToGenerate?: string;  
+  possibleValues?: string;  
+  byDefault?: string; 
+  byDefaultDateType?: string; 
+  resetValueMode?: string; 
+  minimum?: string; 
+  maximum?: string; 
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -44,15 +61,16 @@ export interface ChecklistTemplateDetail {
   deletedAt?: any;
   deletedBy?: any;
   updatedBy?: any;
-  createdBy?: any;  
+  createdBy?: any;
+  
 }
 
 export interface ChecklistTemplatesState {
   loading: boolean;
-  ChecklistTemplatesData: ChecklistTemplatesData;
+  checklistTemplatesData: ChecklistTemplatesData;
 }
 
-export interface ChecklistTemplatestate {
+export interface ChecklistTemplateState {
   loading: boolean;
   moldDetail: ChecklistTemplateDetail;
 }
@@ -61,8 +79,7 @@ export interface ChecklistTemplateCatalog {
   id: string;
   name: string;
   mainImagePath: string;
-  lastGeneratedDate: string;
-  generationCount: number;
+  serialNumber: string;
   status: string;
   updatedAt: string;
 }
@@ -80,7 +97,7 @@ export const emptyChecklistTemplateCatalog = {
     customerId: null,
     name: null,
     mainImagePath: null,    
-    templateType: emptyInternalCatalog,
+    uom: emptyInternalCatalog,
     updatedBy: null,
     status: null,
     updatedAt: null,
@@ -93,7 +110,8 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   customerId: null,
   prefix: null,
   status: null,
-  allowDiscard: GeneralValues.NO,
+  maximum: null,
+  minimum: null,
   createdById: null,
   createdAt: null,
   updatedById: null,
@@ -103,7 +121,18 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
-  translations: [],  
+  showNotes: GeneralValues.NO,
+  required: GeneralValues.NO,
+  allowNoCapture: GeneralValues.NO,
+  allowComments: GeneralValues.NO,
+  showChart: GeneralValues.NO,
+  allowAlarm: GeneralValues.NO,
+  accumulative: GeneralValues.NO,
+  automaticActionPlan: GeneralValues.NO,
+  notifyAlarm: GeneralValues.NO,
+  translations: [],
+  byDefault: '',
+  byDefaultDateType: '-',
 };
 
 export interface ChecklistTemplatePossibleValue {

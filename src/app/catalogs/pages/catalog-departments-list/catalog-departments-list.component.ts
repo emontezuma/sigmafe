@@ -14,41 +14,41 @@ import { routingAnimation, dissolve } from '../../../shared/animations/shared.an
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 import { environment } from 'src/environments/environment';
-import { PlantItem, Plants, PlantsData, emptyPlantCatalog } from '../../models';
+import { PlantItem, Departments, DepartmentsData, emptyPlantCatalog } from '../../models';
 
 @Component({
-  selector: 'app-catalog-plants',
-  templateUrl: './catalog-plants-list.component.html',
+  selector: 'app-catalog-departments',
+  templateUrl: './catalog-departments-list.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-plants-list.component.scss']
+  styleUrls: ['./catalog-departments-list.component.scss']
 })
-export class CatalogPlantsListComponent implements AfterViewInit {
+export class CatalogDepartmentsListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-// Plants ===============
-  plantsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
-  plantsCatalogData = new MatTableDataSource<PlantItem>([]);      
+// Departments ===============
+  departmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+  departmentsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
-  plantsData$: Observable<PlantsData>;
+  departmentsData$: Observable<DepartmentsData>;
   sort$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>;
   settingsData$: Observable<SettingsData>;
   profileData$: Observable<ProfileData>;
   searchBox$: Observable<SearchBox>;
   screenData$: Observable<Screen>;
-  allPlantsToCsv$: Observable<any>;
+  allDepartmentsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "industry";  
+  catalogIcon: string = "department";  
 
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
   filterByText: string;
-  allPlantsToCsv: any;
-  plantsData: Plants = {
+  allDepartmentsToCsv: any;
+  departmentsData: Departments = {
     items: new Array(5).fill(null),
   }
   pageInfo: PageInfo = {
@@ -75,11 +75,11 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.DEPARTMENTS_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.DEPARTMENTS_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +112,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.PLANTS_CATALOG) {
+        if (searchBox.from === ApplicationModules.DEPARTMENTS_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +128,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.PLANTS_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.DEPARTMENTS_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +139,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.PLANTS_CATALOG,
+      from: ApplicationModules.DEPARTMENTS_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +148,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.DEPARTMENTS_CATALOG,
       false,
     );        
   }
@@ -157,8 +157,8 @@ export class CatalogPlantsListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.plantsCatalogData.paginator = this.paginator;
-    this.plantsCatalogData.sort = this.sort;
+    this.departmentsCatalogData.paginator = this.paginator;
+    this.departmentsCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
@@ -186,7 +186,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
 
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
-    this.plantsData = {
+    this.departmentsData = {
       items: new Array(5).fill(emptyPlantCatalog),
     }
     let filter = null;
@@ -194,44 +194,43 @@ export class CatalogPlantsListComponent implements AfterViewInit {
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-    this.plantsCatalogData = new MatTableDataSource<PlantItem>(this.plantsData.items);
-    this.plantsData$ = this._catalogsService.getPlantsDataGql$(skipRecords, takeRecords, this.order, filter)
+    this.departmentsCatalogData = new MatTableDataSource<PlantItem>(this.departmentsData.items);
+    this.departmentsData$ = this._catalogsService.getDepartmentsDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
-      map((plants: any) => {
-        const { data } = plants;
+      map((departments: any) => {
+        const { data } = departments;
         return { 
           ...data,
-          plantsPaginated: {
-            ...data.plantsPaginated,
-            items: data.plantsPaginated.items.map((item) => {
+          departmentsPaginated: {
+            ...data.departmentsPaginated,
+            items: data.departmentsPaginated.items.map((item) => {
               const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
-                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
                 }
               }
             })          
           }
         }
       }),
-      tap( plantsData => {        
-        this.setPaginator(plantsData.plantsPaginated.totalCount);
-        this.plantsData = JSON.parse(JSON.stringify(plantsData.plantsPaginated));
+      tap( departmentsData => {        
+        this.setPaginator(departmentsData.departmentsPaginated.totalCount);
+        this.departmentsData = JSON.parse(JSON.stringify(departmentsData.departmentsPaginated));
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-            this.plantsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.plantsData.items);
+            this.departmentsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.departmentsData.items);
           }      
         }        
-        this.plantsData.items.length = this.plantsData.totalCount;
-        this.plantsCatalogData = new MatTableDataSource<PlantItem>(this.plantsData.items);
-        this.plantsCatalogData.paginator = this.paginator;
-        // this.plantsCatalogData.sort = this.sort;
-        this.plantsCatalogData.sortData = () => this.plantsData.items;        
+        this.departmentsData.items.length = this.departmentsData.totalCount;
+        this.departmentsCatalogData = new MatTableDataSource<PlantItem>(this.departmentsData.items);
+        this.departmentsCatalogData.paginator = this.paginator;
+        // this.departmentsCatalogData.sort = this.sort;
+        this.departmentsCatalogData.sortData = () => this.departmentsData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
           setTimeout(() => {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
@@ -246,7 +245,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.PLANTS_CATALOG,
+          from: ApplicationModules.DEPARTMENTS_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -267,7 +266,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.PLANTS_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.DEPARTMENTS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -279,17 +278,17 @@ export class CatalogPlantsListComponent implements AfterViewInit {
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements.find(e => e.action === action.action).loading = true;                
-        this._router.navigateByUrl("/catalogs/plants/create");
+        this._router.navigateByUrl("/catalogs/departments/create");
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allPlantsToCsv$ = this._catalogsService.getAllPlantsToCsv$().pipe(
-          tap(plantsToCsv => {
-            const fileData$ = this._catalogsService.getAllPlantsCsvData$(plantsToCsv?.data?.exportPlantsToCsv?.exportedFilename)
+        this.allDepartmentsToCsv$ = this._catalogsService.getAllDepartmentsToCsv$().pipe(
+          tap(departmentsToCsv => {
+            const fileData$ = this._catalogsService.getAllDepartmentsCsvData$(departmentsToCsv?.data?.exportDepartmentsToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, plantsToCsv?.data?.exportPlantsToCsv?.downloadFilename);
+              this.downloadFile(data, departmentsToCsv?.data?.exportDepartmentsToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -390,7 +389,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.plantsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.departmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -415,11 +414,11 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.DEPARTMENTS_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.PLANTS_CATALOG,
+      ApplicationModules.DEPARTMENTS_CATALOG,
       loading,
     );         
   }

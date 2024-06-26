@@ -11,7 +11,7 @@ table {
   border-radius: 8px 8px 0px 0px;    
 }
 
-.plants-table {
+.equipments-table {
   width: calc(100% - 11px);
   flex: 1;
   min-height: 0;
@@ -75,9 +75,6 @@ table {
   min-width: 70px;
   padding: 10px;
   text-align: right;
-  ::ng-deep .mat-sort-header-container {
-    justify-content: end;
-  }
 }
 
 .mat-column-mainImagePath {
@@ -101,17 +98,6 @@ table {
 }
 
 
-.mat-column-reference {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;
@@ -130,6 +116,19 @@ table {
   max-width: 20% !important;
   min-width: 20%;
 }
+
+.mat-column-reference {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 26%;
+  max-width: 26% !important;
+  min-width: 26%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
 
 .mat-mdc-header-row {
   font-size: 1.5rem;
@@ -160,7 +159,7 @@ tr:nth-child(2n+1) {
   background-color: var(--z-colors-table-even-background-color);
 }
 
-.plant-image {
+.equipment-image {
   width: inherit;
   max-width: calc(100% - 4px);
   max-height: calc(100% - 4px);

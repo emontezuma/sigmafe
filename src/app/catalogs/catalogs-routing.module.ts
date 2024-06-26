@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogChecklistTemplatesListComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -109,13 +109,43 @@ const routes: Routes = [
       },
       {
         path: 'checklist-templates/create',
-        component: CatalogChecklistTemplatesListComponent,
+        component: CatalogChecklistTemplatesEditionComponent,
         data: { animation: '...' },
       },
       {
         path: 'checklist-templates/edit/:id',
-        component: CatalogChecklistTemplatesListComponent,
+        component: CatalogChecklistTemplatesEditionComponent,
         data: { animation: '...' },
+      },
+      {
+        path: 'equipments',
+        component: CatalogEquipmentsListComponent,
+        data: { animation: 'CatalogEquipmentsComponent' },
+      },
+      {
+        path: 'equipments/create',
+        component: CatalogEquipmentEditionComponent,
+        data: { animation: 'CatalogEquipmentEditionComponent' },
+      },
+      {
+        path: 'equipments/edit/:id',
+        component: CatalogEquipmentEditionComponent,
+        data: { animation: 'CatalogEquipmentEditionComponent' },
+      },
+      {
+        path: 'departments',
+        component: CatalogDepartmentsListComponent,
+        data: { animation: 'CatalogDepartmentsComponent' },
+      },
+      {
+        path: 'departments/create',
+        component: CatalogDepartmentEditionComponent,
+        data: { animation: 'CatalogDepartmentEditionComponent' },
+      },
+      {
+        path: 'departments/edit/:id',
+        component: CatalogDepartmentEditionComponent,
+        data: { animation: 'CatalogDepartmentEditionComponent' },
       },
       {
         path: '**',

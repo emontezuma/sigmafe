@@ -3,7 +3,7 @@
   (@routingAnimation.done)="pageAnimationFinished($event)"
   @routingAnimation
 >
-  <ng-container *ngIf="plantsData$ | async "></ng-container>
+  <ng-container *ngIf="equipmentsData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>
   <ng-container *ngIf="settingsData$ | async "></ng-container>
@@ -11,12 +11,12 @@
   <ng-container *ngIf="searchBox$ | async "></ng-container>
   <ng-container *ngIf="screenData$ | async "></ng-container>
   <ng-container *ngIf="animationData$ | async "></ng-container>
-  <ng-container *ngIf="allPlantsToCsv$ | async "></ng-container>  
+  <ng-container *ngIf="allEquipmentsToCsv$ | async "></ng-container>  
 
   <div
-    class="plants-table"    
+    class="equipments-table"    
   >
-    <table mat-table [dataSource]="plantsCatalogData" matSort>
+    <table mat-table [dataSource]="equipmentsCatalogData" matSort>
 
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
@@ -24,8 +24,7 @@
           <ng-container *ngIf="!loading">{{ row.data.id }}</ng-container>
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
-      </ng-container>
-      
+      </ng-container>      
 
       <ng-container matColumnDef="mainImagePath">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Imagen</th>
@@ -38,7 +37,7 @@
               <img                
                 @dissolve
                 appImageNotFound                
-                class="plant-image"                        
+                class="equipment-image"                        
                 [src]="row.data.mainImage"
                 [alt]="row.data.mainImage"         
                 fill
@@ -62,7 +61,7 @@
       </ng-container>
       
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la planta</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del equipo</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.name }}</strong>
@@ -102,25 +101,25 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="plantsTableColumns; sticky: 1"></tr>
+      <tr mat-header-row *matHeaderRowDef="equipmentsTableColumns; sticky: 1"></tr>
       <tr
         class="table-row"
         mat-row *matRowDef="let row;
-        columns: plantsTableColumns"
-        [routerLink]="['/catalogs/plants/edit/', row.data.id]"
+        columns: equipmentsTableColumns"
+        [routerLink]="['/catalogs/equipments/edit/', row.data.id]"
       >
       </tr>
       <div *ngIf="!loading">
-        <tr class="plants-table-mat-row" *matNoDataRow>
-          <td class="plants-table__no-data" colspan="10">
+        <tr class="equipments-table-mat-row" *matNoDataRow>
+          <td class="equipments-table__no-data" colspan="10">
             No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="plants-table__paginator">
-      <div class="plants-table__paginator--catalog-data">
+    <div class="equipments-table__paginator">
+      <div class="equipments-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
         <div>Total registros {{ pageInfo?.totalRecords}}</div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
@@ -128,7 +127,7 @@
       </div>
       <mat-paginator
         #paginator
-        class="plants-table__paginator--mat"
+        class="equipments-table__paginator--mat"
         [length]="pageInfo?.totalRecords"
         [pageSize]="50"
         (page)="pageChange($event)"

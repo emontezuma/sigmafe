@@ -27,7 +27,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Providers ===============
-  providersTableColumns: string[] = ['id', 'name', 'status', 'updatedAt'];
+  providersTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
   providersCatalogData = new MatTableDataSource<ProviderItem>([]);      
   
   providersData$: Observable<ProvidersData>;
@@ -390,7 +390,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.providersTableColumns = ['id',  'name', 'status', 'updatedAt'];
+    this.providersTableColumns = ['id',  'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

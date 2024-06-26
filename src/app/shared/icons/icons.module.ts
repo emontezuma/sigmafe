@@ -234,6 +234,9 @@ export class IconsModule {
     );iconRegistry.addSvgIcon(
       'brochure',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/brochure.svg`)
+    );iconRegistry.addSvgIcon(
+      'server',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/server.svg`)
     );
   }
   

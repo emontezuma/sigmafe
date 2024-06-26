@@ -535,6 +535,46 @@ form {
   align-items: center;  
 }
 
+.mold-state-label-red {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  font-size: large;
+  color: var(--z-colors-status-alarm);  
+  border: 2px solid var(--z-colors-status-alarm);
+  padding: 5px 10px;
+  border-radius: 7px;
+  width: 100%;
+}
+
+.mold-state-label-yellow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  font-size: large;
+  color: var(--z-colors-status-warn);  
+  border: 2px solid var(--z-colors-status-warn);    
+  padding: 5px 10px;
+  border-radius: 7px;
+  width: 100%;
+}
+
+.control-panel-red {
+  ::ng-deep mat-panel-title {
+    color: var(--z-colors-status-alarm) !important;    
+  }
+  border: 2px solid var(--z-colors-status-alarm);  
+}
+
+.control-panel-yellow {
+  ::ng-deep mat-panel-title {
+    color: var(--z-colors-status-warn) !important; 
+  }  
+  border: 2px solid var(--z-colors-status-warn);  
+}
+
 .message-icon {
   min-width: 32px;
   min-height: 32px;  
@@ -642,10 +682,15 @@ form {
   }    
 }
 
+.skeleton {
+  min-height: 61px;  
+  height: 61px;  
+}
+
+
 .box-row {
   display: flex;
   flex-direction: row;
-  gap: 1px;
 }
 
 .check-span {
@@ -655,6 +700,7 @@ form {
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
+  width: 99%;
 }
 
 app-input-field {
@@ -667,134 +713,4 @@ app-select-field {
   flex: 1;
   display: flex;
   height: 100%;
-}
-
-.date-time {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.flex-columns {
-  display: flex;
-  gap: 10px;
-}
-
-.values-table {  
-  flex: 1;
-  min-height: 0;
-  &__container {
-    overflow: auto;  
-    max-height: 300px;
-    padding-right: 5px;
-  }
-  &__no-data {
-    font-size: 1.3rem;  
-    text-align: center !important;
-    padding: 10px;
-  }
-}
-
-table {
-  border: 1px solid var(--z-colors-table-border-color);
-  border-radius: 8px 8px 0px 0px;    
-}
-
-::ng-deep .mat-mdc-paginator-icon {
-  fill: var(--z-colors-paginator-fore-color) !important;    
-}
-
-.mat-mdc-row:hover {
-  background-color: var(--z-colors-table-hover-background-color) !important;
-}
-
-.mat-column-item {
-  max-width: 40px !important;
-  min-width: 40px !important;
-  width: 40px !important;
-  flex: 0 0 4% !important;  
-  padding: 5px;
-}
-
-.mat-column-value {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  max-width: 170px !important;
-  min-width: 170px !important;
-  width: 170px !important;  
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  word-break: break-word;
-  padding: 10px;
-  flex: 0 0 170px !important;  
-}
-
-.mat-column-byDefault {
-  max-width: 54px !important;
-  min-width: 54px !important;
-  width: 54px !important;
-  flex: 0 0 10% !important;  
-  padding: 5px;
-  text-align: center;
-}
-
-.mat-column-alarmedValue {
-  max-width: 54px !important;
-  min-width: 54px !important;
-  width: 54px !important;
-  flex: 0 0 10% !important;  
-  padding: 5px;
-  text-align: center;
-}
-
-.mat-column-actions {
-  text-align: center;
-  max-width: 264px !important;
-  min-width: 264px !important;
-  width: 264px !important;
-}
-
-.mat-mdc-header-row {
-  font-weight: 700;
-  background-color: var(--z-colors-table-header-background-color) !important;
-  color: var(--z-colors-table-header-fore-color) !important;
-  max-height: 32px !important;
-  height: 32px !important;
-}
-
-::ng-deep .mat-sort-header-arrow {
-  color: var(--z-colors-table-header-fore-color);
-}
-
-.mat-mdc-row {
-  cursor: pointer;
-  color: var(--z-colors-table-row-fore-color);
-  max-height: 26px !important;
-  height: 26px !important;
-}
-
-tr:nth-child(2n) {
-  background-color: var(--z-colors-table-odd-background-color);  
-}
-
-tr:nth-child(2n+1) {
-  background-color: var(--z-colors-table-even-background-color);
-}
-
-.possible-value-fields {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  width: 100%;
-  align-items: center;
-}
-
-mat-hint {
-  display: flex;
-  font-weight: 300;  
-  font-size: 1.1rem;
-  gap: 2px;
-  align-items: center;
-  line-height: 13px;
-  padding: 3px 0px;
 }
