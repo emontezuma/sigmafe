@@ -11,7 +11,7 @@ table {
   border-radius: 8px 8px 0px 0px;    
 }
 
-.molds-table {
+.checklist-templates-table {
   width: calc(100% - 11px);
   flex: 1;
   min-height: 0;
@@ -65,6 +65,11 @@ table {
   width: 100%;
 }
 
+.mdc-form-field {  
+  width: 100%;
+}
+
+
 .mat-mdc-row:hover {
   background-color: var(--z-colors-table-hover-background-color) !important;
 }
@@ -88,77 +93,77 @@ table {
   margin: auto;
 }
 
-.mat-column-description {
+.mat-column-name {
   word-wrap: break-word !important;
   white-space: unset !important;
-  width: 400px;
-  max-width: 450px !important;
-  min-width: 300px;
+  width: 18%;
+  max-width: 18% !important;
+  min-width: 18%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+  .mat-sort-header {
+    text-align: left;
+  }
+}
+
+.mat-column-reference {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
   padding: 10px;
 }
 
-.mat-column-serialNumber {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  width: 250px;
-  max-width: 275px !important;
-  min-width: 200px;  
-  padding: 10px;
-}
-
-.mat-column-position {
+.mat-column-templateType {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;  
-  width: 325px;
-  max-width: 350px !important;
-  min-width: 250px;  
+  width: 12%;
+  max-width: 12% !important;
+  min-width: 12%;
   padding: 10px;
 }
 
-.mat-column-mainInfo {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  flex: 0 0 20% !important;
-  width: 300px;
-  max-width: 350px !important;
-  min-width: 250px;  
-  padding: 10px;
-}
-
-.mat-column-label {
-  min-width: 130px;
-  max-width: 130px;  
-  width: 130px;  
-  padding: 10px;
-}
-
-.mat-column-state {
+.mat-column-lastGeneratedDate {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;  
-  min-width: 170px;
-  max-width: 210px;
-  width: 190px; 
+  width: 12%;
+  max-width: 12% !important;
+  min-width: 12%;
   padding: 10px;
+}
+
+.mat-column-generationCount {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;
+  overflow-wrap: break-word;  
+  text-align: right;
+  width: 10%;
+  max-width: 170% !important;
+  min-width: 10%;
+  padding: 10px;
+  ::ng-deep .mat-sort-header-container {
+    justify-content: end;
+  }
 }
 
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;  
-  min-width: 110px;
-  max-width: 140px;
-  width: 120px;  
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
 }
 
 .mat-column-updatedAt {
@@ -166,31 +171,9 @@ table {
   white-space: unset !important;
   word-break: break-word;
   overflow-wrap: break-word;  
-  min-width: 220px;
-  max-width: 290px;
-  width: 280px;  
-}
-
-.mat-column-hits {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  min-width: 250px;
-  max-width: 300px;
-  width: 310px;  
-}
-
-.mat-column-generalInfo {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  flex: 0 0 28% !important;
-  width: 300px;
-  max-width: 350px !important;
-  min-width: 250px;  
-  padding: 10px;
+  width: 20%;
+  max-width: 20% !important;
+  min-width: 20%;
 }
 
 .mat-mdc-header-row {
@@ -203,12 +186,6 @@ table {
 ::ng-deep .mat-sort-header-arrow {
   color: var(--z-colors-table-header-fore-color);
 }
-
-.mat-sort-header {
-  padding: 5px 16px;
-}
-
-
 
 .mat-mdc-row {
   font-size: 1.3rem;
@@ -224,7 +201,7 @@ tr:nth-child(2n+1) {
   background-color: var(--z-colors-table-even-background-color);
 }
 
-.mold-image {
+.variable-image {
   width: inherit;
   max-width: calc(100% - 4px);
   max-height: calc(100% - 4px);

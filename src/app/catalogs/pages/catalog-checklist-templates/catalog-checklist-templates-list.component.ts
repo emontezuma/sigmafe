@@ -4,7 +4,7 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { Observable, map, skip, tap } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
 import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 import { AppState } from 'src/app/state/app.state';
@@ -14,41 +14,40 @@ import { routingAnimation, dissolve } from '../../../shared/animations/shared.an
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 import { environment } from 'src/environments/environment';
-import { VariableItem, Variables, VariablesData, emptyVariableCatalog } from '../../models';
+import { ChecklistTemplateItem, ChecklistTemplates, ChecklistTemplatesData, emptyChecklistTemplateCatalog } from '../../models';
 
 @Component({
-  selector: 'app-catalog-variables',
-  templateUrl: './catalog-variables-list.component.html',
+  selector: 'app-catalog-checklist-templates',
+  templateUrl: './catalog-checklist-templates-list.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-variables-list.component.scss']
+  styleUrls: ['./catalog-checklist-templates-list.component.scss']
 })
-export class CatalogVariablesListComponent implements AfterViewInit {
+export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-// Variables ===============
-  variablesTableColumns: string[] = ['id', 'mainImagePath', 'name', 'uom', 'sigmaType', 'status', 'updatedAt'];
-  variablesCatalogData = new MatTableDataSource<VariableItem>([]);      
+  checklistTemplatesTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'templateType', 'lastGeneratedDate', 'generationCount', 'status', 'updatedAt'];
+  checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>([]);      
   
-  variablesData$: Observable<VariablesData>;
+  checklistTemplatesData$: Observable<ChecklistTemplatesData>;
   sort$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>;
   settingsData$: Observable<SettingsData>;
   profileData$: Observable<ProfileData>;
   searchBox$: Observable<SearchBox>;
   screenData$: Observable<Screen>;
-  allVariablesToCsv$: Observable<any>;
+  allChecklistTemplatesToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "brochure";  
 
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
   filterByText: string;
-  allVariablesToCsv: any;
-  variablesData: Variables = {
+  allChecklistTemplatesToCsv: any;
+  checklistTemplatesData: ChecklistTemplates = {
     items: new Array(5).fill(null),
   }
   pageInfo: PageInfo = {
@@ -67,7 +66,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
 
   constructor(
     private _store: Store<AppState>,
-    private _sharedService: SharedService,
+    public _sharedService: SharedService,
     private _router: Router,
     private _catalogsService: CatalogsService,
   ) { }
@@ -75,11 +74,11 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +111,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.VARIABLES_CATALOG) {
+        if (searchBox.from === ApplicationModules.CHEKLIST_TEMPLATES_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +127,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.VARIABLES_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.CHEKLIST_TEMPLATES_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +138,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.VARIABLES_CATALOG,
+      from: ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +147,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       false,
     );        
   }
@@ -157,8 +156,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.variablesCatalogData.paginator = this.paginator;
-    this.variablesCatalogData.sort = this.sort;
+    this.checklistTemplatesCatalogData.paginator = this.paginator;
+    this.checklistTemplatesCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
@@ -166,10 +165,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
-          } else if (sortData.active === 'uom') {            
-            this.order = JSON.parse(`{ "data": { "uom": { "name": "${sortData.direction.toUpperCase()}" } } }`);
-          } else if (sortData.active === 'sigmaType') {            
-            this.order = JSON.parse(`{ "data": { "sigmaType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
+          } else if (sortData.active === 'templateType') {            
+            this.order = JSON.parse(`{ "data": { "templateType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -190,65 +187,60 @@ export class CatalogVariablesListComponent implements AfterViewInit {
 
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
-    this.variablesData = {
-      items: new Array(5).fill(emptyVariableCatalog),
+    this.checklistTemplatesData = {
+      items: new Array(5).fill(emptyChecklistTemplateCatalog),
     }
     let filter = null;
     if (this.filterByText) {      
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-
-    // const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "data": { "uom": { "name": { "contains": "${this.filterByText}" } } } }, { "data": { "sigmaType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
-      // filter = JSON.parse(cadFilter);                  
+    // if (this.filterByText) {      
+    //   const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { // "data": { "templateType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
+    //   filter = JSON.parse(cadFilter);                  
     // }
-    this.variablesCatalogData = new MatTableDataSource<VariableItem>(this.variablesData.items);
-    this.variablesData$ = this._catalogsService.getVariablesDataGql$(skipRecords, takeRecords, this.order, filter)
+    this.checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>(this.checklistTemplatesData.items);
+    this.checklistTemplatesData$ = this._catalogsService.getChecklistTemplatesDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
-      map((variables: any) => {
-        const { data } = variables;
+      map((checklistTemplates: any) => {
+        const { data } = checklistTemplates;
         return { 
           ...data,
-          variablesPaginated: {
-            ...data.variablesPaginated,
-            items: data.variablesPaginated.items.map((item) => {
+          checklistTemplatesPaginated: {
+            ...data.checklistTemplatesPaginated,
+            items: data.checklistTemplatesPaginated.items.map((item) => {
               const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
               return {
                 ...item,
                 data: {
                   ...item.data,                  
                   mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
-                  uom: {
-                    ...item.data.uom,
-                    name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,
-                    isTranslated: item.data.uom?.translations?.length > 0 ? true : false,
-                  },
-                  sigmaType: {
-                    ...item.data.sigmaType,
-                    name: item.data.sigmaType?.translations.length > 0 ? item.data.sigmaType.translations[0].name : item.data.sigmaType?.name,
-                    isTranslated: item.data.sigmaType?.translations.length > 0 ? true : false,
-                  }
+                  templateType: {
+                    ...item.data.templateType,
+                    name: item.data.templateType?.translations?.length > 0 ? item.data.templateType.translations[0].name : item.data.templateType?.name,
+                    isTranslated: item.data.templateType?.translations?.length > 0 ? true : false,
+                  },                  
                 }
               }
             })          
           }
         }
       }),
-      tap( variablesData => {        
-        this.setPaginator(variablesData.variablesPaginated.totalCount);
-        this.variablesData = JSON.parse(JSON.stringify(variablesData.variablesPaginated));
+      tap( checklistTemplatesData => {        
+        this.setPaginator(checklistTemplatesData.checklistTemplatesPaginated.totalCount);
+        this.checklistTemplatesData = JSON.parse(JSON.stringify(checklistTemplatesData.checklistTemplatesPaginated));
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-            this.variablesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.variablesData.items);
+            this.checklistTemplatesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.checklistTemplatesData.items);
           }      
         }        
-        this.variablesData.items.length = this.variablesData.totalCount;
-        this.variablesCatalogData = new MatTableDataSource<VariableItem>(this.variablesData.items);
-        this.variablesCatalogData.paginator = this.paginator;
-        // this.variablesCatalogData.sort = this.sort;
-        this.variablesCatalogData.sortData = () => this.variablesData.items;        
+        this.checklistTemplatesData.items.length = this.checklistTemplatesData.totalCount;
+        this.checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>(this.checklistTemplatesData.items);
+        this.checklistTemplatesCatalogData.paginator = this.paginator;
+        // this.checklistTemplatesCatalogData.sort = this.sort;
+        this.checklistTemplatesCatalogData.sortData = () => this.checklistTemplatesData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
           setTimeout(() => {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
@@ -263,7 +255,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.VARIABLES_CATALOG,
+          from: ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -284,7 +276,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.VARIABLES_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.CHEKLIST_TEMPLATES_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -296,17 +288,17 @@ export class CatalogVariablesListComponent implements AfterViewInit {
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements.find(e => e.action === action.action).loading = true;                
-        this._router.navigateByUrl("/catalogs/variables/create");
+        this._router.navigateByUrl("/catalogs/checklist-templates/create");
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allVariablesToCsv$ = this._catalogsService.getAllVariablesToCsv$().pipe(
-          tap(variablesToCsv => {
-            const fileData$ = this._catalogsService.getAllVariablesCsvData$(variablesToCsv?.data?.exportVariablesToCsv?.exportedFilename)
+        this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllChecklistTemplatesToCsv$().pipe(
+          tap(checklistTemplatesToCsv => {
+            const fileData$ = this._catalogsService.getAllChecklistTemplatesCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, variablesToCsv?.data?.exportVariablesToCsv?.downloadFilename);
+              this.downloadFile(data, checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -407,7 +399,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.variablesTableColumns = ['id', 'mainImagePath', 'name', 'uom', 'sigmaType', 'status', 'updatedAt'];
+    this.checklistTemplatesTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'templateType', 'lastGeneratedDate', 'generationCount', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -432,11 +424,11 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
       loading,
     );         
   }

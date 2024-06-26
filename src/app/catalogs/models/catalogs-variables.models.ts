@@ -84,7 +84,7 @@ export interface VariableCatalog {
   updatedAt: string;
 }
 
-export const emptyInternalCatalog = {  
+const emptyInternalCatalog = {  
   id: null,
   customerId: null,
   name: null,      

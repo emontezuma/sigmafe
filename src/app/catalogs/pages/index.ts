@@ -19,4 +19,7 @@ export * from './catalog-company-edition';
 export * from './catalog-providers-list';
 export * from './catalog-provider-edition'
 
+export * from './catalog-checklist-templates';
+// export * from './catalog-checklist-templates-edition'
+
 export * from './catalogs-home';

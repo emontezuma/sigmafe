@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogChecklistTemplatesListComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -101,6 +101,21 @@ const routes: Routes = [
         path: 'companies/edit/:id',
         component: CatalogCompanyEditionComponent,
         data: { animation: 'CatalogCompanyEditionComponent' },
+      },
+      {
+        path: 'checklist-templates',
+        component: CatalogChecklistTemplatesListComponent,
+        data: { animation: 'CatalogChecklistTemplatesListComponent' },
+      },
+      {
+        path: 'checklist-templates/create',
+        component: CatalogChecklistTemplatesListComponent,
+        data: { animation: '...' },
+      },
+      {
+        path: 'checklist-templates/edit/:id',
+        component: CatalogChecklistTemplatesListComponent,
+        data: { animation: '...' },
       },
       {
         path: '**',

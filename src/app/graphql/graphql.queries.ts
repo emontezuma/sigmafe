@@ -988,6 +988,58 @@ export const GET_VARIABLES = gql`
   }
 `;
 
+export const GET_CHECKLIST_TEMPLATES = gql`
+  query ChecklistTemplatesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedChecklistTemplateDtoSortInput!],
+    $filterBy: TranslatedChecklistTemplateDtoFilterInput,
+  ) {
+  checklistTemplatesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          reference
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+          status
+          updatedAt
+          lastGeneratedDate
+          generationCount
+          templateType {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }          
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
 export const ADD_VARIABLE_TRANSLATIONS = gql`
   mutation CreateOrUpdateVariableTranslationTable (
     $translations: [VariableTranslationTableDtoInput!]!    
