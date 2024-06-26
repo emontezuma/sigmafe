@@ -52,7 +52,7 @@ export class CatalogEquipmentEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "equipment";  
+  catalogIcon: string = "server";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -298,7 +298,7 @@ export class CatalogEquipmentEditionComponent {
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR EQUIPAMENTO`,  
+              title: $localize`INACTIVAR EQUIPO`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -321,7 +321,7 @@ export class CatalogEquipmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.equipment.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el equipo con el Id <strong>${this.equipment.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -348,7 +348,7 @@ export class CatalogEquipmentEditionComponent {
                   if (data?.data?.createOrUpdateEquipment.length > 0 && data?.data?.createOrUpdateEquipment[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`El equipamento ha sido inhabilitada`;
+                      const message = $localize`El equipo ha sido inhabilitada`;
                       this.equipment.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -369,7 +369,7 @@ export class CatalogEquipmentEditionComponent {
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR EQUIPAMENTO`,  
+              title: $localize`REACTIVAR EQUIPO`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -392,7 +392,7 @@ export class CatalogEquipmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará el equipamento con el Id <strong>${this.equipment.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el equipo con el Id <strong>${this.equipment.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -419,7 +419,7 @@ export class CatalogEquipmentEditionComponent {
                   if (data?.data?.createOrUpdateEquipment.length > 0 && data?.data?.createOrUpdateEquipment[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`El equipamento ha sido reactivada`;
+                      const message = $localize`El equipo ha sido reactivada`;
                       this.equipment.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -443,7 +443,7 @@ export class CatalogEquipmentEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones del equipamento <strong>${this.equipment.id}</strong>`,
+              title: $localize`Traducciones del equipo <strong>${this.equipment.id}</strong>`,
               topIcon: 'world',
               translations: this.equipment.translations,
               buttons: [{
@@ -487,7 +487,7 @@ export class CatalogEquipmentEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará al equipamento ${this.equipment.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al equipo ${this.equipment.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -512,7 +512,7 @@ export class CatalogEquipmentEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de equipamentos`,
+      tooltip:  $localize`Regresar a la lista de equipos`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -746,9 +746,9 @@ export class CatalogEquipmentEditionComponent {
           this.processTranslations$(equipmentId).subscribe(() => {
             this.requestEquipmentData(equipmentId);
             setTimeout(() => {              
-              let message = $localize`El equipamento ha sido actualizado`;
+              let message = $localize`El equipo ha sido actualizado`;
               if (newRecord) {                
-                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.equipment.id}</strong>`;
+                message = $localize`El equipo ha sido creado satisfactoriamente con el id <strong>${this.equipment.id}</strong>`;
                 this._location.replaceState(`/catalogs/equipments/edit/${equipmentId}`);
               }
               this._sharedService.showSnackMessage({
@@ -830,7 +830,7 @@ export class CatalogEquipmentEditionComponent {
         this.equipment.mainImagePath = res.filePath;
         this.equipment.mainImageGuid = res.fileGuid;
         this.equipment.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipo para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -934,7 +934,7 @@ export class CatalogEquipmentEditionComponent {
     this.equipment.mainImagePath = '';
     this.equipment.mainImageGuid = '';
     this.equipment.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen del equipamento<br>Guarde el equipamento para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen del equipo<br>Guarde el equipo para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -987,7 +987,7 @@ export class CatalogEquipmentEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del equipamento`
+      return $localize`Descripción o nombre del equipo`
     }
     return '';
   }

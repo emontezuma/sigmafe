@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,7 +13,7 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {  DepartmentDetail, DepartmentItem,    emptyDepartmentItem } from '../../models';
+import { DepartmentDetail, DepartmentItem, emptyDepartmentItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
@@ -394,7 +394,7 @@ export class CatalogDepartmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará el equipamento con el Id <strong>${this.department.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el departamento con el Id <strong>${this.department.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -447,7 +447,7 @@ export class CatalogDepartmentEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones del equipamento <strong>${this.department.id}</strong>`,
+              title: $localize`Traducciones del departamento <strong>${this.department.id}</strong>`,
               topIcon: 'world',
               translations: this.department.translations,
               buttons: [{
@@ -491,7 +491,7 @@ export class CatalogDepartmentEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará al equipamento ${this.department.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al departamento ${this.department.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -516,7 +516,7 @@ export class CatalogDepartmentEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de equipamentos`,
+      tooltip:  $localize`Regresar a la lista de departamentos`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -940,7 +940,7 @@ export class CatalogDepartmentEditionComponent {
     this.department.mainImagePath = '';
     this.department.mainImageGuid = '';
     this.department.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen del equipamento<br>Guarde el equipamento para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen del departamento<br>Guarde el equipamento para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -993,7 +993,7 @@ export class CatalogDepartmentEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del equipamento`
+      return $localize`Descripción o nombre del departamento`
     }
     return '';
   }

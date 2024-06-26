@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,12 +13,13 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {ManufacturerDetail, ManufacturerItem, emptyGeneralHardcodedValuesItem, emptyManufacturerItem } from '../../models';
+import {ManufacturerDetail, ManufacturerItem, emptyManufacturerItem } from '../../models';
 
 import { HttpClient } from '@angular/common/http';
 
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
 
 @Component({
   selector: 'app-catalog-manufacturer-edition',
@@ -79,18 +80,10 @@ export class CatalogManufacturerEditionComponent {
       '', 
       Validators.required,      
     ),
-
-  
- 
-
     required: new FormControl(emptyGeneralHardcodedValuesItem),
-   
-
     notes: new FormControl(''),
-  
     reference: new FormControl(''),    
-    prefix: new FormControl(''),    
-  
+    prefix: new FormControl(''),      
   });
 
   pageInfo: PageInfo = {
@@ -105,10 +98,6 @@ export class CatalogManufacturerEditionComponent {
   tmpDate: number = 112;
   loaded: boolean = false;
 
-
-
-
-  
   constructor(
     private _store: Store<AppState>,
     public _sharedService: SharedService,
@@ -152,12 +141,9 @@ export class CatalogManufacturerEditionComponent {
         this.settingsData = settingsData;
         this.takeRecords = this.settingsData.catalog?.pageSize || 50
         const currentPage = 0;
-    
-
       })
     );
-  
-   
+
     this.manufacturerFormChangesSubscription = this.manufacturerForm.valueChanges.subscribe((manufacturerFormChanges: any) => {
       if (!this.loaded) return;
       if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
@@ -221,16 +207,6 @@ export class CatalogManufacturerEditionComponent {
   }
   
 // Functions ================
-
-
-
-
-
-
- 
-
-
-
   pageAnimationFinished(e: any) {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {

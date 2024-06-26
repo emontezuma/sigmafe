@@ -3,7 +3,7 @@
   (@routingAnimation.done)="pageAnimationFinished($event)"
   @routingAnimation
 >
-  <ng-container *ngIf="customersData$ | async "></ng-container>
+  <ng-container *ngIf="checklistTemplatesData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>
   <ng-container *ngIf="settingsData$ | async "></ng-container>
@@ -11,12 +11,13 @@
   <ng-container *ngIf="searchBox$ | async "></ng-container>
   <ng-container *ngIf="screenData$ | async "></ng-container>
   <ng-container *ngIf="animationData$ | async "></ng-container>
-  <ng-container *ngIf="allCustomersToCsv$ | async "></ng-container>  
+  <ng-container *ngIf="allChecklistTemplatesToCsv$ | async "></ng-container>  
 
   <div
-    class="customers-table"    
+    class="checklist-templates-table"    
   >
-    <table mat-table [dataSource]="customersCatalogData" matSort>
+    <table mat-table [dataSource]="checklistTemplatesCatalogData" matSort>
+
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
         <td mat-cell *matCellDef="let row">
@@ -24,6 +25,7 @@
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>
       </ng-container>
+      
 
       <ng-container matColumnDef="mainImagePath">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Imagen</th>
@@ -36,7 +38,7 @@
               <img                
                 @dissolve
                 appImageNotFound                
-                class="record-image"                        
+                class="variable-image"                        
                 [src]="row.data.mainImage"
                 [alt]="row.data.mainImage"         
                 fill
@@ -58,9 +60,9 @@
           </ngx-skeleton-loader>
         </td>      
       </ng-container>
-
+      
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del cliente</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la plantilla/Checklist</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.name }}</strong>
@@ -79,6 +81,30 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="templateType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo de plantilla</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.templateType.name }}</ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="lastGeneratedDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Últ. generación</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ _sharedService.convertUtcTolocal(row.data.lastGeneratedDate) | date :"medium" }}</ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="generationCount">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Total regs.</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.generationCount }}</ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+      
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
         <td mat-cell *matCellDef="let row">
@@ -100,25 +126,25 @@
         </td>
       </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="customersTableColumns; sticky: 1"></tr>
+      <tr mat-header-row *matHeaderRowDef="checklistTemplatesTableColumns; sticky: 1"></tr>
       <tr
         class="table-row"
         mat-row *matRowDef="let row;
-        columns: customersTableColumns"
-        [routerLink]="['/catalogs/customers/edit/', row.data.id]"
+        columns: checklistTemplatesTableColumns"
+        [routerLink]="['/catalogs/checklist-templates/edit/', row.data.id]"
       >
       </tr>
       <div *ngIf="!loading">
-        <tr class="customers-table-mat-row" *matNoDataRow>
-          <td class="customers-table__no-data" colspan="10">
+        <tr class="checklist-templates-table-mat-row" *matNoDataRow>
+          <td class="checklist-templates-table__no-data" colspan="10">
             No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="customers-table__paginator">
-      <div class="customers-table__paginator--catalog-data">
+    <div class="checklist-templates-table__paginator">
+      <div class="checklist-templates-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
         <div>Total registros {{ pageInfo?.totalRecords}}</div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
@@ -126,7 +152,7 @@
       </div>
       <mat-paginator
         #paginator
-        class="customers-table__paginator--mat"
+        class="checklist-templates-table__paginator--mat"
         [length]="pageInfo?.totalRecords"
         [pageSize]="50"
         (page)="pageChange($event)"

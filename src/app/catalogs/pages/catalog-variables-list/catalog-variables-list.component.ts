@@ -198,6 +198,10 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
+
+    // const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "data": { "uom": { "name": { "contains": "${this.filterByText}" } } } }, { "data": { "sigmaType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
+      // filter = JSON.parse(cadFilter);                  
+    // }
     this.variablesCatalogData = new MatTableDataSource<VariableItem>(this.variablesData.items);
     this.variablesData$ = this._catalogsService.getVariablesDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(

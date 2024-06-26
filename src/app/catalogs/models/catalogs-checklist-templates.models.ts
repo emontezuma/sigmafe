@@ -1,27 +1,27 @@
 import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
-export interface VariablesData {
-  variablesPaginated?: Variables;
+export interface ChecklistTemplatesData {
+  checklistTemplatesPaginated?: ChecklistTemplates;
 }
 
-export interface VariableData {
-  oneVariable?: VariableItem;
+export interface ChecklistTemplateData {
+  oneChecklistTemplate?: ChecklistTemplateItem;
   translations?: any;
 }
 
-export interface Variables {
-  items?: VariableItem[];
+export interface ChecklistTemplates {
+  items?: ChecklistTemplateItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface VariableItem {
+export interface ChecklistTemplateItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: VariableDetail;
+  data: ChecklistTemplateDetail;
 }
 
-export interface VariableDetail {
+export interface ChecklistTemplateDetail {
   name?: string;
   reference?: string;
   notes?: string;
@@ -65,17 +65,17 @@ export interface VariableDetail {
   
 }
 
-export interface VariablesState {
+export interface ChecklistTemplatesState {
   loading: boolean;
-  variablesData: VariablesData;
+  checklistTemplatesData: ChecklistTemplatesData;
 }
 
-export interface VariableState {
+export interface ChecklistTemplateState {
   loading: boolean;
-  moldDetail: VariableDetail;
+  moldDetail: ChecklistTemplateDetail;
 }
 
-export interface VariableCatalog {
+export interface ChecklistTemplateCatalog {
   id: string;
   name: string;
   mainImagePath: string;
@@ -90,7 +90,7 @@ const emptyInternalCatalog = {
   name: null,      
 };
 
-export const emptyVariableCatalog = {  
+export const emptyChecklistTemplateCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
@@ -104,7 +104,7 @@ export const emptyVariableCatalog = {
   },
 };
 
-export const emptyVariableItem: VariableDetail = {  
+export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {  
   name: null,
   id: null,
   customerId: null,
@@ -135,7 +135,7 @@ export const emptyVariableItem: VariableDetail = {
   byDefaultDateType: '-',
 };
 
-export interface VariablePossibleValue {
+export interface ChecklistTemplatePossibleValue {
   order?: number;
   value?: string;
   byDefault?: boolean;

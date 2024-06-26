@@ -8,12 +8,7 @@
   <ng-container *ngIf="scroll$ | async"></ng-container>
   <ng-container *ngIf="plant$ | async"></ng-container>  
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
-
-
-
   <ng-container *ngIf="settingsData$ | async"></ng-container>
-
-
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
@@ -21,8 +16,8 @@
   <ng-container *ngIf="updatePlant$ | async "></ng-container>    
   <ng-container *ngIf="deletePlantTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addPlantTranslations$ | async "></ng-container>   
-   
-       
+  <ng-container *ngIf="updatePlantCatalog$ | async "></ng-container>
+  <ng-container *ngIf="companies$ | async"></ng-container>
 
   <mat-card class="card">
     <form
@@ -50,7 +45,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DE LA VARIABLE</label
+                >INFORMACIÓN PRINCIPAL DE LA PLANTA</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -200,44 +195,41 @@
                 </div>                
               </fieldset>              
             </div>
-                   
-          </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    plantForm.controls.company.touched &&
+                    !plantForm.controls.company.valid
+                }"
+                [disabled]="plantForm.controls.company.disabled"
               >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
-            </div>
-          </mat-expansion-panel-header>
-       
+                <div class="title-with-id">
+                  <span class="label field__label">Compañía para la planta</span>
+                  <span class="field__label" *ngIf="plantForm.controls.company?.value?.id">Id: {{ plantForm.controls.company?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='company'"
+                  [formField]="plantForm.controls.company"
+                  [list]="companies.items"
+                  [totalCount]="companies.totalCount"
+                  leftHint="Escriba el nombre de la Compañía a buscar"
+                  [catalog]="SystemTables.COMPANIES"
+                  [loading]="companies.loading"
+                  noItemsError="No hay compañías con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la Compañía de la planta</span
+                >
+              </fieldset>
+            </div>     
+          </div>          
         </mat-expansion-panel>        
       </mat-accordion>
     </form>
@@ -280,7 +272,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="plant.deletedById > 0">
+      <div class="grid-inactive" *ngIf="plant.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(plant.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
@@ -300,7 +292,7 @@
             <strong>El registro está INACTIVO</strong>
           </div>
         </div>
-      </div>
+      </div>    
     </div>
   </mat-card>
 </div>

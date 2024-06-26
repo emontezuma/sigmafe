@@ -9,11 +9,11 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { VariableDetail, VariableItem, VariablePossibleValue, emptyVariableItem } from '../../models';
+import { ChecklistTemplateDetail, ChecklistTemplateItem, ChecklistTemplatePossibleValue, emptyChecklistTemplateItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
@@ -22,19 +22,19 @@ import { MatTableDataSource } from '@angular/material/table';
 import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
 
 @Component({
-  selector: 'app-catalog-variable-edition',
-  templateUrl: './catalog-variable-edition.component.html',
+  selector: 'app-catalog-checklist-templates-edition',
+  templateUrl: './catalog-checklist-templates-edition.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-variable-edition.component.scss']
+  styleUrls: ['./catalog-checklist-templates-edition.component.scss']
 })
-export class CatalogVariableEditionComponent {
+export class CatalogChecklistTemplatesEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
   @ViewChild('possibleValue', { static: false }) possibleValue: ElementRef;  
 
   // Variables ===============
-  variable: VariableDetail = emptyVariableItem;
+  variable: ChecklistTemplateDetail = emptyChecklistTemplateItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
@@ -57,7 +57,7 @@ export class CatalogVariableEditionComponent {
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  variable$: Observable<VariableDetail>;
+  variable$: Observable<ChecklistTemplateDetail>;
   translations$: Observable<any>;
   updateVariable$: Observable<any>;
   updateVariableCatalog$: Observable<any>;
@@ -73,9 +73,9 @@ export class CatalogVariableEditionComponent {
   resetValueModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   variableByDefaultDate: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
-  valuesList: VariablePossibleValue[] = []; 
+  valuesList: ChecklistTemplatePossibleValue[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
-  possibleValuesTable = new MatTableDataSource<VariablePossibleValue>([]);
+  possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>([]);
   possibleValuePositions = [
     { id: 'l', description: $localize`Al final de la lista` },  
     { id: 'f', description: $localize`Al prncipio de la lista` }, 
@@ -99,7 +99,7 @@ export class CatalogVariableEditionComponent {
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  variableData: VariableItem;  
+  variableData: ChecklistTemplateItem;  
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
@@ -154,17 +154,9 @@ export class CatalogVariableEditionComponent {
   loaded: boolean = false;
 
   moldsOptions: SimpleTable[] = [
-    { id: '', description: $localize`No permitir la variable en ningún Molde` },  
+    { id: '', description: $localize`No permitir el template de checklist en ningún Molde` },  
     { id: 'y', description: $localize`TODOS los Moldes activos` },  
     { id: 'n', description: $localize`Los Moldes de lista` },  
-    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
-    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
-  ];
-
-  actionPlansToGenerateOptions: SimpleTable[] = [
-    { id: '', description: $localize`No generar ningún Plan de acción` },  
-    { id: 'y', description: $localize`TODOS los Planes de acción activos` },  
-    { id: 'n', description: $localize`Los Planes de acción de lista` },  
     { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
     { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
   ];
@@ -190,7 +182,7 @@ export class CatalogVariableEditionComponent {
   ngOnInit() {
     // this.variableForm.get('name').disable();
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
       true,
     );
     this.showGoTop$ = this._sharedService.showGoTop.pipe(
@@ -307,7 +299,7 @@ export class CatalogVariableEditionComponent {
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
-          ApplicationModules.VARIABLES_CATALOG_EDITION,
+          ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
           !animationFinished,
         ); 
       }
@@ -315,7 +307,7 @@ export class CatalogVariableEditionComponent {
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       skip(1),
       tap((buttonClicked: ToolbarButtonClicked) => {      
-        if (buttonClicked.from !== ApplicationModules.VARIABLES_CATALOG_EDITION) {
+        if (buttonClicked.from !== ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION) {
             return
         }
         this.toolbarAction(buttonClicked);
@@ -552,7 +544,7 @@ export class CatalogVariableEditionComponent {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
-          from: ApplicationModules.VARIABLES_CATALOG_EDITION,
+          from: ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -565,7 +557,7 @@ export class CatalogVariableEditionComponent {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.VARIABLES_CATALOG_EDITION && this.elements.length > 0) {
+    if (action.from === ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION && this.elements.length > 0) {
       if (action.action === ButtonActions.NEW) {        
         this.elements.find(e => e.action === action.action).loading = true;
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
@@ -668,7 +660,7 @@ export class CatalogVariableEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará la variable con el Id <strong>${this.variable.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el template de checklist con el Id <strong>${this.variable.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -738,7 +730,7 @@ export class CatalogVariableEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará la variable con el Id <strong>${this.variable.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el template de checklist con el Id <strong>${this.variable.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -788,7 +780,7 @@ export class CatalogVariableEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones de la variable <strong>${this.variable.id}</strong>`,
+              title: $localize`Traducciones del template de checklist <strong>${this.variable.id}</strong>`,
               topIcon: 'world',
               translations: this.variable.translations,
               buttons: [{
@@ -832,7 +824,7 @@ export class CatalogVariableEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la variable ${this.variable.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el template de checklist ${this.variable.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -1335,7 +1327,7 @@ export class CatalogVariableEditionComponent {
           variableGqlTranslationsData,
         })
       }),
-      tap((variableData: VariableDetail) => {
+      tap((variableData: ChecklistTemplateDetail) => {
         if (!variableData) return;
         this.variable =  variableData;
 
@@ -1483,7 +1475,7 @@ export class CatalogVariableEditionComponent {
         this.variable.mainImagePath = res.filePath;
         this.variable.mainImageGuid = res.fileGuid;
         this.variable.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la variable para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guardel template de checklist para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -1614,7 +1606,7 @@ export class CatalogVariableEditionComponent {
     this.variable.mainImagePath = '';
     this.variable.mainImageGuid = '';
     this.variable.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la variable<br>Guarde la variable para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen del template de checklist<br>Guardel template de checklist para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -1649,7 +1641,7 @@ export class CatalogVariableEditionComponent {
     this.valuesList = [];
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.variable = emptyVariableItem;
+    this.variable = emptyChecklistTemplateItem;
     this.focusThisField = 'name';
     // this.requestMoldsData(0);
     this.requestActionPlansToGenerateData(0);
@@ -1689,7 +1681,7 @@ export class CatalogVariableEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la variable`
+      return $localize`Descripción o nombre del template de checklist`
     } else if (fieldControlName === 'uom') {
       return $localize`Unidad de medida`
     } else if (fieldControlName === 'sigmaType') {
@@ -1697,11 +1689,11 @@ export class CatalogVariableEditionComponent {
     } else if (fieldControlName === 'valueType') {
       return $localize`Tipo de valor`
     } else if (fieldControlName === 'resetValueMode') {
-      return $localize`Modo de reseteo de la variable`    
+      return $localize`Modo de reseteo del template de checklist`    
     } else if (fieldControlName === 'minimum') {
       return $localize`Rango de valores incorrecto`    
     } else if (fieldControlName === 'possibleValues') {
-      return $localize`Agregue al menos un valor a la lista de posibles valores de la variable`    
+      return $localize`Agregue al menos un valor a la lista de posibles valores del template de checklist`    
     }    
     return '';
   }
@@ -1709,11 +1701,11 @@ export class CatalogVariableEditionComponent {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.VARIABLES_CATALOG_EDITION,
+      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
       loading,
     ); 
   }
@@ -1782,7 +1774,7 @@ export class CatalogVariableEditionComponent {
   }
 
   handleMoveToFirst(id: number) {
-    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const valueIndex = this.valuesList.findIndex((v: ChecklistTemplatePossibleValue) => v.order === id);
     const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
     this.valuesList.splice(valueIndex, 1);
     this.valuesList.unshift({
@@ -1792,15 +1784,15 @@ export class CatalogVariableEditionComponent {
       alarmedValue: tmpValue.alarmedValue,
     })
     let index = 1;
-    this.valuesList.forEach((v: VariablePossibleValue) => {
+    this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
       v.order = index++;
     });
-    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+    this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);    
     this.setEditionButtonsState();
   }
 
   handleMoveToUp(id: number) {
-    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const valueIndex = this.valuesList.findIndex((v: ChecklistTemplatePossibleValue) => v.order === id);
     const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
     const editingItem = this.valuesList[valueIndex - 1];
 
@@ -1813,13 +1805,13 @@ export class CatalogVariableEditionComponent {
       editingItem.byDefault = tmpValue.byDefault;
       editingItem.alarmedValue = tmpValue.alarmedValue;
       
-      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+      this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);    
       this.setEditionButtonsState();      
     }
   }
 
   handleMoveToDown(id: number) {
-    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const valueIndex = this.valuesList.findIndex((v: ChecklistTemplatePossibleValue) => v.order === id);
     const tmpValue = JSON.parse(JSON.stringify(this.valuesList[valueIndex]));
     const editingItem = this.valuesList[valueIndex + 1];
     
@@ -1832,14 +1824,14 @@ export class CatalogVariableEditionComponent {
       editingItem.byDefault = tmpValue.byDefault;
       editingItem.alarmedValue = tmpValue.alarmedValue;      
       
-      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);    
+      this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);    
       this.setEditionButtonsState();      
     }
   }
 
   handleEdit(id: number) {
     this.editingValue = id;
-    this.variableForm.controls.possibleValue.setValue(this.valuesList.find((v: VariablePossibleValue) => v.order === id).value);
+    this.variableForm.controls.possibleValue.setValue(this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === id).value);
     this.possibleValuePositions.push(
       { id: 's', description: $localize`Orden original` },       
     )
@@ -1848,19 +1840,19 @@ export class CatalogVariableEditionComponent {
   }
 
   handleRemove(id: number) {
-    const valueIndex = this.valuesList.findIndex((v: VariablePossibleValue) => v.order === id);
+    const valueIndex = this.valuesList.findIndex((v: ChecklistTemplatePossibleValue) => v.order === id);
     this.valuesList.splice(valueIndex, 1);
     let index = 1;
-    this.valuesList.forEach((v: VariablePossibleValue) => {
+    this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
       v.order = index++;
     });
-    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);
+    this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);
     if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
     this.setEditionButtonsState();
   }
 
   handleAlarmed(id: number) {
-    const value = this.valuesList.find((v: VariablePossibleValue) => v.order === id);
+    const value = this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === id);
     value.alarmedValue = !value.alarmedValue;
     this.setEditionButtonsState();
   }
@@ -1869,7 +1861,7 @@ export class CatalogVariableEditionComponent {
     if (this.valuesList.length === 1 && this.valuesList[0].byDefault) {
       this.valuesList[0].byDefault = false;
     } else {
-      this.valuesList.forEach((v: VariablePossibleValue) => {
+      this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
         v.byDefault = v.order === id;
       });    
     }
@@ -1887,7 +1879,7 @@ export class CatalogVariableEditionComponent {
 
   handleEditPossibleValue() {
     if (this.editingValue > -1) {
-      const editingItem = this.valuesList.find((v: VariablePossibleValue) => v.order === this.editingValue);
+      const editingItem = this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === this.editingValue);
       if (editingItem) {
         editingItem.value = this.variableForm.controls.possibleValue.value;
         this.possibleValuePositions.pop();
@@ -1903,7 +1895,7 @@ export class CatalogVariableEditionComponent {
       } else {
         this.addPossibleValueAtFirst();
       }
-      this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);      
+      this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);      
     }
     this.editingValue = -1;   
     this.variableForm.controls.possibleValue.setValue('');
@@ -1922,7 +1914,7 @@ export class CatalogVariableEditionComponent {
       alarmedValue: false,
     })
     let index = 1;
-    this.valuesList.forEach((v: VariablePossibleValue) => {
+    this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
       v.order = index++;
     })
   }
@@ -1955,7 +1947,7 @@ export class CatalogVariableEditionComponent {
     } else {
       this.valuesList = null;
     }
-    this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);        
+    this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);        
   }
 
   get SystemTables () {

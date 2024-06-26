@@ -747,6 +747,26 @@ export const INACTIVATE_MOLD = gql`
   }
 `;
 
+export const INACTIVATE_PLANT = gql`
+  mutation CreateOrUpdatePlant (
+    $id: Long,
+    $customerId: Long,
+    $companyId: Long,
+    $status: String
+  ) {
+  createOrUpdatePlant (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      companyId: $companyId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 export const UPDATE_MOLD = gql`
   mutation CreateOrUpdateMold (
     $customerId: Long,
@@ -974,6 +994,58 @@ export const GET_VARIABLES = gql`
                 id
             }
           }
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_CHECKLIST_TEMPLATES = gql`
+  query ChecklistTemplatesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedChecklistTemplateDtoSortInput!],
+    $filterBy: TranslatedChecklistTemplateDtoFilterInput,
+  ) {
+  checklistTemplatesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name          
+          reference
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+          status
+          updatedAt
+          lastGeneratedDate
+          generationCount
+          templateType {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }          
           updatedBy {
             name
           }          
@@ -1835,7 +1907,7 @@ export const GET_PLANT = gql`
       mainImageName
       id
       customerId
-      companyId
+      companyId 
       status
       createdById
       createdAt
@@ -1843,6 +1915,17 @@ export const GET_PLANT = gql`
       updatedAt
       deletedById
       deletedAt
+      company {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
       createdBy {
         name
       }
@@ -1854,8 +1937,6 @@ export const GET_PLANT = gql`
       }      
     }
     friendlyStatus
-    friendlyResetValueMode
-    friendlyValueType      
   }
 }
 `;
@@ -1876,13 +1957,25 @@ export const GET_PLANTS = gql`
       items {
         friendlyStatus
         data {
-          name          
+          name         
+          reference 
           mainImagePath
           mainImageName
           mainImageGuid
           id
           customerId
           companyId
+          company {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
           status
           updatedAt
           updatedBy {
@@ -1914,7 +2007,7 @@ export const GET_PLANT_TRANSLATIONS = gql`
   ) {
     totalCount
     items {
-        variableId
+        plantId
         name
         reference
         notes
@@ -1955,7 +2048,7 @@ export const ADD_PLANT_TRANSLATIONS = gql`
       inputs: $translations
     ) {
       id,
-      plantId,
+      plantId,      
       languageId      
     }
   }
@@ -1968,6 +2061,7 @@ export const UPDATE_PLANT = gql`
     $id: Long,
     $status: String    
     $name: String,
+    $prefix: String,
     $reference: String,
     $notes: String,
     $mainImageGuid: String,
@@ -1982,6 +2076,7 @@ export const UPDATE_PLANT = gql`
       status: $status
       name: $name,
       reference: $reference,
+      prefix: $prefix,
       notes: $notes,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
@@ -2098,6 +2193,39 @@ export const GET_COMPANIES = gql`
     }
   }
 `;
+
+export const GET_COMPANIES_LAZY_LOADING = gql`
+  query CompaniesPaginated (
+      $recordsToSkip: Int,
+      $recordsToTake: Int,
+      $orderBy: [TranslatedCompanyDtoSortInput!],
+      $filterBy: TranslatedCompanyDtoFilterInput
+  ) {
+    companiesPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 
 export const GET_COMPANY_TRANSLATIONS = gql`
   query CompaniesTranslationsTable (
@@ -2254,8 +2382,6 @@ export const GET_PROVIDER = gql`
       }      
     }
     friendlyStatus
-    friendlyResetValueMode
-    friendlyValueType      
   }
 }
 `;
@@ -2276,11 +2402,11 @@ export const GET_PROVIDERS = gql`
       items {
         friendlyStatus
         data {
-          name          
+          name
        
           id
           customerId
-       
+          reference
           status
           updatedAt
           updatedBy {
@@ -2772,7 +2898,6 @@ export const GET_DEPARTMENT_TRANSLATIONS = gql`
 }
 `;
 
-
 export const ADD_DEPARTMENT_TRANSLATIONS = gql`
   mutation CreateOrUpdateDepartmentTranslationTable (
     $translations: [DepartmentTranslationTableDtoInput!]!    
@@ -2791,8 +2916,8 @@ export const UPDATE_DEPARTMENT = gql`
   mutation CreateOrUpdateDepartment (
     $customerId: Long,
     $plantId: Long,
-    $recipientId: Long;
-    $approverId: Long;   
+    $recipientId: Long,
+    $approverId: Long,   
     $id: Long,
     $status: String    
     $name: String,
@@ -2849,7 +2974,7 @@ export const DELETE_DEPARTMENT_TRANSLATIONS = gql`
       customerId: $customerId,
       recipientId: $recipientId,
       approverId: $approverId,   
-    plantId: $plantId,
+      plantId: $plantId,
     ) 
   }
 `;
@@ -2858,8 +2983,6 @@ export const INACTIVATE_DEPARTMENT = gql`
   mutation CreateOrUpdateDepartment (
     $id: Long,
     $customerId: Long,
-    $recipientId: Long,
-      $approverId: Long,   
     $plantId: Long,
     $status: String
   ) {
@@ -2867,8 +2990,6 @@ export const INACTIVATE_DEPARTMENT = gql`
     inputs: {
       id: $id
       customerId: $customerId
-      recipientId: $recipientId,
-      approverId: $approverId,   
       plantId: $plantId
       status: $status
     }) {
@@ -2877,4 +2998,5 @@ export const INACTIVATE_DEPARTMENT = gql`
     } 
   }
 `;
+
 //=========END

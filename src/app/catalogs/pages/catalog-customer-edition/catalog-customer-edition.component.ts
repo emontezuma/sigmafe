@@ -13,7 +13,7 @@ import {  EMPTY,  Observable,  Subscription,  catchError,  combineLatest,  map, 
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import {  FormGroup,  FormControl,  Validators,  NgForm,  AbstractControl,} from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {  CustomerDetail,  CustomerItem,  emptyGeneralHardcodedValuesItem,  emptyCustomerItem,} from '../../models';
+import {  CustomerDetail,  CustomerItem,  emptyCustomerItem,} from '../../models';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {  GenericDialogComponent,  TranslationsDialogComponent,} from 'src/app/shared/components';
 import { environment } from 'src/environments/environment';

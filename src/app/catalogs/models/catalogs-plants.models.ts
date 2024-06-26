@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface PlantsData {
   plantsPaginated?: Plants;
@@ -31,6 +31,7 @@ export interface PlantDetail {
   mainImageName?: string;
   mainImage?: string;
   id?: number;
+  company?: GeneralCatalogInternalData,
   customerId?: number;
   companyId?: number;
   status?: string;

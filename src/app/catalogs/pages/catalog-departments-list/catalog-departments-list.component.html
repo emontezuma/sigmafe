@@ -37,7 +37,7 @@
               <img                
                 @dissolve
                 appImageNotFound                
-                class="company-image"                        
+                class="department-image"                        
                 [src]="row.data.mainImage"
                 [alt]="row.data.mainImage"         
                 fill
@@ -61,7 +61,7 @@
       </ng-container>
       
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre de la compañía</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del Departamento</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.name }}</strong>
@@ -81,7 +81,7 @@
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
             {{ row.friendlyStatus }}

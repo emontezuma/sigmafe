@@ -7,9 +7,10 @@ import { AppState } from '../../../state/app.state';
 import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import {  FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { dissolve } from '../../animations/shared.animations';
-import {  CatalogsService, CustomValidators, GeneralCatalogData, MoldParameters, emptyGeneralCatalogData, emptyGeneralCatalogItem } from 'src/app/catalogs';
+import {  CatalogsService, CustomValidators, MoldParameters } from 'src/app/catalogs';
 import { ButtonActions, GeneralCatalogParams, GeneralHardcodedValuesData, RecordStatus, SettingsData, SmallFont, SpinnerFonts, SpinnerLimits, SystemTables, emptyGeneralHardcodedValuesData, toolbarMode } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
+import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from 'src/app/catalogs/models/catalogs-shared.models';
 
 @Component({
   selector: 'app-maintenance-history-dialog',

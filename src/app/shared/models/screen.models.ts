@@ -157,12 +157,13 @@ export enum ApplicationModules {
   COMPANIES_CATALOG = 'companies-catalog',
   COMPANIES_CATALOG_EDITION = 'companies-catalog-edition',
   PROVIDERS_CATALOG = 'providers-catalog',
-  PROVIDERS_CATALOG_EDITION = 'providers-catalog-edition',
+  PROVIDERS_CATALOG_EDITION='providers-catalog-edition',
+  CHEKLIST_TEMPLATES_CATALOG = 'checklist-templates-catalog',
+  CHEKLIST_TEMPLATES_CATALOG_EDITION = 'checklist-templates-edition',
   EQUIPMENTS_CATALOG = 'equipments-catalog',
   EQUIPMENTS_CATALOG_EDITION = 'equipments-catalog-edition',
   DEPARTMENTS_CATALOG = 'departments-catalog',
   DEPARTMENTS_CATALOG_EDITION = 'departments-catalog-edition',
-
 }
 
 export enum ScreenSizes {

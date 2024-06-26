@@ -465,7 +465,7 @@ export class SharedService {
   //==============================
   
   setGraphqlGen(genParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process, customerId} = genParameters;
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process, customerId, companyId } = genParameters;
 
     if (settingType === 'multiSelection') {
       return {
@@ -492,6 +492,13 @@ export class SharedService {
     } else if (settingType === 'statusCustomer') {
       return { 
         id,        
+        status
+      };      
+    } else if (settingType === 'statusPlant') {
+      return { 
+        id,        
+        customerId,
+        companyId,
         status
       };      
     }

@@ -75,6 +75,9 @@ table {
   min-width: 70px;
   padding: 10px;
   text-align: right;
+  ::ng-deep .mat-sort-header-container {
+    justify-content: end;
+  }
 }
 
 .mat-column-mainImagePath {
@@ -98,7 +101,7 @@ table {
 }
 
 
-.mat-column-uom {
+.mat-column-reference {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;
@@ -109,7 +112,7 @@ table {
   padding: 10px;
 }
 
-.mat-column-sigmaType {
+.mat-column-company {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;
@@ -153,8 +156,6 @@ table {
 .mat-sort-header {
   // padding: 5px 16px;
 }
-
-
 
 .mat-mdc-row {
   font-size: 1.3rem;

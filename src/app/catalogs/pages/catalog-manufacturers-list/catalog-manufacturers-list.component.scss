@@ -75,6 +75,9 @@ table {
   min-width: 70px;
   padding: 10px;
   text-align: right;
+  ::ng-deep .mat-sort-header-container {
+    justify-content: end;
+  }
 }
 
 .mat-column-mainImagePath {

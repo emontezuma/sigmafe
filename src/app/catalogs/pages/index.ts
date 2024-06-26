@@ -25,4 +25,7 @@ export * from './catalog-equipment-edition';
 export * from './catalog-departments-list';
 export * from './catalog-department-edition';
 
+export * from './catalog-checklist-templates';
+export * from './catalog-checklist-templates-edition'
+
 export * from './catalogs-home';
