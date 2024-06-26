@@ -159,6 +159,7 @@ export interface MoldDetail {
     status?: string,
     process?: string,
     processId?: number,
+    companyId?: number,
   }
   
   export interface MoldItem {

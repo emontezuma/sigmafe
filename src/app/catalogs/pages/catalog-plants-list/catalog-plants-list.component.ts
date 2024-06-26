@@ -27,7 +27,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Plants ===============
-  plantsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+  plantsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'company', 'status', 'updatedAt'];
   plantsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   plantsData$: Observable<PlantsData>;
@@ -210,7 +210,11 @@ export class CatalogPlantsListComponent implements AfterViewInit {
                 data: {
                   ...item.data,                  
                   mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
-                 
+                  company: {
+                    ...item.data.company,
+                    name: item.data.company?.translations?.length > 0 ? item.data.company.translations[0].name : item.data.company?.name,
+                    isTranslated: item.data.company?.translations?.length > 0 ? true : false,
+                  },
                 }
               }
             })          
@@ -390,7 +394,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.plantsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.plantsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'company', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

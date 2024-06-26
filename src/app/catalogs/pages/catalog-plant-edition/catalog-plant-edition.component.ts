@@ -184,7 +184,7 @@ export class CatalogPlantEditionComponent {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.VARIABLES_CATALOG,
+      from: ApplicationModules.PLANTS_CATALOG_EDITION,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -193,7 +193,7 @@ export class CatalogPlantEditionComponent {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.VARIABLES_CATALOG,
+      ApplicationModules.PLANTS_CATALOG_EDITION,
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
@@ -303,7 +303,7 @@ export class CatalogPlantEditionComponent {
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR VARIABLE`,  
+              title: $localize`INACTIVAR PLANTA`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -340,10 +340,10 @@ export class CatalogPlantEditionComponent {
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
               const plantParameters = {
-                settingType: 'status',
+                settingType: 'statusPlant',
                 id: this.plant.id,
                 customerId: this.plant.customerId,
-                companyId:this.plant.companyId,
+                companyId: this.plant.companyId,
                 status: RecordStatus.INACTIVE,
               }
               const plants = this._sharedService.setGraphqlGen(plantParameters);
@@ -352,7 +352,8 @@ export class CatalogPlantEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdatePlant.length > 0 && data?.data?.createOrUpdatePlant[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.plant.status = RecordStatus.INACTIVE;
                       const message = $localize`La Planta ha sido inhabilitada`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -373,7 +374,7 @@ export class CatalogPlantEditionComponent {
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR VARIABLE`,  
+              title: $localize`REACTIVAR PLANTA`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -410,10 +411,10 @@ export class CatalogPlantEditionComponent {
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
               const plantParameters = {
-                settingType: 'status',
+                settingType: 'statusPlant',
                 id: this.plant.id,
                 customerId: this.plant.customerId,
-                companyId:this.plant.companyId,            //warning get from ???
+                companyId: this.plant.companyId,            //warning get from ???
                 status: RecordStatus.ACTIVE,
               }
               const plants = this._sharedService.setGraphqlGen(plantParameters);
@@ -423,6 +424,7 @@ export class CatalogPlantEditionComponent {
                   if (data?.data?.createOrUpdatePlant.length > 0 && data?.data?.createOrUpdatePlant[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
+                      this.plant.status = RecordStatus.ACTIVE;
                       const message = $localize`La Planta ha sido reactivada`;
                       this._sharedService.showSnackMessage({
                         message,

@@ -112,6 +112,17 @@ table {
   padding: 10px;
 }
 
+.mat-column-company {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;
+  overflow-wrap: break-word;  
+  width: 17%;
+  max-width: 17% !important;
+  min-width: 17%;
+  padding: 10px;
+}
+
 .mat-column-status {
   word-wrap: break-word !important;
   white-space: unset !important;

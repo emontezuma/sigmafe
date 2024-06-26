@@ -747,6 +747,26 @@ export const INACTIVATE_MOLD = gql`
   }
 `;
 
+export const INACTIVATE_PLANT = gql`
+  mutation CreateOrUpdatePlant (
+    $id: Long,
+    $customerId: Long,
+    $companyId: Long,
+    $status: String
+  ) {
+  createOrUpdatePlant (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      companyId: $companyId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 export const UPDATE_MOLD = gql`
   mutation CreateOrUpdateMold (
     $customerId: Long,
@@ -1934,6 +1954,17 @@ export const GET_PLANTS = gql`
           id
           customerId
           companyId
+          company {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
           status
           updatedAt
           updatedBy {
