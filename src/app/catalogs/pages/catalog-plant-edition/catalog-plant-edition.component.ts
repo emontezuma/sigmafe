@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-plant-edition',
@@ -35,6 +37,9 @@ export class CatalogPlantEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
+  companies$: Observable<any>; 
+
+  companies: GeneralCatalogData = emptyGeneralCatalogData; 
 
   valueTypeChanges$: Observable<any>;
 
@@ -80,7 +85,7 @@ export class CatalogPlantEditionComponent {
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
-   
+    company: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),   
   });
 
   pageInfo: PageInfo = {
@@ -678,6 +683,52 @@ export class CatalogPlantEditionComponent {
     }
   }
 
+  requestCompaniesData(currentPage: number, filterStr: string = null) {    
+    this.companies = {
+      ...this.companies,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }      
+    const skipRecords = this.companies.items.length;
+
+    const plantParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(plantParameters);
+    this.companies$ = this._catalogsService.getCompaniesLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {
+        const mappedItems = data?.data?.companiesPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        });
+        this.companies = {
+          ...this.companies,
+          loading: false,
+          pageInfo: data?.data?.companiesPaginated?.pageInfo,
+          items: this.companies.items?.concat(mappedItems),
+          totalCount: data?.data?.companiesPaginated?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   onSubmit() {
     if (!this.submitControlled) return;
     this.submitControlled = false;
@@ -752,9 +803,9 @@ export class CatalogPlantEditionComponent {
           .subscribe(() => {
             this.requestPlantData(plantId);
             setTimeout(() => {              
-              let message = $localize`La planta ha sido actualizado`;
+              let message = $localize`La planta ha sido actualizada`;
               if (newRecord) {                
-                message = $localize`La planta ha sido creado satisfactoriamente con el id <strong>${plantId}</strong>`;
+                message = $localize`La planta ha sido creada satisfactoriamente con el id <strong>${plantId}</strong>`;
                 this._location.replaceState(`/catalogs/plants/edit/${plantId}`);
               }
               this._sharedService.showSnackMessage({
@@ -770,7 +821,6 @@ export class CatalogPlantEditionComponent {
       })
     )
   }
-
 
   requestPlantData(plantId: number): void { 
     let plants = undefined;
@@ -821,22 +871,21 @@ export class CatalogPlantEditionComponent {
     ); 
   }  
 
-  requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "tableName": { "eq": "${catalog}" } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
-    }
-    const plantParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order,
-    }    
-    const plants = this._sharedService.setGraphqlGen(plantParameters);
-    return this._catalogsService.getGenericsLazyLoadingDataGql$(plants).pipe();
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+    if (getMoreDataParams.catalogName === SystemTables.COMPANIES) {
+      if (getMoreDataParams.initArray) {
+        this.companies.currentPage = 0;
+        this.companies.items = [];
+      } else if (!this.companies.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.companies.currentPage++;
+      }
+      this.requestCompaniesData(        
+        this.companies.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    }     
   }
 
   onFileSelected(event: any) {
@@ -930,6 +979,7 @@ export class CatalogPlantEditionComponent {
       reference: this.plant.reference,      
       prefix: this.plant.prefix,      
       notes: this.plant.notes,
+      company: this.plant.company,
       mainImageName: this.plant.mainImageName,
     });
   } 
@@ -1021,7 +1071,9 @@ export class CatalogPlantEditionComponent {
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
       return $localize`Descripción o nombre de la planta`
-    }
+    } else if (fieldControlName === 'company') {
+      return $localize`Compañía asociada a la planta`;
+    }  
     return '';
   }
 
@@ -1038,8 +1090,9 @@ export class CatalogPlantEditionComponent {
   }
 
   validateTables(): void {
-
-    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+    if (this.plantForm.controls.company.value && this.plantForm.controls.company.value.status === RecordStatus.INACTIVE) {
+      this.plantForm.controls.company.setErrors({ inactive: true });   
+    }    
   }
 
   processTranslations$(plantId: number): Observable<any> { 
@@ -1062,7 +1115,7 @@ export class CatalogPlantEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
-        companyId:1                               //warning get from ???
+        companyId: this.plant.companyId,
       }      
       const translationsToAdd = this.plant.translations.map((t: any) => {
         return {
@@ -1101,6 +1154,10 @@ export class CatalogPlantEditionComponent {
 
   get GeneralValues() {
     return GeneralValues; 
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
 // End ======================

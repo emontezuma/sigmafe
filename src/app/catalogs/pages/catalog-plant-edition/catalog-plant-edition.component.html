@@ -16,7 +16,8 @@
   <ng-container *ngIf="updatePlant$ | async "></ng-container>    
   <ng-container *ngIf="deletePlantTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addPlantTranslations$ | async "></ng-container>   
-  <ng-container *ngIf="updatePlantCatalog$ | async "></ng-container>     
+  <ng-container *ngIf="updatePlantCatalog$ | async "></ng-container>
+  <ng-container *ngIf="companies$ | async"></ng-container>
 
   <mat-card class="card">
     <form
@@ -194,7 +195,40 @@
                 </div>                
               </fieldset>              
             </div>
-                   
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    plantForm.controls.company.touched &&
+                    !plantForm.controls.company.valid
+                }"
+                [disabled]="plantForm.controls.company.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Compañía para la planta</span>
+                  <span class="field__label" *ngIf="plantForm.controls.company?.value?.id">Id: {{ plantForm.controls.company?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='company'"
+                  [formField]="plantForm.controls.company"
+                  [list]="companies.items"
+                  [totalCount]="companies.totalCount"
+                  leftHint="Escriba el nombre de la Compañía a buscar"
+                  [catalog]="SystemTables.COMPANIES"
+                  [loading]="companies.loading"
+                  noItemsError="No hay compañías con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la Compañía de la planta</span
+                >
+              </fieldset>
+            </div>     
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>
@@ -238,7 +272,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="plant.deletedById > 0">
+      <div class="grid-inactive" *ngIf="plant.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(plant.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
@@ -258,7 +292,7 @@
             <strong>El registro está INACTIVO</strong>
           </div>
         </div>
-      </div>
+      </div>    
     </div>
   </mat-card>
 </div>

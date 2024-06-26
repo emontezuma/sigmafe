@@ -1915,6 +1915,17 @@ export const GET_PLANT = gql`
       updatedAt
       deletedById
       deletedAt
+      company {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
       createdBy {
         name
       }
@@ -2182,6 +2193,39 @@ export const GET_COMPANIES = gql`
     }
   }
 `;
+
+export const GET_COMPANIES_LAZY_LOADING = gql`
+  query CompaniesPaginated (
+      $recordsToSkip: Int,
+      $recordsToTake: Int,
+      $orderBy: [TranslatedCompanyDtoSortInput!],
+      $filterBy: TranslatedCompanyDtoFilterInput
+  ) {
+    companiesPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 
 export const GET_COMPANY_TRANSLATIONS = gql`
   query CompaniesTranslationsTable (
