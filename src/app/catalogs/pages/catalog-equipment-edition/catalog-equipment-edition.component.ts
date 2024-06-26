@@ -338,7 +338,7 @@ export class CatalogEquipmentEditionComponent {
                 settingType: 'status',
                 id: this.equipment.id,
                 customerId: this.equipment.customerId,
-       
+                plantId: this.equipment.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
@@ -409,7 +409,7 @@ export class CatalogEquipmentEditionComponent {
                 settingType: 'status',
                 id: this.equipment.id,
                 customerId: this.equipment.customerId,
-
+                plantId: this.equipment.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
@@ -906,7 +906,7 @@ export class CatalogEquipmentEditionComponent {
     return  {
         id: this.equipment.id,
       customerId: 1, // TODO: Get from profile
-
+      plantId: 1, // TODO: Get from profile
         status: newRecord ? RecordStatus.ACTIVE : this.equipment.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
@@ -1029,7 +1029,7 @@ export class CatalogEquipmentEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
- 
+        plantId: 1, // TODO: Get from profile
       }      
       const translationsToAdd = this.equipment.translations.map((t: any) => {
         return {
@@ -1040,7 +1040,7 @@ export class CatalogEquipmentEditionComponent {
           notes: t.notes,
           languageId: t.languageId,
           customerId: 1, // TODO: Get from profile
-    
+          plantId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });
