@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY } from 'src/app/graphql/graphql.queries';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { CompanyDetail, CustomerDetail, PlantDetail, VariableDetail } from '../models';
+import { CompanyDetail, CustomerDetail, EquipmentDetail, PlantDetail, VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 
 @Injectable({
@@ -848,6 +848,100 @@ export class CatalogsService {
       variables,       
     });
   }
+
+//======equipments
+
+getAllEquipmentsToCsv$(): Observable<any> {//warning repeated
+  return this._apollo.watchQuery({ 
+    query: GET_ALL_MOLDS_TO_CSV,       
+  }).valueChanges;
+}
+
+getAllEquipmentsCsvData$(fileName: string): Observable<any> {
+  return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+    map(data => data)
+  );
+}
+
+getEquipmentsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+  const variables = {      
+    ...(recordsToSkip !== 0) && { recordsToSkip },
+    ...(recordsToTake !== 0) && { recordsToTake },
+    ...(orderBy) && { orderBy },
+    ...(filterBy) && { filterBy },
+  }
+  
+  return this._apollo.watchQuery({ 
+    query: GET_EQUIPMENTS,
+    variables
+  }).valueChanges    
+}
+
+addEquipmentTransations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: ADD_EQUIPMENT_TRANSLATIONS, 
+    variables,       
+  });
+} 
+
+getEquipmentDataGql$(parameters: any): Observable<any> {
+  const equipmentId = { equipmentId: parameters.equipmentId};
+
+  const variables = {
+    ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+    ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+    ...(parameters.order) && { orderBy: parameters.order },
+    ...(parameters.filter) && { filterBy: parameters.filter },
+  }
+
+  return combineLatest([ 
+    this._apollo.query({ 
+    query: GET_EQUIPMENT, 
+    variables: equipmentId,      
+    }),
+    
+    this._apollo.query({ 
+      query: GET_EQUIPMENT_TRANSLATIONS, 
+      variables, 
+    })
+  ]);
+}
+
+updateEquipmentCatalog$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: UPDATE_EQUIPMENT, 
+    variables,      
+  })
+}
+
+mapOneEquipment(paramsData: any): EquipmentDetail {
+  const { oneEquipment } = paramsData?.equipmentGqlData?.data;
+  const { data } = oneEquipment;
+  const translations = paramsData?.equipmentGqlTranslationsData?.data;
+  const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+  const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+  
+  return {
+    ...data,
+    mainImage,
+    translations: this.mapTranslations(translations),
+  }
+}
+
+deleteEquipmentTranslations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: DELETE_EQUIPMENT_TRANSLATIONS, 
+    variables,       
+  });
+}
+
+updateEquipmentStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  return this._apollo.mutate({
+    mutation: INACTIVATE_EQUIPMENT, 
+    variables,       
+  });
+}
+
 
 // End ======================  
 }

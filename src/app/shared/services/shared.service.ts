@@ -462,7 +462,7 @@ export class SharedService {
   }
 
 
-  //all this are repeated==============================
+  //==============================
   
   setGraphqlGen(genParameters: GqlParameters): any {
     const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process, customerId} = genParameters;

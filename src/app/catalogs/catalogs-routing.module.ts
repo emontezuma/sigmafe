@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent } from './pages';
+import { CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -101,6 +101,21 @@ const routes: Routes = [
         path: 'companies/edit/:id',
         component: CatalogCompanyEditionComponent,
         data: { animation: 'CatalogCompanyEditionComponent' },
+      },
+      {
+        path: 'equipments',
+        component: CatalogEquipmentsListComponent,
+        data: { animation: 'CatalogEquipmentsComponent' },
+      },
+      {
+        path: 'equipments/create',
+        component: CatalogEquipmentEditionComponent,
+        data: { animation: 'CatalogEquipmentEditionComponent' },
+      },
+      {
+        path: 'equipments/edit/:id',
+        component: CatalogEquipmentEditionComponent,
+        data: { animation: 'CatalogEquipmentEditionComponent' },
       },
       {
         path: '**',

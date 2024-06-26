@@ -17,6 +17,9 @@ export * from './catalog-companies-list';
 export * from './catalog-company-edition';
 
 export * from './catalog-providers-list';
-export * from './catalog-provider-edition'
+export * from './catalog-provider-edition';
+
+export * from './catalog-equipments-list';
+export * from './catalog-equipment-edition';
 
 export * from './catalogs-home';
