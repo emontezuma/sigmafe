@@ -2,9 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, combineLatest, map } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, DELETE_DEPARTMENT_TRANSLATIONS, INACTIVATE_DEPARTMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, DELETE_DEPARTMENT_TRANSLATIONS, INACTIVATE_DEPARTMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, ADD_UOM_TRANSLATIONS, GET_UOMS, GET_UOM, GET_UOM_TRANSLATIONS, UPDATE_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, PlantDetail, VariableDetail } from '../models';
+import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, PlantDetail, UomDetail, VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 
 @Injectable({
@@ -347,11 +347,11 @@ export class CatalogsService {
     }
   }
 
-  getAllMoldsToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllMoldsToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllMoldsCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -359,11 +359,11 @@ export class CatalogsService {
     );
   }
 
-  getAllVariablesToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllVariablesToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllVariablesCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -371,11 +371,11 @@ export class CatalogsService {
     );
   }
 
-  getAllChecklistTemplatesToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllChecklistTemplatesToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllChecklistTemplatesCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -432,11 +432,11 @@ export class CatalogsService {
 
   //====customers
   
-  getAllCustomersToCsv$(): Observable<any> { //warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllCustomersToCsv$(): Observable<any> { //warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
   getAllCustomersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
@@ -519,11 +519,11 @@ export class CatalogsService {
 
   //manufacturers=================================
   
-  getAllManufacturersToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllManufacturersToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
   getAllManufacturersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
@@ -610,11 +610,11 @@ export class CatalogsService {
 
   //======plants
 
-  getAllPlantsToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllPlantsToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllPlantsCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -699,11 +699,11 @@ export class CatalogsService {
     });
   }  
 
-  getAllCompaniesToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllCompaniesToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllCompaniesCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -793,11 +793,11 @@ export class CatalogsService {
   //======providers
 
 
-  getAllProvidersToCsv$(): Observable<any> {//warning repeated
-    return this._apollo.watchQuery({ 
-      query: GET_ALL_MOLDS_TO_CSV,       
-    }).valueChanges;
-  }
+  // getAllProvidersToCsv$(): Observable<any> {//warning repeated
+  //   return this._apollo.watchQuery({ 
+  //     query: GET_ALL_MOLDS_TO_CSV,       
+  //   }).valueChanges;
+  // }
 
   getAllProvidersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -884,11 +884,11 @@ export class CatalogsService {
 
 //======equipments
 
-getAllEquipmentsToCsv$(): Observable<any> {//warning repeated
-  return this._apollo.watchQuery({ 
-    query: GET_ALL_MOLDS_TO_CSV,       
-  }).valueChanges;
-}
+// getAllEquipmentsToCsv$(): Observable<any> {//warning repeated
+//   return this._apollo.watchQuery({ 
+//     query: GET_ALL_MOLDS_TO_CSV,       
+//   }).valueChanges;
+// }
 
 getAllEquipmentsCsvData$(fileName: string): Observable<any> {
   return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -977,11 +977,11 @@ updateEquipmentStatus$(variables: any): Observable<any> { //warning missing in c
 
   //======departments
 
-getAllDepartmentsToCsv$(): Observable<any> {//warning repeated
-  return this._apollo.watchQuery({ 
-    query: GET_ALL_MOLDS_TO_CSV,       
-  }).valueChanges;
-}
+// getAllDepartmentsToCsv$(): Observable<any> {//warning repeated
+//   return this._apollo.watchQuery({ 
+//     query: GET_ALL_MOLDS_TO_CSV,       
+//   }).valueChanges;
+// }
 
 getAllDepartmentsCsvData$(fileName: string): Observable<any> {
   return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -1068,5 +1068,101 @@ updateDepartmentStatus$(variables: any): Observable<any> { //warning missing in 
   });
 }
 
+  //======uoms
+
+
+
+getAllUomsCsvData$(fileName: string): Observable<any> {
+  return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+    map(data => data)
+  );
+}
+
+getUomsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+  const variables = {      
+    ...(recordsToSkip !== 0) && { recordsToSkip },
+    ...(recordsToTake !== 0) && { recordsToTake },
+    ...(orderBy) && { orderBy },
+    ...(filterBy) && { filterBy },
+  }
+  
+  return this._apollo.watchQuery({ 
+    query: GET_UOMS,
+    variables
+  }).valueChanges    
+}
+
+addUomTransations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: ADD_UOM_TRANSLATIONS, 
+    variables,       
+  });
+} 
+
+getUomDataGql$(parameters: any): Observable<any> {
+  const departmentId = { departmentId: parameters.departmentId};
+
+  const variables = {
+    ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+    ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+    ...(parameters.order) && { orderBy: parameters.order },
+    ...(parameters.filter) && { filterBy: parameters.filter },
+  }
+
+  return combineLatest([ 
+    this._apollo.query({ 
+    query: GET_UOM, 
+    variables: departmentId,      
+    }),
+    
+    this._apollo.query({ 
+      query: GET_UOM_TRANSLATIONS, 
+      variables, 
+    })
+  ]);
+}
+
+updateUomCatalog$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: UPDATE_UOM, 
+    variables,      
+  })
+}
+
+mapOneUom(paramsData: any): UomDetail {
+  const { oneUom } = paramsData?.departmentGqlData?.data;
+  const { data } = oneUom;
+  const translations = paramsData?.departmentGqlTranslationsData?.data;
+  
+  
+  return {
+    ...data,
+    translations: this.mapTranslations(translations),
+  }
+}
+
+deleteUomTranslations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: DELETE_UOM_TRANSLATIONS, 
+    variables,       
+  });
+}
+
+updateUomStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  return this._apollo.mutate({
+    mutation: INACTIVATE_UOM, 
+    variables,       
+  });
+}
+
+  
+//refactor
+  
+getAllToCsv$(): Observable<any> {//warning repeated
+  return this._apollo.watchQuery({ 
+    query: GET_ALL_MOLDS_TO_CSV,       
+  }).valueChanges;
+}
+  
 // End ======================  
 }

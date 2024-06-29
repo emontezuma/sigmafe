@@ -54,7 +54,7 @@ export interface PlantsState {
   plantsData: PlantsData;
 }
 
-export interface PlantState {//warning
+export interface PlantState {
   loading: boolean;
   moldDetail: PlantDetail;
 }

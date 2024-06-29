@@ -50,7 +50,7 @@ export interface CustomersState {
   customersData: CustomersData;
 }
 
-export interface CustomerState {//warning remove
+export interface CustomerState {
   loading: boolean;
   moldDetail: CustomerDetail;
 }

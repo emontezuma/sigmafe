@@ -14,41 +14,41 @@ import { routingAnimation, dissolve } from '../../../shared/animations/shared.an
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 import { environment } from 'src/environments/environment';
-import { PlantItem, Departments, DepartmentsData, emptyPlantCatalog } from '../../models';
+import { UomItem, Uoms, UomsData, emptyUomCatalog } from '../../models';
 
 @Component({
-  selector: 'app-catalog-departments',
-  templateUrl: './catalog-departments-list.component.html',
+  selector: 'app-catalog-uoms',
+  templateUrl: './catalog-uoms-list.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-departments-list.component.scss']
+  styleUrls: ['./catalog-uoms-list.component.scss']
 })
-export class CatalogDepartmentsListComponent implements AfterViewInit {
+export class CatalogUomsListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-// Departments ===============
-  departmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
-  departmentsCatalogData = new MatTableDataSource<PlantItem>([]);      
+// Uoms ===============
+  uomsTableColumns: string[] = ['id', 'name', 'status', 'updatedAt'];
+  uomsCatalogData = new MatTableDataSource<UomItem>([]);      
   
-  departmentsData$: Observable<DepartmentsData>;
+  uomsData$: Observable<UomsData>;
   sort$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>;
   settingsData$: Observable<SettingsData>;
   profileData$: Observable<ProfileData>;
   searchBox$: Observable<SearchBox>;
   screenData$: Observable<Screen>;
-  allDepartmentsToCsv$: Observable<any>;
+  allUomsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "department";  
+  catalogIcon: string = "equation";  //warning
 
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
   filterByText: string;
-  allDepartmentsToCsv: any;
-  departmentsData: Departments = {
+  allUomsToCsv: any;
+  uomsData: Uoms = {
     items: new Array(5).fill(null),
   }
   pageInfo: PageInfo = {
@@ -75,11 +75,11 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.DEPARTMENTS_CATALOG,
+      ApplicationModules.UOMS_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.DEPARTMENTS_CATALOG,
+      ApplicationModules.UOMS_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +112,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.DEPARTMENTS_CATALOG) {
+        if (searchBox.from === ApplicationModules.UOMS_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +128,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.DEPARTMENTS_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.UOMS_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +139,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.DEPARTMENTS_CATALOG,
+      from: ApplicationModules.UOMS_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +148,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.DEPARTMENTS_CATALOG,
+      ApplicationModules.UOMS_CATALOG,
       false,
     );        
   }
@@ -157,8 +157,8 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.departmentsCatalogData.paginator = this.paginator;
-    this.departmentsCatalogData.sort = this.sort;
+    this.uomsCatalogData.paginator = this.paginator;
+    this.uomsCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
@@ -166,6 +166,10 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'uom') {            
+            this.order = JSON.parse(`{ "data": { "uom": { "name": "${sortData.direction.toUpperCase()}" } } }`);
+          } else if (sortData.active === 'sigmaType') {            
+            this.order = JSON.parse(`{ "data": { "sigmaType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -186,51 +190,65 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
 
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
-    this.departmentsData = {
-      items: new Array(5).fill(emptyPlantCatalog),
+    this.uomsData = {
+      items: new Array(5).fill(emptyUomCatalog),
     }
     let filter = null;
     if (this.filterByText) {      
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-    this.departmentsCatalogData = new MatTableDataSource<PlantItem>(this.departmentsData.items);
-    this.departmentsData$ = this._catalogsService.getDepartmentsDataGql$(skipRecords, takeRecords, this.order, filter)
+
+    // const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "data": { "uom": { "name": { "contains": "${this.filterByText}" } } } }, { "data": { "sigmaType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
+      // filter = JSON.parse(cadFilter);                  
+    // }
+    this.uomsCatalogData = new MatTableDataSource<UomItem>(this.uomsData.items);
+    this.uomsData$ = this._catalogsService.getUomsDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
-      map((departments: any) => {
-        const { data } = departments;
+      map((uoms: any) => {
+        const { data } = uoms;
         return { 
           ...data,
-          departmentsPaginated: {
-            ...data.departmentsPaginated,
-            items: data.departmentsPaginated.items.map((item) => {
+          uomsPaginated: {
+            ...data.uomsPaginated,
+            items: data.uomsPaginated.items.map((item) => {
               const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                  uom: {
+                    ...item.data.uom,
+                    name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,
+                    isTranslated: item.data.uom?.translations?.length > 0 ? true : false,
+                  },
+                  sigmaType: {
+                    ...item.data.sigmaType,
+                    name: item.data.sigmaType?.translations.length > 0 ? item.data.sigmaType.translations[0].name : item.data.sigmaType?.name,
+                    isTranslated: item.data.sigmaType?.translations.length > 0 ? true : false,
+                  }
                 }
               }
             })          
           }
         }
       }),
-      tap( departmentsData => {        
-        this.setPaginator(departmentsData.departmentsPaginated.totalCount);
-        this.departmentsData = JSON.parse(JSON.stringify(departmentsData.departmentsPaginated));
+      tap( uomsData => {        
+        this.setPaginator(uomsData.uomsPaginated.totalCount);
+        this.uomsData = JSON.parse(JSON.stringify(uomsData.uomsPaginated));
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-            this.departmentsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.departmentsData.items);
+            this.uomsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.uomsData.items);
           }      
         }        
-        this.departmentsData.items.length = this.departmentsData.totalCount;
-        this.departmentsCatalogData = new MatTableDataSource<PlantItem>(this.departmentsData.items);
-        this.departmentsCatalogData.paginator = this.paginator;
-        // this.departmentsCatalogData.sort = this.sort;
-        this.departmentsCatalogData.sortData = () => this.departmentsData.items;        
+        this.uomsData.items.length = this.uomsData.totalCount;
+        this.uomsCatalogData = new MatTableDataSource<UomItem>(this.uomsData.items);
+        this.uomsCatalogData.paginator = this.paginator;
+        // this.uomsCatalogData.sort = this.sort;
+        this.uomsCatalogData.sortData = () => this.uomsData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
           setTimeout(() => {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
@@ -245,7 +263,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.DEPARTMENTS_CATALOG,
+          from: ApplicationModules.UOMS_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -266,7 +284,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.DEPARTMENTS_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.UOMS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -278,17 +296,17 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements.find(e => e.action === action.action).loading = true;                
-        this._router.navigateByUrl("/catalogs/departments/create");
+        this._router.navigateByUrl("/catalogs/uoms/create");
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allDepartmentsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
-          tap(departmentsToCsv => {
-            const fileData$ = this._catalogsService.getAllDepartmentsCsvData$(departmentsToCsv?.data?.exportDepartmentsToCsv?.exportedFilename)
+        this.allUomsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+          tap(uomsToCsv => {
+            const fileData$ = this._catalogsService.getAllUomsCsvData$(uomsToCsv?.data?.exportUomsToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, departmentsToCsv?.data?.exportDepartmentsToCsv?.downloadFilename);
+              this.downloadFile(data, uomsToCsv?.data?.exportUomsToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -389,7 +407,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.departmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.uomsTableColumns = ['id', 'mainImagePath', 'name', 'uom', 'sigmaType', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -414,11 +432,11 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.DEPARTMENTS_CATALOG,
+      ApplicationModules.UOMS_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.DEPARTMENTS_CATALOG,
+      ApplicationModules.UOMS_CATALOG,
       loading,
     );         
   }

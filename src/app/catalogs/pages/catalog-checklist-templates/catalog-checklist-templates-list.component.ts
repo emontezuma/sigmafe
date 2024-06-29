@@ -294,7 +294,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllChecklistTemplatesToCsv$().pipe(
+        this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(checklistTemplatesToCsv => {
             const fileData$ = this._catalogsService.getAllChecklistTemplatesCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
             .subscribe(data => { 

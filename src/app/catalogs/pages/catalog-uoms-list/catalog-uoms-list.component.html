@@ -1,0 +1,124 @@
+<div
+  class="container-animated"
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  @routingAnimation
+>
+  <ng-container *ngIf="uomsData$ | async "></ng-container>
+  <ng-container *ngIf="sort$ | async "></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>
+  <ng-container *ngIf="settingsData$ | async "></ng-container>
+  <ng-container *ngIf="profileData$ | async "></ng-container>
+  <ng-container *ngIf="searchBox$ | async "></ng-container>
+  <ng-container *ngIf="screenData$ | async "></ng-container>
+  <ng-container *ngIf="animationData$ | async "></ng-container>
+  <ng-container *ngIf="allUomsToCsv$ | async "></ng-container>  
+
+  <div
+    class="uoms-table"    
+  >
+    <table mat-table [dataSource]="uomsCatalogData" matSort>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.id }}</ng-container>
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+      
+
+     
+      
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.data.name }}</strong>
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="uom">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Unidad de medida</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.uom.name }}</ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="sigmaType">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">{{ row.data.sigmaType.name }}</ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">
+            {{ row.friendlyStatus }}
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="updatedAt">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Últ. actualización</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">
+            <div>{{ row.data.updatedBy?.name }}</div>   
+            <div>{{ row.data.updatedAt | date:"medium" }}</div>   
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="uomsTableColumns; sticky: 1"></tr>
+      <tr
+        class="table-row"
+        mat-row *matRowDef="let row;
+        columns: uomsTableColumns"
+        [routerLink]="['/catalogs/uoms/edit/', row.data.id]"
+      >
+      </tr>
+      <div *ngIf="!loading">
+        <tr class="uoms-table-mat-row" *matNoDataRow>
+          <td class="uoms-table__no-data" colspan="10">
+            No hay registros a mostrar
+          </td>
+        </tr>
+      </div>
+    </table>
+
+    <div class="uoms-table__paginator">
+      <div class="uoms-table__paginator--catalog-data">
+        <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
+        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
+        <mat-divider vertical></mat-divider>
+      </div>
+      <mat-paginator
+        #paginator
+        class="uoms-table__paginator--mat"
+        [length]="pageInfo?.totalRecords"
+        [pageSize]="50"
+        (page)="pageChange($event)"
+        showFirstLastButtons
+        [hidePageSize]="size === 'small'"
+      > 
+      </mat-paginator>
+    </div>
+  </div>
+</div>
+<ng-template #skeleton>
+  <ngx-skeleton-loader
+    *ngIf="loading"
+    class="skeleton"
+    [theme]="{ height: '24px', marginBottom: '0px', backgroundColor: 'rgba(0, 0, 0, 0.075)', }"
+    count="1"
+  >
+  </ngx-skeleton-loader>
+</ng-template>

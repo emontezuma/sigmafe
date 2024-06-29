@@ -2782,7 +2782,7 @@ export const GET_DEPARTMENT = gql`
       id
       customerId
       recipientId
-  approverId
+      approverId
       plantId     
       status
       createdById
@@ -2867,12 +2867,10 @@ export const GET_DEPARTMENT_TRANSLATIONS = gql`
         name
         reference
         notes
+        prefix
         languageId
         id
         customerId
-        plantId
-        recipientId
-        approverId
         status
         createdById
         createdAt
@@ -2964,16 +2962,12 @@ export const UPDATE_DEPARTMENT = gql`
 export const DELETE_DEPARTMENT_TRANSLATIONS = gql`
   mutation DeleteDepartmentsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
-    $customerId: Long!
-    $recipientId: Long!
-      $approverId: Long!   
+    $customerId: Long!   
   $plantId: Long!
   ) {
     deleteDepartmentsTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-      recipientId: $recipientId,
-      approverId: $approverId,   
       plantId: $plantId,
     ) 
   }
@@ -2998,5 +2992,212 @@ export const INACTIVATE_DEPARTMENT = gql`
     } 
   }
 `;
+
+
+//uoms===========================
+
+export const GET_UOM = gql`
+  query OneUom (
+    $uomId: Long!,
+  ) {
+  oneUom (
+    id: $uomId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      id
+      customerId
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_UOMS = gql`
+  query UomsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedUomDtoSortInput!],
+    $filterBy: TranslatedUomDtoFilterInput,
+  ) {
+  uomsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+          id
+          customerId
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_UOM_TRANSLATIONS = gql`
+  query UomsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [UomTranslationTableSortInput!],
+    $filterBy: UomTranslationTableFilterInput,
+  ) {
+    uomsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        uomId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_UOM_TRANSLATIONS = gql`
+  mutation CreateOrUpdateUomTranslationTable (
+    $translations: [UomTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateUomTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      uomId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_UOM = gql`
+  mutation CreateOrUpdateUom (
+    $customerId: Long,
+    $id: Long,
+    $status: String    
+    $name: String,
+    $prefix: String,
+    $reference: String,
+    $notes: String,
+        
+  ) {
+  createOrUpdateUom (
+    inputs: [{
+      customerId: $customerId
+      id: $id      
+      status: $status
+      name: $name,
+      prefix: $prefix,
+      reference: $reference,
+      notes: $notes,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_UOM_TRANSLATIONS = gql`
+  mutation DeleteUomsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+ 
+  ) {
+    deleteUomsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    ) 
+  }
+`;
+
+export const INACTIVATE_UOM = gql`
+  mutation CreateOrUpdateUom (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateUom (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 
 //=========END

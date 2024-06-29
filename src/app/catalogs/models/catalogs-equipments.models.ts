@@ -52,7 +52,7 @@ export interface EquipmentsState {
   equipmentsData: EquipmentsData;
 }
 
-export interface EquipmentState {//warning
+export interface EquipmentState {
   loading: boolean;
   moldDetail: EquipmentDetail;
 }

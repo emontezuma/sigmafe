@@ -1,38 +1,35 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
-export interface CompaniesData {
-  companiesPaginated?: Companies;
+export interface UomsData {
+  uomsPaginated?: Uoms;
 }
 
-export interface CompanyData {
-  oneCompany?: CompanyItem;
+export interface UomData {
+  oneUom?: UomItem;
   translations?: any;
 }
 
-export interface Companies {
-  items?: CompanyItem[];
+export interface Uoms {
+  items?: UomItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface CompanyItem {
+export interface UomItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: CompanyDetail;
+  data: UomDetail;
 }
 
-export interface CompanyDetail {
+export interface UomDetail {
   name?: string;
   reference?: string;
   notes?: string;
   prefix?: string;
-  mainImageGuid?: string;
-  mainImagePath?: string;
-  mainImageName?: string;
-  mainImage?: string;
   id?: number;
   customerId?: number;
   status?: string;
+  translations?: GeneralTranslation[];
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -42,46 +39,49 @@ export interface CompanyDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
-  translations?: GeneralTranslation[];  
-  
 }
 
-export interface CompaniesState {
+export interface UomsState {
   loading: boolean;
-  companiesData: CompaniesData;
+  uomsData: UomsData;
 }
 
-export interface CompanyState {
+export interface UomState {
   loading: boolean;
-  moldDetail: CompanyDetail;
+  moldDetail: UomDetail;
 }
 
-export interface CompanyCatalog {
+export interface UomCatalog {
   id: string;
   name: string;
   mainImagePath: string;
+  serialNumber: string;
   status: string;
   updatedAt: string;
 }
 
-export const emptyCompanyCatalog = {  
+const emptyInternalCatalog = {  
+  id: null,
+  customerId: null,
+  name: null,      
+};
+
+export const emptyUomCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
-    customerId: null,    
+    customerId: null,
     name: null,
-    mainImagePath: null,    
     updatedBy: null,
     status: null,
     updatedAt: null,
   },
 };
 
-export const emptyCompanyItem: CompanyDetail = {  
+export const emptyUomItem: UomDetail = {  
   name: null,
   id: null,
   customerId: null,
-  mainImagePath: null,    
   prefix: null,
   status: null,
   createdById: null,
@@ -93,6 +93,12 @@ export const emptyCompanyItem: CompanyDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
-
   translations: [],
 };
+
+export interface UomPossibleValue {
+  order?: number;
+  value?: string;
+  byDefault?: boolean;
+  alarmedValue?: boolean;  
+}

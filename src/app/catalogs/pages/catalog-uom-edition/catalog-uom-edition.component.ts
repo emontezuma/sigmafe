@@ -13,57 +13,52 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {  PlantDetail, PlantItem,    emptyPlantItem } from '../../models';
+import {  UomDetail, UomItem,    emptyUomItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
-import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
-import { CustomValidators } from '../../custom-validators';
 
 @Component({
-  selector: 'app-catalog-plant-edition',
-  templateUrl: './catalog-plant-edition.component.html',
+  selector: 'app-catalog-uom-edition',
+  templateUrl: './catalog-uom-edition.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-plant-edition.component.scss']
+  styleUrls: ['./catalog-uom-edition.component.scss']
 })
-export class CatalogPlantEditionComponent {
+export class CatalogUomEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
 
-  // Plants ===============
-  plant: PlantDetail = emptyPlantItem;
+  // Uoms ===============
+  uom: UomDetail = emptyUomItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
-  companies$: Observable<any>; 
-
-  companies: GeneralCatalogData = emptyGeneralCatalogData; 
 
   valueTypeChanges$: Observable<any>;
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  plant$: Observable<PlantDetail>;
+  uom$: Observable<UomDetail>;
   translations$: Observable<any>;
-  updatePlant$: Observable<any>;
-  updatePlantCatalog$: Observable<any>;
-  deletePlantTranslations$: Observable<any>;  
-  addPlantTranslations$: Observable<any>;  
+  updateUom$: Observable<any>;
+  updateUomCatalog$: Observable<any>;
+  deleteUomTranslations$: Observable<any>;  
+  addUomTranslations$: Observable<any>;  
   
-  plantFormChangesSubscription: Subscription;
+  uomFormChangesSubscription: Subscription;
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "industry";  
+  catalogIcon: string = "server";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   storedTranslations: [];
   translationChanged: boolean = false
-  imageChanged: boolean = false
+
   submitControlled: boolean = false
   loading: boolean;
   elements: ToolbarElement[] = [];  
@@ -71,21 +66,20 @@ export class CatalogPlantEditionComponent {
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
-  plantData: PlantItem;  
+  uomData: UomItem;  
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
 
-  plantForm = new FormGroup({
+  uomForm = new FormGroup({
     name: new FormControl(
       '', 
       Validators.required,      
     ),   
     notes: new FormControl(''),
-    mainImageName: new FormControl(''),    
+  
     reference: new FormControl(''),    
-    prefix: new FormControl(''),    
-    company: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),   
+    prefix: new FormControl(''),       
   });
 
   pageInfo: PageInfo = {
@@ -115,9 +109,8 @@ export class CatalogPlantEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.PLANTS_CATALOG_EDITION,
+      ApplicationModules.UOMS_CATALOG_EDITION,
       true,
     );
     this.showGoTop$ = this._sharedService.showGoTop.pipe(
@@ -147,25 +140,22 @@ export class CatalogPlantEditionComponent {
 
       })
     );
-    
-    this.plantFormChangesSubscription = this.plantForm.valueChanges.subscribe((plantFormChanges: any) => {
+    this.uomFormChangesSubscription = this.uomForm.valueChanges.subscribe((uomFormChanges: any) => {
       if (!this.loaded) return;
       this.setEditionButtonsState();
     }); 
-
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
-          ApplicationModules.PLANTS_CATALOG_EDITION,
+          ApplicationModules.UOMS_CATALOG_EDITION,
           !animationFinished,
         ); 
       }
-    ));
-    
+    ));    
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       skip(1),
       tap((buttonClicked: ToolbarButtonClicked) => {      
-        if (buttonClicked.from !== ApplicationModules.PLANTS_CATALOG_EDITION) {
+        if (buttonClicked.from !== ApplicationModules.UOMS_CATALOG_EDITION) {
             return
         }
         this.toolbarAction(buttonClicked);
@@ -174,7 +164,7 @@ export class CatalogPlantEditionComponent {
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestPlantData(+params['id']);
+          this.requestUomData(+params['id']);
         }
       })
     ); 
@@ -189,7 +179,7 @@ export class CatalogPlantEditionComponent {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.PLANTS_CATALOG_EDITION,
+      from: ApplicationModules.UOMS_CATALOG_EDITION,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -198,11 +188,11 @@ export class CatalogPlantEditionComponent {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.PLANTS_CATALOG_EDITION,
+      ApplicationModules.UOMS_CATALOG_EDITION,
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.plantFormChangesSubscription) this.plantFormChangesSubscription.unsubscribe(); 
+    if (this.uomFormChangesSubscription) this.uomFormChangesSubscription.unsubscribe(); 
   }
   
 // Functions ================
@@ -211,7 +201,7 @@ export class CatalogPlantEditionComponent {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
-          from: ApplicationModules.PLANTS_CATALOG_EDITION,
+          from: ApplicationModules.UOMS_CATALOG_EDITION,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -224,7 +214,7 @@ export class CatalogPlantEditionComponent {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.PLANTS_CATALOG_EDITION && this.elements.length > 0) {
+    if (action.from === ApplicationModules.UOMS_CATALOG_EDITION && this.elements.length > 0) {
       if (action.action === ButtonActions.NEW) {        
         this.elements.find(e => e.action === action.action).loading = true;
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
@@ -248,7 +238,7 @@ export class CatalogPlantEditionComponent {
             this.elements.find(e => e.action === action.action).loading = false;
           });    
         } else {
-          this._location.replaceState('/catalogs/plants/create');
+          this._location.replaceState('/catalogs/uoms/create');
           this.initForm();
           this.elements.find(e => e.action === action.action).loading = false;  
         }
@@ -256,12 +246,12 @@ export class CatalogPlantEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
-          this._router.navigateByUrl('/catalogs/plants'); 
+          this._router.navigateByUrl('/catalogs/uoms'); 
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState('/catalogs/plants/create');
+        this._location.replaceState('/catalogs/uoms/create');
         this.focusThisField = 'name';
         setTimeout(() => {
           this.focusThisField = '';
@@ -280,11 +270,11 @@ export class CatalogPlantEditionComponent {
       } else if (action.action === ButtonActions.CANCEL) {         
         this.elements.find(e => e.action === action.action).loading = true;
         let noData = true;
-        if (!this.plant.id || this.plant.id === null || this.plant.id === 0) {
+        if (!this.uom.id || this.uom.id === null || this.uom.id === 0) {
           this.initForm();
         } else {
           noData = false;
-          this.requestPlantData(this.plant.id);
+          this.requestUomData(this.uom.id);
         }
         const message = $localize`Edición cancelada`;
           this._sharedService.showSnackMessage({
@@ -301,14 +291,14 @@ export class CatalogPlantEditionComponent {
         }, 200);
       } else if (action.action === ButtonActions.INACTIVATE) { 
         this.elements.find(e => e.action === action.action).loading = true;
-        if (this.plant?.id > 0 && this.plant.status === RecordStatus.ACTIVE) {
+        if (this.uom?.id > 0 && this.uom.status === RecordStatus.ACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR PLANTA`,  
+              title: $localize`INACTIVAR`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -331,7 +321,7 @@ export class CatalogPlantEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará la planta con el Id <strong>${this.plant.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el Id <strong>${this.uom.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -344,22 +334,22 @@ export class CatalogPlantEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const plantParameters = {
-                settingType: 'statusPlant',
-                id: this.plant.id,
-                customerId: this.plant.customerId,
-                companyId: this.plant.companyId,
+              const uomParameters = {
+                settingType: 'status',
+                id: this.uom.id,
+                customerId: this.uom.customerId,
+              
                 status: RecordStatus.INACTIVE,
               }
-              const plants = this._sharedService.setGraphqlGen(plantParameters);
-              this.updatePlant$ = this._catalogsService.updatePlantStatus$(plants)
+              const uoms = this._sharedService.setGraphqlGen(uomParameters);
+              this.updateUom$ = this._catalogsService.updateUomStatus$(uoms)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdatePlant.length > 0 && data?.data?.createOrUpdatePlant[0].status === RecordStatus.INACTIVE) {
+                  if (data?.data?.createOrUpdateUom.length > 0 && data?.data?.createOrUpdateUom[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE);
-                      this.plant.status = RecordStatus.INACTIVE;
-                      const message = $localize`La Planta ha sido inhabilitada`;
+                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      const message = $localize`Ha sido inhabilitada`;
+                      this.uom.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -373,13 +363,13 @@ export class CatalogPlantEditionComponent {
               )
             }            
           });
-        } else if (this.plant?.id > 0 && this.plant.status === RecordStatus.INACTIVE) {
+        } else if (this.uom?.id > 0 && this.uom.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR PLANTA`,  
+              title: $localize`REACTIVAR`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -402,7 +392,7 @@ export class CatalogPlantEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará la planta con el Id <strong>${this.plant.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el Id <strong>${this.uom.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -415,22 +405,22 @@ export class CatalogPlantEditionComponent {
               }, 200); 
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
-              const plantParameters = {
-                settingType: 'statusPlant',
-                id: this.plant.id,
-                customerId: this.plant.customerId,
-                companyId: this.plant.companyId,            
+              const uomParameters = {
+                settingType: 'status',
+                id: this.uom.id,
+                customerId: this.uom.customerId,
+            
                 status: RecordStatus.ACTIVE,
               }
-              const plants = this._sharedService.setGraphqlGen(plantParameters);
-              this.updatePlant$ = this._catalogsService.updatePlantStatus$(plants)
+              const uoms = this._sharedService.setGraphqlGen(uomParameters);
+              this.updateUom$ = this._catalogsService.updateUomStatus$(uoms)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdatePlant.length > 0 && data?.data?.createOrUpdatePlant[0].status === RecordStatus.ACTIVE) {
+                  if (data?.data?.createOrUpdateUom.length > 0 && data?.data?.createOrUpdateUom[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      this.plant.status = RecordStatus.ACTIVE;
-                      const message = $localize`La Planta ha sido reactivada`;
+                      const message = $localize`Ha sido reactivada`;
+                      this.uom.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -446,16 +436,16 @@ export class CatalogPlantEditionComponent {
           });
         }
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
-        if (this.plant?.id > 0) {
+        if (this.uom?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
             width: '500px',
             disableClose: true,
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones de la planta <strong>${this.plant.id}</strong>`,
+              title: $localize`Traducciones del id <strong>${this.uom.id}</strong>`,
               topIcon: 'world',
-              translations: this.plant.translations,
+              translations: this.uom.translations,
               buttons: [{
                 action: ButtonActions.SAVE,
                 showIcon: true,
@@ -497,7 +487,7 @@ export class CatalogPlantEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la planta ${this.plant.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará al id ${this.uom.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -506,10 +496,10 @@ export class CatalogPlantEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.plant.translations = [...response.translations];
+              this.uom.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -522,7 +512,7 @@ export class CatalogPlantEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de plantas`,
+      tooltip:  $localize`Regresar a la lista`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -623,7 +613,7 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: this.plant?.status !== RecordStatus.ACTIVE,
+      disabled: this.uom?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
     },{
       type: 'divider',
@@ -650,7 +640,7 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: !!!this.plant.id,
+      disabled: !!!this.uom.id,
       action: ButtonActions.TRANSLATIONS,      
     },];
   }
@@ -683,66 +673,20 @@ export class CatalogPlantEditionComponent {
     }
   }
 
-  requestCompaniesData(currentPage: number, filterStr: string = null) {    
-    this.companies = {
-      ...this.companies,
-      currentPage,
-      loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
-    } else {
-      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
-    }      
-    const skipRecords = this.companies.items.length;
-
-    const plantParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order
-    }    
-    const variables = this._sharedService.setGraphqlGen(plantParameters);
-    this.companies$ = this._catalogsService.getCompaniesLazyLoadingDataGql$(variables)
-    .pipe(
-      tap((data: any) => {
-        const mappedItems = data?.data?.companiesPaginated?.items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.data.id,
-            status: item.data.status,
-          }
-        });
-        this.companies = {
-          ...this.companies,
-          loading: false,
-          pageInfo: data?.data?.companiesPaginated?.pageInfo,
-          items: this.companies.items?.concat(mappedItems),
-          totalCount: data?.data?.companiesPaginated?.totalCount,
-        }        
-      }),
-      catchError(() => EMPTY)
-    )    
-  }
-
   onSubmit() {
     if (!this.submitControlled) return;
     this.submitControlled = false;
     this.validateTables();
-    this.plantForm.markAllAsTouched();
-    this.plantForm.updateValueAndValidity(); 
-    if (this.plantForm.valid) {      
+    this.uomForm.markAllAsTouched();
+    this.uomForm.updateValueAndValidity(); 
+    if (this.uomForm.valid) {      
       this.saveRecord();   
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
-      for (const controlName in this.plantForm.controls) {
-        if (this.plantForm.controls.hasOwnProperty(controlName)) {
-          const typedControl: AbstractControl = this.plantForm.controls[controlName]; 
+      for (const controlName in this.uomForm.controls) {
+        if (this.uomForm.controls.hasOwnProperty(controlName)) {
+          const typedControl: AbstractControl = this.uomForm.controls[controlName]; 
           if (typedControl.invalid) {
             fieldsMissingCounter++;
             fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -767,9 +711,9 @@ export class CatalogPlantEditionComponent {
       }); 
       dialogResponse.afterClosed().subscribe((response) => {
         let fieldFocused = false;
-        for (const controlName in this.plantForm.controls) {
-          if (this.plantForm.controls.hasOwnProperty(controlName)) {
-            const typedControl: AbstractControl = this.plantForm.controls[controlName]; 
+        for (const controlName in this.uomForm.controls) {
+          if (this.uomForm.controls.hasOwnProperty(controlName)) {
+            const typedControl: AbstractControl = this.uomForm.controls[controlName]; 
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
@@ -792,21 +736,20 @@ export class CatalogPlantEditionComponent {
 
   saveRecord() {
     this.setViewLoading(true);
-    const newRecord = !this.plant.id || this.plant.id === null || this.plant.id === 0;
+    const newRecord = !this.uom.id || this.uom.id === null || this.uom.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updatePlantCatalog$ = this._catalogsService.updatePlantCatalog$(dataToSave)
+    this.updateUomCatalog$ = this._catalogsService.updateUomCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
-        if (data?.data?.createOrUpdatePlant.length > 0) {
-          const plantId = data?.data?.createOrUpdatePlant[0].id;        
-          this.processTranslations$(plantId)
-          .subscribe(() => {
-            this.requestPlantData(plantId);
+        if (data?.data?.createOrUpdateUom.length > 0) {
+          const uomId = data?.data?.createOrUpdateUom[0].id;          
+          this.processTranslations$(uomId).subscribe(() => {
+            this.requestUomData(uomId);
             setTimeout(() => {              
-              let message = $localize`La planta ha sido actualizada`;
+              let message = $localize`Ha sido actualizado`;
               if (newRecord) {                
-                message = $localize`La planta ha sido creada satisfactoriamente con el id <strong>${plantId}</strong>`;
-                this._location.replaceState(`/catalogs/plants/edit/${plantId}`);
+                message = $localize`Ha sido creado satisfactoriamente con el id <strong>${this.uom.id}</strong>`;
+                this._location.replaceState(`/catalogs/uoms/edit/${uomId}`);
               }
               this._sharedService.showSnackMessage({
                 message,
@@ -822,43 +765,43 @@ export class CatalogPlantEditionComponent {
     )
   }
 
-  requestPlantData(plantId: number): void { 
-    let plants = undefined;
-    plants = { plantId };
+  requestUomData(uomId: number): void { 
+    let uoms = undefined;
+    uoms = { uomId };
 
     const skipRecords = 0;
-    const filter = JSON.parse(`{ "plantId": { "eq": ${plantId} } }`);
+    const filter = JSON.parse(`{ "uomId": { "eq": ${uomId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
     // let getData: boolean = false;
     this.setViewLoading(true); 
-    this.plant$ = this._catalogsService.getPlantDataGql$({ 
-      plantId, 
+    this.uom$ = this._catalogsService.getUomDataGql$({ 
+      uomId, 
       skipRecords, 
       takeRecords: this.takeRecords, 
       order, 
       filter, 
     }).pipe(
-      map(([ plantGqlData, plantGqlTranslationsData ]) => {
-        return this._catalogsService.mapOnePlant({
-          plantGqlData,  
-          plantGqlTranslationsData,
+      map(([ uomGqlData, uomGqlTranslationsData ]) => {
+        return this._catalogsService.mapOneUom({
+          uomGqlData,  
+          uomGqlTranslationsData,
         })
       }),
-      tap((plantData: PlantDetail) => {
-        if (!plantData) return;
-        this.plant =  plantData;
+      tap((uomData: UomDetail) => {
+        if (!uomData) return;
+        this.uom =  uomData;
         this.translationChanged = false;
-        this.imageChanged = false;
-        this.storedTranslations = JSON.parse(JSON.stringify(this.plant.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations.length > 0 ? 'accent' : '';   
+      
+        this.storedTranslations = JSON.parse(JSON.stringify(this.uom.translations));
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
-        this.changeInactiveButton(this.plant.status);
+        this.changeInactiveButton(this.uom.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = plantData.translations.length > 0 ? $localize`Traducciones (${plantData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = uomData.translations.length > 0 ? $localize`Traducciones (${uomData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = plantData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = uomData.translations.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -871,50 +814,7 @@ export class CatalogPlantEditionComponent {
     ); 
   }  
 
-  getMoreData(getMoreDataParams: GeneralCatalogParams) {
-    if (getMoreDataParams.catalogName === SystemTables.COMPANIES) {
-      if (getMoreDataParams.initArray) {
-        this.companies.currentPage = 0;
-        this.companies.items = [];
-      } else if (!this.companies.pageInfo.hasNextPage) {
-        return;
-      } else {
-        this.companies.currentPage++;
-      }
-      this.requestCompaniesData(        
-        this.companies.currentPage,
-        getMoreDataParams.textToSearch,  
-      ); 
-    }     
-  }
 
-  onFileSelected(event: any) {
-    const fd = new FormData();
-    fd.append('image', event.target.files[0], event.target.files[0].name);
-
-    const uploadUrl = `${environment.apiUploadUrl}`;
-    const params = new HttpParams()
-    .set('destFolder', `${environment.uploadFolders.catalogs}/plants`)
-    .set('processId', this.plant.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
-    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
-      if (res) {
-        this.imageChanged = true;
-        this.plantForm.controls.mainImageName.setValue(res.fileName);
-        this.plant.mainImagePath = res.filePath;
-        this.plant.mainImageGuid = res.fileGuid;
-        this.plant.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la planta para aplicar el cambio`;
-        this._sharedService.showSnackMessage({
-          message,
-          duration: 5000,
-          snackClass: 'snack-primary',
-          icon: 'check',
-        });
-        this.setEditionButtonsState();
-      }      
-    });
-  }
 
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
@@ -922,14 +822,6 @@ export class CatalogPlantEditionComponent {
 
   handleInputKeydown(event: KeyboardEvent) {
     console.log('[handleInputKeydown]', event)
-  }
-
-  handleMultipleSelectionChanged(catalog: string){    
-    if (!this.plant.id || this.plant.id === null || this.plant.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
   }
 
   pageChange(event: any) {
@@ -974,67 +866,50 @@ export class CatalogPlantEditionComponent {
   }
 
   updateFormFromData(): void {    
-    this.plantForm.patchValue({
-      name: this.plant.name,
-      reference: this.plant.reference,      
-      prefix: this.plant.prefix,      
-      notes: this.plant.notes,
-      company: this.plant.company,
-      mainImageName: this.plant.mainImageName,
+    this.uomForm.patchValue({
+      name: this.uom.name,
+      reference: this.uom.reference,      
+    
+      prefix: this.uom.prefix,      
+      notes: this.uom.notes,      
+
     });
   } 
 
   prepareRecordToAdd(newRecord: boolean): any {
-    const fc = this.plantForm.controls;
+    const fc = this.uomForm.controls;
     return  {
-      id: this.plant.id,
+        id: this.uom.id,
       customerId: 1, // TODO: Get from profile
-      companyId: this.plant.companyId,
-      status: newRecord ? RecordStatus.ACTIVE : this.plant.status,
+     
+        status: newRecord ? RecordStatus.ACTIVE : this.uom.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
 
-      ...(this.imageChanged) && { 
-        mainImageName: fc.mainImageName.value,
-        mainImagePath: this.plant.mainImagePath,
-        mainImageGuid: this.plant.mainImageGuid, },
+      
     }
   }
 
   setEditionButtonsState() {
-    if (!this.plant.id || this.plant.id === null || this.plant.id === 0) {
+    if (!this.uom.id || this.uom.id === null || this.uom.id === 0) {
       this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
     } else {
       this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
     }
-  }  
-  
-  removeImage() {
-    this.imageChanged = true;
-    this.plantForm.controls.mainImageName.setValue('');
-    this.plant.mainImagePath = '';
-    this.plant.mainImageGuid = '';
-    this.plant.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la planta<br>Guarde la planta para aplicar el cambio`;
-    this._sharedService.showSnackMessage({
-      message,
-      duration: 5000,
-      snackClass: 'snack-primary',
-      icon: 'check',
-    });
-    this.setEditionButtonsState();
   }
+  
+
 
   initForm(): void {
-    this.plantForm.reset();
+    this.uomForm.reset();
     // Default values
 
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.plant = emptyPlantItem;
-    this.focusThisField = 'description';
+    this.uom = emptyUomItem;
+    this.focusThisField = 'name';
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
         behavior: 'smooth',
@@ -1045,13 +920,13 @@ export class CatalogPlantEditionComponent {
   }
 
   initUniqueField(): void {
-    this.plant.id = null;
-    this.plant.createdBy = null;
-    this.plant.createdAt = null;
-    this.plant.updatedBy = null;
-    this.plant.updatedAt = null; 
-    this.plant.status = RecordStatus.ACTIVE; 
-    this.plant.translations.map((t) => {
+    this.uom.id = null;
+    this.uom.createdBy = null;
+    this.uom.createdAt = null;
+    this.uom.updatedBy = null;
+    this.uom.updatedAt = null; 
+    this.uom.status = RecordStatus.ACTIVE; 
+    this.uom.translations.map((t) => {
       return {
         ...t,
         id: null,
@@ -1070,34 +945,31 @@ export class CatalogPlantEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la planta`
-    } else if (fieldControlName === 'company') {
-      return $localize`Compañía asociada a la planta`;
-    }  
+      return $localize`Descripción o nombre`
+    }
     return '';
   }
 
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.PLANTS_CATALOG_EDITION,
+      ApplicationModules.UOMS_CATALOG_EDITION,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.PLANTS_CATALOG_EDITION,
+      ApplicationModules.UOMS_CATALOG_EDITION,
       loading,
     ); 
   }
 
   validateTables(): void {
-    if (this.plantForm.controls.company.value && this.plantForm.controls.company.value.status === RecordStatus.INACTIVE) {
-      this.plantForm.controls.company.setErrors({ inactive: true });   
-    }    
+
+    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations$(plantId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
-      return this.plant.translations.find((t: any) => {        
+  processTranslations$(uomId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.uom.translations.length || this.storedTranslations.some((st: any) => {
+      return this.uom.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
         (st.name !== t.name || 
@@ -1115,18 +987,18 @@ export class CatalogPlantEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
-        companyId: this.plant.companyId,
+     
       }      
-      const translationsToAdd = this.plant.translations.map((t: any) => {
+      const translationsToAdd = this.uom.translations.map((t: any) => {
         return {
           id: null,
-          plantId,
+          uomId,
           name: t.name,
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
           customerId: 1, // TODO: Get from profile
-          companyId: this.plant.companyId,
+       
           status: RecordStatus.ACTIVE,
         }
       });
@@ -1135,8 +1007,8 @@ export class CatalogPlantEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addPlantTransations$(varToAdd) : of(null),
-        varToDelete.ids.length > 0 ? this._catalogsService.deletePlantTranslations$(varToDelete) : of(null) 
+        varToAdd.translations.length > 0 ? this._catalogsService.addUomTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteUomTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);

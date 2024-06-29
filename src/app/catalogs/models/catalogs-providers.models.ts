@@ -49,7 +49,8 @@ export interface ProvidersState {
   providersData: ProvidersData;
 }
 
-export interface ProviderState {//warning
+export interface ProviderState {
+  
   loading: boolean;
   moldDetail: ProviderDetail;
 }

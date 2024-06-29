@@ -28,4 +28,7 @@ export * from './catalog-department-edition';
 export * from './catalog-checklist-templates';
 export * from './catalog-checklist-templates-edition'
 
+export * from './catalog-uoms-list';
+export * from './catalog-uom-edition';
+
 export * from './catalogs-home';

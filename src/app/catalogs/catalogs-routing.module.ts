@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -146,6 +146,21 @@ const routes: Routes = [
         path: 'departments/edit/:id',
         component: CatalogDepartmentEditionComponent,
         data: { animation: 'CatalogDepartmentEditionComponent' },
+      },
+      {
+        path: 'uoms',
+        component: CatalogUomsListComponent,
+        data: { animation: 'CatalogUomsComponent' },
+      },
+      {
+        path: 'uoms/create',
+        component: CatalogUomEditionComponent,
+        data: { animation: 'CatalogUomEditionComponent' },
+      },
+      {
+        path: 'uoms/edit/:id',
+        component: CatalogUomEditionComponent,
+        data: { animation: 'CatalogUomEditionComponent' },
       },
       {
         path: '**',

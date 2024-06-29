@@ -316,7 +316,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allMoldsToCsv$ = this._catalogsService.getAllMoldsToCsv$().pipe(
+        this.allMoldsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(moldToCsv => {
             const fileData$ = this._catalogsService.getAllMoldsCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
             .subscribe(data => { 

@@ -284,7 +284,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allEquipmentsToCsv$ = this._catalogsService.getAllEquipmentsToCsv$().pipe(
+        this.allEquipmentsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(equipmentsToCsv => {
             const fileData$ = this._catalogsService.getAllEquipmentsCsvData$(equipmentsToCsv?.data?.exportEquipmentsToCsv?.exportedFilename)
             .subscribe(data => { 

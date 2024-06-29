@@ -285,7 +285,7 @@ export class CatalogCustomersListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allCustomersToCsv$ = this._catalogsService.getAllCustomersToCsv$().pipe(
+        this.allCustomersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(customersToCsv => {
             const fileData$ = this._catalogsService.getAllCustomersCsvData$(customersToCsv?.data?.exportCustomersToCsv?.exportedFilename)
             .subscribe(data => { 

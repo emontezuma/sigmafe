@@ -164,6 +164,8 @@ export enum ApplicationModules {
   EQUIPMENTS_CATALOG_EDITION = 'equipments-catalog-edition',
   DEPARTMENTS_CATALOG = 'departments-catalog',
   DEPARTMENTS_CATALOG_EDITION = 'departments-catalog-edition',
+  UOMS_CATALOG = 'uoms-catalog',
+  UOMS_CATALOG_EDITION = 'uoms-catalog-edition',
 }
 
 export enum ScreenSizes {

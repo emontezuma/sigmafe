@@ -284,7 +284,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allProvidersToCsv$ = this._catalogsService.getAllProvidersToCsv$().pipe(
+        this.allProvidersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(providersToCsv => {
             
             const fileData$ = this._catalogsService.getAllProvidersCsvData$(providersToCsv?.data?.exportProvidersToCsv?.exportedFilename)
