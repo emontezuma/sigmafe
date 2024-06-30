@@ -287,7 +287,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
         this.allPartNumbersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(partNumbersToCsv => {
             
-            const fileData$ = this._catalogsService.getAllPartNumbersCsvData$(partNumbersToCsv?.data?.exportPartNumbersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(partNumbersToCsv?.data?.exportPartNumbersToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, partNumbersToCsv?.data?.exportPartNumbersToCsv?.downloadFilename);
               setTimeout(() => {

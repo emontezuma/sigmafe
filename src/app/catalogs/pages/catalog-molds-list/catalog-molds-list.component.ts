@@ -318,7 +318,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allMoldsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(moldToCsv => {
-            const fileData$ = this._catalogsService.getAllMoldsCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, moldToCsv?.data?.exportMoldToCSV?.downloadFilename);
               setTimeout(() => {

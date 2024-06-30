@@ -304,7 +304,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allUomsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(uomsToCsv => {
-            const fileData$ = this._catalogsService.getAllUomsCsvData$(uomsToCsv?.data?.exportUomsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(uomsToCsv?.data?.exportUomsToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, uomsToCsv?.data?.exportUomsToCsv?.downloadFilename);
               setTimeout(() => {

@@ -287,7 +287,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
         this.allProvidersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(providersToCsv => {
             
-            const fileData$ = this._catalogsService.getAllProvidersCsvData$(providersToCsv?.data?.exportProvidersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(providersToCsv?.data?.exportProvidersToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, providersToCsv?.data?.exportProvidersToCsv?.downloadFilename);
               setTimeout(() => {

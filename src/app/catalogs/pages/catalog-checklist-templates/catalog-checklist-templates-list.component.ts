@@ -296,7 +296,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(checklistTemplatesToCsv => {
-            const fileData$ = this._catalogsService.getAllChecklistTemplatesCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
               setTimeout(() => {

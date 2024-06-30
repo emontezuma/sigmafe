@@ -288,7 +288,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allManufacturersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(manufacturersToCsv => {
-            const fileData$ = this._catalogsService.getAllManufacturersCsvData$(manufacturersToCsv?.data?.exportManufacturersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(manufacturersToCsv?.data?.exportManufacturersToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, manufacturersToCsv?.data?.exportManufacturersToCsv?.downloadFilename);
               setTimeout(() => {
