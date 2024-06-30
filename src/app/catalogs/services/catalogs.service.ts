@@ -793,12 +793,6 @@ export class CatalogsService {
   //======providers
 
 
-  // getAllProvidersToCsv$(): Observable<any> {//warning repeated
-  //   return this._apollo.watchQuery({ 
-  //     query: GET_ALL_MOLDS_TO_CSV,       
-  //   }).valueChanges;
-  // }
-
   getAllProvidersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
@@ -1237,6 +1231,93 @@ updatePositionStatus$(variables: any): Observable<any> { //warning missing in cu
   });
 }
 
+  
+  //======partNumbers
+
+
+  getAllPartNumbersCsvData$(fileName: string): Observable<any> {
+    return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
+      map(data => data)
+    );
+  }
+
+  getPartNumbersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+    
+    return this._apollo.watchQuery({ 
+      query: GET_PROVIDERS,
+      variables
+    }).valueChanges    
+  }
+  
+  addPartNumberTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_PROVIDER_TRANSLATIONS, 
+      variables,       
+    });
+  } 
+  
+  getPartNumberDataGql$(parameters: any): Observable<any> {
+    const partNumberId = { partNumberId: parameters.partNumberId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_PROVIDER, 
+      variables: partNumberId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_PROVIDER_TRANSLATIONS, 
+        variables, 
+      })
+    ]);
+  }
+
+  updatePartNumberCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_PROVIDER, 
+      variables,      
+    })
+  }
+  
+  mapOnePartNumber(paramsData: any): CompanyDetail {
+    const { onePartNumber } = paramsData?.partNumberGqlData?.data;
+    const { data } = onePartNumber;
+    const translations = paramsData?.partNumberGqlTranslationsData?.data;
+    
+    
+    return {
+      ...data,
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deletePartNumberTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_PROVIDER_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  updatePartNumberStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_MOLD, 
+      variables,       
+    });
+  }
+  
   
 //refactor
   

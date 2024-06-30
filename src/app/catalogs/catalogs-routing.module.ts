@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -176,6 +176,21 @@ const routes: Routes = [
         path: 'positions/edit/:id',
         component: CatalogPositionEditionComponent,
         data: { animation: 'CatalogPositionEditionComponent' },
+      },
+      {
+        path: 'part-numbers',
+        component: CatalogPartNumbersListComponent,
+        data: { animation: 'CatalogPartNumbersComponent' },
+      },
+      {
+        path: 'part-numbers/create',
+        component: CatalogPartNumberEditionComponent,
+        data: { animation: 'CatalogPartNumberEditionComponent' },
+      },
+      {
+        path: 'part-numbers/edit/:id',
+        component: CatalogPartNumberEditionComponent,
+        data: { animation: 'CatalogPartNumberEditionComponent' },
       },
       {
         path: '**',

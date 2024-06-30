@@ -3431,4 +3431,198 @@ export const INACTIVATE_POSITION = gql`
   }
 `;
 
+
+//partNumbers===========================
+
+export const GET_PART_NUMBER = gql`
+  query OnePartNumber (
+    $partNumberId: Long!,
+  ) {
+  onePartNumber (
+    id: $partNumberId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+     
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+  }
+}
+`;
+
+export const GET_PART_NUMBERS = gql`
+  query PartNumbersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedPartNumberDtoSortInput!],
+    $filterBy: TranslatedPartNumberDtoFilterInput,
+  ) {
+  partNumbersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+       
+          id
+          customerId
+          reference
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_PART_NUMBER_TRANSLATIONS = gql`
+  query PartNumbersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [PartNumberTranslationTableSortInput!],
+    $filterBy: PartNumberTranslationTableFilterInput,
+  ) {
+    partNumbersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        partNumberId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_PART_NUMBER_TRANSLATIONS = gql`
+  mutation CreateOrUpdatePartNumberTranslationTable (
+    $translations: [PartNumberTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdatePartNumberTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      partNumberId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_PART_NUMBER = gql`
+  mutation CreateOrUpdatePartNumber (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+   
+  ) {
+  createOrUpdatePartNumber (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+   
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_PART_NUMBER_TRANSLATIONS = gql`
+  mutation DeletePartNumbersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deletePartNumbersTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
+
+
 //=========END

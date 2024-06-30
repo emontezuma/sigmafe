@@ -10,3 +10,4 @@ export * from './catalogs-equipments.models';
 export * from './catalogs-departments.models';
 export * from './catalogs-uoms.models';
 export * from './catalogs-positions.models';
+export * from './catalogs-part-numbers.models';

@@ -34,4 +34,7 @@ export * from './catalog-uom-edition';
 export * from './catalog-positions-list';
 export * from './catalog-position-edition';
 
+export * from './catalog-part-numbers-list';
+export * from './catalog-part-number-edition';
+
 export * from './catalogs-home';
