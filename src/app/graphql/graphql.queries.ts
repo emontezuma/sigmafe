@@ -3300,7 +3300,7 @@ query UploadedFiles (
         path
       }
     }
-}
+  }
 `
 ;
 
