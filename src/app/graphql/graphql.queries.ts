@@ -3200,4 +3200,235 @@ export const INACTIVATE_UOM = gql`
 `;
 
 
+//departments===========================
+
+export const GET_POSITION = gql`
+  query OnePosition (
+    $departmentId: Long!,
+  ) {
+  onePosition (
+    id: $departmentId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      id
+      customerId
+      recipientId
+
+      plantId     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_POSITIONS = gql`
+  query PositionsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedPositionDtoSortInput!],
+    $filterBy: TranslatedPositionDtoFilterInput,
+  ) {
+  departmentsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id
+          customerId
+          plantId
+          recipientId
+
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_POSITION_TRANSLATIONS = gql`
+  query PositionsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [PositionTranslationTableSortInput!],
+    $filterBy: PositionTranslationTableFilterInput,
+  ) {
+    departmentsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        departmentId
+        name
+        reference
+        notes
+        prefix
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const ADD_POSITION_TRANSLATIONS = gql`
+  mutation CreateOrUpdatePositionTranslationTable (
+    $translations: [PositionTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdatePositionTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      departmentId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_POSITION = gql`
+  mutation CreateOrUpdatePosition (
+    $customerId: Long,
+    $plantId: Long,
+    $recipientId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $prefix: String,
+    $reference: String,
+    $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdatePosition (
+    inputs: [{
+      customerId: $customerId
+      plantId: $plantId 
+      recipientId: $recipientId
+    
+      id: $id      
+      status: $status
+      name: $name,
+      prefix: $prefix,
+      reference: $reference,
+      notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_POSITION_TRANSLATIONS = gql`
+  mutation DeletePositionsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!   
+  $plantId: Long!
+  ) {
+    deletePositionsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+      plantId: $plantId,
+    ) 
+  }
+`;
+
+export const INACTIVATE_POSITION = gql`
+  mutation CreateOrUpdatePosition (
+    $id: Long,
+    $customerId: Long,
+    $plantId: Long,
+    $status: String
+  ) {
+  createOrUpdatePosition (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      plantId: $plantId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 //=========END

@@ -1,0 +1,264 @@
+<div
+  class="container"
+  #catalogEdition
+  @routingAnimation
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+  i18n
+>
+  <ng-container *ngIf="scroll$ | async"></ng-container>
+  <ng-container *ngIf="position$ | async"></ng-container>  
+  <ng-container *ngIf="showGoTop$ | async"></ng-container>
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+  <ng-container *ngIf="updatePosition$ | async "></ng-container>
+  <ng-container *ngIf="updatePositionCatalog$ | async "></ng-container>      
+  <ng-container *ngIf="deletePositionTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addPositionTranslations$ | async "></ng-container>   
+
+  <mat-card class="card">
+    <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="positionForm"
+        #f="ngForm"
+      >
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DE LA POSICION</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='name'"
+                [bordered]="true"
+                [formField]="positionForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="300"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignado a la posicion"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Descripción/Nombre de la posicion</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='prefix'"
+                [bordered]="true"
+                [formField]="positionForm.controls.prefix"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="50"
+                [showRightHint]="true"                
+                [showCloseButton]="true"
+                fieldHelp="Especifique la abreviación de la posicion"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Abreviación de la posicion</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="positionForm.controls.reference"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="100"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                fieldHelp="Especifique la referencia de la posicion"
+              >
+                <span fieldTitle class="label field__label"
+                  >Referencia</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items field-items--bordered">
+              <app-area-field
+                [bordered]="false"
+                [formField]="positionForm.controls.notes"
+                [fieldMaxLength]="500"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique las notas referentes a esta posicion"
+              >
+                <span fieldTitle class="label field__label"
+                  >Notas referentes a la posicion</span
+                >
+              </app-area-field>              
+            </div>                     
+            <div class="field-items">
+              <fieldset class="field__container">
+                <div class="image-and-field">
+                  <div class="field-components">
+                    <span class="label field__label">Imagen a mostrar</span>                
+                    <mat-form-field appearance="fill" class="field__field">
+                      <input
+                        class="field__input"
+                        matInput
+                        [formControl]="positionForm.controls.mainImageName"                        
+                        [readonly]="true"
+                      />
+                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
+                      <button
+                        matSuffix
+                        mat-icon-button
+                        (click)="fileInput.click()"
+                        style="margin-right: 5px;"
+                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>search</mat-icon>
+                      </button>
+                      <button
+                        *ngIf="position.mainImage"
+                        matSuffix
+                        mat-icon-button
+                        (click)="removeImage()"
+                        style="margin-right: 5px;"
+                        matTooltip="Remueve la imagen de la posicion"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>          
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta posicion</span>
+                  </div>                  
+                  <div *ngIf="!loading" class="card-image">
+                    <div
+                      class="image-container"
+                      *ngIf="this.position.mainImage"
+                    >
+                      <img                
+                        @dissolve
+                        appImageNotFound                
+                        class="mold-image"                        
+                        [src]="this.position.mainImage"
+                        [alt]="this.position.mainImage"            
+                        fill
+                      >      
+                    </div>
+                    <div
+                      *ngIf="!this.position.mainImage"
+                      class="icon-container"
+                    >
+                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
+                    </div>    
+                  </div>
+                </div>                
+              </fieldset>              
+            </div>
+                   
+          </div>          
+        </mat-expansion-panel>        
+      </mat-accordion>
+    </form>
+    <div
+      *ngIf="position.id"
+      class="catalog-footer"
+    >
+      <div class="grid-dates">
+        <div class="flex">
+          <div class="readonly-value item-id">{{ position.id }}</div>
+          <div class="label-with-no-index">ID del registro</div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(position.createdAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de creación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ position.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Creado por</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(position.updatedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de modificación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ position.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="grid-inactive" *ngIf="position.status === RecordStatus.INACTIVE">
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(position.deletedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de inactivación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ position.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Inactivado por</div>
+          </div>
+        </div>
+        <div class="flex-inactive">
+          <div class="label-inactive">
+            <strong>El registro está INACTIVO</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

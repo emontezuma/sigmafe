@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -161,6 +161,21 @@ const routes: Routes = [
         path: 'uoms/edit/:id',
         component: CatalogUomEditionComponent,
         data: { animation: 'CatalogUomEditionComponent' },
+      },
+      {
+        path: 'positions',
+        component: CatalogPositionsListComponent,
+        data: { animation: 'CatalogPositionsComponent' },
+      },
+      {
+        path: 'positions/create',
+        component: CatalogPositionEditionComponent,
+        data: { animation: 'CatalogPositionEditionComponent' },
+      },
+      {
+        path: 'positions/edit/:id',
+        component: CatalogPositionEditionComponent,
+        data: { animation: 'CatalogPositionEditionComponent' },
       },
       {
         path: '**',

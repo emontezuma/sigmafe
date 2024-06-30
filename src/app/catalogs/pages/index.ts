@@ -31,4 +31,7 @@ export * from './catalog-checklist-templates-edition'
 export * from './catalog-uoms-list';
 export * from './catalog-uom-edition';
 
+export * from './catalog-positions-list';
+export * from './catalog-position-edition';
+
 export * from './catalogs-home';
