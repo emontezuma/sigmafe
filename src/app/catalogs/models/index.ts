@@ -13,3 +13,4 @@ export * from './catalogs-positions.models';
 export * from './catalogs-part-numbers.models';
 export * from './catalogs-lines.models';
 export * from './catalogs-tables.models';
+export * from './catalogs-workgroups.models';

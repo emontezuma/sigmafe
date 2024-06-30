@@ -174,6 +174,8 @@ export enum ApplicationModules {
   LINES_CATALOG_EDITION = 'lines-catalog-edition',
   TABLES_CATALOG = 'tables-catalog',
   TABLES_CATALOG_EDITION = 'tables-catalog-edition',
+  WORKGROUPS_CATALOG = 'workgroups-catalog',
+  WORKGROUPS_CATALOG_EDITION = 'workgroups-catalog-edition',
 }
 
 export enum ScreenSizes {

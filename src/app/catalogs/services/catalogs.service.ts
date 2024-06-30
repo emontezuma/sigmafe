@@ -6,6 +6,7 @@ import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PRO
 import { environment } from 'src/environments/environment';
 import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, LineDetail, PlantDetail, PositionDetail, UomDetail, VariableDetail } from '../models';
 import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
+import { WorkgroupDetail } from '../models/catalogs-workgroups.models';
 
 @Injectable({
   providedIn: 'root'
@@ -1359,6 +1360,90 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
       variables,       
     });
   }
+
+
+
+//======workgroups
+
+getWorkgroupsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+  const variables = {      
+    ...(recordsToSkip !== 0) && { recordsToSkip },
+    ...(recordsToTake !== 0) && { recordsToTake },
+    ...(orderBy) && { orderBy },
+    ...(filterBy) && { filterBy },
+  }
+  
+  return this._apollo.watchQuery({ 
+    query: GET_DEPARTMENTS,
+    variables
+  }).valueChanges    
+}
+
+addWorkgroupTransations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: ADD_DEPARTMENT_TRANSLATIONS, 
+    variables,       
+  });
+} 
+
+getWorkgroupDataGql$(parameters: any): Observable<any> {
+  const workgroupId = { workgroupId: parameters.workgroupId};
+
+  const variables = {
+    ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+    ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+    ...(parameters.order) && { orderBy: parameters.order },
+    ...(parameters.filter) && { filterBy: parameters.filter },
+  }
+
+  return combineLatest([ 
+    this._apollo.query({ 
+    query: GET_DEPARTMENT, 
+    variables: workgroupId,      
+    }),
+    
+    this._apollo.query({ 
+      query: GET_DEPARTMENT_TRANSLATIONS, 
+      variables, 
+    })
+  ]);
+}
+
+updateWorkgroupCatalog$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: UPDATE_DEPARTMENT, 
+    variables,      
+  })
+}
+
+mapOneWorkgroup(paramsData: any): WorkgroupDetail {
+  const { oneWorkgroup } = paramsData?.workgroupGqlData?.data;
+  const { data } = oneWorkgroup;
+  const translations = paramsData?.workgroupGqlTranslationsData?.data;
+  const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+  const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+  
+  return {
+    ...data,
+    mainImage,
+    translations: this.mapTranslations(translations),
+  }
+}
+
+deleteWorkgroupTranslations$(variables: any): Observable<any> {
+  return this._apollo.mutate({
+    mutation: DELETE_DEPARTMENT_TRANSLATIONS, 
+    variables,       
+  });
+}
+
+updateWorkgroupStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  return this._apollo.mutate({
+    mutation: INACTIVATE_DEPARTMENT, 
+    variables,       
+  });
+}
+
 
 
     //refactor

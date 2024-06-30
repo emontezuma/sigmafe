@@ -4043,5 +4043,199 @@ export const DELETE_TABLE_TRANSLATIONS = gql`
 `;
 
 
+//workgroups===========================
+
+export const GET_WORKGROUP = gql`
+  query OneWorkgroup (
+    $workgroupId: Long!,
+  ) {
+  oneWorkgroup (
+    id: $workgroupId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+     
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+  }
+}
+`;
+
+export const GET_WORKGROUPS = gql`
+  query WorkgroupsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedWorkgroupDtoSortInput!],
+    $filterBy: TranslatedWorkgroupDtoFilterInput,
+  ) {
+  workgroupsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+       
+          id
+          customerId
+          reference
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_WORKGROUP_TRANSLATIONS = gql`
+  query WorkgroupsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [WorkgroupTranslationTableSortInput!],
+    $filterBy: WorkgroupTranslationTableFilterInput,
+  ) {
+    workgroupsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        workgroupId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_WORKGROUP_TRANSLATIONS = gql`
+  mutation CreateOrUpdateWorkgroupTranslationTable (
+    $translations: [WorkgroupTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateWorkgroupTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      workgroupId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_WORKGROUP = gql`
+  mutation CreateOrUpdateWorkgroup (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+   
+  ) {
+  createOrUpdateWorkgroup (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+   
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_WORKGROUP_TRANSLATIONS = gql`
+  mutation DeleteWorkgroupsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteWorkgroupsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
+
+
+
 
 //=========END

@@ -43,4 +43,7 @@ export * from './catalog-line-edition';
 export * from './catalog-tables-list';
 export * from './catalog-table-edition';
 
+export * from './catalog-workgroups-list';
+export * from './catalog-workgroup-edition';
+
 export * from './catalogs-home';
