@@ -338,6 +338,8 @@ export class CatalogDepartmentEditionComponent {
                 settingType: 'status',
                 id: this.department.id,
                 customerId: this.department.customerId,
+                recipientId: this.department.recipientId,
+                approverId: this.department.approverId,
                 plantId: this.department.plantId,
                 status: RecordStatus.INACTIVE,
               }
@@ -409,6 +411,8 @@ export class CatalogDepartmentEditionComponent {
                 settingType: 'status',
                 id: this.department.id,
                 customerId: this.department.customerId,
+                recipientId: this.department.recipientId,
+                approverId: this.department.approverId,
                 plantId: this.department.plantId,
                 status: RecordStatus.ACTIVE,
               }
@@ -906,6 +910,8 @@ export class CatalogDepartmentEditionComponent {
     return  {
         id: this.department.id,
       customerId: 1, // TODO: Get from profile
+      recipientId: 1, // TODO: Get from profile
+      approverId: 1, // TODO: Get from profile
       plantId: 1, // TODO: Get from profile
         status: newRecord ? RecordStatus.ACTIVE : this.department.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
@@ -1029,6 +1035,8 @@ export class CatalogDepartmentEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
+        recipientId: 1, // TODO: Get from profile
+        approverId: 1, // TODO: Get from profile
         plantId: 1, // TODO: Get from profile
       }      
       const translationsToAdd = this.department.translations.map((t: any) => {
@@ -1040,6 +1048,8 @@ export class CatalogDepartmentEditionComponent {
           notes: t.notes,
           languageId: t.languageId,
           customerId: 1, // TODO: Get from profile
+          recipientId: 1, // TODO: Get from profile
+          approverId: 1, // TODO: Get from profile
           plantId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
