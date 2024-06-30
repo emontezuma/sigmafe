@@ -172,6 +172,8 @@ export enum ApplicationModules {
   PART_NUMBERS_CATALOG_EDITION = 'part-numbers-catalog-edition',
   LINES_CATALOG = 'lines-catalog',
   LINES_CATALOG_EDITION = 'lines-catalog-edition',
+  TABLES_CATALOG = 'tables-catalog',
+  TABLES_CATALOG_EDITION = 'tables-catalog-edition',
 }
 
 export enum ScreenSizes {

@@ -40,4 +40,7 @@ export * from './catalog-part-number-edition';
 export * from './catalog-lines-list';
 export * from './catalog-line-edition';
 
+export * from './catalog-tables-list';
+export * from './catalog-table-edition';
+
 export * from './catalogs-home';
