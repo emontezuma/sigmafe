@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogTablesListComponent, CatalogTableEditionComponent, CatalogWorkgroupsListComponent, CatalogWorkgroupEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -146,6 +146,96 @@ const routes: Routes = [
         path: 'departments/edit/:id',
         component: CatalogDepartmentEditionComponent,
         data: { animation: 'CatalogDepartmentEditionComponent' },
+      },
+      {
+        path: 'uoms',
+        component: CatalogUomsListComponent,
+        data: { animation: 'CatalogUomsComponent' },
+      },
+      {
+        path: 'uoms/create',
+        component: CatalogUomEditionComponent,
+        data: { animation: 'CatalogUomEditionComponent' },
+      },
+      {
+        path: 'uoms/edit/:id',
+        component: CatalogUomEditionComponent,
+        data: { animation: 'CatalogUomEditionComponent' },
+      },
+      {
+        path: 'positions',
+        component: CatalogPositionsListComponent,
+        data: { animation: 'CatalogPositionsComponent' },
+      },
+      {
+        path: 'positions/create',
+        component: CatalogPositionEditionComponent,
+        data: { animation: 'CatalogPositionEditionComponent' },
+      },
+      {
+        path: 'positions/edit/:id',
+        component: CatalogPositionEditionComponent,
+        data: { animation: 'CatalogPositionEditionComponent' },
+      },
+      {
+        path: 'part-numbers',
+        component: CatalogPartNumbersListComponent,
+        data: { animation: 'CatalogPartNumbersComponent' },
+      },
+      {
+        path: 'part-numbers/create',
+        component: CatalogPartNumberEditionComponent,
+        data: { animation: 'CatalogPartNumberEditionComponent' },
+      },
+      {
+        path: 'part-numbers/edit/:id',
+        component: CatalogPartNumberEditionComponent,
+        data: { animation: 'CatalogPartNumberEditionComponent' },
+      },
+      {
+        path: 'lines',
+        component: CatalogLinesListComponent,
+        data: { animation: 'CatalogLinesComponent' },
+      },
+      {
+        path: 'lines/create',
+        component: CatalogLineEditionComponent,
+        data: { animation: 'CatalogLineEditionComponent' },
+      },
+      {
+        path: 'lines/edit/:id',
+        component: CatalogLineEditionComponent,
+        data: { animation: 'CatalogLineEditionComponent' },
+      },
+      {
+        path: 'tables',
+        component: CatalogTablesListComponent,
+        data: { animation: 'CatalogTablesComponent' },
+      },
+      {
+        path: 'tables/create',
+        component: CatalogTableEditionComponent,
+        data: { animation: 'CatalogTableEditionComponent' },
+      },
+      {
+        path: 'tables/edit/:id',
+        component: CatalogTableEditionComponent,
+        data: { animation: 'CatalogTableEditionComponent' },
+      },
+      {
+        path: 'workgroups',
+        component: CatalogWorkgroupsListComponent,
+        data: { animation: 'CatalogWorkgroupsComponent' },
+      },
+      {
+        path: 'workgroups/create',
+        component: CatalogWorkgroupEditionComponent,
+        data: { animation: 'CatalogWorkgroupEditionComponent' },
+      },
+      {
+        path: 'workgroups/edit/:id',
+        component: CatalogWorkgroupEditionComponent,
+        data: { animation: 'CatalogWorkgroupEditionComponent' },
       },
       {
         path: '**',

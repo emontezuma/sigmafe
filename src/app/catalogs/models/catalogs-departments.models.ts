@@ -54,7 +54,7 @@ export interface DepartmentsState {
   departmentsData: DepartmentsData;
 }
 
-export interface DepartmentState {//warning
+export interface DepartmentState {
   loading: boolean;
   moldDetail: DepartmentDetail;
 }

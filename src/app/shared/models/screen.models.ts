@@ -165,6 +165,18 @@ export enum ApplicationModules {
   EQUIPMENTS_CATALOG_EDITION = 'equipments-catalog-edition',
   DEPARTMENTS_CATALOG = 'departments-catalog',
   DEPARTMENTS_CATALOG_EDITION = 'departments-catalog-edition',
+  UOMS_CATALOG = 'uoms-catalog',
+  UOMS_CATALOG_EDITION = 'uoms-catalog-edition',
+  POSITIONS_CATALOG = 'positions-catalog',
+  POSITIONS_CATALOG_EDITION = 'positions-catalog-edition',
+  PART_NUMBERS_CATALOG = 'part-numbers-catalog',
+  PART_NUMBERS_CATALOG_EDITION = 'part-numbers-catalog-edition',
+  LINES_CATALOG = 'lines-catalog',
+  LINES_CATALOG_EDITION = 'lines-catalog-edition',
+  TABLES_CATALOG = 'tables-catalog',
+  TABLES_CATALOG_EDITION = 'tables-catalog-edition',
+  WORKGROUPS_CATALOG = 'workgroups-catalog',
+  WORKGROUPS_CATALOG_EDITION = 'workgroups-catalog-edition',
 }
 
 export enum ScreenSizes {

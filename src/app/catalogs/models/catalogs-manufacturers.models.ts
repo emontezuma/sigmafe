@@ -46,7 +46,7 @@ export interface ManufacturersState {
   manufacturersData: ManufacturersData;
 }
 
-export interface ManufacturerState {//warning remove
+export interface ManufacturerState {
   loading: boolean;
   moldDetail: ManufacturerDetail;
 }

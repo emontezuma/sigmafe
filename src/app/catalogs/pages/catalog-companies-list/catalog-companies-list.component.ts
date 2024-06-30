@@ -284,9 +284,9 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allCompaniesToCsv$ = this._catalogsService.getAllCompaniesToCsv$().pipe(
+        this.allCompaniesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(companiesToCsv => {
-            const fileData$ = this._catalogsService.getAllCompaniesCsvData$(companiesToCsv?.data?.exportCompaniesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(companiesToCsv?.data?.exportCompaniesToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, companiesToCsv?.data?.exportCompaniesToCsv?.downloadFilename);
               setTimeout(() => {

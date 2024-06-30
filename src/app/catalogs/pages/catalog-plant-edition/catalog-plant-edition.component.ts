@@ -419,7 +419,7 @@ export class CatalogPlantEditionComponent {
                 settingType: 'statusPlant',
                 id: this.plant.id,
                 customerId: this.plant.customerId,
-                companyId: this.plant.companyId,            //warning get from ???
+                companyId: this.plant.companyId,            
                 status: RecordStatus.ACTIVE,
               }
               const plants = this._sharedService.setGraphqlGen(plantParameters);

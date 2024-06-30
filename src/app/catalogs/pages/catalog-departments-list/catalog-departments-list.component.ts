@@ -284,9 +284,9 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allDepartmentsToCsv$ = this._catalogsService.getAllDepartmentsToCsv$().pipe(
+        this.allDepartmentsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(departmentsToCsv => {
-            const fileData$ = this._catalogsService.getAllDepartmentsCsvData$(departmentsToCsv?.data?.exportDepartmentsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(departmentsToCsv?.data?.exportDepartmentsToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, departmentsToCsv?.data?.exportDepartmentsToCsv?.downloadFilename);
               setTimeout(() => {

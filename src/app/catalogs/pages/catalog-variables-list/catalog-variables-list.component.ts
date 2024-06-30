@@ -307,9 +307,9 @@ export class CatalogVariablesListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allVariablesToCsv$ = this._catalogsService.getAllVariablesToCsv$().pipe(
+        this.allVariablesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(variablesToCsv => {
-            const fileData$ = this._catalogsService.getAllVariablesCsvData$(variablesToCsv?.data?.exportVariablesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(variablesToCsv?.data?.exportVariablesToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, variablesToCsv?.data?.exportVariablesToCsv?.downloadFilename);
               setTimeout(() => {

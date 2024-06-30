@@ -28,4 +28,22 @@ export * from './catalog-department-edition';
 export * from './catalog-checklist-templates-list';
 export * from './catalog-checklist-templates-edition'
 
+export * from './catalog-uoms-list';
+export * from './catalog-uom-edition';
+
+export * from './catalog-positions-list';
+export * from './catalog-position-edition';
+
+export * from './catalog-part-numbers-list';
+export * from './catalog-part-number-edition';
+
+export * from './catalog-lines-list';
+export * from './catalog-line-edition';
+
+export * from './catalog-tables-list';
+export * from './catalog-table-edition';
+
+export * from './catalog-workgroups-list';
+export * from './catalog-workgroup-edition';
+
 export * from './catalogs-home';

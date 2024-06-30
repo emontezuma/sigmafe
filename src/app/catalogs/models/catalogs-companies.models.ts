@@ -51,7 +51,7 @@ export interface CompaniesState {
   companiesData: CompaniesData;
 }
 
-export interface CompanyState {//warning
+export interface CompanyState {
   loading: boolean;
   moldDetail: CompanyDetail;
 }
