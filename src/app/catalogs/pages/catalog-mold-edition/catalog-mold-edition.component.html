@@ -1,4 +1,4 @@
-<div
+<ng-container
   class="container"
   #moldCatalogEdition
   @routingAnimation
@@ -1008,6 +1008,7 @@
                 <mat-icon                
                   class="svgicon icon-medium"                
                   svgIcon="document"
+                  [ngStyle]="{ visibility: addHistoricalButtonClick ? 'hidden' : 'visible' }"b
                 >
                 </mat-icon>
                 <mat-progress-spinner
@@ -1032,6 +1033,7 @@
                 <mat-icon                
                   class="svgicon icon-medium"                
                   svgIcon="garbage-can"
+                  [ngStyle]="{ visibility: removeHistoricalButtonClick ? 'hidden' : 'visible' }"
                 >
                 </mat-icon>
                 <mat-progress-spinner
@@ -1141,7 +1143,7 @@
       </div>
     </div>
   </mat-card>
-</div>
+</ng-container>
 <ng-template #skeleton>
   <ngx-skeleton-loader
     *ngIf="loadingMaintenance"

@@ -83,6 +83,155 @@
             >
           </app-area-field>
         </div>
+        <section 
+          class="section-fields"
+          *ngIf="data.fromChecklistTemplate"
+        >
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>              
+            <app-area-field            
+              [bordered]="true"
+              [formField]="translationsForm.controls.approvalRequestMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje que se enviará para solicitar la aprobación"
+            >
+              <span fieldTitle class="label field__label"
+                >Notificación a enviar cuando se solicite la aprobación del checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.approvalRequestMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título que se enviará por correo para solicitar la aprobación"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje a enviar (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>                             
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.anticipationMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje anticipado que se enviará por el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Notificación anticipada a enviar antes de generar checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.anticipationMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título de la notificación que se enviará por correo"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje a enviar (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>            
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.expiringMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje que se enviará al expirar el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Notificación a enviar cuando expire el checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.expiringMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título de la notificación que se enviará por correo cuando expire el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje cuando expire el checklist (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>                                              
+        </section>
       </div>
       <div
         *ngIf="selectedTranslation && selectedTranslation.updatedAt && selectedTranslation.updatedByUserName"

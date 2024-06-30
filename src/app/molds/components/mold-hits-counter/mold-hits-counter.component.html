@@ -43,7 +43,7 @@
         <mat-card-subtitle class="label">Id</mat-card-subtitle>
       </div>
       <div class="column">
-        <mat-card-title class="subtitle">{{ mold.translatedPartNumber.translatedReference }}</mat-card-title>
+        <mat-card-title class="subtitle">{{ mold?.translatedPartNumber?.translatedReference }}</mat-card-title>
         <mat-card-subtitle class="label">Número de parte</mat-card-subtitle>
       </div>
       <div class="column">
@@ -200,7 +200,7 @@
           <strong>{{ _sharedService.labelElapsedTime(mold.data.lastHit) }}</strong>
         </span>
         <span
-          *ngIf="!mold.data.lastHit"
+          *ngIf="!mold.data?.lastHit"
          >
           <strong>Indeterminado...</strong>
         </span>
@@ -267,7 +267,7 @@
           <mat-card-subtitle class="label-sub-wide">Id del molde</mat-card-subtitle>
         </div>
         <div class="column">
-          <mat-card-title class="subtitle-wide shadow">{{ mold.translatedPartNumber.translatedReference }}</mat-card-title>
+          <mat-card-title class="subtitle-wide shadow">{{ mold?.translatedPartNumber?.translatedReference }}</mat-card-title>
           <mat-card-subtitle class="label-sub-wide">Número de parte</mat-card-subtitle>
         </div>
         <div class="column">
@@ -433,7 +433,7 @@
           <strong>{{ _sharedService.labelElapsedTime(mold.data.lastHit) }}</strong>
         </span>
         <span
-          *ngIf="!mold.data.lastHit"
+          *ngIf="!mold.data?.lastHit"
          >
           <strong>Indeterminado...</strong>
         </span>

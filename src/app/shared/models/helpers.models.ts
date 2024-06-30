@@ -1,7 +1,9 @@
 export interface Attachment {
-    index: number;
-    id: string;
-    icon: string;    
+    index?: number;
+    id?: string;
+    icon?: string;    
+    image?: string;    
+    name?: string;    
 }
 
 export interface SimpleTable {
@@ -55,6 +57,9 @@ export interface PageInfo {
   export enum originProcess {
     CATALOGS_MOLDS = 'catalogs-molds',    
     CATALOGS_VARIABLES = 'catalogs-variables',
+    CATALOGS_VARIABLES_ATTACHMENTS = 'catalogs-variables-attachments',
+    CATALOGS_VARIABLES_TEMPLATES = 'catalogs-checklist-templates',
+    CATALOGS_CHEKLIST_TEMPLATE_HEADER_ATTACHMENTS = 'catalogs-checklist-template-header-attachments',
     CATALOGS_CUSTOMERS = 'catalogs-custmomers',
 }
   
@@ -66,8 +71,8 @@ export enum SystemTables {
     MOLD_MAINTENANCE_STATES = 'mold-maintenance-states',
     EQUIPMENTS = 'equipments',
     PARTNUMBERS = 'partNumbers',
-    MOLD_TYPES = 'moldTypes',
-    MOLD_CLASSES = 'moldClasses',
+    MOLD_TYPES = 'mold-types',
+    MOLD_CLASSES = 'mold-classes',
     MOLDS = 'variable-molds',
     VARIABLE_TEMPLATE_ACTION_PLANS = 'variable-template-action-plans',
     TEMPLATE_ACTION_PLANS = 'template-action-plans',
@@ -84,6 +89,11 @@ export enum SystemTables {
     CHECKLIST_TEMPLATES_YELLOW = 'mold-checklist-templates-yellow',
     CHECKLIST_TEMPLATES_RED = 'mold-checklist-templates-red',
     CHECKLIST_TEMPLATES = 'checklist-templates',
+    CHECKLIST_TEMPLATE_TYPES = 'checklist-template-types',
+    CHECKLIST_TEMPLATE_MACROS = 'checklist-templates-macros',    
+    CHECKLIST_TEMPLATE_NOTIFYING = 'checklist-template-notifying',    
+    CHANNELS = 'channels',    
+    
 }
 
 export enum GeneralValues {

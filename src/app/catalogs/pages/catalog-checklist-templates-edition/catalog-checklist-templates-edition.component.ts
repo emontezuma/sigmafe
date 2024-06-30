@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue, Attachment } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -33,46 +33,44 @@ export class CatalogChecklistTemplatesEditionComponent {
   @ViewChild('f') private thisForm: NgForm;
   @ViewChild('possibleValue', { static: false }) possibleValue: ElementRef;  
 
-  // Variables ===============
-  variable: ChecklistTemplateDetail = emptyChecklistTemplateItem;
+  // ChecklistTemplates ===============
+  checklistTemplate: ChecklistTemplateDetail = emptyChecklistTemplateItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
 
-  uoms$: Observable<any>; 
+  templateTypes$: Observable<any>; 
   sensors$: Observable<any>; 
-  sigmaTypes$: Observable<any>;
-  valueTypes$: Observable<any>;
-  resetValueModes$: Observable<any>;
   genYesNoValues$: Observable<any>;
-  variableByDefaultDate$: Observable<any>;
+  notifyingModes$: Observable<any>;
+  notifyingChannels$: Observable<any>;
+  duplicateAttachmentsList$: Observable<any>;
+  macros$: Observable<any>;    
 
+  moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
-  molds$: Observable<any>;  
-  actionPlansToGenerate: GeneralCatalogData = emptyGeneralCatalogData; 
-  actionPlansToGenerate$: Observable<any>;  
+  molds$: Observable<any>;    
 
-  valueTypeChanges$: Observable<any>;
-  // variableFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  variable$: Observable<ChecklistTemplateDetail>;
+  checklistTemplate$: Observable<ChecklistTemplateDetail>;
   translations$: Observable<any>;
-  updateVariable$: Observable<any>;
-  updateVariableCatalog$: Observable<any>;
-  deleteVariableTranslations$: Observable<any>;  
-  addVariableTranslations$: Observable<any>;  
+  updateChecklistTemplate$: Observable<any>;
+  updateChecklistTemplateCatalog$: Observable<any>;
+  deleteChecklistTemplateTranslations$: Observable<any>;  
+  addChecklistTemplateTranslations$: Observable<any>;  
   
-  variableFormChangesSubscription: Subscription;
+  checklistTemplateFormChangesSubscription: Subscription;
   
-  uoms: GeneralCatalogData = emptyGeneralCatalogData; 
-  sensors: GeneralCatalogData = emptyGeneralCatalogData; 
-  sigmaTypes: GeneralCatalogData = emptyGeneralCatalogData;
-  valueTypes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
-  resetValueModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  templateTypes: GeneralCatalogData = emptyGeneralCatalogData;   
+  macros: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
-  variableByDefaultDate: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  notifyingModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  notifyingChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  notifyingModesSelected: number = 0;
+  notifyingChannelsSelected: number = 0;
+  
   valuesList: ChecklistTemplatePossibleValue[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
   possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>([]);
@@ -80,14 +78,22 @@ export class CatalogChecklistTemplatesEditionComponent {
     { id: 'l', description: $localize`Al final de la lista` },  
     { id: 'f', description: $localize`Al prncipio de la lista` }, 
   ];
+
+  attachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'actions-attachments' ];
+  attachmentsTable = new MatTableDataSource<Attachment>([]);
+  addAttachmentButtonClick: boolean = false;
+  checklistTemplateAttachmentLabel: string = '';
+  
   editingValue: number = -1;
   
   uploadFiles: Subscription;
+  downloadFiles: Subscription;
   
-  catalogIcon: string = 'equation';  
+  catalogIcon: string = "brochure";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
+  macrosValuesOrder: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   storedTranslations: [];
   translationChanged: boolean = false
@@ -95,7 +101,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   submitControlled: boolean = false
   loading: boolean;
   elements: ToolbarElement[] = [];  
-  panelOpenState: boolean[] = [true, false, false];
+  panelOpenState: boolean[] = [true, false, false, false, false];
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
@@ -107,37 +113,29 @@ export class CatalogChecklistTemplatesEditionComponent {
   tmpValueType: string = '';
   multipleSearchDefaultValue: string = '';
 
-  variableForm = new FormGroup({
+  checklistTemplateForm = new FormGroup({
     name: new FormControl(
       '', 
       Validators.required,      
     ),
-    sigmaType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
-    uom: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
-    // sensor: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
-    valueType: new FormControl(emptyGeneralHardcodedValuesItem),
-    resetValueMode: new FormControl(emptyGeneralHardcodedValuesItem),
-    required: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowComments: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowNoCapture: new FormControl(emptyGeneralHardcodedValuesItem),
-    allowAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
-    showChart: new FormControl(emptyGeneralHardcodedValuesItem),
-    accumulative: new FormControl(emptyGeneralHardcodedValuesItem),
-    automaticActionPlan: new FormControl(emptyGeneralHardcodedValuesItem),
-    notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
+    templateType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    allowDiscard: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowRejection: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowManualMode: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowPartialSaving: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowApprovalByGroup: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
+    cancelOpenChecklist: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyAnticipation: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyGeneration: new FormControl(emptyGeneralHardcodedValuesItem),
+    expiringMessageSubject:  new FormControl(''),
+    expiringMessageBody:  new FormControl(''),
+    molds:  new FormControl(''),
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
-    showNotes: new FormControl(false),
-    minimum:  new FormControl(''),
-    maximum:  new FormControl(''),
-    molds:  new FormControl(''),
-    actionPlansToGenerate:  new FormControl(''),
-    byDefault:  new FormControl(''),    
-    possibleValue: new FormControl(''),
-    possibleValues: new FormControl(''),
-    possibleValuePosition: new FormControl('l'),
     byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),    
   });
 
@@ -152,9 +150,10 @@ export class CatalogChecklistTemplatesEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
+  showMacros: boolean = false;
 
   moldsOptions: SimpleTable[] = [
-    { id: '', description: $localize`No permitir el template de checklist en ningún Molde` },  
+    { id: '', description: $localize`No usar esta plantilla de checklist para ningún Molde` },  
     { id: 'y', description: $localize`TODOS los Moldes activos` },  
     { id: 'n', description: $localize`Los Moldes de lista` },  
     { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
@@ -163,9 +162,6 @@ export class CatalogChecklistTemplatesEditionComponent {
 
   valuesByDefault: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
 
-  moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];
-  actionPlansToGenerateCurrentSelection: GeneralMultipleSelcetionItems[] = [];
-  
   constructor(
     private _store: Store<AppState>,
     public _sharedService: SharedService,
@@ -180,7 +176,7 @@ export class CatalogChecklistTemplatesEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-    // this.variableForm.get('name').disable();
+    // this.checklistTemplateForm.get('name').disable();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.CHEKLIST_TEMPLATES_CATALOG_EDITION,
       true,
@@ -214,88 +210,23 @@ export class CatalogChecklistTemplatesEditionComponent {
         // this.requestPartNumbersData(currentPage);
         // this.requestLinesData(currentPage);
         // this.requestEquipmentsData(currentPage);
-        // this.requestMoldTypessData(currentPage);
+        this.requesttemplateTypessData(currentPage);
+        this.requestMacrosData(currentPage);
+        this.requestGenYesNoValuesData(currentPage);        
+        this.requestNotifyModesData(currentPage);        
+        this.requestNotifyChannelsData(currentPage);        
         // this.requestMoldClassesData(currentPage);
-        // this.requestMoldsData(currentPage);
-        this.requestActionPlansToGenerateData(currentPage);
-        this.requestVariableValueTypesData(currentPage);
-        this.requestVariableResetValueModesData(currentPage);
-        this.requestGenYesNoValuesData(currentPage);
-        this.requestVariableByDefaultDateValuesData(currentPage);        
+        this.requestMoldsData(currentPage);        
       })
     );
         
-    this.variableFormChangesSubscription = this.variableForm.valueChanges
+    this.checklistTemplateFormChangesSubscription = this.checklistTemplateForm.valueChanges
     .subscribe(() => {
       if (!this.loaded) return;
       this.setEditionButtonsState();      
     });
 
-    this.variableFormChangesSubscription = this.variableForm.controls.automaticActionPlan.valueChanges
-    .subscribe((value: any) => {
-      if (!this.loaded) return;
-      if (value === GeneralValues.NO) {
-        if (this.variableForm.get('actionPlansToGenerate').enabled) this.variableForm.get('actionPlansToGenerate').disable();
-      } else if (value === GeneralValues.YES) { 
-        if (this.variableForm.get('actionPlansToGenerate').disabled) this.variableForm.get('actionPlansToGenerate').enable();
-      }      
-    });
-
-    this.variableFormChangesSubscription = this.variableForm.controls.minimum.valueChanges
-    .subscribe((value: any) => {
-      if (value && this.variableForm.controls.maximum.value && (+value > +this.variableForm.controls.maximum.value)) {
-        this.variableForm.controls.minimum.setErrors({ invalidValue: true });
-      } else {
-        this.variableForm.controls.minimum.setErrors(null);
-      }      
-    });
-
-    this.variableFormChangesSubscription = this.variableForm.controls.maximum.valueChanges
-    .subscribe((value: any) => {
-      if (value && this.variableForm.controls.minimum.value && (+value < +this.variableForm.controls.minimum.value)) {
-        this.variableForm.controls.minimum.setErrors({ invalidValue: true });
-      } else {
-        this.variableForm.controls.minimum.setErrors(null);
-      }      
-    });
-
-    this.variableFormChangesSubscription = this.variableForm.controls.valueType.valueChanges
-    .subscribe((value: any) => {
-      if (value === HarcodedVariableValueType.NUMERIC_RANGE) {
-        if (this.variableForm.get('minimum').disabled) this.variableForm.get('minimum').enable();
-        if (this.variableForm.get('maximum').disabled) this.variableForm.get('maximum').enable();
-      } else if (value !== HarcodedVariableValueType.NUMERIC_RANGE) {
-        if (this.variableForm.get('minimum').enabled) this.variableForm.get('minimum').disable();
-        if (this.variableForm.get('maximum').enabled) this.variableForm.get('maximum').disable();
-      }
-      if (value === HarcodedVariableValueType.NUMERIC_RANGE || value === HarcodedVariableValueType.NUMBER) {
-        this.byDefaultValueType = 'number'
-      } else if (value === HarcodedVariableValueType.YES_NO) {
-        this.valuesByDefault = {
-          ...this.valuesByDefault,
-          items: yesNoByDefaultValue,          
-        }
-        if (!this.variableForm.controls.byDefault.value) {
-          this.variableForm.controls.byDefault.setValue('-');
-        }        
-      } else if (value === HarcodedVariableValueType.YES_NO_NA) {
-        this.valuesByDefault = {
-          ...this.valuesByDefault,
-          items: yesNoNaByDefaultValue,          
-        }
-        if (!this.variableForm.controls.byDefault.value) {
-          this.variableForm.controls.byDefault.setValue('-');
-        }
-      } else if (value === HarcodedVariableValueType.DATE || value === HarcodedVariableValueType.DATE_AND_TIME) {        
-        this.variableForm.controls.byDefaultDateType.setValue(GeneralValues.DASH);        
-      } else {
-        this.byDefaultValueType = 'text'
-        if (this.variableForm.controls.byDefault.value === '-') {
-          this.variableForm.controls.byDefault.setValue('');
-        }
-      }
-    });
-
+    
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
         this._sharedService.setGeneralProgressBar(
@@ -316,23 +247,21 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestVariableData(+params['id']);
+          this.requestChecklistTemplateData(+params['id']);
         }
       })
     ); 
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestVariableData(+params['id']);
+          this.requestChecklistTemplateData(+params['id']);
         }
       })
     ); 
     this.calcElements();
-    this.variableForm.controls.valueType.setValue(GeneralValues.N_A); 
-    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A); 
     setTimeout(() => {
       this.focusThisField = 'name';
-      if (!this.variable.id) {
+      if (!this.checklistTemplate.id) {
         this.loaded = true;
         this.initForm();
       }      
@@ -354,190 +283,58 @@ export class CatalogChecklistTemplatesEditionComponent {
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
-    if (this.variableFormChangesSubscription) this.variableFormChangesSubscription.unsubscribe(); 
+    if (this.downloadFiles) this.downloadFiles.unsubscribe();    
+    if (this.checklistTemplateFormChangesSubscription) this.checklistTemplateFormChangesSubscription.unsubscribe(); 
   }
   
-// Functions ================
-  requestVariableValueTypesData(currentPage: number) {
-    this.valueTypes = {
-      ...this.valueTypes,
+// Functions ================  
+  requesttemplateTypessData(currentPage: number, filterStr: string = null) {
+    this.templateTypes = {
+      ...this.templateTypes,
       currentPage,
       loading: true,
-    }        
-    this.valueTypes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.VARIABLE_VALUE_TYPES)
+    } 
+    const skipRecords = this.templateTypes.items.length;
+    this.templateTypes$ = this.requestGenericsData$(currentPage, skipRecords, SystemTables.CHECKLIST_TEMPLATE_TYPES, filterStr)
     .pipe(
       tap((data: any) => {                
-        const accumulatedItems = this.valueTypes.items?.concat(data?.data?.hardcodedValues?.items);
-        this.valueTypes = {
-          ...this.valueTypes,
-          loading: false,
-          pageInfo: data?.data?.hardcodedValues?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,  
-        }        
-      }),
-      catchError(() => EMPTY)
-    )
-  }
-
-  requestVariableResetValueModesData(currentPage: number) {
-    this.resetValueModes = {
-      ...this.resetValueModes,
-      currentPage,
-      loading: true,
-    }        
-    this.resetValueModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.RESET_VALUE_MODES)
-    .pipe(
-      tap((data: any) => {                
-        const accumulatedItems = this.resetValueModes.items?.concat(data?.data?.hardcodedValues?.items);
-        this.resetValueModes = {
-          ...this.resetValueModes,
-          loading: false,
-          pageInfo: data?.data?.hardcodedValues?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,  
-        }        
-      }),
-      catchError(() => EMPTY)
-    )
-  }
-
-  requestGenYesNoValuesData(currentPage: number) {
-    this.genYesNoValues = {
-      ...this.genYesNoValues,
-      currentPage,
-      loading: true,
-    }        
-    this.genYesNoValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.GEN_VALUES_YES_NO)
-    .pipe(
-      tap((data: any) => {                
-        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);
-        this.genYesNoValues = {
-          ...this.genYesNoValues,
-          loading: false,
-          pageInfo: data?.data?.hardcodedValues?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,  
-        }        
-      }),
-      catchError(() => EMPTY)
-    )
-  }
-
-  requestVariableByDefaultDateValuesData(currentPage: number) {
-    this.variableByDefaultDate = {
-      ...this.variableByDefaultDate,
-      currentPage,
-      loading: true,
-    }        
-    this.variableByDefaultDate$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrderById, SystemTables.VARIABLE_BY_DEFAULT_DATE)
-    .pipe(
-      tap((data: any) => {                
-        const accumulatedItems = this.variableByDefaultDate.items?.concat(data?.data?.hardcodedValues?.items);
-        this.variableByDefaultDate = {
-          ...this.genYesNoValues,
-          loading: false,
-          pageInfo: data?.data?.hardcodedValues?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,  
-        }        
-      }),
-      catchError(() => EMPTY)
-    )
-  }
-
-  requestMoldsData(currentPage: number, filterStr: string = null) {    
-    this.molds = {
-      ...this.molds,
-      currentPage,
-      loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    }
-    const skipRecords = this.molds.items.length;
-
-    const processId = !!this.variable.id ? this.variable.id : 0;
-    const variableParameters = {
-      settingType: 'multiSelection',
-      skipRecords,
-      process: SystemTables.MOLDS,
-      processId, 
-      takeRecords: this.takeRecords, 
-      filter,       
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);    
-    this.molds$ = this._catalogsService.getMoldsLazyLoadingDataGql$(variables)
-    .pipe(
-      tap((data: any) => {                
-        const mappedItems = data?.data?.catalogDetailMold?.items.map((item) => {
+        const mappedItems = data?.data?.genericsPaginated?.items.map((item) => {
           return {
             isTranslated: item.isTranslated,
             translatedName: item.translatedName,
             translatedReference: item.translatedReference,
-            id: item.id,
-            valueRight: item.value,
-            catalogDetailId: item.catalogDetailId,
+            id: item.data.id,
+            status: item.data.status,
           }
         })
-        this.molds = {
-          ...this.molds,
+        this.templateTypes = {
+          ...this.templateTypes,
           loading: false,
-          pageInfo: data?.data?.catalogDetailMold?.pageInfo,
-          items: this.molds.items?.concat(mappedItems),
-          totalCount: data?.data?.catalogDetailMold?.totalCount,
+          pageInfo: data?.data?.genericsPaginated?.pageInfo,
+          items: this.templateTypes.items?.concat(mappedItems),
+          totalCount: data?.data?.genericsPaginated?.totalCount,
         }
-      }),
+      }),      
       catchError(() => EMPTY)
-    )    
+    )
   }
 
-  requestActionPlansToGenerateData(currentPage: number, filterStr: string = null) {    
-    this.actionPlansToGenerate = {
-      ...this.actionPlansToGenerate,
-      currentPage,
-      loading: true,
-    }    
+  requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
     let filter = null;
     if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+      filter = JSON.parse(`{ "and": [ { "data": { "tableName": { "eq": "${catalog}" } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
     }
-    const skipRecords = this.actionPlansToGenerate.items.length;
-
-    const processId = !!this.variable.id ? this.variable.id : 0;
-    const variableParameters = {
-      settingType: 'multiSelection',
-      skipRecords,
-      process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
-      processId, 
+    const moldParameters = {
+      settingType: 'tables',
+      skipRecords, 
       takeRecords: this.takeRecords, 
-      filter,       
+      filter, 
+      order: this.order,
     }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);    
-    this.actionPlansToGenerate$ = this._catalogsService.getActionPlansToGenerateLazyLoadingDataGql$(variables)
-    .pipe(
-      tap((data: any) => {                
-        const mappedItems = data?.data?.catalogDetailTemplateActionPlan?.items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.id,
-            valueRight: item.value,
-            catalogDetailId: item.catalogDetailId,
-          }
-        })
-        this.actionPlansToGenerate = {
-          ...this.actionPlansToGenerate,
-          loading: false,
-          pageInfo: data?.data?.catalogDetailTemplateActionPlan?.pageInfo,
-          items: this.actionPlansToGenerate.items?.concat(mappedItems),
-          totalCount: data?.data?.catalogDetailTemplateActionPlan?.totalCount,
-        }
-      }),
-      catchError(() => EMPTY)
-    )    
+    const variables = this._sharedService.setGraphqlGen(moldParameters);   
+    return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
   pageAnimationFinished(e: any) {
@@ -581,7 +378,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             this.elements.find(e => e.action === action.action).loading = false;
           });    
         } else {
-          this._location.replaceState('/catalogs/variables/create');
+          this._location.replaceState('/catalogs/checklist-templates/create');
           this.initForm();
           this.elements.find(e => e.action === action.action).loading = false;  
         }
@@ -589,12 +386,12 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
-          this._router.navigateByUrl('/catalogs/variables'); 
+          this._router.navigateByUrl('/catalogs/checklist-templates'); 
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
-        this._location.replaceState('/catalogs/variables/create');
+        this._location.replaceState('/catalogs/checklist-templates/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
@@ -609,11 +406,11 @@ export class CatalogChecklistTemplatesEditionComponent {
       } else if (action.action === ButtonActions.CANCEL) {         
         this.elements.find(e => e.action === action.action).loading = true;
         let noData = true;
-        if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
+        if (!this.checklistTemplate.id || this.checklistTemplate.id === null || this.checklistTemplate.id === 0) {
           this.initForm();
         } else {
           noData = false;
-          this.requestVariableData(this.variable.id);
+          this.requestChecklistTemplateData(this.checklistTemplate.id);
         }
         const message = $localize`Edición cancelada`;
           this._sharedService.showSnackMessage({
@@ -630,14 +427,14 @@ export class CatalogChecklistTemplatesEditionComponent {
         }, 200);
       } else if (action.action === ButtonActions.INACTIVATE) { 
         this.elements.find(e => e.action === action.action).loading = true;
-        if (this.variable?.id > 0 && this.variable.status === RecordStatus.ACTIVE) {
+        if (this.checklistTemplate?.id > 0 && this.checklistTemplate.status === RecordStatus.ACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             panelClass: 'warn-dialog',
             autoFocus : true,
             data: {
-              title: $localize`INACTIVAR VARIABLE`,  
+              title: $localize`INACTIVAR PLANTILLA DE CHECKLIST`,  
               topIcon: 'delete',
               buttons: [{
                 action: 'inactivate',
@@ -660,7 +457,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el template de checklist con el Id <strong>${this.variable.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará la plantilla checklist con el Id <strong>${this.checklistTemplate.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -675,19 +472,19 @@ export class CatalogChecklistTemplatesEditionComponent {
               this.elements.find(e => e.action === action.action).loading = true;
               const variableParameters = {
                 settingType: 'status',
-                id: this.variable.id,
-                customerId: this.variable.customerId,
+                id: this.checklistTemplate.id,
+                customerId: this.checklistTemplate.customerId,
                 status: RecordStatus.INACTIVE,
               }
               const variables = this._sharedService.setGraphqlGen(variableParameters);
-              this.updateVariable$ = this._catalogsService.updateVariableStatus$(variables)
+              this.updateChecklistTemplate$ = this._catalogsService.updateChecklistTemplateStatus$(variables)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateVariable.length > 0 && data?.data?.createOrUpdateVariable[0].status === RecordStatus.INACTIVE) {
+                  if (data?.data?.createOrUpdateChecklistTemplate.length > 0 && data?.data?.createOrUpdateChecklistTemplate[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE);
-                      this.variable.status = RecordStatus.INACTIVE;
-                      const message = $localize`La Variable ha sido inhabilitada`;
+                      this.checklistTemplate.status = RecordStatus.INACTIVE;
+                      const message = $localize`La Plantilla de checklist ha sido inhabilitada`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -701,13 +498,13 @@ export class CatalogChecklistTemplatesEditionComponent {
               )
             }  
           });
-        } else if (this.variable?.id > 0 && this.variable.status === RecordStatus.INACTIVE) {
+        } else if (this.checklistTemplate?.id > 0 && this.checklistTemplate.status === RecordStatus.INACTIVE) {
           const dialogResponse = this._dialog.open(GenericDialogComponent, {
             width: '450px',
             disableClose: true,
             autoFocus : true,
             data: {
-              title: $localize`REACTIVAR VARIABLE`,  
+              title: $localize`REACTIVAR PLANTILLA DE CHECKLIST`,  
               topIcon: 'check',
               buttons: [{
                 action: 'reactivate',
@@ -730,7 +527,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará el template de checklist con el Id <strong>${this.variable.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará la plantilla de checklist con el Id <strong>${this.checklistTemplate.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -745,19 +542,19 @@ export class CatalogChecklistTemplatesEditionComponent {
               this.elements.find(e => e.action === action.action).loading = true;
               const variableParameters = {
                 settingType: 'status',
-                id: this.variable.id,
-                customerId: this.variable.customerId,
+                id: this.checklistTemplate.id,
+                customerId: this.checklistTemplate.customerId,
                 status: RecordStatus.ACTIVE,
               }
               const variables = this._sharedService.setGraphqlGen(variableParameters);
-              this.updateVariable$ = this._catalogsService.updateVariableStatus$(variables)
+              this.updateChecklistTemplate$ = this._catalogsService.updateChecklistTemplateStatus$(variables)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateVariable.length > 0 && data?.data?.createOrUpdateVariable[0].status === RecordStatus.ACTIVE) {
+                  if (data?.data?.createOrUpdateChecklistTemplate.length > 0 && data?.data?.createOrUpdateChecklistTemplate[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {
-                      this.variable.status = RecordStatus.ACTIVE;
+                      this.checklistTemplate.status = RecordStatus.ACTIVE;
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`La Variable ha sido reactivado`;
+                      const message = $localize`La Plantilla de checklist ha sido reactivado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -772,17 +569,21 @@ export class CatalogChecklistTemplatesEditionComponent {
             }  
           });
         }
+      } else if (action.action === ButtonActions.MACROS) { 
+        this.showMacros = !this.showMacros;
+        this.elements.find(e => e.action === action.action).class = this.showMacros ? 'accent' : '';
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
-        if (this.variable?.id > 0) {
+        if (this.checklistTemplate?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
             width: '500px',
             disableClose: true,
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones del template de checklist <strong>${this.variable.id}</strong>`,
+              title: $localize`Traducciones de la plantila de checklist <strong>${this.checklistTemplate.id}</strong>`,
               topIcon: 'world',
-              translations: this.variable.translations,
+              translations: this.checklistTemplate.translations,
+              fromChecklistTemplate: true,
               buttons: [{
                 action: ButtonActions.SAVE,
                 showIcon: true,
@@ -824,7 +625,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará el template de checklist ${this.variable.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el template de checklist ${this.checklistTemplate.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -833,10 +634,10 @@ export class CatalogChecklistTemplatesEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.variable.translations = [...response.translations];
+              this.checklistTemplate.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -849,7 +650,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de variables`,
+      tooltip:  $localize`Regresar a la lista de plantillas de checklist`,
       icon: 'arrow-left',
       class: 'primary',
       iconSize: '24px',
@@ -950,7 +751,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: this.variable?.status !== RecordStatus.ACTIVE,
+      disabled: this.checklistTemplate?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
     },{
       type: 'divider',
@@ -977,9 +778,98 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: !!!this.variable.id,
+      disabled: !!!this.checklistTemplate.id,
       action: ButtonActions.TRANSLATIONS,      
+    },{
+      type: 'button',
+      caption: $localize`Macros`,
+      tooltip: $localize`Macros disponibles...`,
+      class: '',
+      icon: 'transcode',
+      iconSize: '24px',
+      showIcon: true,
+      showTooltip: true,
+      showCaption: true,
+      loading: false,
+      disabled: false,
+      action: ButtonActions.MACROS,      
     },];
+  }
+
+  requestGenYesNoValuesData(currentPage: number) {
+    this.genYesNoValues = {
+      ...this.genYesNoValues,
+      currentPage,
+      loading: true,
+    }        
+    this.genYesNoValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.GEN_VALUES_YES_NO)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);
+        this.genYesNoValues = {
+          ...this.genYesNoValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+
+  requestNotifyModesData(currentPage: number) {
+    this.notifyingModes = {
+      ...this.notifyingModes,
+      currentPage,
+      loading: true,
+    }        
+    this.notifyingModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.macrosValuesOrder, SystemTables.CHECKLIST_TEMPLATE_NOTIFYING)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.notifyingModes.items?.concat(data?.data?.hardcodedValues?.items);
+        this.notifyingModes = {
+          ...this.notifyingModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+  
+  requestNotifyChannelsData(currentPage: number) {
+    this.notifyingChannels = {
+      ...this.notifyingChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.notifyingChannels$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.CHANNELS)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.notifyingChannels.items?.concat(data?.data?.hardcodedValues?.items);
+        this.notifyingChannels = {
+          ...this.notifyingChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
   }
 
   getScrolling(data: CdkScrollable) {       
@@ -1014,16 +904,16 @@ export class CatalogChecklistTemplatesEditionComponent {
     if (!this.submitControlled) return;
     this.submitControlled = false;
     this.validateTables();
-    this.variableForm.markAllAsTouched();
-    this.variableForm.updateValueAndValidity(); 
-    if (this.variableForm.valid) {      
+    this.checklistTemplateForm.markAllAsTouched();
+    this.checklistTemplateForm.updateValueAndValidity(); 
+    if (this.checklistTemplateForm.valid) {      
       this.saveRecord();   
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
-      for (const controlName in this.variableForm.controls) {
-        if (this.variableForm.controls.hasOwnProperty(controlName)) {
-          const typedControl: AbstractControl = this.variableForm.controls[controlName]; 
+      for (const controlName in this.checklistTemplateForm.controls) {
+        if (this.checklistTemplateForm.controls.hasOwnProperty(controlName)) {
+          const typedControl: AbstractControl = this.checklistTemplateForm.controls[controlName]; 
           if (typedControl.invalid) {
             fieldsMissingCounter++;
             fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -1048,9 +938,9 @@ export class CatalogChecklistTemplatesEditionComponent {
       }); 
       dialogResponse.afterClosed().subscribe((response) => {
         let fieldFocused = false;
-        for (const controlName in this.variableForm.controls) {
-          if (this.variableForm.controls.hasOwnProperty(controlName)) {
-            const typedControl: AbstractControl = this.variableForm.controls[controlName]; 
+        for (const controlName in this.checklistTemplateForm.controls) {
+          if (this.checklistTemplateForm.controls.hasOwnProperty(controlName)) {
+            const typedControl: AbstractControl = this.checklistTemplateForm.controls[controlName]; 
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
@@ -1073,24 +963,24 @@ export class CatalogChecklistTemplatesEditionComponent {
 
   saveRecord() {
     this.setViewLoading(true);
-    const newRecord = !this.variable.id || this.variable.id === null || this.variable.id === 0;
+    const newRecord = !this.checklistTemplate.id || this.checklistTemplate.id === null || this.checklistTemplate.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateVariableCatalog$ = this._catalogsService.updateVariableCatalog$(dataToSave)
+    this.updateChecklistTemplateCatalog$ = this._catalogsService.updateChecklistTemplateCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
-        if (data?.data?.createOrUpdateVariable.length > 0) {
-          const variableId = data?.data?.createOrUpdateVariable[0].id;
+        if (data?.data?.createOrUpdateChecklistTemplate.length > 0) {
+          const checklistTemplateId = data?.data?.createOrUpdateChecklistTemplate[0].id;
           combineLatest([ 
-            this.processTranslations$(variableId), 
-            this.saveCatalogDetails$(variableId)             
+            this.processTranslations$(checklistTemplateId), 
+            this.saveCatalogDetails$(checklistTemplateId)             
           ])      
           .subscribe((data: any) => {
-            this.requestVariableData(variableId);
+            this.requestChecklistTemplateData(checklistTemplateId);
             setTimeout(() => {              
-              let message = $localize`La variable ha sido actualizada`;
+              let message = $localize`La plantilla de checklist ha sido actualizada`;
               if (newRecord) {                
-                message = $localize`La variable ha sido creada satisfactoriamente con el id <strong>${variableId}</strong>`;
-                this._location.replaceState(`/catalogs/variables/edit/${variableId}`);
+                message = $localize`La plantilla de checklist ha sido creada satisfactoriamente con el id <strong>${checklistTemplateId}</strong>`;
+                this._location.replaceState(`/catalogs/checklist-templates/edit/${checklistTemplateId}`);
               }
               this._sharedService.showSnackMessage({
                 message,
@@ -1110,252 +1000,79 @@ export class CatalogChecklistTemplatesEditionComponent {
     )    
   }
 
-  saveCatalogDetails$(processId: number): Observable<any> {
-    if (this.moldsCurrentSelection.length > 0 || this.actionPlansToGenerateCurrentSelection.length > 0) {
-      const moldsToDelete = this.moldsCurrentSelection
-      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
-      .map(ct => {
-        return {
-          id: ct.catalogDetailId,
-          deletePhysically: true,
-        }
-      });
-      const actionPlansToGenerateToDelete = this.actionPlansToGenerateCurrentSelection
-      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
-      .map(ct => {
-        return {
-          id: ct.catalogDetailId,
-          deletePhysically: true,
-        }
-      });
-      const ctToDelete = {
-        ids: [...moldsToDelete, ...actionPlansToGenerateToDelete],
-        customerId: 1, // TODO: Get from profile
-      }
-      const moldsToAdd = this.moldsCurrentSelection
-      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
-      .map(ct => {
-        return {
-          process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
-          processId,
-          detailTableName: SystemTables.TEMPLATE_ACTION_PLANS,
-          value: ct.valueRight,
-          customerId: 1,  // TODO: Get from profile
-        }
-      });
-      const actionPlansToGenerateToAdd = this.actionPlansToGenerateCurrentSelection
-      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
-      .map(ct => {
-        return {
-          process: SystemTables.VARIABLE_TEMPLATE_ACTION_PLANS,
-          processId,
-          detailTableName: SystemTables.TEMPLATE_ACTION_PLANS,
-          value: ct.valueRight,
-          customerId: 1,  // TODO: Get from profile
-        }
-      });
-      const ctToAdd = {
-        catalogDetails: [...moldsToAdd, ...actionPlansToGenerateToAdd],
-      }
-
-      return combineLatest([ 
-        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
-        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
-      ]);
-    } else {
-      return of(null);
-    }
+  saveCatalogDetails$(processId: number): Observable<any> {    
+    return of(null);    
   }
 
-  requestUomsData(currentPage: number, filterStr: string = null) {    
-    this.uoms = {
-      ...this.uoms,
+  requestMacrosData(currentPage: number) {
+    this.macros = {
+      ...this.macros,
       currentPage,
       loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
-    } else {
-      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
-    }      
-    const skipRecords = this.uoms.items.length;
-
-    const variableParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);
-    this.uoms$ = this._catalogsService.getUomsLazyLoadingDataGql$(variables)
-    .pipe(
-      tap((data: any) => {
-        const mappedItems = data?.data?.uomsPaginated?.items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.data.id,
-            status: item.data.status,
-          }
-        });
-        this.uoms = {
-          ...this.uoms,
-          loading: false,
-          pageInfo: data?.data?.uomsPaginated?.pageInfo,
-          items: this.uoms.items?.concat(mappedItems),
-          totalCount: data?.data?.uomsPaginated?.totalCount,
-        }        
-      }),
-      catchError(() => EMPTY)
-    )    
-  }
-
-  requestSensorsData(currentPage: number, filterStr: string = null) {    
-    this.sensors = {
-      ...this.sensors,
-      currentPage,
-      loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
-    } else {
-      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
-    }      
-    const skipRecords = this.sensors.items.length;
-
-    const variableParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);
-    this.sensors$ = this._catalogsService.getSensorsLazyLoadingDataGql$(variables)
-    .pipe(
-      tap((data: any) => {
-        const mappedItems = data?.data?.sensorsPaginated?.items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.data.id,
-            status: item.data.status,
-          }
-        });
-        this.sensors = {
-          ...this.sensors,
-          loading: false,
-          pageInfo: data?.data?.sensorsPaginated?.pageInfo,
-          items: this.sensors.items?.concat(mappedItems),
-          totalCount: data?.data?.sensorsPaginated?.totalCount,
-        }        
-      }),
-      catchError(() => EMPTY)
-    )    
-  }
-
-  requestSigmaTypesData(currentPage: number, filterStr: string = null) {    
-    this.sigmaTypes = {
-      ...this.sigmaTypes,
-      currentPage,
-      loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
-    }
-    const skipRecords = this.sigmaTypes.items.length;
-
-    const variableParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters); 
-    this.sigmaTypes$ = this._catalogsService.getSigmaTypesLazyLoadingDataGql$(variables)
+    }        
+    this.macros$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.macrosValuesOrder, SystemTables.CHECKLIST_TEMPLATE_MACROS)
     .pipe(
       tap((data: any) => {                
-        const mappedItems = data?.data?.sigmaTypesPaginated?.items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.data.id,
-            status: item.data.status,
-          }
-        })
-        this.sigmaTypes = {
-          ...this.sigmaTypes,
+        const accumulatedItems = this.macros.items?.concat(data?.data?.hardcodedValues?.items);        
+        this.macros = {
+          ...this.macros,
           loading: false,
-          pageInfo: data?.data?.sigmaTypesPaginated?.pageInfo,
-          items: this.sigmaTypes.items?.concat(mappedItems),
-          totalCount: data?.data?.sigmaTypesPaginated?.totalCount,
-        }
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
       }),
       catchError(() => EMPTY)
-    )    
+    )
   }
-
-  requestVariableData(variableId: number): void { 
+  
+  requestChecklistTemplateData(checklistTemplateId: number): void { 
     let variables = undefined;
-    variables = { variableId };
+    variables = { checklistTemplateId };
 
     const skipRecords = 0;
-    const filter = JSON.parse(`{ "variableId": { "eq": ${variableId} } }`);
+    const filter = JSON.parse(`{ "checklistTemplateId": { "eq": ${checklistTemplateId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
+    const process = originProcess.CATALOGS_CHEKLIST_TEMPLATE_HEADER_ATTACHMENTS;
     // let getData: boolean = false;
     this.setViewLoading(true); 
-    this.variable$ = this._catalogsService.getVariableDataGql$({ 
-      variableId, 
+    this.checklistTemplate$ = this._catalogsService.getChecklistTemplateDataGql$({ 
+      checklistTemplateId, 
       skipRecords, 
       takeRecords: this.takeRecords, 
       order, 
       filter, 
+      process,
+      customerId: 1, // TODO
     }).pipe(
-      map(([ variableGqlData, variableGqlTranslationsData ]) => {
-        return this._catalogsService.mapOneVariable({
-          variableGqlData,  
-          variableGqlTranslationsData,
+      map(([ checklistTemplateGqlData, checklistTemplateGqlTranslationsData, checklistTemplateGqlAttachments ]) => {
+        return this._catalogsService.mapOneChecklistTemplate({
+          checklistTemplateGqlData,  
+          checklistTemplateGqlTranslationsData,
+          checklistTemplateGqlAttachments,
         })
       }),
-      tap((variableData: ChecklistTemplateDetail) => {
-        if (!variableData) return;
-        this.variable =  variableData;
+      tap((checklistTemplateData: ChecklistTemplateDetail) => {
+        if (!checklistTemplateData) return;
+        this.checklistTemplate =  checklistTemplateData;
 
         this.moldsCurrentSelection = [];
-        this.actionPlansToGenerateCurrentSelection = [];
-
-        this.molds.currentPage = 0;   
-        this.molds.items = [];
-        this.actionPlansToGenerate.currentPage = 0;   
-        this.actionPlansToGenerate.items = [];
-        // this.requestMoldsData(0);
-        this.requestActionPlansToGenerateData(0);
-        
         this.translationChanged = false;
         this.imageChanged = false;
-        this.storedTranslations = JSON.parse(JSON.stringify(this.variable.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
+        this.storedTranslations = JSON.parse(JSON.stringify(this.checklistTemplate.translations));
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.prepareListOfValues();
-        this.changeInactiveButton(this.variable.status);
+        this.changeInactiveButton(this.checklistTemplate.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = variableData.translations.length > 0 ? $localize`Traducciones (${variableData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = checklistTemplateData.translations.length > 0 ? $localize`Traducciones (${checklistTemplateData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = variableData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = checklistTemplateData.translations.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
+        this.setAttachmentLabel();
         this.setViewLoading(false);
         this.loaded = true;
       }),
@@ -1366,66 +1083,20 @@ export class CatalogChecklistTemplatesEditionComponent {
     ); 
   }  
 
-  requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "tableName": { "eq": "${catalog}" } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
-    }
-    const variableParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order,
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);
-    return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
-  }
-
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
-    if (getMoreDataParams.catalogName === SystemTables.UOMS) {
+    if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATE_TYPES) {
       if (getMoreDataParams.initArray) {
-        this.uoms.currentPage = 0;
-        this.uoms.items = [];
-      } else if (!this.uoms.pageInfo.hasNextPage) {
+        this.templateTypes.currentPage = 0;
+        this.templateTypes.items = [];
+      } else if (!this.templateTypes.pageInfo.hasNextPage) {
         return;
       } else {
-        this.uoms.currentPage++;
+        this.templateTypes.currentPage++;
       }
-      this.requestUomsData(        
-        this.uoms.currentPage,
+      this.requesttemplateTypessData(        
+        this.templateTypes.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
-
-    } else if (getMoreDataParams.catalogName === SystemTables.SIGMA_TYPES) {
-      if (getMoreDataParams.initArray) {
-        this.sigmaTypes.currentPage = 0;
-        this.sigmaTypes.items = [];
-      } else if (!this.sigmaTypes.pageInfo.hasNextPage) {
-        return;
-      } else {
-        this.sigmaTypes.currentPage++;
-      }
-      this.requestSigmaTypesData(        
-        this.sigmaTypes.currentPage,
-        getMoreDataParams.textToSearch,  
-      ); 
-    } if (getMoreDataParams.catalogName === SystemTables.SENSORS) {
-      if (getMoreDataParams.initArray) {
-        this.sensors.currentPage = 0;
-        this.sensors.items = [];
-      } else if (!this.sensors.pageInfo.hasNextPage) {
-        return;
-      } else {
-        this.sensors.currentPage++;
-      }
-      this.requestSensorsData(        
-        this.sensors.currentPage,
-        getMoreDataParams.textToSearch,  
-      ); 
-
     } else if (getMoreDataParams.catalogName === SystemTables.MOLDS) {
       if (this.molds.loading) return;
       if (getMoreDataParams.initArray) {
@@ -1440,23 +1111,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.molds.currentPage,
         getMoreDataParams.textToSearch,  
       );    
-    }      
-    else if (getMoreDataParams.catalogName === SystemTables.TEMPLATE_ACTION_PLANS) {
-      if (this.actionPlansToGenerate.loading) return;
-      if (getMoreDataParams.initArray) {
-        this.actionPlansToGenerate.currentPage = 0;   
-        this.actionPlansToGenerate.items = [];
-      } else if (!this.actionPlansToGenerate.pageInfo.hasNextPage) {
-        return;
-      } else {
-        this.actionPlansToGenerate.currentPage++;
-      }
-      this.requestActionPlansToGenerateData(        
-        this.actionPlansToGenerate.currentPage,
-        getMoreDataParams.textToSearch,  
-      );    
-    }      
-    
+    }
   }
 
   onFileSelected(event: any) {
@@ -1465,17 +1120,17 @@ export class CatalogChecklistTemplatesEditionComponent {
 
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
-    .set('destFolder', `${environment.uploadFolders.catalogs}/variables`)
-    .set('processId', this.variable.id)
-    .set('process', originProcess.CATALOGS_VARIABLES);
+    .set('destFolder', `${environment.uploadFolders.catalogs}/checklist-templates`)
+    .set('processId', this.checklistTemplate.id)
+    .set('process', originProcess.CATALOGS_VARIABLES_TEMPLATES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
-        this.variableForm.controls.mainImageName.setValue(res.fileName);
-        this.variable.mainImagePath = res.filePath;
-        this.variable.mainImageGuid = res.fileGuid;
-        this.variable.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guardel template de checklist para aplicar el cambio`;
+        this.checklistTemplateForm.controls.mainImageName.setValue(res.fileName);
+        this.checklistTemplate.mainImagePath = res.filePath;
+        this.checklistTemplate.mainImageGuid = res.fileGuid;
+        this.checklistTemplate.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la plantilla de checklist para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -1537,76 +1192,43 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   updateFormFromData(): void {    
-    this.variableForm.patchValue({
-      name: this.variable.name,
-      reference: this.variable.reference,      
-      prefix: this.variable.prefix,      
-      notes: this.variable.notes,      
-      uom: this.variable.uom,
-      valueType: this.variable.valueType,
-      resetValueMode: this.variable.resetValueMode,
-      required: this.variable.required,
-      allowAlarm: this.variable.allowAlarm,
-      allowNoCapture: this.variable.allowComments,
-      allowComments: this.variable.allowComments,
-      showChart: this.variable.showChart,      
-      notifyAlarm: this.variable.notifyAlarm,
-      accumulative: this.variable.accumulative,
-      automaticActionPlan: this.variable.automaticActionPlan,    
-      byDefault: this.variable.byDefault,    
-      byDefaultDateType: this.variable.byDefaultDateType,    
-      actionPlansToGenerate: this.variable.actionPlansToGenerate,    
-      mainImageName: this.variable.mainImageName,      
-      sigmaType: this.variable.sigmaType,
-      showNotes: this.variable.showNotes === GeneralValues.YES,
-      minimum: this.variable.minimum,
-      maximum: this.variable.maximum,      
+    this.checklistTemplateForm.patchValue({
+      name: this.checklistTemplate.name,
+      reference: this.checklistTemplate.reference,      
+      prefix: this.checklistTemplate.prefix,      
+      notes: this.checklistTemplate.notes,      
+      templateType: this.checklistTemplate.templateType,
+      allowDiscard: this.checklistTemplate.required,
+      mainImageName: this.checklistTemplate.mainImageName,            
     });
   } 
 
   prepareRecordToAdd(newRecord: boolean): any {
-    const fc = this.variableForm.controls;
+    const fc = this.checklistTemplateForm.controls;
     return  {
-        id: this.variable.id,
+        id: this.checklistTemplate.id,
         customerId: 1, // TODO: Get from profile
-        status: newRecord ? RecordStatus.ACTIVE : this.variable.status,
+        status: newRecord ? RecordStatus.ACTIVE : this.checklistTemplate.status,
         possibleValues: JSON.stringify(this.valuesList),
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-      ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value.id },      
-      ...(fc.sigmaType.dirty || fc.sigmaType.touched || newRecord) && { sigmaTypeId: fc.sigmaType.value.id },
-      ...(fc.valueType.dirty || fc.valueType.touched || newRecord) && { valueType: fc.valueType.value },
-      ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? 'y' : 'n' },
-      ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },
-      ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value ? 'y' : 'n' },
-      ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value ? 'y' : 'n' },
-      ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value ? 'y' : 'n' },
-      ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value ? 'y' : 'n' },
-      ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value ? 'y' : 'n' },
-      ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value ? 'y' : 'n' },
-      ...(fc.byDefaultDateType.dirty || fc.byDefaultDateType.touched || newRecord) && { byDefaultDateType: fc.byDefaultDateType.value },
-      ...(fc.automaticActionPlan.dirty || fc.automaticActionPlan.touched || newRecord) && { automaticActionPlan: fc.automaticActionPlan.value ? 'y' : 'n' },
-      ...(fc.accumulative.dirty || fc.accumulative.touched || newRecord) && { accumulative: fc.accumulative.value ? 'y' : 'n' },      
-      ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value ? 'y' : 'n' },            
-      ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
-      ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },
-      ...(fc.actionPlansToGenerate.dirty || fc.actionPlansToGenerate.touched || newRecord) && { actionPlansToGenerate: fc.actionPlansToGenerate.value },
+      ...(fc.templateType.dirty || fc.templateType.touched || newRecord) && { uomId: fc.templateType.value.id },            
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
-        mainImagePath: this.variable.mainImagePath,
-        mainImageGuid: this.variable.mainImageGuid, },
+        mainImagePath: this.checklistTemplate.mainImagePath,
+        mainImageGuid: this.checklistTemplate.mainImageGuid, },
     }
   }
   
   removeImage() {
     this.imageChanged = true;
-    this.variableForm.controls.mainImageName.setValue('');
-    this.variable.mainImagePath = '';
-    this.variable.mainImageGuid = '';
-    this.variable.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen del template de checklist<br>Guardel template de checklist para aplicar el cambio`;
+    this.checklistTemplateForm.controls.mainImageName.setValue('');
+    this.checklistTemplate.mainImagePath = '';
+    this.checklistTemplate.mainImageGuid = '';
+    this.checklistTemplate.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen de la plantilla de checklist<br>Guardel la plantilla de checklist para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -1616,35 +1238,18 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.setEditionButtonsState();
   }
 
+  
   initForm(): void {
-    this.variableForm.reset();
-    this.actionPlansToGenerateCurrentSelection = [];
+    this.checklistTemplateForm.reset();
+    this.moldsCurrentSelection = [];
+    this.checklistTemplateForm.controls.byDefaultDateType.setValue(GeneralValues.DASH);    
+    this.checklistTemplateForm.controls.molds.setValue('');       
     this.multipleSearchDefaultValue = '';
-    // Default values
-    this.variableForm.controls.required.setValue(GeneralValues.NO);
-    this.variableForm.controls.notifyAlarm.setValue(GeneralValues.NO);
-    this.variableForm.controls.allowAlarm.setValue(GeneralValues.NO);
-    this.variableForm.controls.allowNoCapture.setValue(GeneralValues.NO);        
-    this.variableForm.controls.allowComments.setValue(GeneralValues.NO);
-    this.variableForm.controls.showChart.setValue(GeneralValues.NO);    
-    this.variableForm.controls.valueType.setValue(GeneralValues.FREE_TEXT)
-    this.variableForm.controls.resetValueMode.setValue(GeneralValues.N_A);
-    this.variableForm.controls.automaticActionPlan.setValue(GeneralValues.NO);
-    this.variableForm.controls.byDefault.setValue(GeneralValues.NO);
-    this.variableForm.controls.byDefaultDateType.setValue(GeneralValues.DASH);    
-    this.variableForm.controls.molds.setValue('');       
-    this.variableForm.controls.possibleValuePosition.setValue('l');
-    this.variableForm.controls.possibleValue.setValue('');
-    this.variableForm.controls.actionPlansToGenerate.setValue('');    
-    this.variableForm.controls.minimum.setValue(null);    
-    this.variableForm.controls.maximum.setValue(null);    
     this.valuesList = [];
     this.storedTranslations = [];
     this.translationChanged = false;
-    this.variable = emptyChecklistTemplateItem;
+    this.checklistTemplate = emptyChecklistTemplateItem;
     this.focusThisField = 'name';
-    // this.requestMoldsData(0);
-    this.requestActionPlansToGenerateData(0);
         
     setTimeout(() => {
       this.catalogEdition.nativeElement.scrollIntoView({            
@@ -1656,13 +1261,13 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   initUniqueField(): void {
-    this.variable.id = null;
-    this.variable.createdBy = null;
-    this.variable.createdAt = null;
-    this.variable.updatedBy = null;
-    this.variable.updatedAt = null; 
-    this.variable.status = RecordStatus.ACTIVE; 
-    this.variable.translations.map((t) => {
+    this.checklistTemplate.id = null;
+    this.checklistTemplate.createdBy = null;
+    this.checklistTemplate.createdAt = null;
+    this.checklistTemplate.updatedBy = null;
+    this.checklistTemplate.updatedAt = null; 
+    this.checklistTemplate.status = RecordStatus.ACTIVE; 
+    this.checklistTemplate.translations.map((t) => {
       return {
         ...t,
         id: null,
@@ -1681,11 +1286,11 @@ export class CatalogChecklistTemplatesEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del template de checklist`
+      return $localize`Descripción o nombre de la la plantilla de checklist`
     } else if (fieldControlName === 'uom') {
       return $localize`Unidad de medida`
     } else if (fieldControlName === 'sigmaType') {
-      return $localize`Tipo de variable`
+      return $localize`Tipo de checklistTemplate`
     } else if (fieldControlName === 'valueType') {
       return $localize`Tipo de valor`
     } else if (fieldControlName === 'resetValueMode') {
@@ -1711,24 +1316,12 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   validateTables(): void {
-    if (this.variableForm.controls.uom.value && this.variableForm.controls.uom.value.status === RecordStatus.INACTIVE) {
-      this.variableForm.controls.uom.setErrors({ inactive: true });   
-    }    
-    if (this.variableForm.controls.valueType.value === HarcodedVariableValueType.LIST) {
-      if (this.valuesList.length === 0) {
-        this.variableForm.controls.possibleValues.setErrors({ inactive: true });   
-      } else {
-        this.variableForm.controls.possibleValues.setErrors(null);   
-      }
-    } else {
-      this.variableForm.controls.possibleValues.setErrors(null);   
-    }
-    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+  
   }
 
-  processTranslations$(variableId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.variable.translations.length || this.storedTranslations.some((st: any) => {
-      return this.variable.translations.find((t: any) => {        
+  processTranslations$(checklistTemplateId: number): Observable<any> { 
+    const differences = this.storedTranslations.length !== this.checklistTemplate.translations.length || this.storedTranslations.some((st: any) => {
+      return this.checklistTemplate.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
         (st.reference !== t.reference || 
@@ -1747,10 +1340,10 @@ export class CatalogChecklistTemplatesEditionComponent {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
       }      
-      const translationsToAdd = this.variable.translations.map((t: any) => {
+      const translationsToAdd = this.checklistTemplate.translations.map((t: any) => {
         return {
           id: null,
-          variableId,
+          checklistTemplateId,
           name: t.name,
           reference: t.reference,
           notes: t.notes,
@@ -1764,8 +1357,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addVariableTransations$(varToAdd) : of(null),
-        varToDelete.ids.length > 0 ? this._catalogsService.deleteVariableTranslations$(varToDelete) : of(null) 
+        varToAdd.translations.length > 0 ? this._catalogsService.addChecklistTemplateTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);
@@ -1829,118 +1422,11 @@ export class CatalogChecklistTemplatesEditionComponent {
     }
   }
 
-  handleEdit(id: number) {
-    this.editingValue = id;
-    this.variableForm.controls.possibleValue.setValue(this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === id).value);
-    this.possibleValuePositions.push(
-      { id: 's', description: $localize`Orden original` },       
-    )
-    if (this.variableForm.controls.possibleValuePosition.enabled) this.variableForm.controls.possibleValuePosition.disable();
-    this.variableForm.controls.possibleValuePosition.setValue('s');
-  }
-
-  handleRemove(id: number) {
-    const valueIndex = this.valuesList.findIndex((v: ChecklistTemplatePossibleValue) => v.order === id);
-    this.valuesList.splice(valueIndex, 1);
-    let index = 1;
-    this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
-      v.order = index++;
-    });
-    this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);
-    if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
-    this.setEditionButtonsState();
-  }
-
-  handleAlarmed(id: number) {
-    const value = this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === id);
-    value.alarmedValue = !value.alarmedValue;
-    this.setEditionButtonsState();
-  }
-
-  handleByDefault(id: number) {
-    if (this.valuesList.length === 1 && this.valuesList[0].byDefault) {
-      this.valuesList[0].byDefault = false;
-    } else {
-      this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
-        v.byDefault = v.order === id;
-      });    
-    }
-    
-    this.setEditionButtonsState();
-  }
-
-  setEditionButtonsState() {
-    if (!this.variable.id || this.variable.id === null || this.variable.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
-  }
-
-  handleEditPossibleValue() {
-    if (this.editingValue > -1) {
-      const editingItem = this.valuesList.find((v: ChecklistTemplatePossibleValue) => v.order === this.editingValue);
-      if (editingItem) {
-        editingItem.value = this.variableForm.controls.possibleValue.value;
-        this.possibleValuePositions.pop();
-      }        
-    } else {
-      if (this.variableForm.controls.possibleValuePosition.value === 'l') {
-        this.valuesList.push({
-          order: this.valuesList.length + 1,
-          value: this.variableForm.controls.possibleValue.value,
-          byDefault: false,
-          alarmedValue: false,
-        })
-      } else {
-        this.addPossibleValueAtFirst();
-      }
-      this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);      
-    }
-    this.editingValue = -1;   
-    this.variableForm.controls.possibleValue.setValue('');
-    this.variableForm.controls.possibleValuePosition.setValue('l');      
-    setTimeout(() => {
-      if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
-      this.possibleValue.nativeElement.focus();      
-    }, 100)
-  }
-
-  addPossibleValueAtFirst() {
-    this.valuesList.unshift({
-      order: 0,
-      value: this.variableForm.controls.possibleValue.value,
-      byDefault: false,
-      alarmedValue: false,
-    })
-    let index = 1;
-    this.valuesList.forEach((v: ChecklistTemplatePossibleValue) => {
-      v.order = index++;
-    })
-  }
-
-  handleKeyDown(event: KeyboardEvent) {     
-    if (event.key === 'Enter' && this.variableForm.controls.possibleValue.value) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.handleEditPossibleValue();      
-    }    
-  }
-
-  handleCancelPossibleValue() {
-    this.variableForm.controls.possibleValue.setValue('');
-    this.variableForm.controls.possibleValuePosition.setValue('l');
-    if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
-    this.editingValue = -1;
-    setTimeout(() => {
-      this.possibleValue.nativeElement.focus();    
-    }, 100)
-  }
-
+  
   prepareListOfValues() {
-    if (this.variable.possibleValues) {
+    if (this.checklistTemplate.possibleValues) {
       try {
-        this.valuesList = JSON.parse(this.variable.possibleValues);
+        this.valuesList = JSON.parse(this.checklistTemplate.possibleValues);
       } catch (error) {
         this.valuesList = null;
       }          
@@ -1949,6 +1435,360 @@ export class CatalogChecklistTemplatesEditionComponent {
     }
     this.possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>(this.valuesList);        
   }
+
+  setEditionButtonsState() {
+    if (!this.checklistTemplate.id || this.checklistTemplate.id === null || this.checklistTemplate.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
+
+  
+
+  handleAttachmentMoveToFirst(id: number) {
+    const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.checklistTemplate.attachments[valueIndex]));
+    this.checklistTemplate.attachments.splice(valueIndex, 1);
+    this.checklistTemplate.attachments.unshift({
+      index: 0,
+      name: tmpValue.name,
+      image: tmpValue.image,
+      id: tmpValue.id,
+      icon: tmpValue.icon,      
+    })
+    let index = 0;
+    this.checklistTemplate.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+    this.setEditionButtonsState();
+  }
+
+  handleAttachmentMoveToLast(id: number) {
+    const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.checklistTemplate.attachments[valueIndex]));
+    this.checklistTemplate.attachments.splice(valueIndex, 1);
+    this.checklistTemplate.attachments.push({
+      index: 0,
+      name: tmpValue.name,
+      image: tmpValue.image,
+      id: tmpValue.id,
+      icon: tmpValue.icon,      
+    })
+    let index = 0;
+    this.checklistTemplate.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+    this.setEditionButtonsState();
+  }
+
+  handleAttachmentMoveToUp(id: number) {
+    const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.checklistTemplate.attachments[valueIndex]));
+    const editingItem = this.checklistTemplate.attachments[valueIndex - 1];
+
+    if (editingItem) {      
+      this.checklistTemplate.attachments[valueIndex].name = editingItem.name;
+      this.checklistTemplate.attachments[valueIndex].id = editingItem.id;
+      this.checklistTemplate.attachments[valueIndex].icon = editingItem.icon;
+      this.checklistTemplate.attachments[valueIndex].image = editingItem.image;
+
+      editingItem.name = tmpValue.name;
+      editingItem.id = tmpValue.id;
+      editingItem.icon = tmpValue.icon;
+      editingItem.image = tmpValue.image;
+      
+      this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleAttachmentMoveToDown(id: number) {
+    const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.checklistTemplate.attachments[valueIndex]));
+    const editingItem = this.checklistTemplate.attachments[valueIndex + 1];
+    
+    if (editingItem) {      
+      this.checklistTemplate.attachments[valueIndex].name = editingItem.name;
+      this.checklistTemplate.attachments[valueIndex].image = editingItem.image;
+      this.checklistTemplate.attachments[valueIndex].id = editingItem.id;
+      this.checklistTemplate.attachments[valueIndex].icon = editingItem.icon;      
+
+      editingItem.name = tmpValue.name;
+      editingItem.id = tmpValue.id;
+      editingItem.icon = tmpValue.icon;      
+      editingItem.image = tmpValue.image;      
+      
+      this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleAttachmentRemove(id: number) {
+    const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
+    this.checklistTemplate.attachments.splice(valueIndex, 1);
+    let index = 0;
+    this.checklistTemplate.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);
+    this.setAttachmentLabel();
+    this.setEditionButtonsState();
+  }
+
+  messageMaxAttchment() {
+    this.addAttachmentButtonClick = true;    
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: $localize`Máximo de adjuntos alcanzado`,  
+        topIcon: 'warn-fill',
+        defaultButtons: dialogByDefaultButton.ACCEPT,
+        buttons: [],
+        body: {
+          message: $localize`Se ha alcanzado el límite de adjuntos para plantilla de checklist ${this.settingsData?.attachments?.variables ?? 10}.`,
+        },
+        showCloseButton: true,
+      },
+    }); 
+    dialogResponse.afterClosed().subscribe((response) => {
+      this.addAttachmentButtonClick = false;
+    });    
+  }
+
+  onAttachmentFileSelected(event: any) {
+    this.addAttachmentButtonClick = true;    
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/checklist-templates`)
+    .set('processId', this.checklistTemplate.id)
+    .set('process', originProcess.CATALOGS_CHEKLIST_TEMPLATE_HEADER_ATTACHMENTS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        const message = $localize`El adjunto ha sido subido satisfactoriamente<br>`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 3000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.checklistTemplate.attachments.push({
+          index: this.checklistTemplate.attachments.length,
+          name: res.fileName, 
+          id: res.fileGuid, 
+          image: `${environment.serverUrl}/files/${res.filePath}`, 
+          icon: this._catalogsService.setIconName(res.fileType), 
+        })
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+        this.setEditionButtonsState();
+        this.setAttachmentLabel();
+        this.addAttachmentButtonClick = false;
+      }      
+    });    
+  }
+
+  handleRemoveAllAttachments() {
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: $localize`Eliminar todos los adjuntos`,  
+        topIcon: 'garbage-can',
+        defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
+        buttons: [],
+        body: {
+          message: $localize`Esta acción quitará todos los adjuntoas del registro.<br><br><strong>¿Desea continuar?</strong>`,
+        },
+        showCloseButton: true,
+      },
+    }); 
+    dialogResponse.afterClosed().subscribe((response) => {      
+      if (response.action === ButtonActions.OK) {
+        this.checklistTemplate.attachments = [];
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
+        this.setEditionButtonsState();
+        this.setAttachmentLabel();
+      }
+    });       
+  }
+    
+
+  setAttachmentLabel() {
+    if (this.checklistTemplate.attachments.length === 0) {
+      this.checklistTemplateAttachmentLabel = $localize`Este registro no tiene adjuntos...`;
+    } else {
+      this.checklistTemplateAttachmentLabel = $localize`Este registro tiene ${this.checklistTemplate.attachments.length} adjunto(s)...`;
+    }    
+  }
+
+  handleAttachmentDownload(id: number) {
+
+    // let a = document.createElement("a")
+    // a.download = this.checklistTemplate.attachments[id].name;
+    // a.href = this.checklistTemplate.attachments[id].image;
+    // a.click();
+    // a.remove();
+
+   
+    
+    
+    const downloadUrl = `${environment.apiDownloadUrl}`;
+    const params = new HttpParams()
+    .set('fileName', this.checklistTemplate.attachments[id].image.replace(`${environment.serverUrl}/files/`, ''))
+    this.downloadFiles = this._http.get(downloadUrl, { params, responseType: 'blob' }).subscribe((res: any) => {
+      if (res) {
+        let url = window.URL.createObjectURL(res);
+        let link = document.createElement("a"); 
+        link.download = this.checklistTemplate.attachments[id].name;
+        link.href = url;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        link.remove();    
+      }      
+    });
+  }
+
+  duplicateAttachments() {
+    if (this.checklistTemplate.attachments.length === 0) return
+
+    const files = this.checklistTemplate.attachments.map((a) => a.id);
+    this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_CHEKLIST_TEMPLATE_HEADER_ATTACHMENTS, files)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.length !== this.checklistTemplate.attachments) {
+          const message = $localize`No se pudieron duplicar todos los adjuntos...`;
+          this._sharedService.showSnackMessage({
+            message,
+            snackClass: 'snack-warn',
+            progressBarColor: 'warn',
+            icon: 'delete',
+          });
+        }
+        let line = 0;
+        this.checklistTemplate.attachments = newAttachments.map(na => {
+          return {
+            index: line++,
+            name: na.fileName, 
+            image: `${environment.serverUrl}/files/${na.path}`, 
+            id: na.fileId, 
+            icon: this._catalogsService.setIconName(na.fileType), 
+          }
+        });
+      })
+
+    )
+  }
+
+  handleMultipleSelectionChanged(catalog: string){    
+    this.setEditionButtonsState();
+  }
+
+  requestMoldsData(currentPage: number, filterStr: string = null) {    
+    this.molds = {
+      ...this.molds,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    }
+    const skipRecords = this.molds.items.length;
+
+    const processId = !!this.checklistTemplate.id ? this.checklistTemplate.id : 0;
+    const variableParameters = {
+      settingType: 'multiSelection',
+      skipRecords,
+      process: SystemTables.MOLDS,
+      processId, 
+      takeRecords: this.takeRecords, 
+      filter,       
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters);    
+    this.molds$ = this._catalogsService.getMoldsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.catalogDetailMold?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.id,
+            valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
+          }
+        })
+        this.molds = {
+          ...this.molds,
+          loading: false,
+          pageInfo: data?.data?.catalogDetailMold?.pageInfo,
+          items: this.molds.items?.concat(mappedItems),
+          totalCount: data?.data?.catalogDetailMold?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  
+  handleKeyDown(event: KeyboardEvent) { }
+
+  chengeSelection(event: any) { 
+  }
+
+
+  handleChengeSelection(event: any) { 
+    // if (this.formField.disabled) {
+     // event.option.selected = false;
+    // }
+  }
+
+  handleNotifyModesSelectItem(formField: FormControl, item: any) {
+    if (formField.disabled) return;
+    if (formField.value === GeneralValues.YES) {
+      item.selected = !item.selected;
+      this.notifyingModesSelected = this.notifyingModes.items.filter(r => r.selected).length;
+      this.setEditionButtonsState();
+    }
+  }
+
+  handleNotifyChannelsSelectItem(formField: FormControl, item: any) {
+    if (formField.disabled) return;
+    if (formField.value === GeneralValues.YES) {
+      item.selected = !item.selected;
+      this.notifyingChannelsSelected = this.notifyingChannels.items.filter(r => r.selected).length;
+      this.setEditionButtonsState();
+    }
+  }
+
+  /* updateSelections(item: any, action: string = '') {
+    const originalValueRight = item.valueRight;
+    if (action === 'u') {
+      item.valueRight = null;
+    } else if (action === 's') {
+      item.valueRight = item.id;
+    } else {
+      item.valueRight = !!item.valueRight ? null : item.id;
+    }
+    
+    const itemIndexChanged = this.currentSelections.findIndex(r => r.id === item.id && r.valueRight !== item.valueRight)
+    if (itemIndexChanged !== -1) {
+      this.currentSelections[itemIndexChanged].valueRight = item.valueRight;
+    } else {
+      this.currentSelections.push( { id: item.id, valueRight: item.valueRight, originalValueRight, catalogDetailId: item.catalogDetailId });
+    }
+  } */
+  
 
   get SystemTables () {
     return SystemTables;

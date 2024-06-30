@@ -1,9 +1,8 @@
-<div
+<section
   class="container"
   #catalogEdition
   @routingAnimation
   (@routingAnimation.done)="pageAnimationFinished($event)"
-  i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
   <ng-container *ngIf="variable$ | async"></ng-container>  
@@ -26,6 +25,7 @@
   <ng-container *ngIf="molds$ | async "></ng-container>       
   <ng-container *ngIf="actionPlansToGenerate$ | async "></ng-container>       
   <ng-container *ngIf="updateVariableCatalog$ | async "></ng-container>      
+  <ng-container *ngIf="duplicateAttachmentsList$ | async "></ng-container>        
 
   <mat-card class="card">
     <form
@@ -190,20 +190,20 @@
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
-                      *ngIf="this.variable.mainImage"
+                      *ngIf="variable.mainImage"
                     >
                       <img                
                         @dissolve
                         appImageNotFound                
-                        class="mold-image"                        
-                        [src]="this.variable.mainImage"
-                        [alt]="this.variable.mainImage"            
+                        class="variable-image"                        
+                        [src]="variable.mainImage"
+                        [alt]="variable.mainImage"            
                         fill
                       >      
                     </div>
                     <div
-                      *ngIf="!this.variable.mainImage"
-                      class="icon-container"
+                      *ngIf="!variable.mainImage"
+                      class="icon-container-image"
                     >
                       <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
                     </div>    
@@ -367,7 +367,7 @@
                 >
               </app-input-field>
             </div>
-            <section              
+            <div              
               class="field-items"              
               *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
             >
@@ -378,7 +378,7 @@
               >
                 <div class="title-with-id">
                   <span class="label field__label">Lista de posibles valores</span>                  
-                  <span class="field__label">Total valores: {{ valuesList.length }}</span>
+                  <span class="field__label">Total valores: {{ valuesList?.length }}</span>
                 </div>
                 <div            
                   class="values-table values-table__container"    
@@ -462,7 +462,6 @@
                       </td>
                     </ng-container>
 
-                    
                     <ng-container matColumnDef="actions">
                       <th mat-header-cell *matHeaderCellDef>Acciones</th>
                       <td class="general-info" mat-cell *matCellDef="let row">
@@ -556,7 +555,7 @@
                 </button>
                 </div>
               </fieldset>
-            </section>
+            </div>
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.required"
@@ -886,6 +885,225 @@
               </app-multiple-selection-list>                
             </div>
           </div>
+        </mat-expansion-panel> 
+        <mat-expansion-panel
+          (opened)="panelOpenState[2] = true"
+          (closed)="panelOpenState[2] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[2]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[2]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="attachment"> </mat-icon>
+              <label class="accordion-label">ADJUNTOS DE LA VARIABLE ({{ variable.attachments.length }} de un máximo de {{ settingsData?.attachments?.variables ?? 10 }})</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[2]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">            
+            <div class="field-items">              
+              <div            
+                class="values-table values-table__container"    
+              >              
+                <table mat-table [dataSource]="attachmentsTable">
+
+                  <ng-container matColumnDef="index">
+                    <th mat-header-cell *matHeaderCellDef>#</th>                  
+                    <td mat-cell *matCellDef="let row; let i = index">
+                      <ng-container>{{ i + 1 }}</ng-container>                        
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="icon">
+                    <th mat-header-cell *matHeaderCellDef>Aplicación</th>
+                    <td mat-cell *matCellDef="let row">
+                      <div class="card-image-icon">
+                        <div
+                          class="image-container-table"
+                          *ngIf="row.icon === 'field_image'"
+                        >
+                          <img                
+                            @dissolve
+                            appImageNotFound                
+                            class="variable-image"                        
+                            [src]="row.image"
+                            [alt]="row.image"         
+                            fill
+                          >      
+                        </div>
+                        <div
+                          *ngIf="row.icon !== 'field_image'"
+                          class="icon-container"
+                        >
+                          <mat-icon 
+                            class="file-type-icon"
+                            [svgIcon]="row.icon"
+                          >
+                          </mat-icon>
+                        </div>    
+                      </div>                      
+                    </td>      
+                  </ng-container>
+
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>                  
+                    <td mat-cell *matCellDef="let row">
+                      <ng-container>{{ row.name }}</ng-container>                        
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="actions-attachments">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td class="general-info" mat-cell *matCellDef="let row; let i = index">
+                      <div
+                        class="box-row"                          
+                      >
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToUp(i)"
+                          matTooltip="Sube el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === 0"
+                        >
+                          <mat-icon>keyboard_arrow_up</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToDown(i)"
+                          matTooltip="Baja el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === variable.attachments.length - 1"
+                        >
+                          <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToFirst(i)"
+                          matTooltip="Sube el item al primer orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === 0"
+                        >
+                          <mat-icon>keyboard_capslock</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToLast(i)"
+                          matTooltip="Baja el item al último orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === variable.attachments.length - 1"
+                        >
+                          <mat-icon class="icon-rotated">keyboard_capslock</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button (click)="handleAttachmentRemove(i)"
+                          matTooltip="Elimina este adjunto..."
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"                          
+                        >                          
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button (click)="handleAttachmentDownload(i)"
+                          matTooltip="Descarga a su disco una copia del archivo"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"                          
+                        >
+                          <mat-icon>cloud_download</mat-icon>
+                        </button>
+                      </div>                        
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="attachmentsTableColumns; sticky: 1"></tr>
+                  <tr class="table-row" mat-row *matRowDef="let row; columns: attachmentsTableColumns"></tr>
+                  
+                  <tr class="values-table-mat-row" *matNoDataRow>
+                    <td class="values-table__no-data" colspan="9">
+                      No hay adjuntos a mostrar...
+                    </td>
+                  </tr>                  
+                </table>                    
+              </div>        
+              <mat-divider style="margin: 10px 0px 0px 0px;"></mat-divider>
+              <div class="grid-multiple-rows no-flex">
+                <div class="maintenance-buttons" style="padding: 10px 10px 1px 0px;">
+                  <input type="file" style="display: none" (change)="onAttachmentFileSelected($event)" #fileInputAttachment> 
+                  <button
+                    [disabled]="addAttachmentButtonClick"
+                    mat-button
+                    class="toolbar-button"
+                    aria-label="icon-button with menu icon"
+                    matTooltip="Agrega un nuevoadjunto a la variablee"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    (click)="(variable.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttchment() : fileInputAttachment.click();"
+                  >
+                    <mat-icon                                    
+                      class="svgicon icon-medium"                
+                      svgIcon="document"
+                      [ngStyle]="{ visibility: addAttachmentButtonClick ? 'hidden' : 'visible' }"b
+                    >
+                    </mat-icon>
+                    <mat-progress-spinner
+                      *ngIf="addAttachmentButtonClick"
+                      class="spinner-regular-button"
+                      diameter="32"
+                      mode="indeterminate"
+                    >
+                    </mat-progress-spinner>
+                    <mat-label class="button-label">Agregar un adjunto...</mat-label>
+                  </button>          
+                  <button
+                    [disabled]="variable.attachments.length === 0"
+                    mat-button
+                    class="toolbar-button warn"
+                    aria-label="icon-button with menu icon"
+                    matTooltip="Elimina todos los adjuntos"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    (click)="handleRemoveAllAttachments()"
+                  >
+                    <mat-icon                
+                      class="svgicon icon-medium"                
+                      svgIcon="garbage-can"
+                    >
+                    </mat-icon>                      
+                    <mat-label class="button-label">Eliminar todos los adjuntos...</mat-label>
+                  </button>                          
+                  <app-label-ellipsis
+                    class="readonly-value"
+                    style="margin-left: auto"                         
+                    [lines]="1"
+                    [labelInnerHTML]="variableAttachmentLabel"
+                  ></app-label-ellipsis>              
+                </div>
+              </div>      
+            </div>
+          </div>
         </mat-expansion-panel>        
       </mat-accordion>
     </form>
@@ -951,4 +1169,4 @@
       </div>
     </div>
   </mat-card>
-</div>
+</section>

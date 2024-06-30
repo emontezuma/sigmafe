@@ -205,12 +205,12 @@ export class CatalogCustomersListComponent implements AfterViewInit {
           customersPaginated: {
             ...data.customersPaginated,
             items: data.customersPaginated.items.map((item) => { 
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
                 }
               }
             })          

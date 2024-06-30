@@ -204,7 +204,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
           providersPaginated: {
             ...data.providersPaginated,
             items: data.providersPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {

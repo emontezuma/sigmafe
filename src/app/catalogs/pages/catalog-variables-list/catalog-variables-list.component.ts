@@ -212,12 +212,12 @@ export class CatalogVariablesListComponent implements AfterViewInit {
           variablesPaginated: {
             ...data.variablesPaginated,
             items: data.variablesPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
                   uom: {
                     ...item.data.uom,
                     name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,

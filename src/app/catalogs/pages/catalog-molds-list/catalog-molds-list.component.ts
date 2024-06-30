@@ -144,12 +144,12 @@ export class CatalogMoldsListComponent implements AfterViewInit {
           moldsPaginated: {
             ...mold.moldsPaginated,
             items: mold.moldsPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
                 }
               }
             })          

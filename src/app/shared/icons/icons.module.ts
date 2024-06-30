@@ -237,7 +237,28 @@ export class IconsModule {
     );iconRegistry.addSvgIcon(
       'server',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/server.svg`)
-    );
+    );iconRegistry.addSvgIcon(
+      'cold',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/cold.svg`)
+    );iconRegistry.addSvgIcon(
+      'youtube2',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/youtube2.svg`)
+    );iconRegistry.addSvgIcon(
+      'field_image',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/field_image.svg`)
+    );iconRegistry.addSvgIcon(
+      'file_format_pdf',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/file_format_pdf.svg`)
+    );iconRegistry.addSvgIcon(
+      'faq',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/faq.svg`)  
+    );iconRegistry.addSvgIcon(
+      'transcode',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/transcode.svg`)
+    );iconRegistry.addSvgIcon(
+      'announcements',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/announcements.svg`)
+    );    
   }
   
 }

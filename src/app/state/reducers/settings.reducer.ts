@@ -18,6 +18,10 @@ export const initialState: SettingsState = {
     timeOutFortDialog: 0,
     catalog: {
       pageSize: 50,
+    },
+    attachments: {
+      variables: 10,
+      checklistTemplateHeader: 5
     }
   },  
 };

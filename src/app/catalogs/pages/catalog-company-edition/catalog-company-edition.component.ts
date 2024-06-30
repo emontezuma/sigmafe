@@ -829,7 +829,7 @@ export class CatalogCompanyEditionComponent {
         this.companyForm.controls.mainImageName.setValue(res.fileName);
         this.company.mainImagePath = res.filePath;
         this.company.mainImageGuid = res.fileGuid;
-        this.company.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.company.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la compañía para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

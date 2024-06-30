@@ -129,6 +129,7 @@
 }
 
 .field-items {
+  position: relative;
   flex: 1 1 32%;
 }
 
@@ -187,4 +188,20 @@
     ::ng-deep .mat-mdc-text-field-wrapper {
       height: 56px;
     }
+  }
+
+  .macros-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--z-colors-page-shadow);
+    margin-top: 7px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+  
+  .section-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }

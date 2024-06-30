@@ -1,4 +1,4 @@
-import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import { Attachment, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
 export interface ChecklistTemplatesData {
   checklistTemplatesPaginated?: ChecklistTemplates;
@@ -32,7 +32,7 @@ export interface ChecklistTemplateDetail {
   mainImage?: string;
   id?: number;
   customerId?: number;
-  uom?: GeneralCatalogInternalData,
+  templateType?: GeneralCatalogInternalData,
   sigmaType?: GeneralCatalogInternalData,
   valueType?: string,
   status?: string;
@@ -51,6 +51,7 @@ export interface ChecklistTemplateDetail {
   byDefault?: string; 
   byDefaultDateType?: string; 
   resetValueMode?: string; 
+  attachments?: Attachment[];
   minimum?: string; 
   maximum?: string; 
   createdById?: any;
@@ -130,6 +131,7 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   accumulative: GeneralValues.NO,
   automaticActionPlan: GeneralValues.NO,
   notifyAlarm: GeneralValues.NO,
+  attachments: [],
   translations: [],
   byDefault: '',
   byDefaultDateType: '-',

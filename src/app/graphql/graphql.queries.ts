@@ -1074,6 +1074,101 @@ export const ADD_VARIABLE_TRANSLATIONS = gql`
   }
 `;
 
+export const ADD_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
+  mutation createOrUpdateChecklistTemplateTranslationTable (
+    $translations: [ChecklistTemplateTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateChecklistTemplateTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      variableId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_CHECKLIST_TEMPLATE = gql`
+  mutation CreateOrUpdateChecklistTemplate (
+    $customerId: Long,
+    $id: Long,
+    $status: String    
+    $name: String,
+    $reference: String,
+    $notes: String,
+    $valueType: String,
+    $prefix: String,
+    $required: String,
+    $allowComments: String,
+    $allowNoCapture: String,
+    $allowAlarm: String,
+    $resetValueMode: String,
+    $notifyAlarm: String,    
+    $accumulative: String,
+    $showChart: String,
+    $possibleValues: String,
+    $minimum: String,
+    $maximum: String,
+    $showNotes: String,
+    $automaticActionPlan: String,
+    $actionPlansToGenerate: String,
+    $byDefaultDateType: String,
+    $byDefault: String,
+    $uomId: Long,
+    $sigmaTypeId: Long,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
+  ) {
+  createOrUpdateChecklistTemplate (
+    inputs: [{
+      customerId: $customerId
+      id: $id      
+      status: $status
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+      showNotes: $showNotes,
+      prefix: $prefix,
+      valueType: $valueType,
+      minimum: $minimum,
+      maximum: $maximum,
+      required: $required,
+      resetValueMode: $resetValueMode,
+      allowComments: $allowComments,
+      notifyAlarm: $notifyAlarm,      
+      allowNoCapture: $allowNoCapture,
+      automaticActionPlan: $automaticActionPlan,
+      actionPlansToGenerate: $actionPlansToGenerate,
+      possibleValues: $possibleValues,
+      byDefaultDateType: $byDefaultDateType,
+      byDefault: $byDefault,
+      allowAlarm: $allowAlarm,
+      showChart: $showChart,
+      accumulative: $accumulative,
+      uomId: $uomId,
+      sigmaTypeId: $sigmaTypeId,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
 export const UPDATE_VARIABLE = gql`
   mutation CreateOrUpdateVariable (
     $customerId: Long,
@@ -1161,6 +1256,18 @@ export const DELETE_VARIABLE_TRANSLATIONS = gql`
     $customerId: Long!
   ) {
     deleteVariablesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId
+    ) 
+  }
+`;
+
+export const DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
+  mutation DeleteChecklistTemplatesTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  ) {
+    deleteChecklistTemplatesTranslationsTable (      
       ids: $ids,
       customerId: $customerId
     ) 
@@ -1418,6 +1525,129 @@ export const INACTIVATE_VARIABLE = gql`
     $status: String
   ) {
   createOrUpdateVariable (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+export const GET_CHECKLIST_TEMPLATE = gql`
+  query oneChecklistTemplate (
+    $checklistTemplateId: Long!,
+  ) {
+  oneChecklistTemplate (
+    id: $checklistTemplateId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName
+      molds
+      templateTypeId
+      id
+      customerId
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      templateType {
+        id
+        status
+        name
+        reference
+        translations {
+          name
+          reference
+          languageId
+        }
+      }
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
+  query ChecklistTemplatesTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ChecklistTemplateTranslationTableSortInput!],
+    $filterBy: ChecklistTemplateTranslationTableFilterInput,
+  ) {
+    checklistTemplatesTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        checklistTemplateId
+        name
+        reference
+        notes
+        approvalRequestMessageSubject
+        approvalRequestMessageBody
+        anticipationMessageSubject
+        anticipationMessageBody
+        expiringMessageSubject
+        expiringMessageBody
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const INACTIVATE_CHECKLIST_TMEPLATE = gql`
+  mutation CreateOrUpdateChecklistTemplate (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateChecklistTemplate (
     inputs: {
       id: $id
       customerId: $customerId
@@ -2996,6 +3226,65 @@ export const INACTIVATE_DEPARTMENT = gql`
       id
       status
     } 
+  }
+`;
+
+export const SAVE_ATTACHMENTS = gql`
+  mutation UpdateUploadedFiles (
+    $processId: Long!,
+    $process: String!,
+    $files: [String!]!    
+  ) {    
+  updateUploadedFiles (    
+      processId: $processId
+      process: $process
+      fileIds: $files    
+    ) 
+  }
+`;
+
+export const DUPLICATE_ATTACHMENTS = gql`
+  mutation DuplicateAttachments (
+    $process: String!,
+    $files: [String!]!) {    
+    duplicateAttachments (
+      process: $process
+      ids: $files
+    ) {
+        fileId
+        path
+        fileName
+        fileType
+      }
+  }
+`;
+
+export const GET_ALL_ATTACHMENTS = gql`
+query UploadedFiles (
+    $processId: Long,
+    $customerId: Long,
+    $process: String
+  ) {
+  uploadedFiles(
+      where: {
+          and: [
+              { processId: { eq: $processId } }
+              { customerId: { eq: $customerId } }
+              { process: { eq: $process } }
+              { line: { neq: 0 } }
+          ]
+      }
+      order: { line: ASC }
+  ) {
+      totalCount
+      items {
+        line
+        fileId
+        fileType
+        fileName
+        path
+      }
+    }
   }
 `;
 

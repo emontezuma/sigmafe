@@ -8,6 +8,7 @@ export const environment = {
     webSocketAddress: 'wss://localhost:8089',
     serverUrl: 'http://localhost:8089',
     apiUploadUrl: 'http://localhost:8089/api/file/upload',
+    apiDownloadUrl: 'https://localhost:8089/api/file/download',
     uploadFolders: {        
         completePathToFiles: 'http://localhost:8089/files',
         catalogs: 'catalogs',

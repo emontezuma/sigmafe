@@ -1,4 +1,4 @@
-import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import { Attachment, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
 export interface VariablesData {
   variablesPaginated?: Variables;
@@ -38,6 +38,7 @@ export interface VariableDetail {
   status?: string;
   showNotes?: string;
   translations?: GeneralTranslation[];
+  attachments?: Attachment[];
   required?: string;
   allowNoCapture?: string;
   allowComments?: string;
@@ -61,8 +62,7 @@ export interface VariableDetail {
   deletedAt?: any;
   deletedBy?: any;
   updatedBy?: any;
-  createdBy?: any;
-  
+  createdBy?: any;  
 }
 
 export interface VariablesState {
@@ -131,6 +131,7 @@ export const emptyVariableItem: VariableDetail = {
   automaticActionPlan: GeneralValues.NO,
   notifyAlarm: GeneralValues.NO,
   translations: [],
+  attachments: [],
   byDefault: '',
   byDefaultDateType: '-',
 };

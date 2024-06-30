@@ -58,6 +58,12 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
     description: new FormControl(''),
     reference: new FormControl(''),
     notes: new FormControl(''),    
+    approvalRequestMessageSubject: new FormControl(''),  
+    approvalRequestMessageBody: new FormControl(''),  
+    anticipationMessageSubject: new FormControl(''),  
+    anticipationMessageBody: new FormControl(''),  
+    expiringMessageSubject: new FormControl(''),  
+    expiringMessageBody: new FormControl(''),  
     language: new FormControl(''),    
   });
   languages$: Observable<any>; 
@@ -145,6 +151,12 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         translation.name = this.translationsForm.controls.description.value;
         translation.reference = this.translationsForm.controls.reference.value;
         translation.notes = this.translationsForm.controls.notes.value;
+        translation.approvalRequestMessageSubject = this.translationsForm.controls.approvalRequestMessageSubject.value;
+        translation.approvalRequestMessageBody = this.translationsForm.controls.approvalRequestMessageBody.value;
+        translation.anticipationMessageSubject = this.translationsForm.controls.anticipationMessageSubject.value;
+        translation.anticipationMessageBody = this.translationsForm.controls.anticipationMessageBody.value;
+        translation.expiringMessageSubject = this.translationsForm.controls.expiringMessageSubject.value;
+        translation.expiringMessageBody = this.translationsForm.controls.expiringMessageBody.value;
         translation.updatedAt = this._sharedService.formatDate(new Date());
         translation.updatedByUserName = $localize`Este usuario`;
         translation.changed = true;
@@ -164,12 +176,16 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         this.translationsForm.controls.description.setValue(translation['description']);
         this.translationsForm.controls.reference.setValue(translation['reference']);
         this.translationsForm.controls.notes.setValue(translation['notes']);
+        this.translationsForm.controls.approvalRequestMessageSubject.setValue(translation['approvalRequestMessageSubject']);
+        this.translationsForm.controls.approvalRequestMessageBody.setValue(translation['approvalRequestMessageBody']);
+        this.translationsForm.controls.anticipationMessageSubject.setValue(translation['anticipationMessageSubject']);
+        this.translationsForm.controls.anticipationMessageBody.setValue(translation['anticipationMessageBody']);
+        this.translationsForm.controls.expiringMessageSubject.setValue(translation['expiringMessageSubject']);
+        this.translationsForm.controls.expiringMessageBody.setValue(translation['expiringMessageBody']);
         translation['changed'] = false;
         this.setButtonState(toolbarMode.INITIAL_WITH_DATA);
       } else {
-        this.translationsForm.controls.description.setValue('');
-        this.translationsForm.controls.reference.setValue('');
-        this.translationsForm.controls.notes.setValue('');
+        this.initFormFields();
         this.setButtonState(toolbarMode.INITIAL_WITH_NO_DATA);
       }      
     } else if (action === ButtonActions.CLOSE) {      
@@ -201,9 +217,7 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
           this.data.translations =  this.data.translations.filter(translation => translation.languageId !== +this.translationsForm.controls.language.value);
           this.selectedTranslation = null;
           this.printTranslations();
-          this.translationsForm.controls.description.setValue('');
-          this.translationsForm.controls.reference.setValue('');
-          this.translationsForm.controls.notes.setValue('');
+          this.initFormFields();
           this.setButtonState(toolbarMode.INITIAL_WITH_NO_DATA);
           this.languageIsUsed(+this.translationsForm.controls.language.value);
           this.data.translationsUpdated = true;
@@ -213,6 +227,18 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
     setTimeout(() => {
       this.data.buttons.find(b => b.action === action).loading = false;
     }, 200);
+  }
+
+  initFormFields() {
+    this.translationsForm.controls.description.setValue('');
+    this.translationsForm.controls.reference.setValue('');
+    this.translationsForm.controls.notes.setValue('');
+    this.translationsForm.controls.approvalRequestMessageSubject.setValue('');
+    this.translationsForm.controls.approvalRequestMessageBody.setValue('');
+    this.translationsForm.controls.anticipationMessageSubject.setValue('');
+    this.translationsForm.controls.anticipationMessageBody.setValue('');
+    this.translationsForm.controls.expiringMessageSubject.setValue('');
+    this.translationsForm.controls.expiringMessageBody.setValue('');
   }
 
   handleCloseButtonClick() {
@@ -283,6 +309,12 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
       this.translationsForm.controls.description.setValue(this.selectedTranslation.description);
       this.translationsForm.controls.reference.setValue(this.selectedTranslation.reference);
       this.translationsForm.controls.notes.setValue(this.selectedTranslation.notes);
+      this.translationsForm.controls.approvalRequestMessageSubject.setValue(this.selectedTranslation.approvalRequestMessageSubject);
+      this.translationsForm.controls.approvalRequestMessageBody.setValue(this.selectedTranslation.approvalRequestMessageBody);
+      this.translationsForm.controls.anticipationMessageSubject.setValue(this.selectedTranslation.anticipationMessageSubject);
+      this.translationsForm.controls.anticipationMessageBody.setValue(this.selectedTranslation.anticipationMessageBody);
+      this.translationsForm.controls.expiringMessageSubject.setValue(this.selectedTranslation.expiringMessageSubject);
+      this.translationsForm.controls.expiringMessageBody.setValue(this.selectedTranslation.expiringMessageBody);
       this.setButtonState(toolbarMode.INITIAL_WITH_DATA);
     } else {
       const message = $localize`Nueva traducción...`;
@@ -290,9 +322,7 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         message,
         snackClass: 'snack-primary',
       });
-      this.translationsForm.controls.description.setValue('');
-      this.translationsForm.controls.reference.setValue('');
-      this.translationsForm.controls.notes.setValue('');
+      this.initFormFields();
       this.setButtonState(toolbarMode.INITIAL_WITH_NO_DATA);
     }
   }

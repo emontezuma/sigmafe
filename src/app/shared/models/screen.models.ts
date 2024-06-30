@@ -50,6 +50,7 @@ export enum ButtonActions {
   REACTIVATE = 'rectivate',
   DELETE = 'delete',
   TRANSLATIONS = 'translations',
+  MACROS = 'macros',
   INITIALIZE = 'initialize',
   OK = 'ok',
 }

@@ -154,7 +154,7 @@ export class CatalogMoldEditionComponent {
     inactiveRecords: 0,
     activeRecords: 0,
   }
-  addHistoricalButtonClick: boolean = false;
+  addHistoricalButtonClick: boolean = false;  
   removeHistoricalButtonClick: boolean = false;
   historicalItemsLabel: string = '';
 
@@ -352,7 +352,7 @@ export class CatalogMoldEditionComponent {
       loading: true,
     } 
     const skipRecords = this.moldTypes.items.length;
-    this.moldTypes$ = this.requestGenericsData$(currentPage, skipRecords, 'mold-types', filterStr)
+    this.moldTypes$ = this.requestGenericsData$(currentPage, skipRecords, SystemTables.MOLD_TYPES, filterStr)
     .pipe(
       tap((data: any) => {                
         const mappedItems = data?.data?.genericsPaginated?.items.map((item) => {
@@ -383,7 +383,7 @@ export class CatalogMoldEditionComponent {
       loading: true,
     }    
     const skipRecords = this.moldClasses.items.length;
-    this.moldClasses$ = this.requestGenericsData$(currentPage, skipRecords, 'mold-classes', filterStr)
+    this.moldClasses$ = this.requestGenericsData$(currentPage, skipRecords, SystemTables.MOLD_CLASSES, filterStr)
     .pipe(
       tap((data: any) => {                
         const mappedItems = data?.data?.genericsPaginated?.items.map((item) => {
@@ -1663,7 +1663,7 @@ export class CatalogMoldEditionComponent {
         this.moldForm.controls.mainImageName.setValue(res.fileName);
         this.mold.mainImagePath = res.filePath;
         this.mold.mainImageGuid = res.fileGuid;
-        this.mold.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.mold.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

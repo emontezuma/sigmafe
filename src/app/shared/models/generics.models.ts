@@ -282,6 +282,7 @@ export interface MoldDetail {
     value: string;
     disabled: boolean;
     status?: string;
+    selected?: boolean;
   }
  
   export interface GeneralHardcodedValuesData {

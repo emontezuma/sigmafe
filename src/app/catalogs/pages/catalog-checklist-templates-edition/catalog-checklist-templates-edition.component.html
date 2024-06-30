@@ -1,37 +1,52 @@
+
 <div
   class="container"
   #catalogEdition
   @routingAnimation
   (@routingAnimation.done)="pageAnimationFinished($event)"
-  i18n
 >
+
   <ng-container *ngIf="scroll$ | async"></ng-container>
-  <ng-container *ngIf="variable$ | async"></ng-container>  
+  <ng-container *ngIf="checklistTemplate$ | async"></ng-container>  
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
-  <ng-container *ngIf="uoms$ | async"></ng-container>
   <ng-container *ngIf="sensors$ | async"></ng-container>
-  <ng-container *ngIf="valueTypes$ | async"></ng-container>
+  <ng-container *ngIf="templateTypes$ | async"></ng-container>
   <ng-container *ngIf="settingsData$ | async"></ng-container>
-  <ng-container *ngIf="sigmaTypes$ | async"></ng-container>
+  <ng-container *ngIf="macros$ | async"></ng-container>
   <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
-  <ng-container *ngIf="variableByDefaultDate$ | async"></ng-container>  
-  <ng-container *ngIf="resetValueModes$ | async"></ng-container>
+  <ng-container *ngIf="notifyingModes$ | async"></ng-container>  
+  <ng-container *ngIf="notifyingChannels$ | async"></ng-container>  
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
-  <ng-container *ngIf="updateVariable$ | async "></ng-container>    
-  <ng-container *ngIf="deleteVariableTranslations$ | async "></ng-container>      
-  <ng-container *ngIf="addVariableTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="updateChecklistTemplate$ | async "></ng-container>    
+  <ng-container *ngIf="deleteChecklistTemplateTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addChecklistTemplateTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="updateChecklistTemplateCatalog$ | async "></ng-container>      
+  <ng-container *ngIf="duplicateAttachmentsList$ | async "></ng-container>        
   <ng-container *ngIf="molds$ | async "></ng-container>       
-  <ng-container *ngIf="actionPlansToGenerate$ | async "></ng-container>       
-  <ng-container *ngIf="updateVariableCatalog$ | async "></ng-container>      
+
+  <div @dissolve class="sticky" *ngIf="showMacros">
+    <mat-card>
+      <div class="card-macros">
+        <div
+          class="macro-element"  
+          *ngFor="let macro of macros.items; let i = index"
+          [innerHTML]="macro.friendlyText"
+        >        
+        </div>      
+      </div>
+      <mat-divider style="margin: 0px 10px 5px 10px;"></mat-divider>
+      <div style="padding: 0px 10px 10px 10px;"><strong>Inserte en el campo el id de la macro incluyendo los corchetes. Estas macros serán sustituidas por su valor correspondiente al momento de generar el checklist.</strong></div>
+    </mat-card>  
+  </div>
 
   <mat-card class="card">
     <form
         class="layout"
         (ngSubmit)="onSubmit()"
-        [formGroup]="variableForm"
+        [formGroup]="checklistTemplateForm"
         #f="ngForm"
       >
       <mat-accordion multi>
@@ -53,7 +68,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DE LA VARIABLE</label
+                >INFORMACIÓN PRINCIPAL DE LA PLANTILLA DE CHECKLIST</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -74,10 +89,18 @@
           </mat-expansion-panel-header>
           <div class="grid-multiple margin-top">
             <div class="field-items">
+              <mat-icon
+                class="macros-icon"
+                svgIcon="transcode"
+                matTooltip="Este campo soporta macros"
+                matTooltipClass="tooltip-general"
+                matTooltipShowDelay="100"
+              >
+              </mat-icon>              
               <app-input-field
                 [focused]="focusThisField==='name'"
                 [bordered]="true"
-                [formField]="variableForm.controls.name"
+                [formField]="checklistTemplateForm.controls.name"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="300"
                 [showRightHint]="true"
@@ -88,7 +111,7 @@
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre de la variable</span
+                  >Descripción/Nombre del checklist</span
                 >
               </app-input-field>
             </div>
@@ -96,7 +119,7 @@
               <app-input-field
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
-                [formField]="variableForm.controls.prefix"
+                [formField]="checklistTemplateForm.controls.prefix"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
@@ -112,7 +135,7 @@
             <div class="field-items">
               <app-input-field
                 [bordered]="true"
-                [formField]="variableForm.controls.reference"
+                [formField]="checklistTemplateForm.controls.reference"
                 leftHint="Campo opcional"
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
@@ -127,7 +150,7 @@
             <div class="field-items field-items--bordered">
               <app-area-field
                 [bordered]="false"
-                [formField]="variableForm.controls.notes"
+                [formField]="checklistTemplateForm.controls.notes"
                 [fieldMaxLength]="500"
                 [showRightHint]="true"
                 [showCloseButton]="true"
@@ -138,15 +161,7 @@
                 <span fieldTitle class="label field__label"
                   >Notas referentes a la variable</span
                 >
-              </app-area-field>
-              <mat-checkbox
-                style="margin-top: -10px;width: calc(100% - 30px);"                
-                class="field__check-label"
-                formControlName="showNotes"
-                color="primary"
-              >
-                <span class="check-span">Utilizar éstas notas como título/pregunta en el checklist</span>
-              </mat-checkbox>
+              </app-area-field>               
             </div>                     
             <div class="field-items">
               <fieldset class="field__container">
@@ -157,7 +172,7 @@
                       <input
                         class="field__input"
                         matInput
-                        [formControl]="variableForm.controls.mainImageName"                        
+                        [formControl]="checklistTemplateForm.controls.mainImageName"                        
                         [readonly]="true"
                       />
                       <input type="file" style="display: none" (change)="onFileSelected($event)" accept="*.png,*.jpg,*.jpeg,*.svg,*.bmp" #fileInput> 
@@ -173,7 +188,7 @@
                         <mat-icon>search</mat-icon>
                       </button>
                       <button
-                        *ngIf="variable.mainImage"
+                        *ngIf="checklistTemplate.mainImage"
                         matSuffix
                         mat-icon-button
                         (click)="removeImage()"
@@ -190,20 +205,20 @@
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
-                      *ngIf="this.variable.mainImage"
+                      *ngIf="this.checklistTemplate.mainImage"
                     >
                       <img                
                         @dissolve
                         appImageNotFound                
-                        class="mold-image"                        
-                        [src]="this.variable.mainImage"
-                        [alt]="this.variable.mainImage"            
+                        class="variable-image"                        
+                        [src]="this.checklistTemplate.mainImage"
+                        [alt]="this.checklistTemplate.mainImage"            
                         fill
                       >      
                     </div>
                     <div
-                      *ngIf="!this.variable.mainImage"
-                      class="icon-container"
+                      *ngIf="!this.checklistTemplate.mainImage"
+                      class="icon-container-image"
                     >
                       <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
                     </div>    
@@ -217,32 +232,30 @@
                 style="min-width: 350px; height: calc(100% - 22px);"
                 [ngClass]="{
                   'field__container--error':
-                    variableForm.controls.sigmaType.touched &&
-                    !variableForm.controls.sigmaType.valid
+                    checklistTemplateForm.controls.templateType.touched &&
+                    !checklistTemplateForm.controls.templateType.valid
                 }"
-                [disabled]="variableForm.controls.sigmaType.disabled"
+                [disabled]="checklistTemplateForm.controls.templateType.disabled"
               >
                 <div class="title-with-id">
-                  <span class="label field__label">Tipo de variable</span>
-                  <span class="field__label" *ngIf="variableForm.controls.sigmaType?.value?.id">Id: {{ variableForm.controls.sigmaType?.value?.id }}</span>
+                  <span class="label field__label">Tipo de plantilla de checklist</span>
+                  <span class="field__label" *ngIf="checklistTemplateForm.controls.templateType?.value?.id">id: {{ checklistTemplateForm.controls.templateType?.value?.id }}</span>
                 </div>
                 <app-auto-complete-field
-                  [focused]="focusThisField==='sigmaType'"
-                  [formField]="variableForm.controls.sigmaType"
-                  [list]="sigmaTypes.items"
-                  [totalCount]="sigmaTypes.totalCount"
-                  leftHint="Escriba el Tipo de variable a buscar"
-                  [catalog]="SystemTables.SIGMA_TYPES"
-                  [loading]="sigmaTypes.loading"
-                  noItemsError="No hay tipos de variable con este nombre"
+                  [focused]="focusThisField==='templateType'"
+                  [formField]="checklistTemplateForm.controls.templateType"
+                  [list]="templateTypes.items"
+                  [totalCount]="templateTypes.totalCount"
+                  leftHint="Escriba el Tipo de molde"
+                  [catalog]="SystemTables.MOLD_TYPES"
+                  [loading]="templateTypes.loading"
+                  noItemsError="No hay Tipos de molde con este nombre"
                   [showDataState]="true"
                   (optionSelected)="handleOptionSelected($event)"
                   (getMoreData)="getMoreData($event)"
                 >
                 </app-auto-complete-field>
-                <span class="field__help"
-                  >Especifique el Tipo de la variable</span
-                >
+                <span class="field__help">Especifique el Tipo de plantilla de checklist</span>
               </fieldset>
             </div>            
           </div>          
@@ -263,7 +276,7 @@
           >
             <mat-panel-title>
               <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
+              <label class="accordion-label">USO GENERAL DEL TEMPLATE DE CHECKLIST</label>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -281,616 +294,677 @@
               </button>
             </div>
           </mat-expansion-panel-header>
-          <div class="grid-multiple margin-top">
-            <div class="field-items">
-              <fieldset
-                class="field__container"
-                style="min-width: 350px; height: calc(100% - 22px);"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.uom.touched &&
-                    !variableForm.controls.uom.valid
-                }"
-                [disabled]="variableForm.controls.uom.disabled"
-              >
-                <div class="title-with-id">
-                  <span class="label field__label">Unidad de medida para variable</span>
-                  <span class="field__label" *ngIf="variableForm.controls.uom?.value?.id">Id: {{ variableForm.controls.uom?.value?.id }}</span>
-                </div>
-                <app-auto-complete-field
-                  [focused]="focusThisField==='uom'"
-                  [formField]="variableForm.controls.uom"
-                  [list]="uoms.items"
-                  [totalCount]="uoms.totalCount"
-                  leftHint="Escriba el nombre de la Unidad de medida a buscar"
-                  [catalog]="SystemTables.UOMS"
-                  [loading]="uoms.loading"
-                  noItemsError="No hay unidades de medida con este nombre"
-                  [showDataState]="true"
-                  (optionSelected)="handleOptionSelected($event)"
-                  (getMoreData)="getMoreData($event)"
-                >
-                </app-auto-complete-field>
-                <span class="field__help"
-                  >Especifique el Nombre de la Unidad de medida de la variable</span
-                >
-              </fieldset>
-            </div>   
+          <div class="grid-multiple margin-top">            
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.valueType"
-                [list]="valueTypes.items"
-                leftHint="Campo requerido"
-                [fieldRequired]="true"
-                [showRightHint]="true"
-                currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
-                fieldHelp="Especifique el tipo de valor"
-              >
-                <span fieldTitle class="label field__label"
-                  >Tipo de valor a recolectar</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-input-field
-                [bordered]="true"
-                [formField]="variableForm.controls.minimum"
-                leftHint="Campo opcional"
-                fieldInputType="number"
-                currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
-                currentErrorIcon="warn-line"
-                [showCloseButton]="true"
-                [showRightHint]="true"
-                rightHint="Deje el valor vacío para no aplicar el rango mínimo"
-                fieldHelp="Especifique el rango minimo para esta variable"
-              >
-                <span fieldTitle class="label field__label"
-                  >Rango mínimo</span
-                >
-              </app-input-field>
-            </div>
-            <div class="field-items">
-              <app-input-field
-                [bordered]="true"
-                [formField]="variableForm.controls.maximum"
-                leftHint="Campo opcional"
-                fieldInputType="number"
-                currentErrorIcon="warn-line"
-                [showCloseButton]="true"
-                [showRightHint]="true"
-                rightHint="Deje el valor vacío para no aplicar el rango máximo"
-                fieldHelp="Especifique el rango máximo para esta variable"
-              >
-                <span fieldTitle class="label field__label"
-                  >Rango máximo</span
-                >
-              </app-input-field>
-            </div>
-            <section              
-              class="field-items"              
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
-            >
-              <fieldset
-                class="field__container"
-                style="min-width: 500px; height: calc(100% - 22px);"
-                [ngClass]="{ 'field__container--error': !variableForm.controls.possibleValues.valid }"
-              >
-                <div class="title-with-id">
-                  <span class="label field__label">Lista de posibles valores</span>                  
-                  <span class="field__label">Total valores: {{ valuesList.length }}</span>
-                </div>
-                <div            
-                  class="values-table values-table__container"    
-                >
-                  <table mat-table [dataSource]="possibleValuesTable">
-
-                    <ng-container matColumnDef="item">
-                      <th mat-header-cell *matHeaderCellDef>#</th>                  
-                      <td mat-cell *matCellDef="let row; let i = index">
-                        <ng-container>{{ row.order }}</ng-container>                        
-                      </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="value">
-                      <th mat-header-cell *matHeaderCellDef>Valor</th>
-                      <td mat-cell *matCellDef="let row">
-                        <ng-container>{{ row.value }}</ng-container>
-                      </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="byDefault">
-                      <th mat-header-cell *matHeaderCellDef>
-                        <mat-icon
-                          svgIcon="check"
-                          matTooltip="Al seleccionar esta valor se alarmará la variable"
-                          matTooltipClass="tooltip-general"
-                          matTooltipShowDelay="100"
-                        >
-                        </mat-icon>                        
-                      </th>
-                      <td class="main-info" mat-cell *matCellDef="let row">
-                        <ng-container>      
-                          <button 
-                            mat-icon-button
-                            (click)="handleByDefault(row.order)"
-                            [matTooltip]="row.byDefault ? 'Valor por defecto de la variable' : ''"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                          >
-                            <mat-icon                            
-                              svgIcon="check"
-                              [ngStyle]="{ 'color': row.byDefault ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.05)' }"                              
-                            >
-                            </mat-icon>                        
-                          </button>                     
-                        </ng-container>
-                      </td>
-                      <td mat-cell *matCellDef="let row">
-                        <ng-container>{{ row.byDefault }}</ng-container>
-                      </td>
-                    </ng-container>
-
-                    <ng-container matColumnDef="alarmedValue">
-                      
-                      <th mat-header-cell *matHeaderCellDef>
-                        <mat-icon
-                          svgIcon="warn-fill"
-                          matTooltip="Al seleccionar esta valor se alarmará la variable"
-                          matTooltipClass="tooltip-general"
-                          matTooltipShowDelay="100"
-                        >
-                        </mat-icon>                        
-                      </th>
-                      
-                      <td class="main-info" mat-cell *matCellDef="let row">
-                        <ng-container>                           
-                          <button
-                            mat-icon-button
-                            (click)="handleAlarmed(row.order)"
-                            [matTooltip]="row.alarmedValue ? 'Se alarmará la variable' : 'No se alarma'"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                          >
-                            <mat-icon                            
-                              svgIcon="warn-fill"
-                              [ngStyle]="{ 'color': row.alarmedValue ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.1)' }"                              
-                            >
-                            </mat-icon>                        
-                          </button>                           
-                        </ng-container>
-                      </td>
-                    </ng-container>
-
-                    
-                    <ng-container matColumnDef="actions">
-                      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-                      <td class="general-info" mat-cell *matCellDef="let row">
-                        <div
-                          class="box-row"                          
-                        >
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToUp(row.order)"
-                            matTooltip="Sube el item a un orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === 1"
-                          >
-                            <mat-icon>keyboard_arrow_up</mat-icon>
-                          </button>
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToDown(row.order)"
-                            matTooltip="Baja el item a un orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === valuesList.length"
-                          >
-                            <mat-icon>keyboard_arrow_down</mat-icon>
-                          </button>
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToFirst(row.order)"
-                            matTooltip="Sube el item al primer orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === 1"
-                          >
-                            <mat-icon>keyboard_capslock</mat-icon>
-                          </button>
-                          <button mat-icon-button (click)="handleEdit(row.order)">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                          <button mat-icon-button (click)="handleRemove(row.order)">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </div>                        
-                      </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="possibleValuesTableColumns; sticky: 1"></tr>
-                    <tr class="table-row" mat-row *matRowDef="let row; columns: possibleValuesTableColumns"></tr>
-
-                    <div *ngIf="!loading">
-                      <tr class="values-table-mat-row" *matNoDataRow>
-                        <td class="values-table__no-data" colspan="9">
-                          No hay valores a mostrar...
-                        </td>
-                      </tr>
-                    </div>
-                  </table>
-                </div>
-                <div class="possible-value-fields" style="margin-top: 10px">
-                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="possibleValue"
-                      #possibleValue
-                      name="possibleValue"                      
-                      (keydown)="handleKeyDown($event)"          
-                    />
-                    <mat-hint>Valor a agregar</mat-hint>                  
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field">
-                    <mat-select
-                      #selection
-                      formControlName="possibleValuePosition"
-                      [disabled]="variableForm.controls.possibleValuePosition.disabled"
-                      name="possibleValuePosition"                    
-                    >
-                      <mat-option *ngFor="let item of possibleValuePositions; let i = index" [value]="item.id">
-                        <div class="option-container">
-                          {{ item.description }}
-                        </div>
-                      </mat-option>
-                    </mat-select>
-                    <mat-hint>Orden que ocupará el valor</mat-hint>                  
-                </mat-form-field>
-                <button class="circular-button" mat-mini-fab (click)="handleEditPossibleValue()" color="primary" [disabled]="!variableForm.controls.possibleValue.value">
-                  <mat-icon svgIcon="check"></mat-icon>
-                </button>
-                <button class="button circular-button" mat-mini-fab (click)="handleCancelPossibleValue()" [disabled]="!variableForm.controls.possibleValue.value">
-                  <mat-icon svgIcon="cancel"></mat-icon>
-                </button>
-                </div>
-              </fieldset>
-            </section>
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.required"
+                [formField]="checklistTemplateForm.controls.allowDiscard"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable es requerida"
+                fieldHelp="Especifique si el checklist permite descartar el llenado"
               >
                 <span fieldTitle class="label field__label"
-                  >La variable es requerida</span
+                  >¿El checklist permite descartar el llenado?</span
                 >
               </app-select-field>                
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.allowNoCapture"
+                [formField]="checklistTemplateForm.controls.allowRejection"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable permite la NO captura"
+                fieldHelp="Especifique si el checklist permite ser rechazado"
               >
                 <span fieldTitle class="label field__label"
-                  >La variable permite la NO captura</span
+                  >¿El checklist permite ser rechazado?</span
                 >
               </app-select-field>                
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO && 
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO_NA &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.LIST &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE_AND_TIME &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.TIME
-              "
-              class="field-items"
-            >            
-              <app-input-field
-                [bordered]="true"
-                [formField]="variableForm.controls.byDefault"
-                leftHint="Campo opcional"                
-                [fieldInputType]="byDefaultValueType"
-                currentErrorIcon="warn-line"
-                [showCloseButton]="true"
-                [showRightHint]="true"
-                rightHint="Deje el valor vacío para no aplicar el valor por defecto"
-                fieldHelp="Especifique el valor por defecto para esta variable"
-              >
-                <span fieldTitle class="label field__label"
-                  >Valor por defecto para la variable</span
-                >
-              </app-input-field>
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO || 
-                variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO_NA
-              "
-              class="field-items"
-            >
-              <app-select-field
-                [formField]="variableForm.controls.byDefault"
-                [list]="valuesByDefault.items"                
-                fieldHelp="Seleccione de la lista el valor por defecto"
-              >
-                <span fieldTitle class="label field__label"
-                >Valor por defecto para la variable</span
-                >
-              </app-select-field>
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value === HarcodedVariableValueType.DATE ||
-                variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME ||
-                variableForm.controls.valueType.value === HarcodedVariableValueType.TIME
-              "
-              class="field-items"
-            >
-              <app-select-field
-                [formField]="variableForm.controls.byDefaultDateType"
-                [list]="variableByDefaultDate.items"                
-                fieldHelp="Especifique el tipo de valor por defecto"
-              >
-                <span fieldTitle class="label field__label"
-                  >Tipo de fecha/hora por defecto</span
-                >
-              </app-select-field>                
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME"
-              class="field-items"
-            >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
-              >
-                <span class="label field__label">Fecha y hora por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      [matDatepicker]="byDefaultPicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="byDefaultPicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #byDefaultPicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn-line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      type="time"
-                    />
-                    <mat-hint>HH:MM AM/PM</mat-hint>                  
-                  </mat-form-field>
-                </div>
-                <span class="field__help"
-                  >Especifique la fecha y hora por defecto</span
-                >
-              </fieldset>
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE"
-              class="field-items"
-            >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
-              >
-                <span class="label field__label">Fecha por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      [matDatepicker]="byDefaultPicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="byDefaultPicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #byDefaultPicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn-line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>                 
-                </div>
-                <span class="field__help"
-                  >Especifique la fecha por defecto</span
-                >
-              </fieldset>
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.TIME"
-              class="field-items"
-            >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
-              >
-                <span class="label field__label">Hora por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      type="time"
-                    />
-                    <mat-hint>HH:MM AM/PM</mat-hint>                  
-                  </mat-form-field>
-                </div>
-                <span class="field__help"
-                  >Especifique la hora por defecto</span
-                >
-              </fieldset>
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.allowComments"
+                [formField]="checklistTemplateForm.controls.allowManualMode"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable permite la entrada de comentarios"
+                fieldHelp="Especifique si el checklist permite modo manual"
               >
                 <span fieldTitle class="label field__label"
-                  >La variable permite la entrada de comentarios</span
+                  >¿El checklist permite modo manual?</span
                 >
               </app-select-field>                
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.showChart"
+                [formField]="checklistTemplateForm.controls.allowPartialSaving"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si en la captura de la variable se muestra el gráfico"
+                fieldHelp="Especifique si el checklist permite el guardado parcial"
               >
                 <span fieldTitle class="label field__label"
-                  >Mostrar gráfico</span
+                  >¿El checklist permite guardado parcial?</span
                 >
               </app-select-field>                
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.allowAlarm"
+                [formField]="checklistTemplateForm.controls.allowApprovalByGroup"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si esta variable generará alarmas"
+                fieldHelp="Especifique si el checklist permite ser aprobado por el grupo"
               >
                 <span fieldTitle class="label field__label"
-                  >La variable generará alarmas</span
+                  >¿El checklist permite ser aprobado por el grupo?</span
                 >
               </app-select-field>                
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.notifyAlarm"                
+                [formField]="checklistTemplateForm.controls.allowExpiring"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la alarma de esta variable generará notificaciones"
+                fieldHelp="Especifique si el checklist permite  expiración"
               >
                 <span fieldTitle class="label field__label"
-                  >La alarma de la variable generará notificaciones</span
+                  >¿El checklist expira?</span
                 >
               </app-select-field>                
-            </div>
+            </div>            
             <div class="field-items">
               <app-select-field
-                [formField]="variableForm.controls.resetValueMode"
-                [list]="resetValueModes.items"                
-                [fieldRequired]="true"
-                [showRightHint]="true"
-                currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
-                fieldHelp="Modo de reseteo de la variable"
+                [formField]="checklistTemplateForm.controls.allowApprovalByGroup"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite ser aprobado por el grupo"
               >
                 <span fieldTitle class="label field__label"
-                  >Modo de reseteo de la variable</span
+                  >¿El checklist permite ser aprobado por el grupo?</span
                 >
               </app-select-field>                
+            </div>            
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[2] = true"
+          (closed)="panelOpenState[2] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[2]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[2]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="treasure-chest"> </mat-icon>
+              <label class="accordion-label">MOLDES ASOCIADOS</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[2]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
             </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">            
             <div class="field-items">
               <app-multiple-selection-list
-                [bordered]="true"
+                [bordered]="false"
                 [showSelect]="true"                  
                 [selectOptions]="moldsOptions"
                 [currentSelections]="moldsCurrentSelection"        
-                [formField]="variableForm.controls.molds"
+                [formField]="checklistTemplateForm.controls.molds"
                 [list]="molds.items"
                 [totalCount]="molds.totalCount"
                 [loading]="molds.loading"                                    
-                [catalog]="SystemTables.MOLDS"                  
-                (multipleSelectionChanged)="setEditionButtonsState()"
+                [catalog]="SystemTables.MOLDS"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
                 (getMoreData)="getMoreData($event)"
               >
-              <span fieldTitle class="label field__label">Moldes donde se puede usar la variable</span>
+              <span fieldTitle class="label field__label">Moldes donde se puede aplicar este checklist</span>
               </app-multiple-selection-list>                
-            </div>            
+            </div>
           </div>
-        </mat-expansion-panel>        
+        </mat-expansion-panel> 
+        <mat-expansion-panel
+          (opened)="panelOpenState[3] = true"
+          (closed)="panelOpenState[3] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[3]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[3]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="announcements"> </mat-icon>
+              <label class="accordion-label">NOIFICACIONES</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[3]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">            
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.notifyExpiring"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist notifica la expiración"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist notifica la expiración?</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="multiple-selection-list__field-container"
+                [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+              >
+                <span class="label field__label">Modo de notificación</span>
+                <div
+                  class="multiple-selection-list__list-options-container"
+                  [ngStyle]="{
+                    'border-color':
+                    checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                        ? 'var(--z-colors-page-button-disabled-border)'
+                        : 'var(--theme-primary-300)'
+                  }"
+                >
+                  <div
+                    *ngIf="loading"
+                    class="multiple-selection-list__progress-container"
+                  >
+                    <mat-progress-spinner
+                      mode="indeterminate"
+                      color="primary"
+                      class="multiple-selection-list__progress"
+                      diameter="64"
+                    >
+                    </mat-progress-spinner>
+                  </div>
+                  <div          
+                    class="multiple-selection-list__list-options-box no-selections"
+                    *ngIf="notifyingModes.items.length === 0 && !loading"
+                  >
+                    <span>No hay elementos a mostrar...</span>
+                  </div>
+                  <mat-selection-list
+                    *ngIf="notifyingModes.items.length > 0 || loading"
+                    class="multiple-selection-list__list-options-box"
+                    [disabled]="
+                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                    "
+                    name="multipleSelection"
+                    (click)="handleChengeSelection($event)"                    
+                    (keydown)="handleKeyDown($event)"
+                    cdkScrollable
+                  >
+                    <mat-list-option
+                      *ngFor="let item of notifyingModes.items; let i = index"            
+                      [value]="item.id"
+                      (click)="handleNotifyModesSelectItem(checklistTemplateForm.controls.notifyExpiring, item)"
+                      (keydown)="handleKeyDown($event)"
+                      [selected]="!!item.selected"
+                      checkboxPosition="before"
+                      
+                      color="primary"
+                    >
+                      <div class="multiple-selection-list__list-option-container">
+                        <div class="multiple-selection-list__list-option">
+                          {{ item.friendlyText }}
+                        </div>
+                      </div>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </div>
+                <div
+                  class="multiple-selection-list__search-container"        
+                >
+                  <mat-hint
+                    class="auto-complete__hint"
+                    align="start"          
+                  >
+                    <span
+                      *ngIf="notifyingModes.items.length > 0"
+                      class="auto-complete__hint--normal"
+                    >
+                      Item(s): {{ notifyingModes.items.length }}
+                    </span>
+                    <span 
+                      *ngIf="notifyingModes.items.length === 0"
+                      class="auto-complete__hint--normal"
+                    >
+                      No hay items a mostrar...
+                    </span>
+                  </mat-hint>
+                  <mat-hint
+                    class="auto-complete__hint"
+                    align="end"          
+                  >
+                    <span class="auto-complete__hint--normal">
+                        Seleccionados en la lista: {{ notifyingModesSelected }}
+                    </span>
+                  </mat-hint>
+                </div>
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="multiple-selection-list__field-container"
+                [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+              >
+                <span class="label field__label">Canal de notificación</span>
+                <div
+                  class="multiple-selection-list__list-options-container"
+                  [ngStyle]="{
+                    'border-color':
+                    checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                        ? 'var(--z-colors-page-button-disabled-border)'
+                        : 'var(--theme-primary-300)'
+                  }"
+                >
+                  <div
+                    *ngIf="loading"
+                    class="multiple-selection-list__progress-container"
+                  >
+                    <mat-progress-spinner
+                      mode="indeterminate"
+                      color="primary"
+                      class="multiple-selection-list__progress"
+                      diameter="64"
+                    >
+                    </mat-progress-spinner>
+                  </div>
+                  <div          
+                    class="multiple-selection-list__list-options-box no-selections"
+                    *ngIf="notifyingChannels.items.length === 0 && !loading"
+                  >
+                    <span>No hay elementos a mostrar...</span>
+                  </div>
+                  <mat-selection-list
+                    *ngIf="notifyingChannels.items.length > 0 || loading"
+                    class="multiple-selection-list__list-options-box"
+                    [disabled]="
+                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                    "
+                    name="multipleSelection"
+                    (click)="handleChengeSelection($event)"                    
+                    (keydown)="handleKeyDown($event)"
+                    cdkScrollable
+                  >
+                    <mat-list-option
+                      *ngFor="let item of notifyingChannels.items; let i = index"            
+                      [value]="item.id"
+                      (click)="handleNotifyChannelsSelectItem(checklistTemplateForm.controls.notifyExpiring, item)"
+                      (keydown)="handleKeyDown($event)"
+                      [selected]="!!item.selected"
+                      checkboxPosition="before"
+                      
+                      color="primary"
+                    >
+                      <div class="multiple-selection-list__list-option-container">
+                        <div class="multiple-selection-list__list-option">
+                          {{ item.friendlyText }}
+                        </div>
+                      </div>
+                    </mat-list-option>
+                  </mat-selection-list>
+                </div>
+                <div
+                  class="multiple-selection-list__search-container"        
+                >
+                  <mat-hint
+                    class="auto-complete__hint"
+                    align="start"          
+                  >
+                    <span
+                      *ngIf="notifyingChannels.items.length > 0"
+                      class="auto-complete__hint--normal"
+                    >
+                      Item(s): {{ notifyingChannels.items.length }}
+                    </span>
+                    <span 
+                      *ngIf="notifyingChannels.items.length === 0"
+                      class="auto-complete__hint--normal"
+                    >
+                      No hay items a mostrar...
+                    </span>
+                  </mat-hint>
+                  <mat-hint
+                    class="auto-complete__hint"
+                    align="end"          
+                  >
+                    <span class="auto-complete__hint--normal">
+                        Seleccionados en la lista: {{ notifyingChannelsSelected }}
+                    </span>
+                  </mat-hint>
+                </div>
+              </fieldset>
+            </div>
+            <div class="field-items field-items--bordered">
+              <mat-icon
+                class="macros-icon"
+                svgIcon="transcode"
+                matTooltip="Este campo soporta macros"
+                matTooltipClass="tooltip-general"
+                matTooltipShowDelay="100"
+              >
+              </mat-icon>              
+              <app-area-field
+                [bordered]="false"
+                [formField]="checklistTemplateForm.controls.expiringMessageBody"
+                [fieldMaxLength]="1000"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique el mensaje que se enviará"
+              >
+                <span fieldTitle class="label field__label"
+                  >Notificación a enviar cuando expire el checklist</span
+                >
+              </app-area-field>               
+            </div>                     
+            <div class="field-items field-items--bordered">
+              <mat-icon
+                class="macros-icon"
+                svgIcon="transcode"
+                matTooltip="Este campo soporta macros"
+                matTooltipClass="tooltip-general"
+                matTooltipShowDelay="100"
+              >
+              </mat-icon>              
+              <app-area-field
+                [bordered]="false"
+                [formField]="checklistTemplateForm.controls.expiringMessageSubject"
+                [fieldMaxLength]="200"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique el título de la notificación que se enviará por correo"
+              >
+                <span fieldTitle class="label field__label"
+                  >Título del mensaje a enviar (sólo para envío de correos)</span
+                >
+              </app-area-field>               
+            </div>                     
+          </div>
+        </mat-expansion-panel>
+        <mat-expansion-panel
+          (opened)="panelOpenState[4] = true"
+          (closed)="panelOpenState[4] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[4]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[4]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" svgIcon="attachment"> </mat-icon>
+              <label class="accordion-label">ADJUNTOS DEL DE LA PLANTILLA DE CHECKLIST / CABECERA ({{ checklistTemplate.attachments.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[4]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">            
+            <div class="field-items">              
+              <div            
+                class="values-table values-table__container"    
+              >              
+                <table mat-table [dataSource]="attachmentsTable">
+
+                  <ng-container matColumnDef="index">
+                    <th mat-header-cell *matHeaderCellDef>#</th>                  
+                    <td mat-cell *matCellDef="let row; let i = index">
+                      <ng-container>{{ i + 1 }}</ng-container>                        
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="icon">
+                    <th mat-header-cell *matHeaderCellDef>Aplicación</th>
+                    <td mat-cell *matCellDef="let row">
+                      <div class="card-image-icon">
+                        <div
+                          class="image-container-table"
+                          *ngIf="row.icon === 'field_image'"
+                        >
+                          <img                
+                            @dissolve
+                            appImageNotFound                
+                            class="variable-image"                        
+                            [src]="row.image"
+                            [alt]="row.image"         
+                            fill
+                          >      
+                        </div>
+                        <div
+                          *ngIf="row.icon !== 'field_image'"
+                          class="icon-container"
+                        >
+                          <mat-icon 
+                            class="file-type-icon"
+                            [svgIcon]="row.icon"
+                          >
+                          </mat-icon>
+                        </div>    
+                      </div>                      
+                    </td>      
+                  </ng-container>
+
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>                  
+                    <td mat-cell *matCellDef="let row">
+                      <ng-container>{{ row.name }}</ng-container>                        
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="actions-attachments">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td class="general-info" mat-cell *matCellDef="let row; let i = index">
+                      <div
+                        class="box-row"                          
+                      >
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToUp(i)"
+                          matTooltip="Sube el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === 0"
+                        >
+                          <mat-icon>keyboard_arrow_up</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToDown(i)"
+                          matTooltip="Baja el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === checklistTemplate.attachments.length - 1"
+                        >
+                          <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToFirst(i)"
+                          matTooltip="Sube el item al primer orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === 0"
+                        >
+                          <mat-icon>keyboard_capslock</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleAttachmentMoveToLast(i)"
+                          matTooltip="Baja el item al último orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="i === checklistTemplate.attachments.length - 1"
+                        >
+                          <mat-icon class="icon-rotated">keyboard_capslock</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button (click)="handleAttachmentRemove(i)"
+                          matTooltip="Elimina este adjunto..."
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"                          
+                        >                          
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button (click)="handleAttachmentDownload(i)"
+                          matTooltip="Descarga a su disco una copia del archivo"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"                          
+                        >
+                          <mat-icon>cloud_download</mat-icon>
+                        </button>
+                      </div>                        
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="attachmentsTableColumns; sticky: 1"></tr>
+                  <tr class="table-row" mat-row *matRowDef="let row; columns: attachmentsTableColumns"></tr>
+                  
+                  <tr class="values-table-mat-row" *matNoDataRow>
+                    <td class="values-table__no-data" colspan="9">
+                      No hay adjuntos a mostrar...
+                    </td>
+                  </tr>                  
+                </table>                    
+              </div>        
+              <mat-divider style="margin: 10px 0px 0px 0px;"></mat-divider>
+              <div class="grid-multiple-rows no-flex">
+                <div class="maintenance-buttons" style="padding: 10px 10px 1px 0px;">
+                  <input type="file" style="display: none" (change)="onAttachmentFileSelected($event)" #fileInputAttachment> 
+                  <button
+                    [disabled]="addAttachmentButtonClick"
+                    mat-button
+                    class="toolbar-button"
+                    aria-label="icon-button with menu icon"
+                    matTooltip="Agrega un nuevoadjunto a la variablee"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    (click)="(checklistTemplate.attachments.length >= (settingsData?.attachments?.checklistTemplateHeader ?? 10)) ? messageMaxAttchment() : fileInputAttachment.click();"
+                  >
+                    <mat-icon                                    
+                      class="svgicon icon-medium"                
+                      svgIcon="document"
+                      [ngStyle]="{ visibility: addAttachmentButtonClick ? 'hidden' : 'visible' }"b
+                    >
+                    </mat-icon>
+                    <mat-progress-spinner
+                      *ngIf="addAttachmentButtonClick"
+                      class="spinner-regular-button"
+                      diameter="32"
+                      mode="indeterminate"
+                    >
+                    </mat-progress-spinner>
+                    <mat-label class="button-label">Agregar un adjunto...</mat-label>
+                  </button>          
+                  <button
+                    [disabled]="checklistTemplate.attachments.length === 0"
+                    mat-button
+                    class="toolbar-button warn"
+                    aria-label="icon-button with menu icon"
+                    matTooltip="Elimina todos los adjuntos"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    (click)="handleRemoveAllAttachments()"
+                  >
+                    <mat-icon                
+                      class="svgicon icon-medium"                
+                      svgIcon="garbage-can"
+                    >
+                    </mat-icon>                      
+                    <mat-label class="button-label">Eliminar todos los adjuntos...</mat-label>
+                  </button>                          
+                  <app-label-ellipsis
+                    class="readonly-value"
+                    style="margin-left: auto"                         
+                    [lines]="1"
+                    [labelInnerHTML]="checklistTemplateAttachmentLabel"
+                  ></app-label-ellipsis>              
+                </div>
+              </div>      
+            </div>
+          </div>
+        </mat-expansion-panel>   
       </mat-accordion>
     </form>
     <div
-      *ngIf="variable.id"
+      *ngIf="checklistTemplate.id"
       class="catalog-footer"
     >
       <div class="grid-dates">
         <div class="flex">
-          <div class="readonly-value item-id">{{ variable.id }}</div>
+          <div class="readonly-value item-id">{{ checklistTemplate.id }}</div>
           <div class="label-with-no-index">ID del registro</div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.createdAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistTemplate.createdAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de creación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ variable.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ checklistTemplate.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Creado por</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.updatedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistTemplate.updatedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de modificación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ variable.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ checklistTemplate.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
@@ -898,16 +972,16 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="variable.status === RecordStatus.INACTIVE">
+      <div class="grid-inactive" *ngIf="checklistTemplate.status === RecordStatus.INACTIVE">
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(variable.deletedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistTemplate.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de inactivación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ variable.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ checklistTemplate.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Inactivado por</div>

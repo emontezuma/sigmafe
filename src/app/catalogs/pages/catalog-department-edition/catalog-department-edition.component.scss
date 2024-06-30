@@ -3,6 +3,7 @@
 .container {
   margin: 5px 1px;
   counter-reset: counter subCounter;
+  padding-bottom: 5px;
 }
 
 mat-card-title {

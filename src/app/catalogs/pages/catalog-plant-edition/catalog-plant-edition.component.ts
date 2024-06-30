@@ -903,7 +903,7 @@ export class CatalogPlantEditionComponent {
         this.plantForm.controls.mainImageName.setValue(res.fileName);
         this.plant.mainImagePath = res.filePath;
         this.plant.mainImageGuid = res.fileGuid;
-        this.plant.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.plant.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la planta para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1090,7 +1090,9 @@ export class CatalogPlantEditionComponent {
   }
 
   validateTables(): void {
-    if (this.plantForm.controls.company.value && this.plantForm.controls.company.value.status === RecordStatus.INACTIVE) {
+    if (!this.plantForm.controls.company.value || !this.plantForm.controls.company.value.id) {
+      this.plantForm.controls.company.setErrors({ required: true });   
+    } else if (this.plantForm.controls.company.value && this.plantForm.controls.company.value.status === RecordStatus.INACTIVE) {
       this.plantForm.controls.company.setErrors({ inactive: true });   
     }    
   }

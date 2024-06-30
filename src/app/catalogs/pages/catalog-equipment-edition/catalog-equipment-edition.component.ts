@@ -829,7 +829,7 @@ export class CatalogEquipmentEditionComponent {
         this.equipmentForm.controls.mainImageName.setValue(res.fileName);
         this.equipment.mainImagePath = res.filePath;
         this.equipment.mainImageGuid = res.fileGuid;
-        this.equipment.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.equipment.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipo para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

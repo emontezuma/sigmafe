@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { Observable, combineLatest, map } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, DELETE_DEPARTMENT_TRANSLATIONS, INACTIVATE_DEPARTMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { Observable, combineLatest, map, of } from 'rxjs';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS,  GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, DELETE_DEPARTMENT_TRANSLATIONS, INACTIVATE_DEPARTMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPDATE_CHECKLIST_TEMPLATE, ADD_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS } from 'src/app/graphql/graphql.queries';
 import { environment } from 'src/environments/environment';
-import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, PlantDetail, VariableDetail } from '../models';
-import { GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
+import { ChecklistTemplateDetail, CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, PlantDetail, VariableDetail } from '../models';
+import { Attachment, GeneralCatalogMappedItem, GeneralTranslation, MoldDetail, originProcess } from 'src/app/shared/models';
 
 @Injectable({
   providedIn: 'root'
@@ -158,6 +158,12 @@ export class CatalogsService {
       ...(parameters.order) && { orderBy: parameters.order },
       ...(parameters.filter) && { filterBy: parameters.filter },
     }
+
+    const variablesForAttachments = {
+      processId: parameters.variableId,
+      process: parameters.process,
+      customerId: parameters.customerId,
+    }
     
     return combineLatest([ 
       this._apollo.query({ 
@@ -168,7 +174,49 @@ export class CatalogsService {
       this._apollo.query({ 
         query: GET_VARIABLE_TRANSLATIONS, 
         variables, 
-      })
+      }),
+
+      this._apollo.query({ 
+        query: GET_ALL_ATTACHMENTS,
+        variables: variablesForAttachments,
+      }),
+      
+    ]);
+  }
+
+  getChecklistTemplateDataGql$(parameters: any): Observable<any> {
+
+    const checklistTemplateId = { checklistTemplateId: parameters.checklistTemplateId};
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    const variablesForAttachments = {
+      processId: parameters.checklistTemplateId,
+      process: parameters.process,
+      customerId: parameters.customerId,
+    }
+    
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_CHECKLIST_TEMPLATE, 
+      variables: checklistTemplateId,      
+      }),
+      
+      this._apollo.query({ 
+        query: GET_CHECKLIST_TEMPLATE_TRANSLATIONS, 
+        variables, 
+      }),
+
+      this._apollo.query({ 
+        query: GET_ALL_ATTACHMENTS,
+        variables: variablesForAttachments,
+      }),
+      
     ]);
   }
 
@@ -185,6 +233,14 @@ export class CatalogsService {
       variables,       
     });
   }
+
+  updateChecklistTemplateStatus$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: INACTIVATE_CHECKLIST_TMEPLATE, 
+      variables,       
+    });
+  }
+  
 
   updateCustomerStatus$(variables: any): Observable<any> {
     return this._apollo.mutate({
@@ -207,16 +263,30 @@ export class CatalogsService {
     })
   }
 
+  updateChecklistTemplateCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_CHECKLIST_TEMPLATE, 
+      variables,      
+    })
+  }
+
   deleteMoldTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: DELETE_MOLD_TRANSLATIONS, 
       variables,       
     });
-  }7
+  }
 
   deleteVariableTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: DELETE_VARIABLE_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
+  deleteChecklistTemplateTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, 
       variables,       
     });
   }
@@ -256,6 +326,13 @@ export class CatalogsService {
     });
   }
 
+  addChecklistTemplateTransations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: ADD_CHECKLIST_TEMPLATE_TRANSLATIONS, 
+      variables,       
+    });
+  }
+
   addMoldMaintenanceHistory$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: ADD_MAINTENANCE_HISTORY, 
@@ -267,8 +344,8 @@ export class CatalogsService {
     const { oneMold } = paramsData?.moldGqlData?.data;
     const { data } = oneMold;
     const translations = paramsData?.moldGqlTranslationsData?.data;
-    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
     return {
       ...data,
       mainImage,      
@@ -285,17 +362,63 @@ export class CatalogsService {
 
   mapOneVariable(paramsData: any): VariableDetail {
     const { oneVariable } = paramsData?.variableGqlData?.data;
-    const { data } = oneVariable;
+    const { data } = oneVariable;    
+
     const translations = paramsData?.variableGqlTranslationsData?.data;
-    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+    const attachments = paramsData?.variableGqlAttachments?.data?.uploadedFiles;
+    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
     return {
       ...data,
       mainImage,      
       uom: this.mapDetailTranslationsData(data.uom),
       sigmaType: this.mapDetailTranslationsData(data.sigmaType),
       translations: this.mapTranslations(translations),
+      attachments: this.mapAttachments(attachments), 
     }
+  }
+
+  mapOneChecklistTemplate(paramsData: any): ChecklistTemplateDetail {
+    const { oneChecklistTemplate } = paramsData?.checklistTemplateGqlData?.data;
+    const { data } = oneChecklistTemplate;    
+
+    const translations = paramsData?.checklistTemplateGqlTranslationsData?.data;
+    const attachments = paramsData?.checklistTemplateGqlAttachments?.data?.uploadedFiles;
+    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    // const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
+    const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
+    return {
+      ...data,
+      mainImage,      
+      templateType: this.mapDetailGeneralData(oneChecklistTemplate.translatedMoldType, data.templateType),
+      translations: this.mapTranslations(translations),
+      attachments: this.mapAttachments(attachments), 
+    }
+  }
+
+  mapAttachments(data: any): Attachment[] {
+    const { items } = data;
+    let line = 0;
+    return items.map(t =>  {
+      return {
+        index: line++,
+        name: t.fileName, 
+        image: `${environment.serverUrl}/files/${t.path}`, 
+        id: t.fileId, 
+        icon: this.setIconName(t.fileType), 
+      }
+    }); 
+  }
+
+  setIconName(fileType: string): string {
+    if (fileType.toLowerCase().indexOf('image') > -1) {
+      return 'field_image'
+    } else if (fileType.toLowerCase().indexOf('pdf') > -1) {
+      return 'file_format_pdf'
+    } else if (fileType.toLowerCase().indexOf('video') > -1) {
+      return 'youtube2'
+    }
+    return 'faq';
   }
 
   mapTranslations(data: any): GeneralTranslation {
@@ -307,7 +430,13 @@ export class CatalogsService {
         id: t.id, 
         customerId: t.customerId,
         description: name, 
-        name, 
+        name,
+        approvalRequestMessageSubject: t.approvalRequestMessageSubject,
+        approvalRequestMessageBody: t.approvalRequestMessageBody,
+        anticipationMessageSubject: t.anticipationMessageSubject,
+        anticipationMessageBody: t.anticipationMessageBody,
+        expiringMessageSubject: t.expiringMessageSubject,
+        expiringMessageBody: t.expiringMessageBody,
         reference: t.reference, 
         notes: t.notes, 
         languageId: t.languageId, 
@@ -442,6 +571,7 @@ export class CatalogsService {
       map(data => data)
     );
   }
+  
   getCustomersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
     const variables = {      
       ...(recordsToSkip !== 0) && { recordsToSkip },
@@ -456,8 +586,6 @@ export class CatalogsService {
     }).valueChanges    
   }
 
-  
-  
   addCustomerTransations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: ADD_CUSTOMER_TRANSLATIONS, 
@@ -499,8 +627,8 @@ export class CatalogsService {
     const { oneCustomer } = paramsData?.customerGqlData?.data;
     const { data } = oneCustomer;
     const translations = paramsData?.customerGqlTranslationsData?.data;
-    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
     
     return {
       ...data,
@@ -516,19 +644,18 @@ export class CatalogsService {
     });
   }
 
-
-  //manufacturers=================================
-  
   getAllManufacturersToCsv$(): Observable<any> {//warning repeated
     return this._apollo.watchQuery({ 
       query: GET_ALL_MOLDS_TO_CSV,       
     }).valueChanges;
   }
+
   getAllManufacturersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
     );
   }
+  
   getManufacturersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
     const variables = {      
       ...(recordsToSkip !== 0) && { recordsToSkip },
@@ -586,8 +713,6 @@ export class CatalogsService {
     const { oneManufacturer } = paramsData?.manufacturerGqlData?.data;
     const { data } = oneManufacturer;
     const translations = paramsData?.manufacturerGqlTranslationsData?.data;
-    
-    
     return {
       ...data,
       translations: this.mapTranslations(translations),
@@ -677,7 +802,7 @@ export class CatalogsService {
     const { onePlant } = paramsData?.plantGqlData?.data;
     const { data } = onePlant;
     const translations = paramsData?.plantGqlTranslationsData?.data;
-    
+
     return {
       ...data,
       company: this.mapDetailTranslationsData(data.company),
@@ -766,8 +891,8 @@ export class CatalogsService {
     const { oneCompany } = paramsData?.companyGqlData?.data;
     const { data } = oneCompany;
     const translations = paramsData?.companyGqlTranslationsData?.data;
-    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+    const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
     
     return {
       ...data,
@@ -951,8 +1076,8 @@ mapOneEquipment(paramsData: any): EquipmentDetail {
   const { oneEquipment } = paramsData?.equipmentGqlData?.data;
   const { data } = oneEquipment;
   const translations = paramsData?.equipmentGqlTranslationsData?.data;
-  const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-  const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+  // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+  const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
   
   return {
     ...data,
@@ -1044,8 +1169,8 @@ mapOneDepartment(paramsData: any): DepartmentDetail {
   const { oneDepartment } = paramsData?.departmentGqlData?.data;
   const { data } = oneDepartment;
   const translations = paramsData?.departmentGqlTranslationsData?.data;
-  const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-  const mainImage = data.mainImageName ? `${environment.serverUrl}/${data.mainImagePath.replace(data.mainImageName, data.mainImageGuid + '.' + extension)}` : '';
+  // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
+  const mainImage = `${environment.serverUrl}/${data.mainImagePath}`;
   
   return {
     ...data,
@@ -1066,6 +1191,35 @@ updateDepartmentStatus$(variables: any): Observable<any> { //warning missing in 
     mutation: INACTIVATE_DEPARTMENT, 
     variables,       
   });
+}
+
+saveAttachments$(process: originProcess, processId: number, files: string[]): Observable<any> {
+  if (files.length > 0) {
+    return this._apollo.mutate({
+      mutation: SAVE_ATTACHMENTS, 
+      variables: {
+        process,
+        processId,
+        files, 
+      },       
+    });
+  } else {
+    return of([]);
+  }  
+}
+
+duplicateAttachmentsList$(process: originProcess, files: string[]): Observable<any> {
+  if (files.length > 0) {
+    return this._apollo.mutate({
+      mutation: DUPLICATE_ATTACHMENTS, 
+      variables: {
+        process,
+        files, 
+      },       
+    });
+  } else {
+    return of([]);
+  }  
 }
 
 // End ======================  

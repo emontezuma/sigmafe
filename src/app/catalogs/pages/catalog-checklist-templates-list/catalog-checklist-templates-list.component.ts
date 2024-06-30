@@ -209,12 +209,12 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
           checklistTemplatesPaginated: {
             ...data.checklistTemplatesPaginated,
             items: data.checklistTemplatesPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
                   templateType: {
                     ...item.data.templateType,
                     name: item.data.templateType?.translations?.length > 0 ? item.data.templateType.translations[0].name : item.data.templateType?.name,

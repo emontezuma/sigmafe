@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue, Attachment } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -46,6 +46,7 @@ export class CatalogVariableEditionComponent {
   resetValueModes$: Observable<any>;
   genYesNoValues$: Observable<any>;
   variableByDefaultDate$: Observable<any>;
+  duplicateAttachmentsList$: Observable<any>;  
 
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
   molds$: Observable<any>;  
@@ -63,6 +64,7 @@ export class CatalogVariableEditionComponent {
   updateVariableCatalog$: Observable<any>;
   deleteVariableTranslations$: Observable<any>;  
   addVariableTranslations$: Observable<any>;  
+  addAttachmentButtonClick: boolean = false;
   
   variableFormChangesSubscription: Subscription;
   
@@ -80,11 +82,17 @@ export class CatalogVariableEditionComponent {
     { id: 'l', description: $localize`Al final de la lista` },  
     { id: 'f', description: $localize`Al prncipio de la lista` }, 
   ];
+
+  attachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'actions-attachments' ];
+  attachmentsTable = new MatTableDataSource<Attachment>([]);
+
   editingValue: number = -1;
   
   uploadFiles: Subscription;
+  downloadFiles: Subscription;
   
   catalogIcon: string = 'equation';  
+  variableAttachmentLabel: string = '';
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -215,7 +223,7 @@ export class CatalogVariableEditionComponent {
     this.settingsData$ = this._store.select(selectSettingsData).pipe(
       tap(settingsData => {
         this.settingsData = settingsData;
-        this.takeRecords = this.settingsData.catalog?.pageSize || 50
+        this.takeRecords = this.settingsData.catalog?.pageSize || 50        
         const currentPage = 0;
         // this.requestProvidersData(currentPage);   
         // this.requestManufacturersData(currentPage);
@@ -362,6 +370,7 @@ export class CatalogVariableEditionComponent {
       false,
     );
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
+    if (this.downloadFiles) this.downloadFiles.unsubscribe();
     if (this.variableFormChangesSubscription) this.variableFormChangesSubscription.unsubscribe(); 
   }
   
@@ -601,7 +610,8 @@ export class CatalogVariableEditionComponent {
         }, 750);
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
-        this.initUniqueField();
+        this.duplicateAttachments();
+        this.initUniqueField();        
         this._location.replaceState('/catalogs/variables/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -1088,9 +1098,11 @@ export class CatalogVariableEditionComponent {
       tap((data: any) => {
         if (data?.data?.createOrUpdateVariable.length > 0) {
           const variableId = data?.data?.createOrUpdateVariable[0].id;
+          const files = this.variable.attachments.map((a) => a.id);
           combineLatest([ 
-            this.processTranslations$(variableId), 
-            this.saveCatalogDetails$(variableId)             
+            this.processTranslations$(variableId),
+            this.saveCatalogDetails$(variableId),
+            this._catalogsService.saveAttachments$(originProcess.CATALOGS_VARIABLES_ATTACHMENTS, variableId, files),
           ])      
           .subscribe((data: any) => {
             this.requestVariableData(variableId);
@@ -1320,19 +1332,24 @@ export class CatalogVariableEditionComponent {
     const skipRecords = 0;
     const filter = JSON.parse(`{ "variableId": { "eq": ${variableId} } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
+    const process = originProcess.CATALOGS_VARIABLES_ATTACHMENTS;
+
     // let getData: boolean = false;
     this.setViewLoading(true); 
     this.variable$ = this._catalogsService.getVariableDataGql$({ 
-      variableId, 
+      variableId,      
       skipRecords, 
       takeRecords: this.takeRecords, 
       order, 
-      filter, 
+      filter,
+      process,
+      customerId: 1, // TODO: get from user
     }).pipe(
-      map(([ variableGqlData, variableGqlTranslationsData ]) => {
+      map(([ variableGqlData, variableGqlTranslationsData, variableGqlAttachments ]) => {
         return this._catalogsService.mapOneVariable({
           variableGqlData,  
           variableGqlTranslationsData,
+          variableGqlAttachments,
         })
       }),
       tap((variableData: VariableDetail) => {
@@ -1365,6 +1382,8 @@ export class CatalogVariableEditionComponent {
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);
+        this.setAttachmentLabel();
         this.loaded = true;
       }),
       catchError(err => {
@@ -1373,24 +1392,6 @@ export class CatalogVariableEditionComponent {
       })      
     ); 
   }  
-
-  requestGenericsData$(currentPage: number, skipRecords: number, catalog: string, filterStr: string = null): Observable<any> {    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "data": { "tableName": { "eq": "${catalog}" } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    } else {
-      filter = JSON.parse(`{ "and":  [ { "data": { "tableName": { "eq": "${catalog}" } } } , { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] } `);
-    }
-    const variableParameters = {
-      settingType: 'tables',
-      skipRecords, 
-      takeRecords: this.takeRecords, 
-      filter, 
-      order: this.order,
-    }    
-    const variables = this._sharedService.setGraphqlGen(variableParameters);
-    return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
-  }
 
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
     if (getMoreDataParams.catalogName === SystemTables.UOMS) {
@@ -1482,11 +1483,11 @@ export class CatalogVariableEditionComponent {
         this.variableForm.controls.mainImageName.setValue(res.fileName);
         this.variable.mainImagePath = res.filePath;
         this.variable.mainImageGuid = res.fileGuid;
-        this.variable.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.variable.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la variable para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
-          duration: 5000,
+          duration: 3000,
           snackClass: 'snack-primary',
           icon: 'check',
         });
@@ -1512,7 +1513,7 @@ export class CatalogVariableEditionComponent {
   }
 
   setToolbarMode(mode: toolbarMode) {
-    if (this.elements.length === 0) return;
+    if (this.elements.length === 0 || !this.loaded ) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {      
       // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
@@ -1617,7 +1618,7 @@ export class CatalogVariableEditionComponent {
     const message = $localize`Se ha quitado la imagen de la variable<br>Guarde la variable para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
-      duration: 5000,
+      duration: 3000,
       snackClass: 'snack-primary',
       icon: 'check',
     });
@@ -1626,6 +1627,7 @@ export class CatalogVariableEditionComponent {
 
   initForm(): void {
     this.variableForm.reset();
+    this.variable.attachments = [];
     this.actionPlansToGenerateCurrentSelection = [];
     this.multipleSearchDefaultValue = '';
     // Default values
@@ -1956,6 +1958,251 @@ export class CatalogVariableEditionComponent {
       this.valuesList = null;
     }
     this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.valuesList);        
+  }
+
+  handleAttachmentMoveToFirst(id: number) {
+    const valueIndex = this.variable.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.variable.attachments[valueIndex]));
+    this.variable.attachments.splice(valueIndex, 1);
+    this.variable.attachments.unshift({
+      index: 0,
+      name: tmpValue.name,
+      image: tmpValue.image,
+      id: tmpValue.id,
+      icon: tmpValue.icon,      
+    })
+    let index = 0;
+    this.variable.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+    this.setEditionButtonsState();
+  }
+
+  handleAttachmentMoveToLast(id: number) {
+    const valueIndex = this.variable.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.variable.attachments[valueIndex]));
+    this.variable.attachments.splice(valueIndex, 1);
+    this.variable.attachments.push({
+      index: 0,
+      name: tmpValue.name,
+      image: tmpValue.image,
+      id: tmpValue.id,
+      icon: tmpValue.icon,      
+    })
+    let index = 0;
+    this.variable.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+    this.setEditionButtonsState();
+  }
+
+  handleAttachmentMoveToUp(id: number) {
+    const valueIndex = this.variable.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.variable.attachments[valueIndex]));
+    const editingItem = this.variable.attachments[valueIndex - 1];
+
+    if (editingItem) {      
+      this.variable.attachments[valueIndex].name = editingItem.name;
+      this.variable.attachments[valueIndex].id = editingItem.id;
+      this.variable.attachments[valueIndex].icon = editingItem.icon;
+      this.variable.attachments[valueIndex].image = editingItem.image;
+
+      editingItem.name = tmpValue.name;
+      editingItem.id = tmpValue.id;
+      editingItem.icon = tmpValue.icon;
+      editingItem.image = tmpValue.image;
+      
+      this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleAttachmentMoveToDown(id: number) {
+    const valueIndex = this.variable.attachments.findIndex((v: Attachment) => v.index === id);
+    const tmpValue = JSON.parse(JSON.stringify(this.variable.attachments[valueIndex]));
+    const editingItem = this.variable.attachments[valueIndex + 1];
+    
+    if (editingItem) {      
+      this.variable.attachments[valueIndex].name = editingItem.name;
+      this.variable.attachments[valueIndex].image = editingItem.image;
+      this.variable.attachments[valueIndex].id = editingItem.id;
+      this.variable.attachments[valueIndex].icon = editingItem.icon;      
+
+      editingItem.name = tmpValue.name;
+      editingItem.id = tmpValue.id;
+      editingItem.icon = tmpValue.icon;      
+      editingItem.image = tmpValue.image;      
+      
+      this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+      this.setEditionButtonsState();      
+    }
+  }
+
+  handleAttachmentRemove(id: number) {
+    const valueIndex = this.variable.attachments.findIndex((v: Attachment) => v.index === id);
+    this.variable.attachments.splice(valueIndex, 1);
+    let index = 0;
+    this.variable.attachments.forEach((v: Attachment) => {
+      v.index = index++;
+    });
+    this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);
+    this.setAttachmentLabel();
+    this.setEditionButtonsState();
+  }
+
+  messageMaxAttchment() {
+    this.addAttachmentButtonClick = true;    
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: $localize`Máximo de adjuntos alcanzado`,  
+        topIcon: 'warn-fill',
+        defaultButtons: dialogByDefaultButton.ACCEPT,
+        buttons: [],
+        body: {
+          message: $localize`Se ha alcanzado el límite de adjuntos para variables ${this.settingsData?.attachments?.variables ?? 10}.`,
+        },
+        showCloseButton: true,
+      },
+    }); 
+    dialogResponse.afterClosed().subscribe((response) => {
+      this.addAttachmentButtonClick = false;
+    });    
+  }
+
+  onAttachmentFileSelected(event: any) {
+    this.addAttachmentButtonClick = true;    
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/variables`)
+    .set('processId', this.variable.id)
+    .set('process', originProcess.CATALOGS_VARIABLES_ATTACHMENTS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        const message = $localize`El adjunto ha sido subido satisfactoriamente<br>`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 3000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.variable.attachments.push({
+          index: this.variable.attachments.length,
+          name: res.fileName, 
+          id: res.fileGuid, 
+          image: `${environment.serverUrl}/files/${res.filePath}`, 
+          icon: this._catalogsService.setIconName(res.fileType), 
+        })
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+        this.setEditionButtonsState();
+        this.setAttachmentLabel();
+        this.addAttachmentButtonClick = false;
+      }      
+    });    
+  }
+
+  handleRemoveAllAttachments() {
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: $localize`Eliminar todos los adjuntos`,  
+        topIcon: 'garbage-can',
+        defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
+        buttons: [],
+        body: {
+          message: $localize`Esta acción quitará todos los adjuntoas del registro.<br><br><strong>¿Desea continuar?</strong>`,
+        },
+        showCloseButton: true,
+      },
+    }); 
+    dialogResponse.afterClosed().subscribe((response) => {      
+      if (response.action === ButtonActions.OK) {
+        this.variable.attachments = [];
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
+        this.setEditionButtonsState();
+        this.setAttachmentLabel();
+      }
+    });       
+  }
+    
+
+  setAttachmentLabel() {
+    if (this.variable.attachments.length === 0) {
+      this.variableAttachmentLabel = $localize`Este registro no tiene adjuntos...`;
+    } else {
+      this.variableAttachmentLabel = $localize`Este registro tiene ${this.variable.attachments.length} adjunto(s)...`;
+    }
+  }
+
+  handleAttachmentDownload(id: number) {
+
+    // let a = document.createElement("a")
+    // a.download = this.variable.attachments[id].name;
+    // a.href = this.variable.attachments[id].image;
+    // a.click();
+    // a.remove();
+
+   
+    
+    
+    const downloadUrl = `${environment.apiDownloadUrl}`;
+    const params = new HttpParams()
+    .set('fileName', this.variable.attachments[id].image.replace(`${environment.serverUrl}/files/`, ''))
+    this.downloadFiles = this._http.get(downloadUrl, { params, responseType: 'blob' }).subscribe((res: any) => {
+      if (res) {
+        let url = window.URL.createObjectURL(res);
+        let link = document.createElement("a"); 
+        link.download = this.variable.attachments[id].name;
+        link.href = url;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        link.remove();    
+      }      
+    });
+  }
+
+  duplicateAttachments() {
+    if (this.variable.attachments.length === 0) return
+
+    const files = this.variable.attachments.map((a) => a.id);
+    this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_VARIABLES_ATTACHMENTS, files)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.data.duplicateAttachments.length !== this.variable.attachments) {
+          const message = $localize`No se pudieron duplicar todos los adjuntos...`;
+          this._sharedService.showSnackMessage({
+            message,
+            snackClass: 'snack-warn',
+            progressBarColor: 'warn',
+            icon: 'delete',
+          });
+        }
+        let line = 0;
+        this.variable.attachments = newAttachments.data.duplicateAttachments.sort((a, b) => a.index - b.index).map(na => {
+          return {
+            index: line++,
+            name: na.fileName, 
+            image: `${environment.serverUrl}/files/${na.path}`, 
+            id: na.fileId, 
+            icon: this._catalogsService.setIconName(na.fileType), 
+          }
+        });
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);
+        this.setAttachmentLabel();
+      })
+
+    )
   }
 
   get SystemTables () {
