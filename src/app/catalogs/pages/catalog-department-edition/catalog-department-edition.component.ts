@@ -833,7 +833,7 @@ export class CatalogDepartmentEditionComponent {
         this.departmentForm.controls.mainImageName.setValue(res.fileName);
         this.department.mainImagePath = res.filePath;
         this.department.mainImageGuid = res.fileGuid;
-        this.department.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.department.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

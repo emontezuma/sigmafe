@@ -13,9 +13,10 @@
   <ng-container *ngIf="templateTypes$ | async"></ng-container>
   <ng-container *ngIf="settingsData$ | async"></ng-container>
   <ng-container *ngIf="macros$ | async"></ng-container>
+  <ng-container *ngIf="recipients$ | async"></ng-container>
   <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
-  <ng-container *ngIf="notifyingModes$ | async"></ng-container>  
-  <ng-container *ngIf="notifyingChannels$ | async"></ng-container>  
+  <ng-container *ngIf="notificationModes$ | async"></ng-container>  
+  <ng-container *ngIf="notificationChannels$ | async"></ng-container>  
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
@@ -236,7 +237,7 @@
                     !checklistTemplateForm.controls.templateType.valid
                 }"
                 [disabled]="checklistTemplateForm.controls.templateType.disabled"
-              >
+              >7
                 <div class="title-with-id">
                   <span class="label field__label">Tipo de plantilla de checklist</span>
                   <span class="field__label" *ngIf="checklistTemplateForm.controls.templateType?.value?.id">id: {{ checklistTemplateForm.controls.templateType?.value?.id }}</span>
@@ -276,7 +277,7 @@
           >
             <mat-panel-title>
               <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DEL TEMPLATE DE CHECKLIST</label>
+              <label class="accordion-label">USO GENERAL DE LA PLANTILLA DE CHECKLIST</label>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -354,10 +355,21 @@
               <app-select-field
                 [formField]="checklistTemplateForm.controls.allowExpiring"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite  expiración"
+                fieldHelp="Especifique si el checklist permite expiración"
               >
                 <span fieldTitle class="label field__label"
                   >¿El checklist expira?</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.requiresApproval"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist requiere aprobación"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist requiere aprobación?</span
                 >
               </app-select-field>                
             </div>            
@@ -371,7 +383,18 @@
                   >¿El checklist permite ser aprobado por el grupo?</span
                 >
               </app-select-field>                
-            </div>            
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.cancelOpenChecklists"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si la generación de este checklist cancela los demás que estén abiertos"
+              >
+                <span fieldTitle class="label field__label"
+                  >Al generar este checklist cancelaría los demás pendientes?</span
+                >
+              </app-select-field>                
+            </div>
           </div>
         </mat-expansion-panel>
         <mat-expansion-panel
@@ -446,7 +469,7 @@
           >
             <mat-panel-title>
               <mat-icon class="accordion-icon" svgIcon="announcements"> </mat-icon>
-              <label class="accordion-label">NOIFICACIONES</label>
+              <label class="accordion-label">NOTIFICACIONES</label>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -464,253 +487,1340 @@
               </button>
             </div>
           </mat-expansion-panel-header>
-          <div class="grid-multiple margin-top">            
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.notifyExpiring"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist notifica la expiración"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist notifica la expiración?</span
+          <mat-expansion-panel            
+            (opened)="generalPanelOpenState[0] = true"
+            (closed)="generalPanelOpenState[0] = false"
+            hideToggle="true"
+            [expanded]="generalPanelOpenState[0]"
+            style="margin: 5px"
+          >
+            <mat-expansion-panel-header              
+              [collapsedHeight]="'55px'"
+              [ngStyle]="{
+                'background-color': generalPanelOpenState[0]
+                  ? 'var(--z-colors-page-shadow)'
+                  : 'var(--z-colors-page-card-background-color)'
+              }"
+            >
+              <mat-panel-title>
+                <mat-icon class="accordion-icon" svgIcon="time_cycles"> </mat-icon>    
+                <label class="accordion-label-no-counter">ANTICIPACIÓN DEL CHECKLIST</label>
+              </mat-panel-title>
+              <div class="icon-button-container">
+                <button
+                  mat-icon-button
+                  class="icon-button open"
+                  aria-label="icon-button with menu icon"
                 >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <fieldset
-                class="multiple-selection-list__field-container"
-                [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
-              >
-                <span class="label field__label">Modo de notificación</span>
-                <div
-                  class="multiple-selection-list__list-options-container"
-                  [ngStyle]="{
-                    'border-color':
-                    checklistTemplateForm.controls.notifyExpiring.value !== 'y'
-                        ? 'var(--z-colors-page-button-disabled-border)'
-                        : 'var(--theme-primary-300)'
-                  }"
+                  <mat-icon class="icon-button">
+                    {{
+                      generalPanelOpenState[0]
+                        ? "keyboard_arrow_up"
+                        : "keyboard_arrow_down"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel-header>
+            <div class="grid-multiple margin-top">        
+              <div class="field-items">
+                <app-select-field
+                  [formField]="checklistTemplateForm.controls.notifyAnticipation"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el checklist se notifica anticipadamente"
                 >
+                  <span fieldTitle class="label field__label"
+                    >¿El checklist se notifica anticipadamente?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"                
+                >
+                  <span class="label field__label">Modo de notificación</span>
                   <div
-                    *ngIf="loading"
-                    class="multiple-selection-list__progress-container"
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
                   >
-                    <mat-progress-spinner
-                      mode="indeterminate"
-                      color="primary"
-                      class="multiple-selection-list__progress"
-                      diameter="64"
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
                     >
-                    </mat-progress-spinner>
-                  </div>
-                  <div          
-                    class="multiple-selection-list__list-options-box no-selections"
-                    *ngIf="notifyingModes.items.length === 0 && !loading"
-                  >
-                    <span>No hay elementos a mostrar...</span>
-                  </div>
-                  <mat-selection-list
-                    *ngIf="notifyingModes.items.length > 0 || loading"
-                    class="multiple-selection-list__list-options-box"
-                    [disabled]="
-                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
-                    "
-                    name="multipleSelection"
-                    (click)="handleChengeSelection($event)"                    
-                    (keydown)="handleKeyDown($event)"
-                    cdkScrollable
-                  >
-                    <mat-list-option
-                      *ngFor="let item of notifyingModes.items; let i = index"            
-                      [value]="item.id"
-                      (click)="handleNotifyModesSelectItem(checklistTemplateForm.controls.notifyExpiring, item)"
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="anticipationModes.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="anticipationModes.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
                       (keydown)="handleKeyDown($event)"
-                      [selected]="!!item.selected"
-                      checkboxPosition="before"
-                      
-                      color="primary"
+                      cdkScrollable
                     >
-                      <div class="multiple-selection-list__list-option-container">
-                        <div class="multiple-selection-list__list-option">
-                          {{ item.friendlyText }}
+                      <mat-list-option
+                        *ngFor="let item of anticipationModes.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyModesSelectItem('anticipation', checklistTemplateForm.controls.notifyAnticipation, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
                         </div>
-                      </div>
-                    </mat-list-option>
-                  </mat-selection-list>
-                </div>
-                <div
-                  class="multiple-selection-list__search-container"        
-                >
-                  <mat-hint
-                    class="auto-complete__hint"
-                    align="start"          
-                  >
-                    <span
-                      *ngIf="notifyingModes.items.length > 0"
-                      class="auto-complete__hint--normal"
-                    >
-                      Item(s): {{ notifyingModes.items.length }}
-                    </span>
-                    <span 
-                      *ngIf="notifyingModes.items.length === 0"
-                      class="auto-complete__hint--normal"
-                    >
-                      No hay items a mostrar...
-                    </span>
-                  </mat-hint>
-                  <mat-hint
-                    class="auto-complete__hint"
-                    align="end"          
-                  >
-                    <span class="auto-complete__hint--normal">
-                        Seleccionados en la lista: {{ notifyingModesSelected }}
-                    </span>
-                  </mat-hint>
-                </div>
-              </fieldset>
-            </div>
-            <div class="field-items">
-              <fieldset
-                class="multiple-selection-list__field-container"
-                [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
-              >
-                <span class="label field__label">Canal de notificación</span>
-                <div
-                  class="multiple-selection-list__list-options-container"
-                  [ngStyle]="{
-                    'border-color':
-                    checklistTemplateForm.controls.notifyExpiring.value !== 'y'
-                        ? 'var(--z-colors-page-button-disabled-border)'
-                        : 'var(--theme-primary-300)'
-                  }"
-                >
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
                   <div
-                    *ngIf="loading"
-                    class="multiple-selection-list__progress-container"
+                    class="multiple-selection-list__search-container"        
                   >
-                    <mat-progress-spinner
-                      mode="indeterminate"
-                      color="primary"
-                      class="multiple-selection-list__progress"
-                      diameter="64"
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
                     >
-                    </mat-progress-spinner>
+                      <span
+                        *ngIf="anticipationModes.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ anticipationModes.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="anticipationModes.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ anticipationModesSelected }}
+                      </span>
+                    </mat-hint>
                   </div>
-                  <div          
-                    class="multiple-selection-list__list-options-box no-selections"
-                    *ngIf="notifyingChannels.items.length === 0 && !loading"
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
                   >
-                    <span>No hay elementos a mostrar...</span>
-                  </div>
-                  <mat-selection-list
-                    *ngIf="notifyingChannels.items.length > 0 || loading"
-                    class="multiple-selection-list__list-options-box"
-                    [disabled]="
-                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
-                    "
-                    name="multipleSelection"
-                    (click)="handleChengeSelection($event)"                    
-                    (keydown)="handleKeyDown($event)"
-                    cdkScrollable
-                  >
-                    <mat-list-option
-                      *ngFor="let item of notifyingChannels.items; let i = index"            
-                      [value]="item.id"
-                      (click)="handleNotifyChannelsSelectItem(checklistTemplateForm.controls.notifyExpiring, item)"
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="notifyingChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="notifyingChannels.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
                       (keydown)="handleKeyDown($event)"
-                      [selected]="!!item.selected"
-                      checkboxPosition="before"
-                      
-                      color="primary"
+                      cdkScrollable
                     >
-                      <div class="multiple-selection-list__list-option-container">
-                        <div class="multiple-selection-list__list-option">
-                          {{ item.friendlyText }}
+                      <mat-list-option
+                        *ngFor="let item of anticipationChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('anticipation', checklistTemplateForm.controls.notifyAnticipation, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
                         </div>
-                      </div>
-                    </mat-list-option>
-                  </mat-selection-list>
-                </div>
-                <div
-                  class="multiple-selection-list__search-container"        
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="notifyingChannels.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ notifyingChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="notifyingChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ notifyingChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      checklistTemplateForm.controls.anticipationRecipient.touched &&
+                      !checklistTemplateForm.controls.anticipationRecipient.valid
+                  }"
+                  [disabled]="checklistTemplateForm.controls.anticipationRecipient.disabled ||checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"
                 >
-                  <mat-hint
-                    class="auto-complete__hint"
-                    align="start"          
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="checklistTemplateForm.controls.anticipationRecipient?.value?.id">Id: {{ checklistTemplateForm.controls.anticipationRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='anticipationRecipient'"
+                    [formField]="checklistTemplateForm.controls.anticipationRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
                   >
-                    <span
-                      *ngIf="notifyingChannels.items.length > 0"
-                      class="auto-complete__hint--normal"
-                    >
-                      Item(s): {{ notifyingChannels.items.length }}
-                    </span>
-                    <span 
-                      *ngIf="notifyingChannels.items.length === 0"
-                      class="auto-complete__hint--normal"
-                    >
-                      No hay items a mostrar...
-                    </span>
-                  </mat-hint>
-                  <mat-hint
-                    class="auto-complete__hint"
-                    align="end"          
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
                   >
-                    <span class="auto-complete__hint--normal">
-                        Seleccionados en la lista: {{ notifyingChannelsSelected }}
-                    </span>
-                  </mat-hint>
-                </div>
-              </fieldset>
+                </fieldset>
+              </div>
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.expiringMessageBody.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.expiringMessageBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.anticipationMessageBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar al anticipar el checklist</span
+                  >
+                </app-area-field>               
+              </div>                     
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.expiringMessageSubject.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.expiringMessageSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.anticipationMessageSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>  
+              <div class="field-items">
+                <app-input-field
+                  [bordered]="true"
+                  [formField]="checklistTemplateForm.controls.anticipationSeconds"
+                  rightHint="Campo opcional"
+                  fieldInputType="number"
+                  currentErrorIcon="warn-line"
+                  [showCloseButton]="true"
+                  [showRightHint]="true"
+                  leftHint="Expresado en segundos"
+                  fieldHelp="Indique el tiempo de anticipación"
+                  [rightSuffix]="_sharedService.getHours(checklistTemplateForm.controls.anticipationSeconds.value)"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Tiempo de anticipación</span
+                  >
+                </app-input-field>
+              </div>                   
             </div>
-            <div class="field-items field-items--bordered">
-              <mat-icon
-                class="macros-icon"
-                svgIcon="transcode"
-                matTooltip="Este campo soporta macros"
-                matTooltipClass="tooltip-general"
-                matTooltipShowDelay="100"
-              >
-              </mat-icon>              
-              <app-area-field
-                [bordered]="false"
-                [formField]="checklistTemplateForm.controls.expiringMessageBody"
-                [fieldMaxLength]="1000"
-                [showRightHint]="true"
-                [showCloseButton]="true"
-                [minRows]="1"
-                [maxRows]="5"
-                fieldHelp="Especifique el mensaje que se enviará"
-              >
-                <span fieldTitle class="label field__label"
-                  >Notificación a enviar cuando expire el checklist</span
+          </mat-expansion-panel>
+          <mat-expansion-panel            
+            (opened)="generalPanelOpenState[1] = true"
+            (closed)="generalPanelOpenState[1] = false"
+            hideToggle="true"
+            [expanded]="generalPanelOpenState[1]"
+            style="margin: 5px"
+          >
+            <mat-expansion-panel-header              
+              [collapsedHeight]="'55px'"
+              [ngStyle]="{
+                'background-color': generalPanelOpenState[1]
+                  ? 'var(--z-colors-page-shadow)'
+                  : 'var(--z-colors-page-card-background-color)'
+              }"
+            >
+              <mat-panel-title>
+                <mat-icon class="accordion-icon" svgIcon="update"> </mat-icon>
+                <label class="accordion-label-no-counter">GENERACIÓN DEL CHECKLIST</label>
+              </mat-panel-title>
+              <div class="icon-button-container">
+                <button
+                  mat-icon-button
+                  class="icon-button open"
+                  aria-label="icon-button with menu icon"
                 >
-              </app-area-field>               
-            </div>                     
-            <div class="field-items field-items--bordered">
-              <mat-icon
-                class="macros-icon"
-                svgIcon="transcode"
-                matTooltip="Este campo soporta macros"
-                matTooltipClass="tooltip-general"
-                matTooltipShowDelay="100"
-              >
-              </mat-icon>              
-              <app-area-field
-                [bordered]="false"
-                [formField]="checklistTemplateForm.controls.expiringMessageSubject"
-                [fieldMaxLength]="200"
-                [showRightHint]="true"
-                [showCloseButton]="true"
-                [minRows]="1"
-                [maxRows]="5"
-                fieldHelp="Especifique el título de la notificación que se enviará por correo"
-              >
-                <span fieldTitle class="label field__label"
-                  >Título del mensaje a enviar (sólo para envío de correos)</span
+                  <mat-icon class="icon-button">
+                    {{
+                      generalPanelOpenState[1]
+                        ? "keyboard_arrow_up"
+                        : "keyboard_arrow_down"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel-header>
+            <div class="grid-multiple margin-top">        
+              <div class="field-items">
+                <app-select-field
+                  [formField]="checklistTemplateForm.controls.notifyGeneration"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el checklist notifica la generación"
                 >
-              </app-area-field>               
-            </div>                     
-          </div>
+                  <span fieldTitle class="label field__label"
+                    >¿El checklist se notifica al generarse?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== 'y'"                
+                >
+                  <span class="label field__label">Modo de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="generationModes.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="generationModes.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of generationModes.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyModesSelectItem('generation', checklistTemplateForm.controls.notifyGeneration, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="generationModes.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ generationModes.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="generationModes.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ generationModesSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="generationChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="generationChannels.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of generationChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('generation', checklistTemplateForm.controls.notifyGeneration, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="generationChannels.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ generationChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="generationChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ generationChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      checklistTemplateForm.controls.anticipationRecipient.touched &&
+                      !checklistTemplateForm.controls.anticipationRecipient.valid
+                  }"
+                  [disabled]="checklistTemplateForm.controls.anticipationRecipient.disabled ||checklistTemplateForm.controls.notifyGeneration.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="checklistTemplateForm.controls.anticipationRecipient?.value?.id">Id: {{ checklistTemplateForm.controls.anticipationRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='generationRecipient'"
+                    [formField]="checklistTemplateForm.controls.generationRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div>
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.anticipationMessageBody.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.anticipationMessageBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.anticipationMessageBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar al generar el checklist</span
+                  >
+                </app-area-field>               
+              </div>                     
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.anticipationMessageSubject.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.anticipationMessageSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.anticipationMessageSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar en la generación (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>                     
+            </div>
+          </mat-expansion-panel>
+          <mat-expansion-panel            
+            (opened)="generalPanelOpenState[2] = true"
+            (closed)="generalPanelOpenState[2] = false"
+            hideToggle="true"
+            [expanded]="generalPanelOpenState[2]"
+            style="margin: 5px"
+          >
+            <mat-expansion-panel-header              
+              [collapsedHeight]="'55px'"
+              [ngStyle]="{
+                'background-color': generalPanelOpenState[2]
+                  ? 'var(--z-colors-page-shadow)'
+                  : 'var(--z-colors-page-card-background-color)'
+              }"
+            >
+              <mat-panel-title>
+                <mat-icon class="accordion-icon" svgIcon="accept_document"> </mat-icon>
+                <label class="accordion-label-no-counter">APROBACIÓN DEL CHECKLIST</label>
+              </mat-panel-title>
+              <div class="icon-button-container">
+                <button
+                  mat-icon-button
+                  class="icon-button open"
+                  aria-label="icon-button with menu icon"
+                >
+                  <mat-icon class="icon-button">
+                    {{
+                      generalPanelOpenState[2]
+                        ? "keyboard_arrow_up"
+                        : "keyboard_arrow_down"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel-header>
+            <div class="grid-multiple margin-top">        
+              <div class="field-items">
+                <app-select-field
+                  [formField]="checklistTemplateForm.controls.notifyApproval"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el checklist se notifica la generación"
+                >
+                  <span fieldTitle class="label field__label"
+                    >¿El checklist notifica la aprobación?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== 'y'"                
+                >
+                  <span class="label field__label">Modo de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="approvalModes.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="approvalModes.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of approvalModes.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyModesSelectItem('generation', checklistTemplateForm.controls.notifyApproval, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="approvalModes.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ approvalModes.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="approvalModes.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ approvalModesSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="approvalChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="approvalChannels.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of approvalChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('generation', checklistTemplateForm.controls.notifyApproval, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="approvalChannels.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ approvalChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="approvalChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ approvalChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      checklistTemplateForm.controls.approvalRecipient.touched &&
+                      !checklistTemplateForm.controls.approvalRecipient.valid
+                  }"
+                  [disabled]="checklistTemplateForm.controls.approvalRecipient.disabled ||checklistTemplateForm.controls.notifyApproval.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="checklistTemplateForm.controls.approvalRecipient?.value?.id">Id: {{ checklistTemplateForm.controls.approvalRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='generationRecipient'"
+                    [formField]="checklistTemplateForm.controls.generationRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div>
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.approvalMessageBody.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.approvalMessageBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.approvalMessageBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar al solicitar la aprobación del checklist</span
+                  >
+                </app-area-field>               
+              </div>                     
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.approvalMessageSubject.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.approvalMessageSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.approvalMessageSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar al solicitar la aprobación del checklist (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>                     
+            </div>
+          </mat-expansion-panel>
+          <mat-expansion-panel            
+            (opened)="generalPanelOpenState[3] = true"
+            (closed)="generalPanelOpenState[3] = false"
+            hideToggle="true"
+            [expanded]="generalPanelOpenState[3]"
+            style="margin: 5px"
+          >
+            <mat-expansion-panel-header              
+              [collapsedHeight]="'55px'"
+              [ngStyle]="{
+                'background-color': generalPanelOpenState[3]
+                  ? 'var(--z-colors-page-shadow)'
+                  : 'var(--z-colors-page-card-background-color)'
+              }"
+            >
+              <mat-panel-title>            
+                <mat-icon class="accordion-icon" svgIcon="delivery_time_1"> </mat-icon>    
+                <label class="accordion-label-no-counter">EXPIRACIÓN DEL CHECKLIST</label>
+              </mat-panel-title>
+              <div class="icon-button-container">
+                <button
+                  mat-icon-button
+                  class="icon-button open"
+                  aria-label="icon-button with menu icon"
+                >
+                  <mat-icon class="icon-button">
+                    {{
+                      panelOpenState[3]
+                        ? "keyboard_arrow_up"
+                        : "keyboard_arrow_down"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel-header>
+            <div class="grid-multiple margin-top">        
+              <div class="field-items">
+                <app-select-field
+                  [formField]="checklistTemplateForm.controls.notifyExpiring"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el checklist notifica la expiración"
+                >
+                  <span fieldTitle class="label field__label"
+                    >¿El checklist notifica la expiración?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+                >
+                  <span class="label field__label">Modo de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="notifyingModes.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="notifyingModes.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of notifyingModes.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyModesSelectItem('expiring', checklistTemplateForm.controls.notifyExpiring, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="notifyingModes.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ notifyingModes.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="notifyingModes.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ notifyingModesSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="notifyingChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="notifyingChannels.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of notifyingChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('expiring', checklistTemplateForm.controls.notifyExpiring, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="notifyingChannels.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ notifyingChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="notifyingChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ notifyingChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      checklistTemplateForm.controls.expiringRecipient.touched &&
+                      !checklistTemplateForm.controls.expiringRecipient.valid
+                  }"
+                  [disabled]="checklistTemplateForm.controls.expiringRecipient.disabled ||checklistTemplateForm.controls.notifyExpiring.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="checklistTemplateForm.controls.expiringRecipient?.value?.id">Id: {{ checklistTemplateForm.controls.expiringRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='expiringRecipient'"
+                    [formField]="checklistTemplateForm.controls.expiringRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div> 
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.expiringMessageBody.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.expiringMessageBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.expiringMessageBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar cuando expire el checklist</span
+                  >
+                </app-area-field>               
+              </div>                     
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.expiringMessageSubject.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.expiringMessageSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.expiringMessageSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>                     
+            </div>
+          </mat-expansion-panel>
         </mat-expansion-panel>
         <mat-expansion-panel
           (opened)="panelOpenState[4] = true"

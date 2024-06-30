@@ -214,7 +214,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   templateType: {
                     ...item.data.templateType,
                     name: item.data.templateType?.translations?.length > 0 ? item.data.templateType.translations[0].name : item.data.templateType?.name,

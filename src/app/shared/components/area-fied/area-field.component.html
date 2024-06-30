@@ -1,57 +1,63 @@
-<ng-container 
-    class="container"
-    i18n
->
-    <fieldset
-        class="field__container"
-        [ngClass]="{ 'field__container--error': formField.touched && !formField.valid }"
-        [disabled]="formField.disabled"
-        [ngClass]="{ 'not-bordered': !bordered }"
-    >
-        <ng-content select="[fieldTitle]"></ng-content>        
-        <mat-form-field appearance="fill" class="field__field">
-            <textarea class="field__input"
-                matInput
-                [formControl]="formField"
-                #selection
-                name="selection"
-                [maxlength]="fieldMaxLength"                
-                (input)="handleInput($event)"
-                [type]="fieldInputType"
-                [cdkTextareaAutosize]="autosize" 
-                [cdkAutosizeMinRows]="minRows"
-                [cdkAutosizeMaxRows]="maxRows" 
-            ></textarea>
-            <mat-hint
-                *ngIf="leftHint"
-                class="field__hint"
-                align="start"
-            >   
-                <span class="field__required-label"><strong>{{ leftHint }}</strong></span>     
-            </mat-hint>
-            <mat-hint
-                *ngIf="showRightHint"
-                class="field__hint"
-                align="end"
-            >
-                {{ rightHint ? rightHint : (selection?.value.length + ' / ' + fieldMaxLength) }}
-            </mat-hint>
-            <mat-error 
-                *ngIf="currentErrorIcon || currentErrorMessage"
-                class="field__error field__required"
-            >
-                <mat-icon class="field__required-icon" [svgIcon]="currentErrorIcon"></mat-icon>
-                <span class="field__required-label"><strong>{{ currentErrorMessage }}</strong></span>
-            </mat-error>
-            <button 
-                *ngIf="selection?.value.length > 0 && !selection.disabled && showCloseButton"
-                matSuffix 
-                mat-icon-button 
-                aria-label="Clear"
-                 (click)="formField.setValue('')">
-                <mat-icon>close</mat-icon>
-            </button>
-        </mat-form-field>
-        <span class="field__help">{{ fieldHelp }}</span>
-      </fieldset>
+<ng-container class="container" i18n>
+  <fieldset
+    class="field__container"
+    [ngClass]="{
+      'field__container--error': formField.touched && !formField.valid
+    }"
+    [disabled]="formField.disabled"
+    [ngClass]="{ 'not-bordered': !bordered }"
+  >
+    <ng-content select="[fieldTitle]"></ng-content>
+    <mat-form-field appearance="fill" class="field__field">
+      <textarea
+        class="field__input"
+        matInput
+        [formControl]="formField"
+        #selection
+        name="selection"
+        [maxlength]="fieldMaxLength"
+        (input)="handleInput($event)"
+        [type]="fieldInputType"
+        [cdkTextareaAutosize]="autosize"
+        [cdkAutosizeMinRows]="minRows"
+        [cdkAutosizeMaxRows]="maxRows"
+      ></textarea>
+      <mat-hint *ngIf="leftHint" class="field__hint" align="start">
+        <span class="field__required-label"
+          ><strong>{{ leftHint }}</strong></span
+        >
+      </mat-hint>
+      <mat-hint *ngIf="showRightHint" class="field__hint" align="end">
+        {{
+          rightHint
+            ? rightHint
+            : selection?.value.length + " / " + fieldMaxLength
+        }}
+      </mat-hint>
+      <mat-error
+        *ngIf="currentErrorIcon || currentErrorMessage"
+        class="field__error field__required"
+      >
+        <mat-icon
+          class="field__required-icon"
+          [svgIcon]="currentErrorIcon"
+        ></mat-icon>
+        <span class="field__required-label"
+          ><strong>{{ currentErrorMessage }}</strong></span
+        >
+      </mat-error>
+      <button
+        *ngIf="
+          selection?.value.length > 0 && !selection.disabled && showCloseButton
+        "
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="formField.setValue('')"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+    <span class="field__help">{{ fieldHelp }}</span>
+  </fieldset>
 </ng-container>

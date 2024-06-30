@@ -209,7 +209,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   company: {
                     ...item.data.company,
                     name: item.data.company?.translations?.length > 0 ? item.data.company.translations[0].name : item.data.company?.name,

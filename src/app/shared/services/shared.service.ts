@@ -504,7 +504,20 @@ export class SharedService {
     }
   }
 
-
+  getHours(value: any): string {
+    const seconds = value ? +value : 0;
+    let timeStr = "";
+    if (seconds === 0) {
+      timeStr = '0' + $localize`min`;
+    } else if (Math.abs(seconds) > 0 && Math.abs(seconds) <= 60) {
+      timeStr = '1' + $localize`min`;
+    } else if (Math.abs(seconds / 3600) < 1) {
+      timeStr = (seconds / 60).toFixed(1) + $localize`min`;
+    } else {
+      timeStr = (seconds / 3600).toFixed(2) + $localize`h`;
+    }
+    return timeStr;
+  }
   
 // End ======================
 }

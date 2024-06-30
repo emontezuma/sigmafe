@@ -42,14 +42,16 @@ export class CatalogChecklistTemplatesEditionComponent {
   templateTypes$: Observable<any>; 
   sensors$: Observable<any>; 
   genYesNoValues$: Observable<any>;
-  notifyingModes$: Observable<any>;
-  notifyingChannels$: Observable<any>;
+  notificationModes$: Observable<any>;
+  notificationChannels$: Observable<any>;
   duplicateAttachmentsList$: Observable<any>;
   macros$: Observable<any>;    
+  recipients$: Observable<any>;
 
   moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
   molds$: Observable<any>;    
+  recipients: GeneralCatalogData = emptyGeneralCatalogData;
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -62,14 +64,27 @@ export class CatalogChecklistTemplatesEditionComponent {
   addChecklistTemplateTranslations$: Observable<any>;  
   
   checklistTemplateFormChangesSubscription: Subscription;
+  checklistTemplateFieldFormChangesSubscription: Subscription;
   
   templateTypes: GeneralCatalogData = emptyGeneralCatalogData;   
   macros: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   notifyingModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   notifyingChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  anticipationModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  anticipationChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  generationModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  generationChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  approvalModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  approvalChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   notifyingModesSelected: number = 0;
   notifyingChannelsSelected: number = 0;
+  anticipationModesSelected: number = 0;
+  anticipationChannelsSelected: number = 0;
+  approvalModesSelected: number = 0;
+  approvalChannelsSelected: number = 0;
+  generationModesSelected: number = 0;
+  generationChannelsSelected: number = 0;
   
   valuesList: ChecklistTemplatePossibleValue[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
@@ -102,6 +117,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   loading: boolean;
   elements: ToolbarElement[] = [];  
   panelOpenState: boolean[] = [true, false, false, false, false];
+  generalPanelOpenState: boolean[] = [];
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
@@ -111,7 +127,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   focusThisField: string = '';
   byDefaultValueType: string = '';
   tmpValueType: string = '';
-  multipleSearchDefaultValue: string = '';
+  multipleSearchDefaultValue: string = '';  
 
   checklistTemplateForm = new FormGroup({
     name: new FormControl(
@@ -125,18 +141,40 @@ export class CatalogChecklistTemplatesEditionComponent {
     allowPartialSaving: new FormControl(emptyGeneralHardcodedValuesItem),
     allowApprovalByGroup: new FormControl(emptyGeneralHardcodedValuesItem),
     allowExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
+    requiresApproval: new FormControl(emptyGeneralHardcodedValuesItem),
+    cancelOpenChecklists: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
-    cancelOpenChecklist: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyAnticipation: new FormControl(emptyGeneralHardcodedValuesItem),
+    anticipationSeconds: new FormControl(0),    
+    cancelOpenChecklist: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyApproval: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyGeneration: new FormControl(emptyGeneralHardcodedValuesItem),
     expiringMessageSubject:  new FormControl(''),
     expiringMessageBody:  new FormControl(''),
+    expiringNotificationMode:  new FormControl(''),
+    approvalNotificationMode:  new FormControl(''),
+    anticipationNotificationMode:  new FormControl(''),
+    generationNotificationMode:  new FormControl(''),
+    expiringNotificationChannels:  new FormControl(''),
+    approvalNotificationChannels:  new FormControl(''),
+    anticipationNotificationChannels:  new FormControl(''),
+    generationNotificationChannels:  new FormControl(''),    
+    approvalMessageSubject:  new FormControl(''),
+    anticipationMessageSubject:  new FormControl(''),
+    generationMessageSubject:  new FormControl(''),
+    approvalMessageBody:  new FormControl(''),
+    anticipationMessageBody:  new FormControl(''),
+    generationMessageBody:  new FormControl(''),    
     molds:  new FormControl(''),
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
-    byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),    
+    byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),
+    expiringRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    approvalRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    anticipationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    generationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
   });
 
   pageInfo: PageInfo = {
@@ -193,6 +231,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         }      
       })
     );
+
     this.scroll$ = this._scrollDispatcher
     .scrolled()
     .pipe(
@@ -200,6 +239,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.getScrolling(data);
       })
     );  
+
     this.settingsData$ = this._store.select(selectSettingsData).pipe(
       tap(settingsData => {
         this.settingsData = settingsData;
@@ -225,7 +265,6 @@ export class CatalogChecklistTemplatesEditionComponent {
       if (!this.loaded) return;
       this.setEditionButtonsState();      
     });
-
     
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
@@ -235,6 +274,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         ); 
       }
     ));
+
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       skip(1),
       tap((buttonClicked: ToolbarButtonClicked) => {      
@@ -244,6 +284,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.toolbarAction(buttonClicked);
       }
     ));
+
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
@@ -251,6 +292,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         }
       })
     ); 
+
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
@@ -258,6 +300,58 @@ export class CatalogChecklistTemplatesEditionComponent {
         }
       })
     ); 
+
+    this.checklistTemplateFieldFormChangesSubscription = this.checklistTemplateForm.controls.notifyExpiring.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (!value || value === GeneralValues.NO) {
+        if (this.checklistTemplateForm.get('expiringMessageBody').enabled) this.checklistTemplateForm.get('expiringMessageBody').disable();
+        if (this.checklistTemplateForm.get('expiringMessageSubject').enabled) this.checklistTemplateForm.get('expiringMessageSubject').disable();
+      } else if (value === GeneralValues.YES) { 
+        if (this.checklistTemplateForm.get('expiringMessageBody').disabled) this.checklistTemplateForm.get('expiringMessageBody').enable();
+        if (this.checklistTemplateForm.get('expiringMessageSubject').disabled) this.checklistTemplateForm.get('expiringMessageSubject').enable();
+      }      
+    });
+
+    this.checklistTemplateFieldFormChangesSubscription = this.checklistTemplateForm.controls.notifyAnticipation.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (!value || value === GeneralValues.NO) {
+        if (this.checklistTemplateForm.get('anticipationMessageBody').enabled) this.checklistTemplateForm.get('anticipationMessageBody').disable();
+        if (this.checklistTemplateForm.get('anticipationMessageSubject').enabled) this.checklistTemplateForm.get('anticipationMessageSubject').disable();
+        if (this.checklistTemplateForm.get('anticipationSeconds').enabled) this.checklistTemplateForm.get('anticipationSeconds').disable();
+        
+      } else if (value === GeneralValues.YES) { 
+        if (this.checklistTemplateForm.get('anticipationMessageBody').disabled) this.checklistTemplateForm.get('anticipationMessageBody').enable();
+        if (this.checklistTemplateForm.get('anticipationMessageSubject').disabled) this.checklistTemplateForm.get('anticipationMessageSubject').enable();
+        if (this.checklistTemplateForm.get('anticipationSeconds').disabled) this.checklistTemplateForm.get('anticipationSeconds').enable();        
+      }      
+    });
+
+    this.checklistTemplateFieldFormChangesSubscription = this.checklistTemplateForm.controls.notifyApproval.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (!value || value === GeneralValues.NO) {
+        if (this.checklistTemplateForm.get('approvalMessageBody').enabled) this.checklistTemplateForm.get('approvalMessageBody').disable();
+        if (this.checklistTemplateForm.get('approvalMessageSubject').enabled) this.checklistTemplateForm.get('approvalMessageSubject').disable();
+      } else if (value === GeneralValues.YES) { 
+        if (this.checklistTemplateForm.get('approvalMessageBody').disabled) this.checklistTemplateForm.get('approvalMessageBody').enable();
+        if (this.checklistTemplateForm.get('approvalMessageSubject').disabled) this.checklistTemplateForm.get('approvalMessageSubject').enable();
+      }      
+    });
+
+    this.checklistTemplateFieldFormChangesSubscription = this.checklistTemplateForm.controls.notifyGeneration.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (!value || value === GeneralValues.NO) {
+        if (this.checklistTemplateForm.get('generationMessageBody').enabled) this.checklistTemplateForm.get('generationMessageBody').disable();
+        if (this.checklistTemplateForm.get('generationMessageSubject').enabled) this.checklistTemplateForm.get('generationMessageSubject').disable();
+      } else if (value === GeneralValues.YES) { 
+        if (this.checklistTemplateForm.get('generationMessageBody').disabled) this.checklistTemplateForm.get('generationMessageBody').enable();
+        if (this.checklistTemplateForm.get('generationMessageSubject').disabled) this.checklistTemplateForm.get('generationMessageSubject').enable();
+      }      
+    });
+
     this.calcElements();
     setTimeout(() => {
       this.focusThisField = 'name';
@@ -285,9 +379,56 @@ export class CatalogChecklistTemplatesEditionComponent {
     if (this.uploadFiles) this.uploadFiles.unsubscribe();
     if (this.downloadFiles) this.downloadFiles.unsubscribe();    
     if (this.checklistTemplateFormChangesSubscription) this.checklistTemplateFormChangesSubscription.unsubscribe(); 
+    if (this.checklistTemplateFieldFormChangesSubscription) this.checklistTemplateFieldFormChangesSubscription.unsubscribe();     
   }
   
 // Functions ================  
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   requesttemplateTypessData(currentPage: number, filterStr: string = null) {
     this.templateTypes = {
       ...this.templateTypes,
@@ -823,8 +964,23 @@ export class CatalogChecklistTemplatesEditionComponent {
       ...this.notifyingModes,
       currentPage,
       loading: true,
+    }
+    this.anticipationModes = {
+      ...this.anticipationModes,
+      currentPage,
+      loading: true,
+    }
+    this.approvalModes = {
+      ...this.approvalModes,
+      currentPage,
+      loading: true,
+    }
+    this.generationModes = {
+      ...this.generationModes,
+      currentPage,
+      loading: true,
     }        
-    this.notifyingModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.macrosValuesOrder, SystemTables.CHECKLIST_TEMPLATE_NOTIFYING)
+    this.notificationModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.macrosValuesOrder, SystemTables.CHECKLIST_TEMPLATE_NOTIFYING)
     .pipe(
       tap((data: any) => {                
         const accumulatedItems = this.notifyingModes.items?.concat(data?.data?.hardcodedValues?.items);
@@ -839,7 +995,43 @@ export class CatalogChecklistTemplatesEditionComponent {
             }
           }),
           totalCount: data?.data?.hardcodedValues?.totalCount,
-        }        
+        }
+        this.anticipationModes = {
+          ...this.anticipationModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.approvalModes = {
+          ...this.approvalModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.generationModes = {
+          ...this.generationModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
       }),
       catchError(() => EMPTY)
     )
@@ -851,12 +1043,63 @@ export class CatalogChecklistTemplatesEditionComponent {
       currentPage,
       loading: true,
     }        
-    this.notifyingChannels$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.CHANNELS)
+    this.anticipationChannels = {
+      ...this.anticipationChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.approvalChannels = {
+      ...this.approvalChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.generationChannels = {
+      ...this.generationChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.notificationChannels$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.CHANNELS)
     .pipe(
       tap((data: any) => {                
         const accumulatedItems = this.notifyingChannels.items?.concat(data?.data?.hardcodedValues?.items);
         this.notifyingChannels = {
           ...this.notifyingChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.anticipationChannels = {
+          ...this.anticipationChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.approvalChannels = {
+          ...this.approvalChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.generationChannels = {
+          ...this.generationChannels,
           loading: false,
           pageInfo: data?.data?.hardcodedValues?.pageInfo,
           items: accumulatedItems.map((i) => {
@@ -1110,7 +1353,20 @@ export class CatalogChecklistTemplatesEditionComponent {
       this.requestMoldsData(        
         this.molds.currentPage,
         getMoreDataParams.textToSearch,  
-      );    
+      );        
+    } else if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
     }
   }
 
@@ -1129,7 +1385,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.checklistTemplateForm.controls.mainImageName.setValue(res.fileName);
         this.checklistTemplate.mainImagePath = res.filePath;
         this.checklistTemplate.mainImageGuid = res.fileGuid;
-        this.checklistTemplate.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.checklistTemplate.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la plantilla de checklist para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1214,7 +1470,10 @@ export class CatalogChecklistTemplatesEditionComponent {
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-      ...(fc.templateType.dirty || fc.templateType.touched || newRecord) && { uomId: fc.templateType.value.id },            
+      ...(fc.templateType.dirty || fc.templateType.touched || newRecord) && { uomId: fc.templateType.value.id },
+      ...(fc.templateType.dirty || fc.templateType.touched || newRecord) && { uomId: fc.templateType.value.id },
+      ...(fc.requiresApproval.dirty || fc.requiresApproval.touched || newRecord) && { requiresApproval: fc.requiresApproval.value },
+      ...(fc.cancelOpenChecklists.dirty || fc.cancelOpenChecklists.touched || newRecord) && { cancelOpenChecklists: fc.cancelOpenChecklists.value },      
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.checklistTemplate.mainImagePath,
@@ -1287,18 +1546,10 @@ export class CatalogChecklistTemplatesEditionComponent {
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
       return $localize`Descripción o nombre de la la plantilla de checklist`
-    } else if (fieldControlName === 'uom') {
-      return $localize`Unidad de medida`
-    } else if (fieldControlName === 'sigmaType') {
-      return $localize`Tipo de checklistTemplate`
-    } else if (fieldControlName === 'valueType') {
-      return $localize`Tipo de valor`
-    } else if (fieldControlName === 'resetValueMode') {
-      return $localize`Modo de reseteo del template de checklist`    
-    } else if (fieldControlName === 'minimum') {
-      return $localize`Rango de valores incorrecto`    
-    } else if (fieldControlName === 'possibleValues') {
-      return $localize`Agregue al menos un valor a la lista de posibles valores del template de checklist`    
+    } else if (fieldControlName === 'templateType') {
+      return $localize`Tipo de plantilla`
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente`
     }    
     return '';
   }
@@ -1316,7 +1567,21 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   validateTables(): void {
-  
+    if (this.checklistTemplateForm.controls.templateType.value && this.checklistTemplateForm.controls.templateType.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.templateType.setErrors({ inactive: true });   
+    }    
+    if (this.checklistTemplateForm.controls.notifyExpiring.value === GeneralValues.YES && this.checklistTemplateForm.controls.expiringRecipient.value && this.checklistTemplateForm.controls.expiringRecipient.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.expiringRecipient.setErrors({ inactive: true });   
+    }
+    if (this.checklistTemplateForm.controls.notifyAnticipation.value === GeneralValues.YES && this.checklistTemplateForm.controls.anticipationRecipient.value && this.checklistTemplateForm.controls.anticipationRecipient.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.anticipationRecipient.setErrors({ inactive: true });   
+    }
+    if (this.checklistTemplateForm.controls.notifyGeneration.value === GeneralValues.YES && this.checklistTemplateForm.controls.generationRecipient.value && this.checklistTemplateForm.controls.generationRecipient.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.generationRecipient.setErrors({ inactive: true });   
+    }
+    if (this.checklistTemplateForm.controls.notifyApproval.value === GeneralValues.YES && this.checklistTemplateForm.controls.approvalRecipient.value && this.checklistTemplateForm.controls.approvalRecipient.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.approvalRecipient.setErrors({ inactive: true });   
+    }    
   }
 
   processTranslations$(checklistTemplateId: number): Observable<any> { 
@@ -1421,7 +1686,6 @@ export class CatalogChecklistTemplatesEditionComponent {
       this.setEditionButtonsState();      
     }
   }
-
   
   prepareListOfValues() {
     if (this.checklistTemplate.possibleValues) {
@@ -1443,8 +1707,6 @@ export class CatalogChecklistTemplatesEditionComponent {
       this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
     }
   }
-
-  
 
   handleAttachmentMoveToFirst(id: number) {
     const valueIndex = this.checklistTemplate.attachments.findIndex((v: Attachment) => v.index === id);
@@ -1753,20 +2015,36 @@ export class CatalogChecklistTemplatesEditionComponent {
     // }
   }
 
-  handleNotifyModesSelectItem(formField: FormControl, item: any) {
+  handleNotifyModesSelectItem(origin: string, formField: FormControl, item: any) {
     if (formField.disabled) return;
     if (formField.value === GeneralValues.YES) {
       item.selected = !item.selected;
-      this.notifyingModesSelected = this.notifyingModes.items.filter(r => r.selected).length;
+      if (origin === 'expiring') {
+        this.notifyingModesSelected = this.notifyingModes.items.filter(r => r.selected).length;
+      } else if (origin === 'anticipation') {
+        this.anticipationModesSelected = this.anticipationModes.items.filter(r => r.selected).length;
+      } else if (origin === 'generation') {
+        this.generationModesSelected = this.generationModes.items.filter(r => r.selected).length;
+      } else if (origin === 'approval') {
+        this.approvalModesSelected = this.approvalModes.items.filter(r => r.selected).length;
+      }      
       this.setEditionButtonsState();
     }
   }
 
-  handleNotifyChannelsSelectItem(formField: FormControl, item: any) {
+  handleNotifyChannelsSelectItem(origin: string, formField: FormControl, item: any) {
     if (formField.disabled) return;
     if (formField.value === GeneralValues.YES) {
       item.selected = !item.selected;
-      this.notifyingChannelsSelected = this.notifyingChannels.items.filter(r => r.selected).length;
+      if (origin === 'expiring') {
+        this.notifyingChannelsSelected = this.notifyingChannels.items.filter(r => r.selected).length;
+      } else if (origin === 'anticipation') {
+        this.anticipationChannelsSelected = this.anticipationChannels.items.filter(r => r.selected).length;
+      } else if (origin === 'generation') {
+        this.generationChannelsSelected = this.generationChannels.items.filter(r => r.selected).length;
+      } else if (origin === 'approval') {
+        this.approvalChannelsSelected = this.approvalChannels.items.filter(r => r.selected).length;
+      }      
       this.setEditionButtonsState();
     }
   }

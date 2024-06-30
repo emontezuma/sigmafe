@@ -16,6 +16,7 @@
   <ng-container *ngIf="variableByDefaultDate$ | async"></ng-container>  
   <ng-container *ngIf="resetValueModes$ | async"></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="recipients$ | async "></ng-container>    
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
@@ -821,6 +822,40 @@
                   >La alarma de la variable generará notificaciones</span
                 >
               </app-select-field>                
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    variableForm.controls.recipient.touched &&
+                    !variableForm.controls.recipient.valid
+                }"
+                [disabled]="variableForm.controls.notifyAlarm.value !== 'y'"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Recipiente asociado</span>
+                  <span class="field__label" *ngIf="variableForm.controls.recipient?.value?.id">Id: {{ variableForm.controls.recipient?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='recipient'"
+                  [formField]="variableForm.controls.recipient"
+                  [list]="recipients.items"
+                  [totalCount]="recipients.totalCount"
+                  leftHint="Escriba el Nombre del recipiente a buscar"
+                  [catalog]="SystemTables.RECIPIENTS"
+                  [loading]="recipients.loading"
+                  noItemsError="No hay recipientes con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Recipiente a notificar</span
+                >
+              </fieldset>
             </div>
             <div class="field-items">
               <app-select-field

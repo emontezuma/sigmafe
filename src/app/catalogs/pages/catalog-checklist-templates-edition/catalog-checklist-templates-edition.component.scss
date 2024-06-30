@@ -19,8 +19,7 @@ mat-panel-title {
   margin-left: 10px;
 }
 
-.card {
-  height: -webkit-fill-available;
+.card {  
   width: -webkit-fill-available;
   border-radius: 0px 7px 7px 7px;
   margin: 10px 5px;
@@ -522,7 +521,11 @@ form {
   &--bordered {
     border: 1.5px solid var(--theme-primary-300);
     border-radius: 5px;    
-  }
+  }  
+  &--bordered-disabled {
+    border: 1.5px solid var(--z-colors-page-button-disabled-border);
+    border-radius: 5px;    
+  }  
 }
 
 .label-inactive {  
@@ -1099,4 +1102,13 @@ mat-list-option {
   padding: 5px;
   border-radius: 5px;
   background-color: rgba(0, 0, 0, 0.03);
+}
+
+.notification-label {
+  font-size: 1.4rem;
+  font-weight: 600;
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  margin: 6px;
+  border-radius: 4px;
 }

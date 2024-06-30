@@ -1663,7 +1663,7 @@ export class CatalogMoldEditionComponent {
         this.moldForm.controls.mainImageName.setValue(res.fileName);
         this.mold.mainImagePath = res.filePath;
         this.mold.mainImageGuid = res.fileGuid;
-        this.mold.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.mold.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -2193,21 +2193,6 @@ export class CatalogMoldEditionComponent {
       }
       this.elements.find(e => e.action === action).loading = false;
     });       
-  }
-
-  getHours(): string {
-    const seconds = this.moldForm.controls.timeZone.value ? +this.moldForm.controls.timeZone.value : 0;
-    let timeStr = "";
-    if (seconds === 0) {
-      timeStr = '0' + $localize`min`;
-    } else if (Math.abs(seconds) > 0 && Math.abs(seconds) <= 60) {
-      timeStr = '1' + $localize`min`;
-    } else if (Math.abs(seconds / 3600) < 1) {
-      timeStr = (seconds / 60).toFixed(1) + $localize`min`;
-    } else {
-      timeStr = (seconds / 3600).toFixed(2) + $localize`h`;
-    }
-    return timeStr;
   }
 
   setEditionButtonsState() {

@@ -9,7 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, startWith, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
@@ -40,6 +40,7 @@ export class CatalogVariableEditionComponent {
   settingsData$: Observable<SettingsData>; 
 
   uoms$: Observable<any>; 
+  recipients$: Observable<any>;
   sensors$: Observable<any>; 
   sigmaTypes$: Observable<any>;
   valueTypes$: Observable<any>;
@@ -75,6 +76,7 @@ export class CatalogVariableEditionComponent {
   resetValueModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   variableByDefaultDate: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  recipients: GeneralCatalogData = emptyGeneralCatalogData;
   valuesList: VariablePossibleValue[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
   possibleValuesTable = new MatTableDataSource<VariablePossibleValue>([]);
@@ -122,6 +124,7 @@ export class CatalogVariableEditionComponent {
     ),
     sigmaType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     uom: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     // sensor: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     valueType: new FormControl(emptyGeneralHardcodedValuesItem),
     resetValueMode: new FormControl(emptyGeneralHardcodedValuesItem),
@@ -375,6 +378,52 @@ export class CatalogVariableEditionComponent {
   }
   
 // Functions ================
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   requestVariableValueTypesData(currentPage: number) {
     this.valueTypes = {
       ...this.valueTypes,
@@ -1464,6 +1513,19 @@ export class CatalogVariableEditionComponent {
         this.actionPlansToGenerate.currentPage,
         getMoreDataParams.textToSearch,  
       );    
+    } else if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
     }      
     
   }
@@ -1483,7 +1545,7 @@ export class CatalogVariableEditionComponent {
         this.variableForm.controls.mainImageName.setValue(res.fileName);
         this.variable.mainImagePath = res.filePath;
         this.variable.mainImageGuid = res.fileGuid;
-        this.variable.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.variable.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la variable para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1552,6 +1614,7 @@ export class CatalogVariableEditionComponent {
       prefix: this.variable.prefix,      
       notes: this.variable.notes,      
       uom: this.variable.uom,
+      recipient: this.variable.recipient,      
       valueType: this.variable.valueType,
       resetValueMode: this.variable.resetValueMode,
       required: this.variable.required,
@@ -1585,20 +1648,21 @@ export class CatalogVariableEditionComponent {
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value.id },      
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value.id },      
       ...(fc.sigmaType.dirty || fc.sigmaType.touched || newRecord) && { sigmaTypeId: fc.sigmaType.value.id },
       ...(fc.valueType.dirty || fc.valueType.touched || newRecord) && { valueType: fc.valueType.value },
       ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? 'y' : 'n' },
       ...(fc.resetValueMode.dirty || fc.resetValueMode.touched || newRecord) && { resetValueMode: fc.resetValueMode.value },
-      ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value ? 'y' : 'n' },
-      ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value ? 'y' : 'n' },
-      ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value ? 'y' : 'n' },
-      ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value ? 'y' : 'n' },
-      ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value ? 'y' : 'n' },
-      ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value ? 'y' : 'n' },
+      ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value },
+      ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value },
+      ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value },
+      ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value },
+      ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value },
+      ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value },
       ...(fc.byDefaultDateType.dirty || fc.byDefaultDateType.touched || newRecord) && { byDefaultDateType: fc.byDefaultDateType.value },
-      ...(fc.automaticActionPlan.dirty || fc.automaticActionPlan.touched || newRecord) && { automaticActionPlan: fc.automaticActionPlan.value ? 'y' : 'n' },
-      ...(fc.accumulative.dirty || fc.accumulative.touched || newRecord) && { accumulative: fc.accumulative.value ? 'y' : 'n' },      
-      ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value ? 'y' : 'n' },            
+      ...(fc.automaticActionPlan.dirty || fc.automaticActionPlan.touched || newRecord) && { automaticActionPlan: fc.automaticActionPlan.value },
+      ...(fc.accumulative.dirty || fc.accumulative.touched || newRecord) && { accumulative: fc.accumulative.value },      
+      ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value },            
       ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
       ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },
       ...(fc.actionPlansToGenerate.dirty || fc.actionPlansToGenerate.touched || newRecord) && { actionPlansToGenerate: fc.actionPlansToGenerate.value },
@@ -1702,6 +1766,8 @@ export class CatalogVariableEditionComponent {
       return $localize`Modo de reseteo de la variable`    
     } else if (fieldControlName === 'minimum') {
       return $localize`Rango de valores incorrecto`    
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente`    
     } else if (fieldControlName === 'possibleValues') {
       return $localize`Agregue al menos un valor a la lista de posibles valores de la variable`    
     }    
@@ -1733,6 +1799,9 @@ export class CatalogVariableEditionComponent {
     } else {
       this.variableForm.controls.possibleValues.setErrors(null);   
     }
+    if (this.variableForm.controls.notifyAlarm.value && this.variableForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+      this.variableForm.controls.recipient.setErrors({ inactive: true });   
+    }    
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 

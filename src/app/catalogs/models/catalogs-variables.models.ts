@@ -33,6 +33,7 @@ export interface VariableDetail {
   id?: number;
   customerId?: number;
   uom?: GeneralCatalogInternalData,
+  recipient?: GeneralCatalogInternalData,
   sigmaType?: GeneralCatalogInternalData,
   valueType?: string,
   status?: string;
@@ -98,6 +99,7 @@ export const emptyVariableCatalog = {
     name: null,
     mainImagePath: null,    
     uom: emptyInternalCatalog,
+    recipient: emptyInternalCatalog,    
     updatedBy: null,
     status: null,
     updatedAt: null,

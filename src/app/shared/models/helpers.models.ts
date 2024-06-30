@@ -92,8 +92,8 @@ export enum SystemTables {
     CHECKLIST_TEMPLATE_TYPES = 'checklist-template-types',
     CHECKLIST_TEMPLATE_MACROS = 'checklist-templates-macros',    
     CHECKLIST_TEMPLATE_NOTIFYING = 'checklist-template-notifying',    
-    CHANNELS = 'channels',    
-    
+    CHANNELS = 'channels',        
+    RECIPIENTS = 'recipients',        
 }
 
 export enum GeneralValues {

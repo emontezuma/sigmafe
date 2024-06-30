@@ -79,11 +79,14 @@
   }
 }
 
-
 ::-webkit-scrollbar-button:single-button {
   display: none;
 }
 
 .not-bordered {
+  border-style: none !important;
+}
+
+.not-bordered:disabled {
   border-style: none !important;
 }

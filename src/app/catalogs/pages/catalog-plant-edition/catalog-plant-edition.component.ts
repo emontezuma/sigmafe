@@ -903,7 +903,7 @@ export class CatalogPlantEditionComponent {
         this.plantForm.controls.mainImageName.setValue(res.fileName);
         this.plant.mainImagePath = res.filePath;
         this.plant.mainImageGuid = res.fileGuid;
-        this.plant.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.plant.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la planta para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

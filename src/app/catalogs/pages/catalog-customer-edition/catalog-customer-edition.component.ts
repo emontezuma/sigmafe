@@ -944,7 +944,7 @@ export class CatalogCustomerEditionComponent {
         this.customerForm.controls.mainImageName.setValue(res.fileName);
         this.customer.mainImagePath = res.filePath;
         this.customer.mainImageGuid = res.fileGuid;
-        this.customer.mainImage = `${environment.serverUrl}/${res.filePath}/${res.fileGuid}`;
+        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el cliente para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,

@@ -217,11 +217,16 @@ export class CatalogVariablesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid)}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   uom: {
                     ...item.data.uom,
                     name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,
                     isTranslated: item.data.uom?.translations?.length > 0 ? true : false,
+                  },
+                  recipient: {
+                    ...item.data.recipient,
+                    name: item.data.recipient?.translations?.length > 0 ? item.data.recipient.translations[0].name : item.data.recipient?.name,
+                    isTranslated: item.data.recipient?.translations?.length > 0 ? true : false,
                   },
                   sigmaType: {
                     ...item.data.sigmaType,

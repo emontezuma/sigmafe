@@ -228,37 +228,64 @@ export class IconsModule {
     iconRegistry.addSvgIcon(
       'equation',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'our_costumers',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/our_costumers.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'brochure',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/brochure.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'server',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/server.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'cold',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/cold.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'youtube2',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/youtube2.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'field_image',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/field_image.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'file_format_pdf',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/file_format_pdf.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'faq',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/faq.svg`)  
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'transcode',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/transcode.svg`)
-    );iconRegistry.addSvgIcon(
+    );
+    iconRegistry.addSvgIcon(
       'announcements',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/announcements.svg`)
-    );    
+    );
+    iconRegistry.addSvgIcon(
+      'update',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/update.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'accept_document',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/accept_document.svg`)
+    );        
+    iconRegistry.addSvgIcon(
+      'delivery_time_1',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/delivery_time_1.svg`)
+    );        
+    iconRegistry.addSvgIcon(
+      'time_cycles',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/time_cycles.svg`)
+    );        
+    
   }
   
 }

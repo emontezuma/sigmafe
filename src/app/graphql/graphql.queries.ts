@@ -1196,6 +1196,7 @@ export const UPDATE_VARIABLE = gql`
     $byDefaultDateType: String,
     $byDefault: String,
     $uomId: Long,
+    $recipientId: Long,
     $sigmaTypeId: Long,
     $mainImageGuid: String,
     $mainImageName: String,
@@ -1228,6 +1229,7 @@ export const UPDATE_VARIABLE = gql`
       showChart: $showChart,
       accumulative: $accumulative,
       uomId: $uomId,
+      recipientId: $recipientId,
       sigmaTypeId: $sigmaTypeId,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
@@ -1370,7 +1372,37 @@ export const GET_SIGMA_TYPES_LAZY_LOADING = gql`
   }
 `;
 
-//variables=======================================
+export const GET_RECIPIENTS_LAZY_LOADING = gql`
+  query RecipientsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedRecipientDtoSortInput!],
+    $filterBy: TranslatedRecipientDtoFilterInput
+  ) {
+    recipientsPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+    ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
 
 export const GET_VARIABLE = gql`
   query OneVariable (
@@ -1390,6 +1422,7 @@ export const GET_VARIABLE = gql`
       sigmaTypeId
       equipments
       uomId
+      recipientId
       valueType
       showNotes
       applyRange
@@ -1433,6 +1466,17 @@ export const GET_VARIABLE = gql`
       deletedById
       deletedAt
       uom {
+        id
+        status
+        name
+        reference
+        translations {
+          name
+          reference
+          languageId
+        }
+      }
+      recipient {
         id
         status
         name
