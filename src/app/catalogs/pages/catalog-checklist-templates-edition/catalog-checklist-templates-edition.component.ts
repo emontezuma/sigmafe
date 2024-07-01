@@ -77,6 +77,8 @@ export class CatalogChecklistTemplatesEditionComponent {
   generationChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   approvalModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   approvalChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  alarmModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  alarmChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   notifyingModesSelected: number = 0;
   notifyingChannelsSelected: number = 0;
   anticipationModesSelected: number = 0;
@@ -85,6 +87,8 @@ export class CatalogChecklistTemplatesEditionComponent {
   approvalChannelsSelected: number = 0;
   generationModesSelected: number = 0;
   generationChannelsSelected: number = 0;
+  alarmModesSelected: number = 0;
+  alarmChannelsSelected: number = 0;
   
   valuesList: ChecklistTemplatePossibleValue[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
@@ -141,9 +145,11 @@ export class CatalogChecklistTemplatesEditionComponent {
     allowPartialSaving: new FormControl(emptyGeneralHardcodedValuesItem),
     allowApprovalByGroup: new FormControl(emptyGeneralHardcodedValuesItem),
     allowExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     requiresApproval: new FormControl(emptyGeneralHardcodedValuesItem),
     cancelOpenChecklists: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyExpiring: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyAnticipation: new FormControl(emptyGeneralHardcodedValuesItem),
     anticipationSeconds: new FormControl(0),    
     cancelOpenChecklist: new FormControl(emptyGeneralHardcodedValuesItem),
@@ -151,11 +157,15 @@ export class CatalogChecklistTemplatesEditionComponent {
     notifyGeneration: new FormControl(emptyGeneralHardcodedValuesItem),
     expiringMessageSubject:  new FormControl(''),
     expiringMessageBody:  new FormControl(''),
+    alarmMessageSubject:  new FormControl(''),
+    alarmMessageBody:  new FormControl(''),
     expiringNotificationMode:  new FormControl(''),
+    alarmNotificationMode:  new FormControl(''),
     approvalNotificationMode:  new FormControl(''),
     anticipationNotificationMode:  new FormControl(''),
     generationNotificationMode:  new FormControl(''),
     expiringNotificationChannels:  new FormControl(''),
+    alarmNotificationChannels:  new FormControl(''),
     approvalNotificationChannels:  new FormControl(''),
     anticipationNotificationChannels:  new FormControl(''),
     generationNotificationChannels:  new FormControl(''),    
@@ -173,6 +183,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),
     expiringRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     approvalRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    alarmRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     anticipationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     generationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
   });
@@ -310,6 +321,18 @@ export class CatalogChecklistTemplatesEditionComponent {
       } else if (value === GeneralValues.YES) { 
         if (this.checklistTemplateForm.get('expiringMessageBody').disabled) this.checklistTemplateForm.get('expiringMessageBody').enable();
         if (this.checklistTemplateForm.get('expiringMessageSubject').disabled) this.checklistTemplateForm.get('expiringMessageSubject').enable();
+      }      
+    });
+
+    this.checklistTemplateFieldFormChangesSubscription = this.checklistTemplateForm.controls.notifyAlarm.valueChanges
+    .subscribe((value: any) => {
+      if (!this.loaded) return;
+      if (!value || value === GeneralValues.NO) {
+        if (this.checklistTemplateForm.get('alarmMessageBody').enabled) this.checklistTemplateForm.get('alarmMessageBody').disable();
+        if (this.checklistTemplateForm.get('alarmMessageSubject').enabled) this.checklistTemplateForm.get('alarmMessageSubject').disable();
+      } else if (value === GeneralValues.YES) { 
+        if (this.checklistTemplateForm.get('alarmMessageBody').disabled) this.checklistTemplateForm.get('alarmMessageBody').enable();
+        if (this.checklistTemplateForm.get('alarmMessageSubject').disabled) this.checklistTemplateForm.get('alarmMessageSubject').enable();
       }      
     });
 
@@ -975,6 +998,11 @@ export class CatalogChecklistTemplatesEditionComponent {
       currentPage,
       loading: true,
     }
+    this.alarmModes = {
+      ...this.alarmModes,
+      currentPage,
+      loading: true,
+    }
     this.generationModes = {
       ...this.generationModes,
       currentPage,
@@ -1020,6 +1048,18 @@ export class CatalogChecklistTemplatesEditionComponent {
           }),
           totalCount: data?.data?.hardcodedValues?.totalCount,
         }
+        this.alarmModes = {
+          ...this.alarmModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
         this.generationModes = {
           ...this.generationModes,
           loading: false,
@@ -1050,6 +1090,11 @@ export class CatalogChecklistTemplatesEditionComponent {
     }        
     this.approvalChannels = {
       ...this.approvalChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.alarmChannels = {
+      ...this.alarmChannels,
       currentPage,
       loading: true,
     }        
@@ -1100,6 +1145,18 @@ export class CatalogChecklistTemplatesEditionComponent {
         }
         this.generationChannels = {
           ...this.generationChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }        
+        this.alarmChannels = {
+          ...this.alarmChannels,
           loading: false,
           pageInfo: data?.data?.hardcodedValues?.pageInfo,
           items: accumulatedItems.map((i) => {
@@ -1581,6 +1638,9 @@ export class CatalogChecklistTemplatesEditionComponent {
     }
     if (this.checklistTemplateForm.controls.notifyApproval.value === GeneralValues.YES && this.checklistTemplateForm.controls.approvalRecipient.value && this.checklistTemplateForm.controls.approvalRecipient.value.status === RecordStatus.INACTIVE) {
       this.checklistTemplateForm.controls.approvalRecipient.setErrors({ inactive: true });   
+    }
+    if (this.checklistTemplateForm.controls.notifyAlarm.value === GeneralValues.YES && this.checklistTemplateForm.controls.alarmRecipient.value && this.checklistTemplateForm.controls.alarmRecipient.value.status === RecordStatus.INACTIVE) {
+      this.checklistTemplateForm.controls.alarmRecipient.setErrors({ inactive: true });   
     }    
   }
 
@@ -1590,6 +1650,16 @@ export class CatalogChecklistTemplatesEditionComponent {
         return st.languageId === t.languageId &&
         st.id === t.id &&
         (st.reference !== t.reference || 
+        st.approvalRequestMessageSubject !== t.approvalRequestMessageSubject || 
+        st.approvalRequestMessageBody !== t.approvalRequestMessageBody || 
+        st.anticipationMessageSubject !== t.anticipationMessageSubject || 
+        st.anticipationMessageBody !== t.anticipationMessageBody || 
+        st.expiringMessageSubject !== t.expiringMessageSubject || 
+        st.expiringMessageBody !== t.expiringMessageBody || 
+        st.alarmMessageSubject !== t.alarmMessageSubject || 
+        st.alarmMessageBody !== t.alarmMessageBody || 
+        st.generationMessageSubject !== t.generationMessageSubject || 
+        st.generationMessageBody !== t.generationMessageBody || 
         st.name !== t.name || 
         st.notes !== t.notes);
       });
@@ -1612,6 +1682,16 @@ export class CatalogChecklistTemplatesEditionComponent {
           name: t.name,
           reference: t.reference,
           notes: t.notes,
+          approvalRequestMessageSubject: t.approvalRequestMessageSubject,
+          approvalRequestMessageBody: t.approvalRequestMessageBody,
+          anticipationMessageSubject: t.anticipationMessageSubject,
+          anticipationMessageBody: t.anticipationMessageBody,
+          expiringMessageSubject: t.expiringMessageSubject,
+          expiringMessageBody: t.expiringMessageBody,
+          alarmMessageSubject: t.alarmMessageSubject,
+          alarmMessageBody: t.alarmMessageBody,
+          generationMessageSubject: t.generationMessageSubject,
+          generationMessageBody: t.generationMessageBody,
           languageId: t.languageId,
           customerId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
@@ -2027,6 +2107,8 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.generationModesSelected = this.generationModes.items.filter(r => r.selected).length;
       } else if (origin === 'approval') {
         this.approvalModesSelected = this.approvalModes.items.filter(r => r.selected).length;
+      } else if (origin === 'alarm') {
+        this.alarmModesSelected = this.alarmModes.items.filter(r => r.selected).length;
       }      
       this.setEditionButtonsState();
     }
@@ -2044,6 +2126,8 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.generationChannelsSelected = this.generationChannels.items.filter(r => r.selected).length;
       } else if (origin === 'approval') {
         this.approvalChannelsSelected = this.approvalChannels.items.filter(r => r.selected).length;
+      } else if (origin === 'alarm') {
+        this.alarmChannelsSelected = this.alarmChannels.items.filter(r => r.selected).length;
       }      
       this.setEditionButtonsState();
     }

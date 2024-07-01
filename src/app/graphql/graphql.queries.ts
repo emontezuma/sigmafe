@@ -1634,6 +1634,10 @@ export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
         anticipationMessageBody
         expiringMessageSubject
         expiringMessageBody
+        alarmMessageSubject
+        alarmMessageBody
+        generationMessageSubject
+        generationMessageBody
         languageId
         id
         customerId
@@ -3042,6 +3046,28 @@ export const GET_DEPARTMENT = gql`
       updatedAt
       deletedById
       deletedAt
+      plant {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+      recipient {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
       createdBy {
         name
       }
@@ -3081,6 +3107,28 @@ export const GET_DEPARTMENTS = gql`
           id
           customerId
           plantId
+          plant {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
+          recipient {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
           recipientId
           approverId
           status
@@ -4543,5 +4591,38 @@ export const DELETE_WORKGROUP_TRANSLATIONS = gql`
     ) 
   }
 `;
+
+export const GET_PLANTS_LAZY_LOADING = gql`
+  query PlantsPaginated (
+      $recordsToSkip: Int,
+      $recordsToTake: Int,
+      $orderBy: [TranslatedPlantDtoSortInput!],
+      $filterBy: TranslatedPlantDtoFilterInput
+  ) {
+    plantsPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 
 //=========END

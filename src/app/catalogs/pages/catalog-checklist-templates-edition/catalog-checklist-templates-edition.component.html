@@ -1821,6 +1821,335 @@
               </div>                     
             </div>
           </mat-expansion-panel>
+          <mat-expansion-panel            
+            (opened)="generalPanelOpenState[4] = true"
+            (closed)="generalPanelOpenState[4] = false"
+            hideToggle="true"
+            [expanded]="generalPanelOpenState[4]"
+            style="margin: 5px"
+          >
+            <mat-expansion-panel-header              
+              [collapsedHeight]="'55px'"
+              [ngStyle]="{
+                'background-color': generalPanelOpenState[4]
+                  ? 'var(--z-colors-page-shadow)'
+                  : 'var(--z-colors-page-card-background-color)'
+              }"
+            >
+              <mat-panel-title>            
+                <mat-icon class="accordion-icon" svgIcon="warm-fill"> </mat-icon>    
+                <label class="accordion-label-no-counter">ALARMADO DEL CHECKLIST</label>
+              </mat-panel-title>
+              <div class="icon-button-container">
+                <button
+                  mat-icon-button
+                  class="icon-button open"
+                  aria-label="icon-button with menu icon"
+                >
+                  <mat-icon class="icon-button">
+                    {{
+                      panelOpenState[3]
+                        ? "keyboard_arrow_up"
+                        : "keyboard_arrow_down"
+                    }}
+                  </mat-icon>
+                </button>
+              </div>
+            </mat-expansion-panel-header>
+            <div class="grid-multiple margin-top">        
+              <div class="field-items">
+                <app-select-field
+                  [formField]="checklistTemplateForm.controls.notifyAlarm"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el checklist notifica su alarmado"
+                >
+                  <span fieldTitle class="label field__label"
+                    >¿El checklist notificará cuiando se alarme?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== 'y'"                
+                >
+                  <span class="label field__label">Modo de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="alarmModes.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="alarmModes.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of alarmModes.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyModesSelectItem('alarm', checklistTemplateForm.controls.notifyAlarm, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="alarmModes.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ alarmModes.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="alarmModes.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ alarmModesSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="alarmChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="alarmChannels.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChengeSelection($event)"                    
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of alarmChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('alarm', checklistTemplateForm.controls.notifyAlarm, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="alarmChannels.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ alarmChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="alarmChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ alarmChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      checklistTemplateForm.controls.alarmRecipient.touched &&
+                      !checklistTemplateForm.controls.alarmRecipient.valid
+                  }"
+                  [disabled]="checklistTemplateForm.controls.alarmRecipient.disabled ||checklistTemplateForm.controls.notifyAlarm.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="checklistTemplateForm.controls.alarmRecipient?.value?.id">Id: {{ checklistTemplateForm.controls.alarmRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='alarmRecipient'"
+                    [formField]="checklistTemplateForm.controls.alarmRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div> 
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.alarmMessageBody.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.alarmMessageBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.alarmMessageBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar cuando el checklist se alarme</span
+                  >
+                </app-area-field>               
+              </div>                     
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : checklistTemplateForm.controls.alarmMessageSubject.enabled,
+                  'field-items--bordered-disabled' : checklistTemplateForm.controls.alarmMessageSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="checklistTemplateForm.controls.alarmMessageSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar cuando se alarme el checklist (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>                     
+            </div>
+          </mat-expansion-panel>
         </mat-expansion-panel>
         <mat-expansion-panel
           (opened)="panelOpenState[4] = true"

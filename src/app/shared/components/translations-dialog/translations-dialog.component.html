@@ -95,54 +95,6 @@
               matTooltipClass="tooltip-general"
               matTooltipShowDelay="100"
             >
-            </mat-icon>              
-            <app-area-field            
-              [bordered]="true"
-              [formField]="translationsForm.controls.approvalRequestMessageBody"
-              [fieldMaxLength]="1000"
-              [showRightHint]="true"
-              [showCloseButton]="true"
-              [minRows]="1"
-              [maxRows]="5"
-              fieldHelp="Especifique el mensaje que se enviará para solicitar la aprobación"
-            >
-              <span fieldTitle class="label field__label"
-                >Notificación a enviar cuando se solicite la aprobación del checklist</span
-              >
-            </app-area-field>               
-          </div>                     
-          <div class="field-items">
-            <mat-icon
-              class="macros-icon"
-              svgIcon="transcode"
-              matTooltip="Este campo soporta macros"
-              matTooltipClass="tooltip-general"
-              matTooltipShowDelay="100"
-            >
-            </mat-icon>   
-            <app-area-field
-              [bordered]="true"
-              [formField]="translationsForm.controls.approvalRequestMessageSubject"
-              [fieldMaxLength]="200"
-              [showRightHint]="true"
-              [showCloseButton]="true"
-              [minRows]="1"
-              [maxRows]="5"
-              fieldHelp="Especifique el título que se enviará por correo para solicitar la aprobación"
-            >
-              <span fieldTitle class="label field__label"
-                >Título del mensaje a enviar (sólo para envío de correos)</span
-              >
-            </app-area-field>               
-          </div>                             
-          <div class="field-items">
-            <mat-icon
-              class="macros-icon"
-              svgIcon="transcode"
-              matTooltip="Este campo soporta macros"
-              matTooltipClass="tooltip-general"
-              matTooltipShowDelay="100"
-            >
             </mat-icon>   
             <app-area-field
               [bordered]="true"
@@ -182,7 +134,151 @@
                 >Título del mensaje a enviar (sólo para envío de correos)</span
               >
             </app-area-field>               
-          </div>            
+          </div>
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.generationMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje que se enviará al generar el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Mensaje a enviar al generar checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.generationMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título de la notificación que se enviará por correo"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje a enviar en la generación del checklist (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>              
+            <app-area-field            
+              [bordered]="true"
+              [formField]="translationsForm.controls.approvalRequestMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje que se enviará para solicitar la aprobación"
+            >
+              <span fieldTitle class="label field__label"
+                >Notificación a enviar cuando se solicite la aprobación del checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.approvalRequestMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título que se enviará por correo para solicitar la aprobación"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje a enviar (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.alarmMessageBody"
+              [fieldMaxLength]="1000"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el mensaje que se enviará al alarmarse el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Notificación a enviar cuando se alarme el checklist</span
+              >
+            </app-area-field>               
+          </div>                     
+          <div class="field-items">
+            <mat-icon
+              class="macros-icon"
+              svgIcon="transcode"
+              matTooltip="Este campo soporta macros"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+            >
+            </mat-icon>   
+            <app-area-field
+              [bordered]="true"
+              [formField]="translationsForm.controls.alarmMessageSubject"
+              [fieldMaxLength]="200"
+              [showRightHint]="true"
+              [showCloseButton]="true"
+              [minRows]="1"
+              [maxRows]="5"
+              fieldHelp="Especifique el título de la notificación que se enviará por correo cuando se alarme el checklist"
+            >
+              <span fieldTitle class="label field__label"
+                >Título del mensaje cuando se alarme el checklist (sólo para envío de correos)</span
+              >
+            </app-area-field>               
+          </div>                                            
           <div class="field-items">
             <mat-icon
               class="macros-icon"

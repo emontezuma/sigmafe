@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralCatalogParams } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-department-edition',
@@ -36,7 +38,10 @@ export class CatalogDepartmentEditionComponent {
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
 
-  valueTypeChanges$: Observable<any>;
+  plants$: Observable<any>; 
+  plants: GeneralCatalogData = emptyGeneralCatalogData; 
+  recipients$: Observable<any>; 
+  recipients: GeneralCatalogData = emptyGeneralCatalogData; 
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -79,7 +84,9 @@ export class CatalogDepartmentEditionComponent {
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
-    prefix: new FormControl(''),       
+    prefix: new FormControl(''), 
+    plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
   });
 
   pageInfo: PageInfo = {
@@ -93,7 +100,6 @@ export class CatalogDepartmentEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
-
   
   constructor(
     private _store: Store<AppState>,
@@ -321,7 +327,7 @@ export class CatalogDepartmentEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.department.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará El departamento con el Id <strong>${this.department.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -350,7 +356,7 @@ export class CatalogDepartmentEditionComponent {
                   if (data?.data?.createOrUpdateDepartment.length > 0 && data?.data?.createOrUpdateDepartment[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`El equipamento ha sido inhabilitada`;
+                      const message = $localize`El departamento ha sido inhabilitada`;
                       this.department.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -423,7 +429,7 @@ export class CatalogDepartmentEditionComponent {
                   if (data?.data?.createOrUpdateDepartment.length > 0 && data?.data?.createOrUpdateDepartment[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`El equipamento ha sido reactivada`;
+                      const message = $localize`El departamento ha sido reactivada`;
                       this.department.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -750,9 +756,9 @@ export class CatalogDepartmentEditionComponent {
           this.processTranslations$(departmentId).subscribe(() => {
             this.requestDepartmentData(departmentId);
             setTimeout(() => {              
-              let message = $localize`El equipamento ha sido actualizado`;
+              let message = $localize`El departamento ha sido actualizado`;
               if (newRecord) {                
-                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.department.id}</strong>`;
+                message = $localize`El departamento ha sido creado satisfactoriamente con el id <strong>${this.department.id}</strong>`;
                 this._location.replaceState(`/catalogs/departments/edit/${departmentId}`);
               }
               this._sharedService.showSnackMessage({
@@ -834,7 +840,7 @@ export class CatalogDepartmentEditionComponent {
         this.department.mainImagePath = res.filePath;
         this.department.mainImageGuid = res.fileGuid;
         this.department.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde El departamento para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -901,23 +907,24 @@ export class CatalogDepartmentEditionComponent {
       mainImageName: this.department.mainImageName,
       prefix: this.department.prefix,      
       notes: this.department.notes,      
-
+      plant: this.department.plant,
+      recipient: this.department.recipient,
     });
   } 
 
   prepareRecordToAdd(newRecord: boolean): any {
     const fc = this.departmentForm.controls;
     return  {
-        id: this.department.id,
+      id: this.department.id,
       customerId: 1, // TODO: Get from profile
-      recipientId: 1, // TODO: Get from profile
-      approverId: 1, // TODO: Get from profile
-      plantId: 1, // TODO: Get from profile
+      approverId: 1, // TODO: Get from profile      
         status: newRecord ? RecordStatus.ACTIVE : this.department.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
+      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value.id },      
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value.id },      
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
@@ -940,7 +947,7 @@ export class CatalogDepartmentEditionComponent {
     this.department.mainImagePath = '';
     this.department.mainImageGuid = '';
     this.department.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen del departamento<br>Guarde el equipamento para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen del departamento<br>Guarde El departamento para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -993,8 +1000,12 @@ export class CatalogDepartmentEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del departamento`
-    }
+      return $localize`Descripción o nombre del departamento`    
+    } else if (fieldControlName === 'plant') {
+      return $localize`Planta asociada al departamento`;
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente asociado al departamento`;
+    }    
     return '';
   }
 
@@ -1011,8 +1022,11 @@ export class CatalogDepartmentEditionComponent {
   }
 
   validateTables(): void {
-
-    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+    if (!this.departmentForm.controls.plant.value || !this.departmentForm.controls.plant.value.id) {
+      this.departmentForm.controls.plant.setErrors({ required: true });   
+    } else if (this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+      this.departmentForm.controls.recipient.setErrors({ inactive: true });   
+    }    
   }
 
   processTranslations$(departmentId: number): Observable<any> { 
@@ -1067,6 +1081,129 @@ export class CatalogDepartmentEditionComponent {
     }
     
   }
+
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+    if (getMoreDataParams.catalogName === SystemTables.PLANTS) {
+      if (getMoreDataParams.initArray) {
+        this.plants.currentPage = 0;
+        this.plants.items = [];
+      } else if (!this.plants.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.plants.currentPage++;
+      }
+      this.requestPlantsData(        
+        this.plants.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    } else if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    }     
+  }
+
+  requestPlantsData(currentPage: number, filterStr: string = null) {    
+    this.plants = {
+      ...this.plants,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }      
+    const skipRecords = this.plants.items.length;
+
+    const plantParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(plantParameters);
+    this.plants$ = this._catalogsService.getPlantsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {
+        const mappedItems = data?.data?.plantsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        });
+        this.plants = {
+          ...this.plants,
+          loading: false,
+          pageInfo: data?.data?.plantsPaginated?.pageInfo,
+          items: this.plants.items?.concat(mappedItems),
+          totalCount: data?.data?.plantsPaginated?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
 
   get SystemTables () {
     return SystemTables;

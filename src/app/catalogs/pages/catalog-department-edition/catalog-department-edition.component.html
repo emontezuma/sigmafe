@@ -12,6 +12,8 @@
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="plants$ | async "></ng-container>  
+  <ng-container *ngIf="recipients$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateDepartment$ | async "></ng-container>
   <ng-container *ngIf="updateDepartmentCatalog$ | async "></ng-container>      
@@ -130,7 +132,7 @@
                   >Notas referentes al departamento</span
                 >
               </app-area-field>              
-            </div>                     
+            </div>
             <div class="field-items">
               <fieldset class="field__container">
                 <div class="image-and-field">
@@ -194,7 +196,73 @@
                 </div>                
               </fieldset>              
             </div>
-                   
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    departmentForm.controls.plant.touched &&
+                    !departmentForm.controls.plant.valid
+                }"
+                [disabled]="departmentForm.controls.plant.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Planta del departamento</span>
+                  <span class="field__label" *ngIf="departmentForm.controls.plant?.value?.id">Id: {{ departmentForm.controls.plant?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='plant'"
+                  [formField]="departmentForm.controls.plant"
+                  [list]="plants.items"
+                  [totalCount]="plants.totalCount"
+                  leftHint="Escriba el nombre de la Planta a buscar"
+                  [catalog]="SystemTables.PLANTS"
+                  [loading]="plants.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la planta</span
+                >
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    departmentForm.controls.recipient.touched &&
+                    !departmentForm.controls.recipient.valid
+                }"               
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Recipiente asociado al departamento</span>
+                  <span class="field__label" *ngIf="departmentForm.controls.recipient?.value?.id">Id: {{ departmentForm.controls.recipient?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='recipient'"
+                  [formField]="departmentForm.controls.recipient"
+                  [list]="recipients.items"
+                  [totalCount]="recipients.totalCount"
+                  leftHint="Escriba el Nombre del recipiente a buscar"
+                  [catalog]="SystemTables.RECIPIENTS"
+                  [loading]="recipients.loading"
+                  noItemsError="No hay recipientes con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Recipiente a notificar</span
+                >
+              </fieldset>
+            </div>
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>

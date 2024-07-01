@@ -27,7 +27,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Departments ===============
-  departmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+  departmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   departmentsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   departmentsData$: Observable<DepartmentsData>;
@@ -210,6 +210,16 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
                 data: {
                   ...item.data,                  
                   mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
+                  plant: {
+                    ...item.data.plant,
+                    name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
+                    isTranslated: item.data.plant?.translations?.length > 0 ? true : false,
+                  },
+                  recipient: {
+                    ...item.data.recipient,
+                    name: item.data.recipient?.translations?.length > 0 ? item.data.recipient.translations[0].name : item.data.recipient?.name,
+                    isTranslated: item.data.recipient?.translations?.length > 0 ? true : false,
+                  },
                 }
               }
             })          
@@ -389,7 +399,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.departmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.departmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

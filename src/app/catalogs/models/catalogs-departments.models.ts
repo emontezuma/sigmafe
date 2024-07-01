@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface DepartmentsData {
   departmentsPaginated?: Departments;
@@ -30,6 +30,8 @@ export interface DepartmentDetail {
   mainImagePath?: string;
   mainImageName?: string;
   mainImage?: string;
+  plant?: GeneralCatalogInternalData,
+  recipient?: GeneralCatalogInternalData,
   id?: number;
   customerId?: number;
   plantId?: number;
@@ -46,7 +48,6 @@ export interface DepartmentDetail {
   updatedBy?: any;
   createdBy?: any;
   translations?: GeneralTranslation[];  
-  
 }
 
 export interface DepartmentsState {

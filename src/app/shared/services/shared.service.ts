@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
 import { CapitalizationMethod, DatesDifference, RecordStatus } from '../models/helpers.models';
-import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_MOLDS } from '../../graphql/graphql.queries';
+import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_MOLDS, GET_PLANTS_LAZY_LOADING } from '../../graphql/graphql.queries';
 import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
@@ -443,7 +443,7 @@ export class SharedService {
     }).valueChanges;
   }
 
-  
+
   requestHardcodedValuesData$(currentPage: number, skipRecords: number, takeRecords: number, order: any, catalog: string): Observable<any> {    
     const filter = JSON.parse(`{ "and":  [ { "languageId": { "eq": 1 } }, { "customerId": { "eq": 1 } }, { "tableName": { "eq": "${catalog}" } }, { "status": { "eq": "${RecordStatus.ACTIVE}" } } ] }`);
     // TODO Get language and customer from table

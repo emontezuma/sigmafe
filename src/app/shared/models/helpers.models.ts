@@ -66,6 +66,7 @@ export interface PageInfo {
 export enum SystemTables {
     PROVIDERS = 'providers',
     COMPANIES = 'companies',
+    PLANTS = 'plants',
     MANUFACTURERS = 'manufacturers',
     LINES = 'lines',
     MOLD_MAINTENANCE_STATES = 'mold-maintenance-states',
