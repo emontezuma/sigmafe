@@ -52,7 +52,7 @@ export class CatalogPositionEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "position";  
+  catalogIcon: string = "construction_worker";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);

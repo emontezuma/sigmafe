@@ -32,6 +32,7 @@ export interface DepartmentDetail {
   mainImage?: string;
   plant?: GeneralCatalogInternalData,
   recipient?: GeneralCatalogInternalData,
+  approver?: GeneralCatalogInternalData,
   id?: number;
   customerId?: number;
   plantId?: number;

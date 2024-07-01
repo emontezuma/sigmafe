@@ -285,7 +285,14 @@ export class IconsModule {
       'time_cycles',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/time_cycles.svg`)
     );        
-    
+    iconRegistry.addSvgIcon(
+      'time_cycles',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/time_cycles.svg`)
+    );        
+    iconRegistry.addSvgIcon(
+      'construction_worker',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/construction_worker.svg`)
+    );        
   }
   
 }

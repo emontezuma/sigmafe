@@ -67,6 +67,7 @@ export enum SystemTables {
     PROVIDERS = 'providers',
     COMPANIES = 'companies',
     PLANTS = 'plants',
+    USERS = 'users',
     MANUFACTURERS = 'manufacturers',
     LINES = 'lines',
     MOLD_MAINTENANCE_STATES = 'mold-maintenance-states',

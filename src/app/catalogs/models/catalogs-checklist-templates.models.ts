@@ -51,6 +51,8 @@ export interface ChecklistTemplateDetail {
   byDefault?: string; 
   byDefaultDateType?: string; 
   resetValueMode?: string; 
+  lastGeneratedDate?: string; 
+  generationCount: number;
   attachments?: Attachment[];
   minimum?: string; 
   maximum?: string; 
@@ -122,6 +124,8 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
+  lastGeneratedDate: null,
+  generationCount: 0,
   showNotes: GeneralValues.NO,
   required: GeneralValues.NO,
   allowNoCapture: GeneralValues.NO,

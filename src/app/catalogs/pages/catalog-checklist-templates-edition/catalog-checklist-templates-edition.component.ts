@@ -121,7 +121,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   loading: boolean;
   elements: ToolbarElement[] = [];  
   panelOpenState: boolean[] = [true, false, false, false, false];
-  generalPanelOpenState: boolean[] = [];
+  generalPanelOpenState: boolean[] = [false, false, false, false, false];
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
@@ -155,6 +155,9 @@ export class CatalogChecklistTemplatesEditionComponent {
     cancelOpenChecklist: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyApproval: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyGeneration: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowReassignment: new FormControl(emptyGeneralHardcodedValuesItem),
+    requiresActivation: new FormControl(emptyGeneralHardcodedValuesItem),
+    allowRestarting: new FormControl(emptyGeneralHardcodedValuesItem),
     expiringMessageSubject:  new FormControl(''),
     expiringMessageBody:  new FormControl(''),
     alarmMessageSubject:  new FormControl(''),
@@ -186,6 +189,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     alarmRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     anticipationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     generationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    timeToFill: new FormControl(0),    
   });
 
   pageInfo: PageInfo = {
@@ -1656,8 +1660,8 @@ export class CatalogChecklistTemplatesEditionComponent {
         st.anticipationMessageBody !== t.anticipationMessageBody || 
         st.expiringMessageSubject !== t.expiringMessageSubject || 
         st.expiringMessageBody !== t.expiringMessageBody || 
-        st.alarmMessageSubject !== t.alarmMessageSubject || 
-        st.alarmMessageBody !== t.alarmMessageBody || 
+        st.alarmNotificationMessageSubject !== t.alarmNotificationMessageSubject || 
+        st.alarmNotificationMessageBody !== t.alarmNotificationMessageBody || 
         st.generationMessageSubject !== t.generationMessageSubject || 
         st.generationMessageBody !== t.generationMessageBody || 
         st.name !== t.name || 
@@ -1688,8 +1692,8 @@ export class CatalogChecklistTemplatesEditionComponent {
           anticipationMessageBody: t.anticipationMessageBody,
           expiringMessageSubject: t.expiringMessageSubject,
           expiringMessageBody: t.expiringMessageBody,
-          alarmMessageSubject: t.alarmMessageSubject,
-          alarmMessageBody: t.alarmMessageBody,
+          alarmNotificationMessageSubject: t.alarmNotificationMessageSubject,
+          alarmNotificationMessageBody: t.alarmNotificationMessageBody,
           generationMessageSubject: t.generationMessageSubject,
           generationMessageBody: t.generationMessageBody,
           languageId: t.languageId,

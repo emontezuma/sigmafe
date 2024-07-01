@@ -13,6 +13,7 @@
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="plants$ | async "></ng-container>  
+  <ng-container *ngIf="approvers$ | async "></ng-container>  
   <ng-container *ngIf="recipients$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateDepartment$ | async "></ng-container>
@@ -195,6 +196,40 @@
                   </div>
                 </div>                
               </fieldset>              
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    departmentForm.controls.approver.touched &&
+                    !departmentForm.controls.approver.valid
+                }"
+                [disabled]="departmentForm.controls.approver.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Aprobador del Departamento</span>
+                  <span class="field__label" *ngIf="departmentForm.controls.approver?.value?.id">Id: {{ departmentForm.controls.approver?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='approver'"
+                  [formField]="departmentForm.controls.approver"
+                  [list]="approvers.items"
+                  [totalCount]="approvers.totalCount"
+                  leftHint="Escriba el nombre del aprobador a buscar"
+                  [catalog]="SystemTables.USERS"
+                  [loading]="approvers.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la planta</span
+                >
+              </fieldset>
             </div>
             <div class="field-items">
               <fieldset

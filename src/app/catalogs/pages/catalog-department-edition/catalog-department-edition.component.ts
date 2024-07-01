@@ -39,7 +39,9 @@ export class CatalogDepartmentEditionComponent {
   settingsData$: Observable<SettingsData>; 
 
   plants$: Observable<any>; 
+  approvers$: Observable<any>; 
   plants: GeneralCatalogData = emptyGeneralCatalogData; 
+  approvers: GeneralCatalogData = emptyGeneralCatalogData; 
   recipients$: Observable<any>; 
   recipients: GeneralCatalogData = emptyGeneralCatalogData; 
 
@@ -57,9 +59,10 @@ export class CatalogDepartmentEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "department";  
+  catalogIcon: string = "organizational-chart";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
+  approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   storedTranslations: [];
   translationChanged: boolean = false
@@ -87,6 +90,7 @@ export class CatalogDepartmentEditionComponent {
     prefix: new FormControl(''), 
     plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    approver: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
   });
 
   pageInfo: PageInfo = {
@@ -345,7 +349,7 @@ export class CatalogDepartmentEditionComponent {
                 id: this.department.id,
                 customerId: this.department.customerId,
                 recipientId: this.department.recipientId,
-                approverId: this.department.approverId,
+                approverId: this.department.approverId,                
                 plantId: this.department.plantId,
                 status: RecordStatus.INACTIVE,
               }
@@ -909,6 +913,7 @@ export class CatalogDepartmentEditionComponent {
       notes: this.department.notes,      
       plant: this.department.plant,
       recipient: this.department.recipient,
+      approver: this.department.approver,
     });
   } 
 
@@ -916,15 +921,15 @@ export class CatalogDepartmentEditionComponent {
     const fc = this.departmentForm.controls;
     return  {
       id: this.department.id,
-      customerId: 1, // TODO: Get from profile
-      approverId: 1, // TODO: Get from profile      
+      customerId: 1, // TODO: Get from profile      
         status: newRecord ? RecordStatus.ACTIVE : this.department.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
-      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value.id },      
-      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value.id },      
+      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value ? fc.plant.value.id : null },      
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id  : null},      
+      ...(fc.approver.dirty || fc.approver.touched || newRecord) && { approverId: fc.approver.value ? fc.approver.value.id : null },      
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
@@ -1005,6 +1010,8 @@ export class CatalogDepartmentEditionComponent {
       return $localize`Planta asociada al departamento`;
     } else if (fieldControlName === 'recipient') {
       return $localize`Recipiente asociado al departamento`;
+    } else if (fieldControlName === 'approver') {
+      return $localize`Aprobador`;
     }    
     return '';
   }
@@ -1024,9 +1031,21 @@ export class CatalogDepartmentEditionComponent {
   validateTables(): void {
     if (!this.departmentForm.controls.plant.value || !this.departmentForm.controls.plant.value.id) {
       this.departmentForm.controls.plant.setErrors({ required: true });   
-    } else if (this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+    } else if (this.departmentForm.controls.plant.value.status === RecordStatus.INACTIVE) {
+      this.departmentForm.controls.plant.setErrors({ inactive: true });   
+    } else {
+      this.departmentForm.controls.plant.setErrors(null);   
+    }
+    if (this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
       this.departmentForm.controls.recipient.setErrors({ inactive: true });   
-    }    
+    } else {
+      this.departmentForm.controls.recipient.setErrors(null);   
+    }   
+    if (this.departmentForm.controls.approver.value && this.departmentForm.controls.approver.value.status === RecordStatus.INACTIVE) {
+      this.departmentForm.controls.approver.setErrors({ inactive: true });   
+    } else {
+      this.departmentForm.controls.approver.setErrors(null);   
+    }
   }
 
   processTranslations$(departmentId: number): Observable<any> { 
@@ -1048,10 +1067,8 @@ export class CatalogDepartmentEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-        customerId: 1, // TODO: Get from profile
-        recipientId: 1, // TODO: Get from profile
-        approverId: 1, // TODO: Get from profile
-        plantId: 1, // TODO: Get from profile
+        customerId: 1, // TODO: Get from profile        
+        plantId: this.department.plantId, // TODO: Get from profile
       }      
       const translationsToAdd = this.department.translations.map((t: any) => {
         return {
@@ -1061,10 +1078,7 @@ export class CatalogDepartmentEditionComponent {
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-          customerId: 1, // TODO: Get from profile
-          recipientId: 1, // TODO: Get from profile
-          approverId: 1, // TODO: Get from profile
-          plantId: 1, // TODO: Get from profile
+          plantId: this.department.plantId, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });
@@ -1128,6 +1142,52 @@ export class CatalogDepartmentEditionComponent {
     )    
   }
 
+  requestApproversData(currentPage: number, filterStr: string = null) {    
+    this.approvers = {
+      ...this.approvers,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "data": { "name": { "contains": "${filterStr}" } } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.approvers.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.approversOrder,
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.approvers$ = this._catalogsService.getApproversLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.usersPaginated?.items.map((item) => {
+          return {
+            isTranslated: true,
+            translatedName: item.data.name,
+            translatedReference: item.data.reference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.approvers = {
+          ...this.approvers,
+          loading: false,
+          pageInfo: data?.data?.usersPaginated?.pageInfo,
+          items: this.approvers.items?.concat(mappedItems),
+          totalCount: data?.data?.usersPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
     if (getMoreDataParams.catalogName === SystemTables.PLANTS) {
       if (getMoreDataParams.initArray) {
@@ -1153,6 +1213,19 @@ export class CatalogDepartmentEditionComponent {
       }
       this.requestRecipientsData(        
         this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    } else if (getMoreDataParams.catalogName === SystemTables.USERS) {
+      if (getMoreDataParams.initArray) {
+        this.approvers.currentPage = 0;
+        this.approvers.items = [];
+      } else if (!this.approvers.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.approvers.currentPage++;
+      }
+      this.requestApproversData(        
+        this.approvers.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
     }     
@@ -1203,7 +1276,6 @@ export class CatalogDepartmentEditionComponent {
       catchError(() => EMPTY)
     )    
   }
-
 
   get SystemTables () {
     return SystemTables;

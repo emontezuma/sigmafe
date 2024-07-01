@@ -40,7 +40,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   allPositionsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "position";  
+  catalogIcon: string = "construction_worker";  
 
   loading: boolean;
   onTopStatus: string;

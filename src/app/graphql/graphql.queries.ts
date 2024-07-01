@@ -1381,6 +1381,36 @@ export const GET_RECIPIENTS_LAZY_LOADING = gql`
   }
 `;
 
+export const GET_APPROVERS_LAZY_LOADING = gql`
+  query UsersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedUserDtoSortInput!],
+    $filterBy: TranslatedUserDtoFilterInput
+  ) {
+    usersPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+    ) {
+      totalCount
+      items {
+        data {
+            name
+            reference
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 export const GET_VARIABLE = gql`
   query OneVariable (
     $variableId: Long!,
@@ -1634,8 +1664,8 @@ export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
         anticipationMessageBody
         expiringMessageSubject
         expiringMessageBody
-        alarmMessageSubject
-        alarmMessageBody
+        alarmNotificationMessageSubject
+        alarmNotificationMessageBody
         generationMessageSubject
         generationMessageBody
         languageId
@@ -3067,6 +3097,12 @@ export const GET_DEPARTMENT = gql`
           languageId
           id
         }
+      }
+      approver {
+        id
+        customerId
+        name
+        status        
       }
       createdBy {
         name

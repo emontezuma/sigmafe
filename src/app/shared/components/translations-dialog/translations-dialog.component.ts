@@ -64,8 +64,8 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
     anticipationMessageBody: new FormControl(''),  
     expiringMessageSubject: new FormControl(''),  
     expiringMessageBody: new FormControl(''),  
-    alarmMessageSubject: new FormControl(''),  
-    alarmMessageBody: new FormControl(''),  
+    alarmNotificationMessageSubject: new FormControl(''),  
+    alarmNotificationMessageBody: new FormControl(''),  
     generationMessageSubject: new FormControl(''),  
     generationMessageBody: new FormControl(''),  
     language: new FormControl(''),    
@@ -161,8 +161,8 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         translation.anticipationMessageBody = this.translationsForm.controls.anticipationMessageBody.value;
         translation.expiringMessageSubject = this.translationsForm.controls.expiringMessageSubject.value;
         translation.expiringMessageBody = this.translationsForm.controls.expiringMessageBody.value;
-        translation.alarmMessageSubject = this.translationsForm.controls.alarmMessageSubject.value;
-        translation.alarmMessageBody = this.translationsForm.controls.alarmMessageBody.value;
+        translation.alarmNotificationMessageSubject = this.translationsForm.controls.alarmNotificationMessageSubject.value;
+        translation.alarmNotificationMessageBody = this.translationsForm.controls.alarmNotificationMessageBody.value;
         translation.generationMessageSubject = this.translationsForm.controls.generationMessageSubject.value;
         translation.generationMessageBody = this.translationsForm.controls.generationMessageBody.value;
         translation.updatedAt = this._sharedService.formatDate(new Date());
@@ -190,8 +190,8 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         this.translationsForm.controls.anticipationMessageBody.setValue(translation['anticipationMessageBody']);
         this.translationsForm.controls.expiringMessageSubject.setValue(translation['expiringMessageSubject']);
         this.translationsForm.controls.expiringMessageBody.setValue(translation['expiringMessageBody']);
-        this.translationsForm.controls.alarmMessageSubject.setValue(translation['alarmMessageSubject']);
-        this.translationsForm.controls.alarmMessageBody.setValue(translation['alarmMessageBody']);
+        this.translationsForm.controls.alarmNotificationMessageSubject.setValue(translation['alarmNotificationMessageSubject']);
+        this.translationsForm.controls.alarmNotificationMessageBody.setValue(translation['alarmNotificationMessageBody']);
         this.translationsForm.controls.generationMessageSubject.setValue(translation['generationMessageSubject']);
         this.translationsForm.controls.generationMessageBody.setValue(translation['generationMessageBody']);
         translation['changed'] = false;
@@ -251,8 +251,8 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
     this.translationsForm.controls.anticipationMessageBody.setValue('');
     this.translationsForm.controls.expiringMessageSubject.setValue('');
     this.translationsForm.controls.expiringMessageBody.setValue('');
-    this.translationsForm.controls.alarmMessageSubject.setValue('');
-    this.translationsForm.controls.alarmMessageBody.setValue('');
+    this.translationsForm.controls.alarmNotificationMessageSubject.setValue('');
+    this.translationsForm.controls.alarmNotificationMessageBody.setValue('');
     this.translationsForm.controls.generationMessageSubject.setValue('');
     this.translationsForm.controls.generationMessageBody.setValue('');
   }
@@ -331,8 +331,8 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
       this.translationsForm.controls.anticipationMessageBody.setValue(this.selectedTranslation.anticipationMessageBody);
       this.translationsForm.controls.expiringMessageSubject.setValue(this.selectedTranslation.expiringMessageSubject);
       this.translationsForm.controls.expiringMessageBody.setValue(this.selectedTranslation.expiringMessageBody);
-      this.translationsForm.controls.alarmMessageSubject.setValue(this.selectedTranslation.alarmMessageSubject);
-      this.translationsForm.controls.alarmMessageBody.setValue(this.selectedTranslation.alarmMessageBody);
+      this.translationsForm.controls.alarmNotificationMessageSubject.setValue(this.selectedTranslation.alarmNotificationMessageSubject);
+      this.translationsForm.controls.alarmNotificationMessageBody.setValue(this.selectedTranslation.alarmNotificationMessageBody);
       this.translationsForm.controls.generationMessageSubject.setValue(this.selectedTranslation.generationMessageSubject);
       this.translationsForm.controls.generationMessageBody.setValue(this.selectedTranslation.generationMessageBody);
       this.setButtonState(toolbarMode.INITIAL_WITH_DATA);

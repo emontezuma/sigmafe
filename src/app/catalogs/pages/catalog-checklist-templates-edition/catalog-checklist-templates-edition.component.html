@@ -237,7 +237,7 @@
                     !checklistTemplateForm.controls.templateType.valid
                 }"
                 [disabled]="checklistTemplateForm.controls.templateType.disabled"
-              >7
+              >
                 <div class="title-with-id">
                   <span class="label field__label">Tipo de plantilla de checklist</span>
                   <span class="field__label" *ngIf="checklistTemplateForm.controls.templateType?.value?.id">id: {{ checklistTemplateForm.controls.templateType?.value?.id }}</span>
@@ -258,6 +258,24 @@
                 </app-auto-complete-field>
                 <span class="field__help">Especifique el Tipo de plantilla de checklist</span>
               </fieldset>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="checklistTemplateForm.controls.timeToFill"
+                rightHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn-line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                leftHint="Expresado en segundos"
+                fieldHelp="Indique el tiempo de promedio de llenado"
+                [rightSuffix]="_sharedService.getHours(checklistTemplateForm.controls.timeToFill.value)"
+              >
+                <span fieldTitle class="label field__label"
+                  >Tiempo aproximado de llenado</span
+                >
+              </app-input-field>
             </div>            
           </div>          
         </mat-expansion-panel>
@@ -375,12 +393,34 @@
             </div>            
             <div class="field-items">
               <app-select-field
-                [formField]="checklistTemplateForm.controls.allowApprovalByGroup"
+                [formField]="checklistTemplateForm.controls.allowReassignment"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite ser aprobado por el grupo"
+                fieldHelp="Especifique si el checklist permite ser reasignado"
               >
                 <span fieldTitle class="label field__label"
-                  >¿El checklist permite ser aprobado por el grupo?</span
+                  >¿El checklist permite ser reasignado a otro usuario?</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.requiresActivation"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist requiere activación"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist requiere activación?</span
+                >
+              </app-select-field>                
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowRestarting"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite reseteo"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite ser reseteado?</span
                 >
               </app-select-field>                
             </div>
@@ -391,7 +431,7 @@
                 fieldHelp="Especifique si la generación de este checklist cancela los demás que estén abiertos"
               >
                 <span fieldTitle class="label field__label"
-                  >Al generar este checklist cancelaría los demás pendientes?</span
+                  >Al generar este checklist cancelarían los demás no iniciados?</span
                 >
               </app-select-field>                
             </div>
@@ -1519,7 +1559,7 @@
                 >
                   <mat-icon class="icon-button">
                     {{
-                      panelOpenState[3]
+                      generalPanelOpenState[3]
                         ? "keyboard_arrow_up"
                         : "keyboard_arrow_down"
                     }}
@@ -1837,7 +1877,7 @@
               }"
             >
               <mat-panel-title>            
-                <mat-icon class="accordion-icon" svgIcon="warm-fill"> </mat-icon>    
+                <mat-icon class="accordion-icon" svgIcon="warn-fill"> </mat-icon>    
                 <label class="accordion-label-no-counter">ALARMADO DEL CHECKLIST</label>
               </mat-panel-title>
               <div class="icon-button-container">
@@ -1848,7 +1888,7 @@
                 >
                   <mat-icon class="icon-button">
                     {{
-                      panelOpenState[3]
+                      generalPanelOpenState[4]
                         ? "keyboard_arrow_up"
                         : "keyboard_arrow_down"
                     }}
@@ -2369,7 +2409,7 @@
               </div>      
             </div>
           </div>
-        </mat-expansion-panel>   
+        </mat-expansion-panel>           
       </mat-accordion>
     </form>
     <div
@@ -2407,6 +2447,22 @@
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+
+
+        <div class="flex">
+          <div class="readonly-value">{{ checklistTemplate.lastGeneratedDate ? (_sharedService.convertUtcTolocal(checklistTemplate.lastGeneratedDate) | date :"medium") : "Indeterminado..." }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+              <div class="label-with-no-index">Fecha de últ. generación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value item-id">{{ (checklistTemplate.generationCount ? checklistTemplate.generationCount : 0) | number : "1." }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="update"></mat-icon>
+              <div class="label-with-no-index">Checklist generados</div>
           </div>
         </div>
       </div>
