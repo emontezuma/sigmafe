@@ -89,7 +89,7 @@ export class CatalogMoldEditionComponent {
 
   uploadFiles: Subscription;
   
-  catalogIcon: string = 'treasure-chest';
+  catalogIcon: string = 'treasure_chest';
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -501,7 +501,7 @@ export class CatalogMoldEditionComponent {
             autoFocus : true,
             data: {
               title: $localize`Cambios sin guardar`,  
-              topIcon: 'warn-fill',
+              topIcon: 'warn_fill',
               defaultButtons: dialogByDefaultButton.ACCEPT,
               buttons: [],
               body: {
@@ -737,7 +737,7 @@ export class CatalogMoldEditionComponent {
               }, {
                 action: ButtonActions.DELETE,
                 showIcon: true,
-                icon: 'garbage-can',
+                icon: 'garbage_can',
                 showCaption: true,
                 caption: $localize`Eliminar`,
                 showTooltip: true,            
@@ -781,7 +781,7 @@ export class CatalogMoldEditionComponent {
       type: 'button',
       caption: $localize`Regresar...`,
       tooltip:  $localize`Regresar a la lista de moldes`,
-      icon: 'arrow-left',
+      icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
       showIcon: true,
@@ -971,7 +971,7 @@ export class CatalogMoldEditionComponent {
         autoFocus : true,
         data: {
           title: $localize`DATOS INVÁLIDOS`,
-          topIcon: 'warn-fill',
+          topIcon: 'warn_fill',
           defaultButtons: dialogByDefaultButton.ACCEPT,
           buttons: [],
           body: {
@@ -2157,7 +2157,7 @@ export class CatalogMoldEditionComponent {
       autoFocus : true,
       data: {
         title: id === 0 ? $localize`Eliminar todo el historial` : $localize`Eliminar mantenimiento`,  
-        topIcon: 'garbage-can',
+        topIcon: 'garbage_can',
         defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
         buttons: [],
         body: {

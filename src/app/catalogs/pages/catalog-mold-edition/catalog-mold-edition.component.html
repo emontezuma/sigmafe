@@ -41,7 +41,7 @@
   <mat-card class="card">
     <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">
       <div [ngClass]="getMoldStateClass()">
-        <mat-icon class="message-icon" svgIcon="warn-fill"></mat-icon>
+        <mat-icon class="message-icon" svgIcon="warn_fill"></mat-icon>
         <app-label-ellipsis
           [labelInnerHTML]="getMoldStateLabel()"
           [lines]="2"
@@ -103,7 +103,7 @@
                 [fieldMaxLength]="300"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 fieldHelp="Especifique el nombre asignado al molde"
                 [initialFocus]="true"                
@@ -122,7 +122,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 fieldHelp="Especifique el Serial del molde"
               >
@@ -176,7 +176,7 @@
                   <mat-error class="field__error field__required">
                     <mat-icon
                       class="field__required-icon"
-                      svgIcon="warn-line"
+                      svgIcon="warn_line"
                     ></mat-icon>
                     <span class="field__required-label"
                       ><strong>Error en el formato de la fecha</strong></span
@@ -436,7 +436,7 @@
                   <mat-error class="field__error field__required">
                     <mat-icon
                       class="field__required-icon"
-                      svgIcon="warn-line"
+                      svgIcon="warn_line"
                     ></mat-icon>
                     <span class="field__required-label"
                       ><strong>Error en el formato de la fecha</strong></span
@@ -454,7 +454,7 @@
                 [formField]="moldForm.controls.timeZone"
                 rightHint="Campo opcional"
                 fieldInputType="number"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
                 leftHint="Expresado en segundos"
@@ -544,7 +544,7 @@
                 [formField]="moldForm.controls.position"
                 rightHint="Campo opcional"
                 fieldInputType="number"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
                 leftHint="Deje vacío o en cero para no asignar el molde"
@@ -642,7 +642,7 @@
             }"
           >
             <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="task-notes"> </mat-icon>
+              <mat-icon class="accordion-icon" svgIcon="task_notes"> </mat-icon>
               <label class="accordion-label">CONTROL</label>
             </mat-panel-title>
             <div class="icon-button-container">
@@ -671,7 +671,7 @@
                   [fieldRequired]="true"
                   [showRightHint]="true"
                   currentErrorMessage="Este campo no puede estar vacío"
-                  currentErrorIcon="warn-line"
+                  currentErrorIcon="warn_line"
                   fieldHelp="Especifique la estrategia de control y seguimiento"
                 >
                   <span fieldTitle class="label field__label"
@@ -686,7 +686,7 @@
                   rightHint="Campo opcional"
                   fieldInputType="number"
                   currentErrorMessage="El valor de advertencia no debe ser mayor al valor de la Alarma"
-                  currentErrorIcon="warn-line"
+                  currentErrorIcon="warn_line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
                   leftHint="Deje el valor vacío para no aplicar umbral"
@@ -703,7 +703,7 @@
                   [formField]="moldForm.controls.thresholdRed"
                   rightHint="Campo opcional"
                   fieldInputType="number"
-                  currentErrorIcon="warn-line"
+                  currentErrorIcon="warn_line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
                   leftHint="Deje el valor vacío para no aplicar umbral"
@@ -720,7 +720,7 @@
                   [formField]="moldForm.controls.thresholdDateYellow"
                   rightHint="Campo opcional"
                   fieldInputType="number"
-                  currentErrorIcon="warn-line"
+                  currentErrorIcon="warn_line"
                   currentErrorMessage="El Número de días de arvertencia no debe ser mayor al Número de días de la Alarma"
                   [showCloseButton]="true"
                   [showRightHint]="true"
@@ -738,7 +738,7 @@
                   [formField]="moldForm.controls.thresholdDateRed"
                   rightHint="Campo opcional"
                   fieldInputType="number"
-                  currentErrorIcon="warn-line"
+                  currentErrorIcon="warn_line"
                   [showCloseButton]="true"
                   [showRightHint]="true"
                   leftHint="Deje vacío o en cero para no aplicar umbral"
@@ -949,7 +949,7 @@
                         <mat-icon svgIcon="pencil"></mat-icon>
                       </button>
                       <button matSuffix mat-icon-button (click)="handleRemoveAllHistoricalButtonClick('delete', row.id)" style="margin-right: 5px;">
-                        <mat-icon svgIcon="garbage-can"></mat-icon>
+                        <mat-icon svgIcon="garbage_can"></mat-icon>
                       </button>
                     </div>
                     <ngx-skeleton-loader
@@ -1032,7 +1032,7 @@
               >
                 <mat-icon                
                   class="svgicon icon-medium"                
-                  svgIcon="garbage-can"
+                  svgIcon="garbage_can"
                   [ngStyle]="{ visibility: removeHistoricalButtonClick ? 'hidden' : 'visible' }"
                 >
                 </mat-icon>

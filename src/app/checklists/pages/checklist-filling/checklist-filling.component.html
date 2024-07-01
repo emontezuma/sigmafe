@@ -48,7 +48,7 @@
       <ng-template mat-tab-label>
         <mat-icon
           class="tab-icon"
-          svgIcon="checklist-header"
+          svgIcon="checklist_header"
           [ngStyle]="{
             fill:
               currentTabIndex === 1
@@ -269,7 +269,7 @@
                       [reference]="checklist.type?.code"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
-                      icon="white-list"
+                      icon="white_list"
                       [showGoToRecord]="true"
                       [recordId]="checklist.type?.id"
                     >
@@ -282,7 +282,7 @@
                       [reference]="checklist.class?.code"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
-                      icon="white-list"
+                      icon="white_list"
                       [showGoToRecord]="true"
                       [recordId]="checklist.class?.id"
                     >
@@ -392,7 +392,7 @@
                       <app-readonly-field
                         [label]="checklist.assignement?.department"
                         [loading]="loading"
-                        icon="organizational-chart"
+                        icon="organizational_chart"
                       >
                       </app-readonly-field>
                       <mat-card-subtitle class="label">
@@ -447,7 +447,7 @@
                       <app-readonly-field
                         [label]="checklist.assignement?.type"
                         [loading]="loading"
-                        icon="white-list"                
+                        icon="white_list"                
                       >
                       </app-readonly-field>            
                       <mat-card-subtitle class="label">
@@ -509,7 +509,7 @@
                       <app-readonly-field
                         [label]="checklist.planning?.department"
                         [loading]="loading"
-                        icon="organizational-chart"
+                        icon="organizational_chart"
                       >
                       </app-readonly-field>
                       <mat-card-subtitle class="label">
@@ -544,7 +544,7 @@
                     }"
                   >
                     <mat-panel-title>
-                      <mat-icon class="accordion-icon" svgIcon="task-notes">
+                      <mat-icon class="accordion-icon" svgIcon="task_notes">
                       </mat-icon>
                       <label class="accordion-label">Notas del checklist</label>
                     </mat-panel-title>

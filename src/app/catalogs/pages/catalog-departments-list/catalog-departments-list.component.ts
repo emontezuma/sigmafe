@@ -40,7 +40,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
   allDepartmentsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "organizational-chart";  
+  catalogIcon: string = "organizational_chart";  
 
   loading: boolean;
   onTopStatus: string;

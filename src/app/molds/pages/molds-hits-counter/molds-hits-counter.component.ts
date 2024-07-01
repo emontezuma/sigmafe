@@ -327,7 +327,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       },
       {
         caption: $localize`Alarmados`,
-        icon: 'warn-fill',
+        icon: 'warn_fill',
         value: ButtonActions.ALARMED,        
       },
       {

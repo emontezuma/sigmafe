@@ -210,7 +210,7 @@ export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
         autoFocus : true,
         data: {
           title: $localize`Eliminar traducción`,
-          topIcon: 'warn-fill',
+          topIcon: 'warn_fill',
           defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
           buttons: [],
           body: {

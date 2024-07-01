@@ -18,7 +18,7 @@ export class IconsModule {
     sanitizer: DomSanitizer,
   ) {
     iconRegistry.addSvgIcon(
-      'vertical-menu',
+      'vertical_menu',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/vertical_menu.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -54,19 +54,19 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/support.svg`)
     );
     iconRegistry.addSvgIcon(
-      'checklist-header',
+      'checklist_header',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/checklist_header.svg`)
     );
     iconRegistry.addSvgIcon(
-      'small-locked',
+      'small_locked',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/small_locked.svg`)
     );
     iconRegistry.addSvgIcon(
-      'arrow-up',
+      'arrow_up',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_up.svg`)
     );
     iconRegistry.addSvgIcon(
-      'arrow-down',
+      'arrow_down',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_down.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -74,11 +74,11 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/check.svg`)
     );
     iconRegistry.addSvgIcon(
-      'warn-line',
+      'warn_line',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/warn_line.svg`)
     );  
     iconRegistry.addSvgIcon(
-      'warn-fill',
+      'warn_fill',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/warn_fill.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -86,7 +86,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/block.svg`)
     );
     iconRegistry.addSvgIcon(
-      'attachment-file',
+      'attachment_file',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/attachment_file.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -134,11 +134,11 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/time.svg`)
     );
     iconRegistry.addSvgIcon(
-      'task-notes',
+      'task_notes',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/task_notes.svg`)
     );
     iconRegistry.addSvgIcon(
-      'white-list',
+      'white_list',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/white_list.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -146,7 +146,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/problems.svg`)
     );
     iconRegistry.addSvgIcon(
-      'organizational-chart',
+      'organizational_chart',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/organizational_chart.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -158,7 +158,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/delete.svg`)
     );
     iconRegistry.addSvgIcon(
-      'external-link',
+      'external_link',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/external_link.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -178,7 +178,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/document.svg`)
     );
     iconRegistry.addSvgIcon(
-      'treasure-chest',
+      'treasure_chest',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/treasure_chest.svg`)
     );    
     iconRegistry.addSvgIcon(
@@ -186,7 +186,7 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/copy.svg`)
     );    
     iconRegistry.addSvgIcon(
-      'garbage-can',
+      'garbage_can',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/garbage_can.svg`)
     );    
     iconRegistry.addSvgIcon(
@@ -194,11 +194,11 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/cross.svg`)
     );    
     iconRegistry.addSvgIcon(
-      'lock-closed',
+      'lock_closed',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/lock_closed.svg`)
     );        
     iconRegistry.addSvgIcon(
-      'arrow-left',
+      'arrow_left',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_left.svg`)
     );
     iconRegistry.addSvgIcon(
@@ -293,6 +293,14 @@ export class IconsModule {
       'construction_worker',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/construction_worker.svg`)
     );        
+    iconRegistry.addSvgIcon(
+      'view_mode_details',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/view_mode_details.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equation_add',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_add.svg`)
+    );
   }
   
 }

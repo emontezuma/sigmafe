@@ -96,7 +96,7 @@ body {
 
 mat-icon {
   width: 32px;
-  height: 32px;
+  height: 32px; 
 }
 
 .button-locked {
@@ -107,7 +107,7 @@ mat-icon {
   z-index: 999;
 }
 
-.small-locked {
+.small_locked {
   color: var(--z-colors-page-button-normal-background-color);
 }
 
@@ -118,8 +118,9 @@ mat-icon {
   ) !important;
   border-color: var(--z-colors-page-button-normal-border-color) !important;
   cursor: pointer;
-  .mat-icon {
+  .mat-icon * {
     color: var(--z-colors-page-button-normal-fore-color) !important;
+    fill: var(--z-colors-page-button-normal-fore-color) !important;
   }
 }
 
@@ -137,8 +138,9 @@ mat-icon {
   box-shadow: 0 0 0 0.5em rgba(#fff, 0);
   color: var(--theme-primary-500) !important;
   border-color: var(--theme-primary-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-primary-500) !important;
+    fill: var(--theme-primary-500) !important;
   }
 }
 
@@ -170,8 +172,9 @@ mat-icon {
   background-color: var(--theme-warn-500) !important;
   border-color: var(--theme-warn-500) !important;
   color: var(--theme-warn-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-warn-contrast-500) !important;
+    fill: var(--theme-warn-contrast-500) !important;
   }
 }
 
@@ -179,8 +182,9 @@ mat-icon {
   background-color: var(--theme-primary-500) !important;
   border-color: var(--theme-primary-500) !important;
   color: var(--theme-primary-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-primary-contrast-500) !important;
+    fill: var(--theme-primary-contrast-500) !important;
   }
 }
 
@@ -188,8 +192,9 @@ mat-icon {
   background-color: var(--theme-accent-500) !important;
   border-color: var(--theme-accent-500) !important;
   color: var(--theme-accent-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-accent-contrast-500) !important;
+    fill: var(--theme-accent-contrast-500) !important;
   }
 }
 
@@ -216,8 +221,9 @@ button:disabled {
   border-color: var(--z-colors-page-button-disabled-border) !important;
   outline-color: var(--z-colors-page-button-disabled-border) !important;
   cursor: url("./assets/icons/unable.png"), not-allowed;
-  .mat-icon {
+  .mat-icon * {
     color: var(--z-colors-page-button-disabled-fore) !important;
+    fill: var(--z-colors-page-button-disabled-fore) !important;
   }
 }
 
@@ -261,8 +267,9 @@ mat-card {
   background-color: var(--z-colors-page-button-normal-background-color);
   border-color: var(--z-colors-page-button-normal-border-color);
   cursor: pointer;
-  .mat-icon {
+  .mat-icon * {
     color: var(--z-colors-page-fore) !important;
+    fill: var(--z-colors-page-fore) !important;
   }
 }
 
@@ -275,8 +282,9 @@ mat-card {
   box-shadow: 0 0 0 3px rgba(#fff, 0);
   color: var(--theme-primary-500) !important;
   border-color: var(--theme-primary-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-primary-500) !important;
+    fill: var(--theme-primary-500) !important;
   }
 }
 
@@ -308,8 +316,9 @@ mat-card {
   background-color: var(--theme-warn-500) !important;
   border-color: var(--theme-warn-500) !important;
   color: var(--theme-warn-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-warn-contrast-500) !important;
+    fill: var(--theme-warn-contrast-500) !important;
   }
 }
 
@@ -317,8 +326,9 @@ mat-card {
   background-color: var(--theme-primary-500) !important;
   border-color: var(--theme-primary-500) !important;
   color: var(--theme-primary-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-primary-contrast-500) !important;
+    fill: var(--theme-primary-contrast-500) !important;
   }
 }
 
@@ -326,8 +336,9 @@ mat-card {
   background-color: var(--theme-accent-500) !important;
   border-color: var(--theme-accent-500) !important;
   color: var(--theme-accent-contrast-500) !important;
-  mat-icon {
+  mat-icon * {
     color: var(--theme-accent-contrast-500) !important;
+    fill: var(--theme-accent-contrast-500) !important;
   }
 }
 

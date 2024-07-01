@@ -36,6 +36,10 @@ mat-card-subtitle {
   color: var(--z-colors-page-card-fore) !important;
 }
 
+.accordion-label {
+  cursor: pointer;
+}
+
 .accordion-label::before {
     counter-reset: subCounter;
     counter-increment: counter;

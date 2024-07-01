@@ -147,3 +147,19 @@ export interface ChecklistTemplatePossibleValue {
   byDefault?: boolean;
   alarmedValue?: boolean;  
 }
+
+export interface ChecklistTemplateLine {
+  variableId?: number;
+  minimum?: number;
+  maximum?: number;
+  required?: string;
+  byDefault?: string;
+  allowNoCapture?: string;
+  allowComments?: string;
+  sensorId?: number;
+  showChart?: string;
+  allowAlarm?: string;
+  notifyAlarm?: string;  
+  recipient?: GeneralCatalogInternalData,
+  status?: string;  
+}

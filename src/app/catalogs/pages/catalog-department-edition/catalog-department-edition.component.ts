@@ -59,7 +59,7 @@ export class CatalogDepartmentEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "organizational-chart";  
+  catalogIcon: string = "organizational_chart";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
@@ -235,7 +235,7 @@ export class CatalogDepartmentEditionComponent {
             autoFocus : true,
             data: {
               title: $localize`Cambios sin guardar`,  
-              topIcon: 'warn-fill',
+              topIcon: 'warn_fill',
               defaultButtons: dialogByDefaultButton.ACCEPT,
               buttons: [],
               body: {
@@ -483,7 +483,7 @@ export class CatalogDepartmentEditionComponent {
               }, {
                 action: ButtonActions.DELETE,
                 showIcon: true,
-                icon: 'garbage-can',
+                icon: 'garbage_can',
                 showCaption: true,
                 caption: $localize`Eliminar`,
                 showTooltip: true,            
@@ -527,7 +527,7 @@ export class CatalogDepartmentEditionComponent {
       type: 'button',
       caption: $localize`Regresar...`,
       tooltip:  $localize`Regresar a la lista de departamentos`,
-      icon: 'arrow-left',
+      icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
       showIcon: true,
@@ -714,7 +714,7 @@ export class CatalogDepartmentEditionComponent {
         autoFocus : true,
         data: {
           title: $localize`DATOS INVÁLIDOS`,
-          topIcon: 'warn-fill',
+          topIcon: 'warn_fill',
           defaultButtons: dialogByDefaultButton.ACCEPT,
           buttons: [],
           body: {

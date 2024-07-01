@@ -11,9 +11,9 @@ import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
 import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
-import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators, NgForm, AbstractControl, FormBuilder, FormArray } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { ChecklistTemplateDetail, ChecklistTemplateItem, ChecklistTemplatePossibleValue, emptyChecklistTemplateItem } from '../../models';
+import { ChecklistTemplateDetail, ChecklistTemplateItem, ChecklistTemplateLine, ChecklistTemplatePossibleValue, emptyChecklistTemplateItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
@@ -91,6 +91,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   alarmChannelsSelected: number = 0;
   
   valuesList: ChecklistTemplatePossibleValue[] = []; 
+  checklistTemplateLines: ChecklistTemplateLine[] = []; 
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
   possibleValuesTable = new MatTableDataSource<ChecklistTemplatePossibleValue>([]);
   possibleValuePositions = [
@@ -189,7 +190,8 @@ export class CatalogChecklistTemplatesEditionComponent {
     alarmRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     anticipationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
     generationRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
-    timeToFill: new FormControl(0),    
+    timeToFill: new FormControl(0),
+    lines: this.formBuilder.array([])
   });
 
   pageInfo: PageInfo = {
@@ -225,6 +227,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     private _http: HttpClient,
     public _dialog: MatDialog,
     private _location: Location,
+    private formBuilder: FormBuilder,
   ) {}
 
 // Hooks ====================
@@ -533,7 +536,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             autoFocus : true,
             data: {
               title: $localize`Cambios sin guardar`,  
-              topIcon: 'warn-fill',
+              topIcon: 'warn_fill',
               defaultButtons: dialogByDefaultButton.ACCEPT,
               buttons: [],
               body: {
@@ -775,7 +778,7 @@ export class CatalogChecklistTemplatesEditionComponent {
               }, {
                 action: ButtonActions.DELETE,
                 showIcon: true,
-                icon: 'garbage-can',
+                icon: 'garbage_can',
                 showCaption: true,
                 caption: $localize`Eliminar`,
                 showTooltip: true,            
@@ -819,7 +822,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       type: 'button',
       caption: $localize`Regresar...`,
       tooltip:  $localize`Regresar a la lista de plantillas de checklist`,
-      icon: 'arrow-left',
+      icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
       showIcon: true,
@@ -1231,7 +1234,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         autoFocus : true,
         data: {
           title: $localize`DATOS INVÁLIDOS`,
-          topIcon: 'warn-fill',
+          topIcon: 'warn_fill',
           defaultButtons: dialogByDefaultButton.ACCEPT,
           buttons: [],
           body: {
@@ -1893,7 +1896,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       autoFocus : true,
       data: {
         title: $localize`Máximo de adjuntos alcanzado`,  
-        topIcon: 'warn-fill',
+        topIcon: 'warn_fill',
         defaultButtons: dialogByDefaultButton.ACCEPT,
         buttons: [],
         body: {
@@ -1949,7 +1952,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       autoFocus : true,
       data: {
         title: $localize`Eliminar todos los adjuntos`,  
-        topIcon: 'garbage-can',
+        topIcon: 'garbage_can',
         defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
         buttons: [],
         body: {
@@ -2154,7 +2157,36 @@ export class CatalogChecklistTemplatesEditionComponent {
       this.currentSelections.push( { id: item.id, valueRight: item.valueRight, originalValueRight, catalogDetailId: item.catalogDetailId });
     }
   } */
+
+  addVariable() {
+
+  }  
+
+  addLine() {
+    const lineForm = this.formBuilder.group({
+      name: new FormControl(
+        '', 
+        Validators.required,      
+      ),
+      recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+      required: new FormControl(emptyGeneralHardcodedValuesItem),
+      allowComments: new FormControl(emptyGeneralHardcodedValuesItem),
+      allowNoCapture: new FormControl(emptyGeneralHardcodedValuesItem),
+      allowAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
+      showChart: new FormControl(emptyGeneralHardcodedValuesItem),
+      notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
+      showNotes: new FormControl(false),
+      minimum:  new FormControl(''),
+      maximum:  new FormControl(''),
+      byDefault:  new FormControl(''),    
+      possibleValue: new FormControl(''),
+      possibleValues: new FormControl(''),
+      possibleValuePosition: new FormControl('l'),
+      byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),    
+    });
   
+    this.checklistTemplateVariables.push(lineForm);
+  }
 
   get SystemTables () {
     return SystemTables;
@@ -2174,6 +2206,10 @@ export class CatalogChecklistTemplatesEditionComponent {
 
   get RecordStatus() {
     return RecordStatus; 
+  }
+
+  get checklistTemplateVariables () {
+    return this.checklistTemplateForm.controls["lines"] as FormArray;
   }
   
 // End ======================

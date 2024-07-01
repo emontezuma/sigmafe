@@ -83,7 +83,7 @@
                 [fieldMaxLength]="300"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 fieldHelp="Especifique el nombre asignadoa la variable"
                 [initialFocus]="true"                
@@ -325,7 +325,7 @@
                 [fieldRequired]="true"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 fieldHelp="Especifique el tipo de valor"
               >
                 <span fieldTitle class="label field__label"
@@ -340,7 +340,7 @@
                 leftHint="Campo opcional"
                 fieldInputType="number"
                 currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
                 rightHint="Deje el valor vacío para no aplicar el rango mínimo"
@@ -357,7 +357,7 @@
                 [formField]="variableForm.controls.maximum"
                 leftHint="Campo opcional"
                 fieldInputType="number"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
                 rightHint="Deje el valor vacío para no aplicar el rango máximo"
@@ -436,7 +436,7 @@
                       
                       <th mat-header-cell *matHeaderCellDef>
                         <mat-icon
-                          svgIcon="warn-fill"
+                          svgIcon="warn_fill"
                           matTooltip="Al seleccionar esta valor se alarmará la variable"
                           matTooltipClass="tooltip-general"
                           matTooltipShowDelay="100"
@@ -454,7 +454,7 @@
                             matTooltipShowDelay="100"
                           >
                             <mat-icon                            
-                              svgIcon="warn-fill"
+                              svgIcon="warn_fill"
                               [ngStyle]="{ 'color': row.alarmedValue ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.1)' }"                              
                             >
                             </mat-icon>                        
@@ -595,7 +595,7 @@
                 [formField]="variableForm.controls.byDefault"
                 leftHint="Campo opcional"                
                 [fieldInputType]="byDefaultValueType"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 [showCloseButton]="true"
                 [showRightHint]="true"
                 rightHint="Deje el valor vacío para no aplicar el valor por defecto"
@@ -675,7 +675,7 @@
                     <mat-error class="field__error field__required">
                       <mat-icon
                         class="field__required-icon"
-                        svgIcon="warn-line"
+                        svgIcon="warn_line"
                       ></mat-icon>
                       <span class="field__required-label"
                         ><strong>Error en el formato de la fecha</strong></span
@@ -733,7 +733,7 @@
                     <mat-error class="field__error field__required">
                       <mat-icon
                         class="field__required-icon"
-                        svgIcon="warn-line"
+                        svgIcon="warn_line"
                       ></mat-icon>
                       <span class="field__required-label"
                         ><strong>Error en el formato de la fecha</strong></span
@@ -864,7 +864,7 @@
                 [fieldRequired]="true"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn-line"
+                currentErrorIcon="warn_line"
                 fieldHelp="Modo de reseteo de la variable"
               >
                 <span fieldTitle class="label field__label"
@@ -937,7 +937,10 @@
           >
             <mat-panel-title>
               <mat-icon class="accordion-icon" svgIcon="attachment"> </mat-icon>
-              <label class="accordion-label">ADJUNTOS DE LA VARIABLE ({{ variable.attachments.length }} de un máximo de {{ settingsData?.attachments?.variables ?? 10 }})</label>
+              <div class="flex-accordion">
+                <label class="accordion-label">ADJUNTOS DE LA VARIABLE</label>
+                <label class="accordion-label-no-counter">({{ variable.attachments.length }} de un máximo de {{ settingsData?.attachments?.variables ?? 10 }})</label>                
+              </div>                
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -1092,7 +1095,7 @@
                     mat-button
                     class="toolbar-button"
                     aria-label="icon-button with menu icon"
-                    matTooltip="Agrega un nuevoadjunto a la variablee"
+                    matTooltip="Agrega un nuevo adjunto a la variablee"
                     matTooltipClass="tooltip-general"
                     matTooltipShowDelay="100"
                     (click)="(variable.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttchment() : fileInputAttachment.click();"
@@ -1124,7 +1127,7 @@
                   >
                     <mat-icon                
                       class="svgicon icon-medium"                
-                      svgIcon="garbage-can"
+                      svgIcon="garbage_can"
                     >
                     </mat-icon>                      
                     <mat-label class="button-label">Eliminar todos los adjuntos...</mat-label>

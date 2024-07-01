@@ -13,6 +13,7 @@ export interface SettingsData {
     animate: boolean;
     timeOutFortDialog: number;
     catalog: SettingsCatalog;
+    checklistTemplate?: SettingChecklistTemplate;
     attachments?: SettingAttachments;
 }
 
@@ -28,4 +29,8 @@ export interface SettingsCatalog {
 export interface SettingAttachments {
     variables?: number;    
     checklistTemplateHeader?: number;    
+}
+
+export interface SettingChecklistTemplate {
+    variablesLimit?: number;        
 }

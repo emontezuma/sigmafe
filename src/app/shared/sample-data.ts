@@ -442,9 +442,11 @@ export const sampleSettings: SettingsData = {
   },
   attachments: {
     variables: 10,
-    checklistTemplateHeader: 5
+    checklistTemplateHeader: 5,
+  },
+  checklistTemplate: {
+    variablesLimit: 50,
   }
-
 };
 
 export const sampleProfile: ProfileData = {

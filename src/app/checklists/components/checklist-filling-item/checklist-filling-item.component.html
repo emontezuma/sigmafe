@@ -43,10 +43,10 @@
           item.status === ChecklistQuestionStatus.COMPLETED
             ? 'check'
             : item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING
-            ? 'attachment-file'
+            ? 'attachment_file'
             : item.status === ChecklistQuestionStatus.CANCELLED
             ? 'block'
-            : 'warn-fill'
+            : 'warn_fill'
         "
         [matTooltipDisabled]="item.status === ChecklistQuestionStatus.COMPLETED"
         [matTooltip]="cornerTooltip"       

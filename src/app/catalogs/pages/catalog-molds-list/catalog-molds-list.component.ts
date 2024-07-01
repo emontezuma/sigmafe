@@ -42,7 +42,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   allMoldsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "treasure-chest";
+  catalogIcon: string = "treasure_chest";
 
   loading: boolean;
   onTopStatus: string;

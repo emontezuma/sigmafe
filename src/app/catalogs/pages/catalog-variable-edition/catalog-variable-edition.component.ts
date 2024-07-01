@@ -634,7 +634,7 @@ export class CatalogVariableEditionComponent {
             autoFocus : true,
             data: {
               title: $localize`Cambios sin guardar`,  
-              topIcon: 'warn-fill',
+              topIcon: 'warn_fill',
               defaultButtons: dialogByDefaultButton.ACCEPT,
               buttons: [],
               body: {
@@ -873,7 +873,7 @@ export class CatalogVariableEditionComponent {
               }, {
                 action: ButtonActions.DELETE,
                 showIcon: true,
-                icon: 'garbage-can',
+                icon: 'garbage_can',
                 showCaption: true,
                 caption: $localize`Eliminar`,
                 showTooltip: true,            
@@ -917,7 +917,7 @@ export class CatalogVariableEditionComponent {
       type: 'button',
       caption: $localize`Regresar...`,
       tooltip:  $localize`Regresar a la lista de variables`,
-      icon: 'arrow-left',
+      icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
       showIcon: true,
@@ -1104,7 +1104,7 @@ export class CatalogVariableEditionComponent {
         autoFocus : true,
         data: {
           title: $localize`DATOS INVÁLIDOS`,
-          topIcon: 'warn-fill',
+          topIcon: 'warn_fill',
           defaultButtons: dialogByDefaultButton.ACCEPT,
           buttons: [],
           body: {
@@ -2130,7 +2130,7 @@ export class CatalogVariableEditionComponent {
       autoFocus : true,
       data: {
         title: $localize`Máximo de adjuntos alcanzado`,  
-        topIcon: 'warn-fill',
+        topIcon: 'warn_fill',
         defaultButtons: dialogByDefaultButton.ACCEPT,
         buttons: [],
         body: {
@@ -2186,7 +2186,7 @@ export class CatalogVariableEditionComponent {
       autoFocus : true,
       data: {
         title: $localize`Eliminar todos los adjuntos`,  
-        topIcon: 'garbage-can',
+        topIcon: 'garbage_can',
         defaultButtons: dialogByDefaultButton.ACCEPT_AND_CANCEL,
         buttons: [],
         body: {
