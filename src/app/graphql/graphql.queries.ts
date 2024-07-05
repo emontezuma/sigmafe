@@ -4018,14 +4018,14 @@ export const DELETE_PART_NUMBER_TRANSLATIONS = gql`
 `;
 
 
-//equipments===========================
+//lines===========================
 
 export const GET_LINE = gql`
-  query OneEquipment (
-    $equipmentId: Long!,
+  query OneLine (
+    $lineId: Long!,
   ) {
-  oneEquipment (
-    id: $equipmentId        
+  oneLine (
+    id: $lineId        
   ) {
     data {
       name
@@ -4061,13 +4061,13 @@ export const GET_LINE = gql`
 `;
 
 export const GET_LINES = gql`
-  query EquipmentsPaginated (
+  query LinesPaginated (
     $recordsToSkip: Int,
     $recordsToTake: Int,
-    $orderBy: [TranslatedEquipmentDtoSortInput!],
-    $filterBy: TranslatedEquipmentDtoFilterInput,
+    $orderBy: [TranslatedLineDtoSortInput!],
+    $filterBy: TranslatedLineDtoFilterInput,
   ) {
-  equipmentsPaginated (
+  linesPaginated (
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -4101,13 +4101,13 @@ export const GET_LINES = gql`
 `;
 
 export const GET_LINE_TRANSLATIONS = gql`
-  query EquipmentsTranslationsTable (
+  query LinesTranslationsTable (
     $recordsToSkip: Int,
     $recordsToTake: Int,
-    $orderBy: [EquipmentTranslationTableSortInput!],
-    $filterBy: EquipmentTranslationTableFilterInput,
+    $orderBy: [LineTranslationTableSortInput!],
+    $filterBy: LineTranslationTableFilterInput,
   ) {
-    equipmentsTranslationsTable(
+    linesTranslationsTable(
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -4115,7 +4115,7 @@ export const GET_LINE_TRANSLATIONS = gql`
   ) {
     totalCount
     items {
-        equipmentId
+        lineId
         name
         reference
         notes
@@ -4150,21 +4150,21 @@ export const GET_LINE_TRANSLATIONS = gql`
 
 
 export const ADD_LINE_TRANSLATIONS = gql`
-  mutation CreateOrUpdateEquipmentTranslationTable (
-    $translations: [EquipmentTranslationTableDtoInput!]!    
+  mutation CreateOrUpdateLineTranslationTable (
+    $translations: [LineTranslationTableDtoInput!]!    
   ) {
-    createOrUpdateEquipmentTranslationTable (
+    createOrUpdateLineTranslationTable (
       inputs: $translations
     ) {
       id,
-      equipmentId,
+      lineId,
       languageId      
     }
   }
 `;
 
 export const UPDATE_LINE = gql`
-  mutation CreateOrUpdateEquipment (
+  mutation CreateOrUpdateLine (
     $customerId: Long,
     $plantId: Long,  
     $id: Long,
@@ -4177,7 +4177,7 @@ export const UPDATE_LINE = gql`
     $mainImageName: String,
     $mainImagePath: String,    
   ) {
-  createOrUpdateEquipment (
+  createOrUpdateLine (
     inputs: [{
       customerId: $customerId
       plantId: $plantId     
@@ -4209,12 +4209,12 @@ export const UPDATE_LINE = gql`
 `;
 
 export const DELETE_LINE_TRANSLATIONS = gql`
-  mutation DeleteEquipmentsTranslationsTable (
+  mutation DeleteLinesTranslationsTable (
     $ids: [IdToDeleteInput!]!,
     $customerId: Long!
   $plantId: Long!
   ) {
-    deleteEquipmentsTranslationsTable (      
+    deleteLinesTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
     plantId: $plantId,
@@ -4223,13 +4223,13 @@ export const DELETE_LINE_TRANSLATIONS = gql`
 `;
 
 export const INACTIVATE_LINE = gql`
-  mutation CreateOrUpdateEquipment (
+  mutation CreateOrUpdateLine (
     $id: Long,
     $customerId: Long,
     $plantId: Long,
     $status: String
   ) {
-  createOrUpdateEquipment (
+  createOrUpdateLine (
     inputs: {
       id: $id
       customerId: $customerId
@@ -4242,198 +4242,6 @@ export const INACTIVATE_LINE = gql`
   }
 `;
 
-
-//tables===========================
-
-export const GET_TABLE = gql`
-  query OneTable (
-    $tableId: Long!,
-  ) {
-  oneTable (
-    id: $tableId        
-  ) {
-    data {
-      name
-      reference
-      notes
-      prefix
-     
-      id
-      customerId
-     
-      status
-      createdById
-      createdAt
-      updatedById
-      updatedAt
-      deletedById
-      deletedAt
-      createdBy {
-        name
-      }
-      updatedBy {
-        name
-      }
-      deletedBy {
-        name
-      }      
-    }
-    friendlyStatus
-  }
-}
-`;
-
-export const GET_TABLES = gql`
-  query TablesPaginated (
-    $recordsToSkip: Int,
-    $recordsToTake: Int,
-    $orderBy: [TranslatedTableDtoSortInput!],
-    $filterBy: TranslatedTableDtoFilterInput,
-  ) {
-  tablesPaginated (
-    skip: $recordsToSkip,
-    take: $recordsToTake,
-    order: $orderBy,
-    where: $filterBy
-  ) {
-      items {
-        friendlyStatus
-        data {
-          name
-       
-          id
-          customerId
-          reference
-          status
-          updatedAt
-          updatedBy {
-            name
-          }          
-        }
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-      }    
-      totalCount    
-    }
-  }
-`;
-
-export const GET_TABLE_TRANSLATIONS = gql`
-  query TablesTranslationsTable (
-    $recordsToSkip: Int,
-    $recordsToTake: Int,
-    $orderBy: [TableTranslationTableSortInput!],
-    $filterBy: TableTranslationTableFilterInput,
-  ) {
-    tablesTranslationsTable(
-    skip: $recordsToSkip,
-    take: $recordsToTake,
-    order: $orderBy,
-    where: $filterBy
-  ) {
-    totalCount
-    items {
-        tableId
-        name
-        reference
-        notes
-        languageId
-        id
-        customerId
-        status
-        createdById
-        createdAt
-        updatedById
-        updatedAt
-        deletedById
-        deletedAt
-        language {
-            name
-            reference
-            id
-            iso
-        }
-        updatedBy {
-          name
-        }
-    }
-    pageInfo {
-        hasNextPage
-        hasPreviousPage
-    }      
-  }
-}
-`;
-
-
-export const ADD_TABLE_TRANSLATIONS = gql`
-  mutation CreateOrUpdateTableTranslationTable (
-    $translations: [TableTranslationTableDtoInput!]!    
-  ) {
-    createOrUpdateTableTranslationTable (
-      inputs: $translations
-    ) {
-      id,
-      tableId,
-      languageId      
-    }
-  }
-`;
-
-export const UPDATE_TABLE = gql`
-  mutation CreateOrUpdateTable (
-    $customerId: Long,
-  
-    $id: Long,
-    $status: String    
-    $name: String,
-    $reference: String,
-    $notes: String,
-   
-  ) {
-  createOrUpdateTable (
-    inputs: [{
-      customerId: $customerId
-     
-      id: $id      
-      status: $status
-      name: $name,
-      reference: $reference,
-      notes: $notes,
-   
-    }]) {
-      id
-      createdAt
-      updatedAt
-      deletedAt
-      createdBy {
-        name
-      }
-      updatedBy {
-        name
-      }
-      deletedBy {
-        name
-      }  
-    } 
-  }
-`;
-
-export const DELETE_TABLE_TRANSLATIONS = gql`
-  mutation DeleteTablesTranslationsTable (
-    $ids: [IdToDeleteInput!]!,
-    $customerId: Long!
-  
-  ) {
-    deleteTablesTranslationsTable (      
-      ids: $ids,
-      customerId: $customerId,
-    
-    ) 
-  }
-`;
 
 
 //workgroups===========================
@@ -4659,6 +4467,223 @@ export const GET_PLANTS_LAZY_LOADING = gql`
     }
   }
 `;
+
+//lines===========================
+
+export const GET_SHIFT = gql`
+  query OneShift (
+    $shiftId: Long!,
+  ) {
+  oneShift (
+    id: $shiftId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+     
+      id
+      customerId
+     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_SHIFTS = gql`
+  query ShiftsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedShiftDtoSortInput!],
+    $filterBy: TranslatedShiftDtoFilterInput,
+  ) {
+  shiftsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+         
+          id
+          customerId
+        
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_SHIFT_TRANSLATIONS = gql`
+  query ShiftsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ShiftTranslationTableSortInput!],
+    $filterBy: ShiftTranslationTableFilterInput,
+  ) {
+    shiftsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        shiftId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+    
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+
+export const ADD_SHIFT_TRANSLATIONS = gql`
+  mutation CreateOrUpdateShiftTranslationTable (
+    $translations: [ShiftTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateShiftTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      shiftId,
+      languageId      
+    }
+  }
+`;
+
+export const UPDATE_SHIFT = gql`
+  mutation CreateOrUpdateShift (
+    $customerId: Long,
+   
+    $id: Long,
+    $status: String    
+    $name: String,
+    $prefix: String,
+    $reference: String,
+    $notes: String,
+  
+  ) {
+  createOrUpdateShift (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      prefix: $prefix,
+      reference: $reference,
+      notes: $notes,
+    
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_SHIFT_TRANSLATIONS = gql`
+  mutation DeleteShiftsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+ 
+  ) {
+    deleteShiftsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+  
+    ) 
+  }
+`;
+
+export const INACTIVATE_SHIFT = gql`
+  mutation CreateOrUpdateShift (
+    $id: Long,
+    $customerId: Long,
+   
+    $status: String
+  ) {
+  createOrUpdateShift (
+    inputs: {
+      id: $id
+      customerId: $customerId
+    
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 
 
 //=========END

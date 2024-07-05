@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ImageNotFoundModule, OptionsScrollModule, FocusInvalidInputModule } from '../shared/directives';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogTablesListComponent, CatalogTableEditionComponent, CatalogWorkgroupsListComponent, CatalogWorkgroupEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogsHomeComponent, CatalogMoldEditionComponent, CatalogVariableEditionComponent, CatalogVariablesListComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogWorkgroupsListComponent, CatalogWorkgroupEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent } from './pages';
 import { CatalogsRoutingModule } from './catalogs-routing.module'
 import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, AutoCompleteFieldModule, InputFieldModule, AreaFieldModule, SelectFieldModule, MultipleSelectionListModule } from '../shared/components';
 
@@ -49,11 +49,12 @@ const company = [CatalogCompaniesListComponent, CatalogCompanyEditionComponent]
     CatalogLinesListComponent,
     CatalogLineEditionComponent,
 
-    CatalogTablesListComponent,
-    CatalogTableEditionComponent,
 
     CatalogWorkgroupsListComponent,
     CatalogWorkgroupEditionComponent,
+
+    CatalogShiftsListComponent,
+    CatalogShiftEditionComponent,
   ],
   imports: [
     CommonModule,

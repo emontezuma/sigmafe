@@ -13,42 +13,42 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
-
-import { TableItem, Tables, TablesData, emptyTableCatalog } from '../../models';
+import { environment } from 'src/environments/environment';
+import { PlantItem, Shifts, ShiftsData, emptyPlantCatalog } from '../../models';
 
 @Component({
-  selector: 'app-catalog-tables',
-  templateUrl: './catalog-tables-list.component.html',
+  selector: 'app-catalog-shifts',
+  templateUrl: './catalog-shifts-list.component.html',
   animations: [ routingAnimation, dissolve, ],
-  styleUrls: ['./catalog-tables-list.component.scss']
+  styleUrls: ['./catalog-shifts-list.component.scss']
 })
-export class CatalogTablesListComponent implements AfterViewInit {
+export class CatalogShiftsListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-// Tables ===============
-  tablesTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
-  tablesCatalogData = new MatTableDataSource<TableItem>([]);      
+// Shifts ===============
+  shiftsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  shiftsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
-  tablesData$: Observable<TablesData>;
+  shiftsData$: Observable<ShiftsData>;
   sort$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>;
   settingsData$: Observable<SettingsData>;
   profileData$: Observable<ProfileData>;
   searchBox$: Observable<SearchBox>;
   screenData$: Observable<Screen>;
-  allTablesToCsv$: Observable<any>;
+  allShiftsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "server";  
 
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
   profileData: ProfileData;
   filterByText: string;
-  allTablesToCsv: any;
-  tablesData: Tables = {
+  allShiftsToCsv: any;
+  shiftsData: Shifts = {
     items: new Array(5).fill(null),
   }
   pageInfo: PageInfo = {
@@ -75,11 +75,11 @@ export class CatalogTablesListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.TABLES_CATALOG,
+      ApplicationModules.SHIFTS_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.TABLES_CATALOG,
+      ApplicationModules.SHIFTS_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +112,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.TABLES_CATALOG) {
+        if (searchBox.from === ApplicationModules.SHIFTS_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +128,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.TABLES_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.SHIFTS_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +139,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.TABLES_CATALOG,
+      from: ApplicationModules.SHIFTS_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +148,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.TABLES_CATALOG,
+      ApplicationModules.SHIFTS_CATALOG,
       false,
     );        
   }
@@ -157,8 +157,8 @@ export class CatalogTablesListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.tablesCatalogData.paginator = this.paginator;
-    this.tablesCatalogData.sort = this.sort;
+    this.shiftsCatalogData.paginator = this.paginator;
+    this.shiftsCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
@@ -166,7 +166,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
-          }  else {
+          } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
         }
@@ -186,25 +186,25 @@ export class CatalogTablesListComponent implements AfterViewInit {
 
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
-    this.tablesData = {
-      items: new Array(5).fill(emptyTableCatalog),
+    this.shiftsData = {
+      items: new Array(5).fill(emptyPlantCatalog),
     }
     let filter = null;
     if (this.filterByText) {      
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-    this.tablesCatalogData = new MatTableDataSource<TableItem>(this.tablesData.items);
-    this.tablesData$ = this._catalogsService.getTablesDataGql$(skipRecords, takeRecords, this.order, filter)
+    this.shiftsCatalogData = new MatTableDataSource<PlantItem>(this.shiftsData.items);
+    this.shiftsData$ = this._catalogsService.getShiftsDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
-      map((tables: any) => {
-        const { data } = tables;
+      map((shifts: any) => {
+        const { data } = shifts;
         return { 
           ...data,
-          tablesPaginated: {
-            ...data.tablesPaginated,
-            items: data.tablesPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+          shiftsPaginated: {
+            ...data.shiftsPaginated,
+            items: data.shiftsPaginated.items.map((item) => {
+              
               return {
                 ...item,
                 data: {
@@ -216,21 +216,21 @@ export class CatalogTablesListComponent implements AfterViewInit {
           }
         }
       }),
-      tap( tablesData => {        
-        this.setPaginator(tablesData.tablesPaginated.totalCount);
-        this.tablesData = JSON.parse(JSON.stringify(tablesData.tablesPaginated));
+      tap( shiftsData => {        
+        this.setPaginator(shiftsData.shiftsPaginated.totalCount);
+        this.shiftsData = JSON.parse(JSON.stringify(shiftsData.shiftsPaginated));
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-            this.tablesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.tablesData.items);
+            this.shiftsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.shiftsData.items);
           }      
         }        
-        this.tablesData.items.length = this.tablesData.totalCount;
-        this.tablesCatalogData = new MatTableDataSource<TableItem>(this.tablesData.items);
-        this.tablesCatalogData.paginator = this.paginator;
-        // this.tablesCatalogData.sort = this.sort;
-        this.tablesCatalogData.sortData = () => this.tablesData.items;        
+        this.shiftsData.items.length = this.shiftsData.totalCount;
+        this.shiftsCatalogData = new MatTableDataSource<PlantItem>(this.shiftsData.items);
+        this.shiftsCatalogData.paginator = this.paginator;
+        // this.shiftsCatalogData.sort = this.sort;
+        this.shiftsCatalogData.sortData = () => this.shiftsData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
           setTimeout(() => {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
@@ -245,7 +245,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.TABLES_CATALOG,
+          from: ApplicationModules.SHIFTS_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -266,7 +266,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.TABLES_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.SHIFTS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -278,18 +278,17 @@ export class CatalogTablesListComponent implements AfterViewInit {
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements.find(e => e.action === action.action).loading = true;                
-        this._router.navigateByUrl("/catalogs/tables/create");
+        this._router.navigateByUrl("/catalogs/shifts/create");
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allTablesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
-          tap(tablesToCsv => {
-            
-            const fileData$ = this._catalogsService.getAllCsvData$(tablesToCsv?.data?.exportTablesToCsv?.exportedFilename)
+        this.allShiftsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+          tap(shiftsToCsv => {
+            const fileData$ = this._catalogsService.getAllCsvData$(shiftsToCsv?.data?.exportShiftsToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, tablesToCsv?.data?.exportTablesToCsv?.downloadFilename);
+              this.downloadFile(data, shiftsToCsv?.data?.exportShiftsToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -390,7 +389,7 @@ export class CatalogTablesListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.tablesTableColumns = ['id',  'name', 'reference', 'status', 'updatedAt'];
+    this.shiftsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -415,11 +414,11 @@ export class CatalogTablesListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.TABLES_CATALOG,
+      ApplicationModules.SHIFTS_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.TABLES_CATALOG,
+      ApplicationModules.SHIFTS_CATALOG,
       loading,
     );         
   }

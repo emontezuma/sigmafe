@@ -40,10 +40,11 @@ export * from './catalog-part-number-edition';
 export * from './catalog-lines-list';
 export * from './catalog-line-edition';
 
-export * from './catalog-tables-list';
-export * from './catalog-table-edition';
-
 export * from './catalog-workgroups-list';
 export * from './catalog-workgroup-edition';
+
+
+export * from './catalog-shifts-list';
+export * from './catalog-shift-edition';
 
 export * from './catalogs-home';

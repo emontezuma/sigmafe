@@ -1,27 +1,27 @@
 import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
-export interface TablesData {
-  tablesPaginated?: Tables;
+export interface ShiftsData {
+  shiftsPaginated?: Shifts;
 }
 
-export interface TableData {
-  oneTable?: TableItem;
+export interface ShiftData {
+  oneShift?: ShiftItem;
   translations?: any;
 }
 
-export interface Tables {
-  items?: TableItem[];
+export interface Shifts {
+  items?: ShiftItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface TableItem {
+export interface ShiftItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: TableDetail;
+  data: ShiftDetail;
 }
 
-export interface TableDetail {
+export interface ShiftDetail {
   name?: string;
   reference?: string;
   notes?: string;
@@ -29,6 +29,7 @@ export interface TableDetail {
 
   id?: number;
   customerId?: number;
+
   status?: string;
   createdById?: any;
   createdAt?: string;
@@ -39,50 +40,48 @@ export interface TableDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
-
   translations?: GeneralTranslation[];  
   
 }
 
-export interface TablesState {
+export interface ShiftsState {
   loading: boolean;
-  tablesData: TablesData;
+  shiftsData: ShiftsData;
 }
 
-export interface TableState {
-  
+export interface ShiftState {
   loading: boolean;
-  moldDetail: TableDetail;
+  moldDetail: ShiftDetail;
 }
 
-export interface TableCatalog {
+export interface ShiftCatalog {
   id: string;
   name: string;
-
-
+  mainImagePath: string;
   status: string;
   updatedAt: string;
 }
 
-
-
-export const emptyTableCatalog = {  
+export const emptyShiftCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
     customerId: null,
+
     name: null,
-   
+  
     updatedBy: null,
     status: null,
     updatedAt: null,
   },
 };
 
-export const emptyTableItem: TableDetail = {  
+export const emptyShiftItem: ShiftDetail = {  
   name: null,
   id: null,
   customerId: null,
+
+ 
   prefix: null,
   status: null,
   createdById: null,
