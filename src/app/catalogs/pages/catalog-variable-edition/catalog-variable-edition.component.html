@@ -282,6 +282,7 @@
               </button>
             </div>
           </mat-expansion-panel-header>
+
           <div class="grid-multiple margin-top">
             <div class="field-items">
               <fieldset
@@ -790,6 +791,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.showChart"
@@ -801,6 +803,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.allowAlarm"
@@ -812,6 +815,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.notifyAlarm"                
@@ -920,7 +924,10 @@
               </app-multiple-selection-list>                
             </div>
           </div>
+
         </mat-expansion-panel> 
+
+        
         <mat-expansion-panel
           (opened)="panelOpenState[2] = true"
           (closed)="panelOpenState[2] = false"

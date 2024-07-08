@@ -14,7 +14,7 @@ import { routingAnimation, dissolve } from '../../../shared/animations/shared.an
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 import { environment } from 'src/environments/environment';
-import { PlantItem, Shifts, ShiftsData, emptyPlantCatalog } from '../../models';
+import { emptyShiftCatalog, PlantItem, Shifts, ShiftsData } from '../../models';
 
 @Component({
   selector: 'app-catalog-shifts',
@@ -28,7 +28,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
 
 // Shifts ===============
   shiftsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
-  shiftsCatalogData = new MatTableDataSource<PlantItem>([]);      
+  shiftsCatalogData = new MatTableDataSource<Object>([]);     // PlantItem
   
   shiftsData$: Observable<ShiftsData>;
   sort$: Observable<any>;
@@ -187,14 +187,14 @@ export class CatalogShiftsListComponent implements AfterViewInit {
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
     this.shiftsData = {
-      items: new Array(5).fill(emptyPlantCatalog),
+      items: new Array(5).fill(emptyShiftCatalog),
     }
     let filter = null;
     if (this.filterByText) {      
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-    this.shiftsCatalogData = new MatTableDataSource<PlantItem>(this.shiftsData.items);
+    this.shiftsCatalogData = new MatTableDataSource<Object>(this.shiftsData.items);    // PlantItem
     this.shiftsData$ = this._catalogsService.getShiftsDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
       map((shifts: any) => {
@@ -208,8 +208,12 @@ export class CatalogShiftsListComponent implements AfterViewInit {
               return {
                 ...item,
                 data: {
-                  ...item.data,                  
-                  
+                  ...item.data,
+                  calendar: {
+                    ...item.data.calendar,
+                    name: item.data.calendar?.translations?.length > 0 ? item.data.calendar.translations[0].name : item.data.calendar?.name,
+                    isTranslated: item.data.calendar?.translations?.length > 0 ? true : false,
+                  },
                 }
               }
             })          
@@ -227,8 +231,8 @@ export class CatalogShiftsListComponent implements AfterViewInit {
           }      
         }        
         this.shiftsData.items.length = this.shiftsData.totalCount;
-        this.shiftsCatalogData = new MatTableDataSource<PlantItem>(this.shiftsData.items);
-        this.shiftsCatalogData.paginator = this.paginator;
+        this.shiftsCatalogData = new MatTableDataSource<Object>(this.shiftsData.items);  // PlantItem
+        this.shiftsCatalogData.paginator = this.paginator; 
         // this.shiftsCatalogData.sort = this.sort;
         this.shiftsCatalogData.sortData = () => this.shiftsData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
@@ -288,7 +292,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
           tap(shiftsToCsv => {
             const fileData$ = this._catalogsService.getAllCsvData$(shiftsToCsv?.data?.exportShiftsToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, shiftsToCsv?.data?.exportShiftsToCsv?.downloadFilename);
+              this.downloadFile(data, shiftsToCsv?.data?.exportShifthhsToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -389,7 +393,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.shiftsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt'];
+    this.shiftsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt','calendar'];
   }
   
   setTabIndex(tab: any) { 

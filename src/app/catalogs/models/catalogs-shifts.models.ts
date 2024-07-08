@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface ShiftsData {
   shiftsPaginated?: Shifts;
@@ -21,6 +21,8 @@ export interface ShiftItem {
   data: ShiftDetail;
 }
 
+
+
 export interface ShiftDetail {
   name?: string;
   reference?: string;
@@ -29,6 +31,17 @@ export interface ShiftDetail {
 
   id?: number;
   customerId?: number;
+
+  calendarId?: number;
+  calendar?: GeneralCatalogInternalData;
+  
+  twoDays?: string;
+  moveToDate?: number;
+  fromTime?: Date;
+  toTime?: Date;
+  sequence?: number;
+  isFirstSequence?: string;
+  isLastSequence?: string;
 
   status?: string;
   createdById?: any;
@@ -69,6 +82,8 @@ export const emptyShiftCatalog = {
     customerId: null,
 
     name: null,
+
+    calendarId:null,
   
     updatedBy: null,
     status: null,
@@ -80,6 +95,19 @@ export const emptyShiftItem: ShiftDetail = {
   name: null,
   id: null,
   customerId: null,
+
+  calendarId: null,
+  
+  notes:null,
+
+  twoDays:null,
+  moveToDate:null,
+  fromTime:null,
+  toTime:null,
+
+  sequence:null,
+  isFirstSequence:null,
+  isLastSequence:null,
 
  
   prefix: null,

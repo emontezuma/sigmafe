@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-shift-edition',
@@ -76,10 +78,11 @@ export class CatalogShiftEditionComponent {
       '', 
       Validators.required,      
     ),   
-    notes: new FormControl(''),
-   
+    notes: new FormControl(''),   
     reference: new FormControl(''),    
-    prefix: new FormControl(''),       
+    prefix: new FormControl(''),  
+    
+    calendar: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
   });
 
   pageInfo: PageInfo = {
@@ -871,7 +874,8 @@ export class CatalogShiftEditionComponent {
       reference: this.shift.reference,      
 
       prefix: this.shift.prefix,      
-      notes: this.shift.notes,      
+      notes: this.shift.notes,
+      calendar:this.shift.calendar,
 
     });
   } 
@@ -881,13 +885,13 @@ export class CatalogShiftEditionComponent {
     return  {
         id: this.shift.id,
       customerId: 1, // TODO: Get from profile
-      plantId: 1, // TODO: Get from profile
+      calendarId: 1, // TODO: Get from profile
         status: newRecord ? RecordStatus.ACTIVE : this.shift.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
-
+      ...(fc.calendar.dirty || fc.calendar.touched || newRecord) && { calendarId: fc.calendar.value ? fc.calendar.value.id : null },      
       
     }
   }
@@ -987,7 +991,7 @@ export class CatalogShiftEditionComponent {
       const varToDelete = {
         ids: translationsToDelete,
         customerId: 1, // TODO: Get from profile
-        plantId: 1, // TODO: Get from profile
+        calendarId: 1, // TODO: Get from profile
       }      
       const translationsToAdd = this.shift.translations.map((t: any) => {
         return {
@@ -998,7 +1002,7 @@ export class CatalogShiftEditionComponent {
           notes: t.notes,
           languageId: t.languageId,
           customerId: 1, // TODO: Get from profile
-          plantId: 1, // TODO: Get from profile
+          calendarId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });

@@ -69,6 +69,16 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="calendar">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Calendario</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.data.calendar.name }}</strong>
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
       <tr mat-header-row *matHeaderRowDef="shiftsTableColumns; sticky: 1"></tr>
       <tr
         class="table-row"
