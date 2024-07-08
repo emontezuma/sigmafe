@@ -248,6 +248,9 @@
             </div>            
           </div>          
         </mat-expansion-panel>
+
+<!--2-->
+
         <mat-expansion-panel
           (opened)="panelOpenState[1] = true"
           (closed)="panelOpenState[1] = false"
@@ -282,6 +285,9 @@
               </button>
             </div>
           </mat-expansion-panel-header>
+
+<!--2-->
+
           <div class="grid-multiple margin-top">
             <div class="field-items">
               <fieldset
@@ -368,195 +374,199 @@
                 >
               </app-input-field>
             </div>
+
             <div              
-              class="field-items"              
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
+            class="field-items"              
+            *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
+          >
+            <fieldset
+              class="field__container"
+              style="min-width: 500px; height: calc(100% - 22px);"
+              [ngClass]="{ 'field__container--error': !variableForm.controls.possibleValues.valid }"
             >
-              <fieldset
-                class="field__container"
-                style="min-width: 500px; height: calc(100% - 22px);"
-                [ngClass]="{ 'field__container--error': !variableForm.controls.possibleValues.valid }"
+              <div class="title-with-id">
+                <span class="label field__label">Lista de posibles valores</span>                  
+                <span class="field__label">Total valores: {{ valuesList?.length }}</span>
+              </div>
+              <div            
+                class="values-table values-table__container"    
               >
-                <div class="title-with-id">
-                  <span class="label field__label">Lista de posibles valores</span>                  
-                  <span class="field__label">Total valores: {{ valuesList?.length }}</span>
-                </div>
-                <div            
-                  class="values-table values-table__container"    
-                >
-                  <table mat-table [dataSource]="possibleValuesTable">
+                <table mat-table [dataSource]="possibleValuesTable">
 
-                    <ng-container matColumnDef="item">
-                      <th mat-header-cell *matHeaderCellDef>#</th>                  
-                      <td mat-cell *matCellDef="let row; let i = index">
-                        <ng-container>{{ row.order }}</ng-container>                        
-                      </td>
-                    </ng-container>
+                  <ng-container matColumnDef="item">
+                    <th mat-header-cell *matHeaderCellDef>#</th>                  
+                    <td mat-cell *matCellDef="let row; let i = index">
+                      <ng-container>{{ row.order }}</ng-container>                        
+                    </td>
+                  </ng-container>
 
-                    <ng-container matColumnDef="value">
-                      <th mat-header-cell *matHeaderCellDef>Valor</th>
-                      <td mat-cell *matCellDef="let row">
-                        <ng-container>{{ row.value }}</ng-container>
-                      </td>
-                    </ng-container>
+                  <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef>Valor</th>
+                    <td mat-cell *matCellDef="let row">
+                      <ng-container>{{ row.value }}</ng-container>
+                    </td>
+                  </ng-container>
 
-                    <ng-container matColumnDef="byDefault">
-                      <th mat-header-cell *matHeaderCellDef>
-                        <mat-icon
-                          svgIcon="check"
-                          matTooltip="Al seleccionar esta valor se alarmará la variable"
+                  <ng-container matColumnDef="byDefault">
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-icon
+                        svgIcon="check"
+                        matTooltip="Al seleccionar esta valor se alarmará la variable"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                      </mat-icon>                        
+                    </th>
+                    <td class="main-info" mat-cell *matCellDef="let row">
+                      <ng-container>      
+                        <button 
+                          mat-icon-button
+                          (click)="handleByDefault(row.order)"
+                          [matTooltip]="row.byDefault ? 'Valor por defecto de la variable' : ''"
                           matTooltipClass="tooltip-general"
                           matTooltipShowDelay="100"
                         >
-                        </mat-icon>                        
-                      </th>
-                      <td class="main-info" mat-cell *matCellDef="let row">
-                        <ng-container>      
-                          <button 
-                            mat-icon-button
-                            (click)="handleByDefault(row.order)"
-                            [matTooltip]="row.byDefault ? 'Valor por defecto de la variable' : ''"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
+                          <mat-icon                            
+                            svgIcon="check"
+                            [ngStyle]="{ 'color': row.byDefault ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.05)' }"                              
                           >
-                            <mat-icon                            
-                              svgIcon="check"
-                              [ngStyle]="{ 'color': row.byDefault ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.05)' }"                              
-                            >
-                            </mat-icon>                        
-                          </button>                     
-                        </ng-container>
-                      </td>
-                      <td mat-cell *matCellDef="let row">
-                        <ng-container>{{ row.byDefault }}</ng-container>
-                      </td>
-                    </ng-container>
+                          </mat-icon>                        
+                        </button>                     
+                      </ng-container>
+                    </td>
+                    <td mat-cell *matCellDef="let row">
+                      <ng-container>{{ row.byDefault }}</ng-container>
+                    </td>
+                  </ng-container>
 
-                    <ng-container matColumnDef="alarmedValue">
-                      
-                      <th mat-header-cell *matHeaderCellDef>
-                        <mat-icon
-                          svgIcon="warn_fill"
-                          matTooltip="Al seleccionar esta valor se alarmará la variable"
+                  <ng-container matColumnDef="alarmedValue">
+                    
+                    <th mat-header-cell *matHeaderCellDef>
+                      <mat-icon
+                        svgIcon="warn_fill"
+                        matTooltip="Al seleccionar esta valor se alarmará la variable"
+                        matTooltipClass="tooltip-general"
+                        matTooltipShowDelay="100"
+                      >
+                      </mat-icon>                        
+                    </th>
+                    
+                    <td class="main-info" mat-cell *matCellDef="let row">
+                      <ng-container>                           
+                        <button
+                          mat-icon-button
+                          (click)="handleAlarmed(row.order)"
+                          [matTooltip]="row.alarmedValue ? 'Se alarmará la variable' : 'No se alarma'"
                           matTooltipClass="tooltip-general"
                           matTooltipShowDelay="100"
                         >
-                        </mat-icon>                        
-                      </th>
-                      
-                      <td class="main-info" mat-cell *matCellDef="let row">
-                        <ng-container>                           
-                          <button
-                            mat-icon-button
-                            (click)="handleAlarmed(row.order)"
-                            [matTooltip]="row.alarmedValue ? 'Se alarmará la variable' : 'No se alarma'"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
+                          <mat-icon                            
+                            svgIcon="warn_fill"
+                            [ngStyle]="{ 'color': row.alarmedValue ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.1)' }"                              
                           >
-                            <mat-icon                            
-                              svgIcon="warn_fill"
-                              [ngStyle]="{ 'color': row.alarmedValue ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.1)' }"                              
-                            >
-                            </mat-icon>                        
-                          </button>                           
-                        </ng-container>
-                      </td>
-                    </ng-container>
+                          </mat-icon>                        
+                        </button>                           
+                      </ng-container>
+                    </td>
+                  </ng-container>
 
-                    <ng-container matColumnDef="actions">
-                      <th mat-header-cell *matHeaderCellDef>Acciones</th>
-                      <td class="general-info" mat-cell *matCellDef="let row">
-                        <div
-                          class="box-row"                          
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                    <td class="general-info" mat-cell *matCellDef="let row">
+                      <div
+                        class="box-row"                          
+                      >
+                        <button
+                          mat-icon-button
+                          (click)="handleMoveToUp(row.order)"
+                          matTooltip="Sube el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="row.order === 1"
                         >
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToUp(row.order)"
-                            matTooltip="Sube el item a un orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === 1"
-                          >
-                            <mat-icon>keyboard_arrow_up</mat-icon>
-                          </button>
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToDown(row.order)"
-                            matTooltip="Baja el item a un orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === valuesList.length"
-                          >
-                            <mat-icon>keyboard_arrow_down</mat-icon>
-                          </button>
-                          <button
-                            mat-icon-button
-                            (click)="handleMoveToFirst(row.order)"
-                            matTooltip="Sube el item al primer orden"
-                            matTooltipClass="tooltip-general"
-                            matTooltipShowDelay="100"
-                            [disabled]="row.order === 1"
-                          >
-                            <mat-icon>keyboard_capslock</mat-icon>
-                          </button>
-                          <button mat-icon-button (click)="handleEdit(row.order)">
-                            <mat-icon>edit</mat-icon>
-                          </button>
-                          <button mat-icon-button (click)="handleRemove(row.order)">
-                            <mat-icon>delete</mat-icon>
-                          </button>
-                        </div>                        
+                          <mat-icon>keyboard_arrow_up</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleMoveToDown(row.order)"
+                          matTooltip="Baja el item a un orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="row.order === valuesList.length"
+                        >
+                          <mat-icon>keyboard_arrow_down</mat-icon>
+                        </button>
+                        <button
+                          mat-icon-button
+                          (click)="handleMoveToFirst(row.order)"
+                          matTooltip="Sube el item al primer orden"
+                          matTooltipClass="tooltip-general"
+                          matTooltipShowDelay="100"
+                          [disabled]="row.order === 1"
+                        >
+                          <mat-icon>keyboard_capslock</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="handleEdit(row.order)">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="handleRemove(row.order)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>                        
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="possibleValuesTableColumns; sticky: 1"></tr>
+                  <tr class="table-row" mat-row *matRowDef="let row; columns: possibleValuesTableColumns"></tr>
+
+                  <div *ngIf="!loading">
+                    <tr class="values-table-mat-row" *matNoDataRow>
+                      <td class="values-table__no-data" colspan="9">
+                        No hay valores a mostrar...
                       </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="possibleValuesTableColumns; sticky: 1"></tr>
-                    <tr class="table-row" mat-row *matRowDef="let row; columns: possibleValuesTableColumns"></tr>
-
-                    <div *ngIf="!loading">
-                      <tr class="values-table-mat-row" *matNoDataRow>
-                        <td class="values-table__no-data" colspan="9">
-                          No hay valores a mostrar...
-                        </td>
-                      </tr>
-                    </div>
-                  </table>
-                </div>
-                <div class="possible-value-fields" style="margin-top: 10px">
-                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="possibleValue"
-                      #possibleValue
-                      name="possibleValue"                      
-                      (keydown)="handleKeyDown($event)"          
-                    />
-                    <mat-hint>Valor a agregar</mat-hint>                  
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field">
-                    <mat-select
-                      #selection
-                      formControlName="possibleValuePosition"
-                      [disabled]="variableForm.controls.possibleValuePosition.disabled"
-                      name="possibleValuePosition"                    
-                    >
-                      <mat-option *ngFor="let item of possibleValuePositions; let i = index" [value]="item.id">
-                        <div class="option-container">
-                          {{ item.description }}
-                        </div>
-                      </mat-option>
-                    </mat-select>
-                    <mat-hint>Orden que ocupará el valor</mat-hint>                  
+                    </tr>
+                  </div>
+                </table>
+              </div>
+              <div class="possible-value-fields" style="margin-top: 10px">
+                <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+                  <input
+                    class="field__input"
+                    matInput
+                    formControlName="possibleValue"
+                    #possibleValue
+                    name="possibleValue"                      
+                    (keydown)="handleKeyDown($event)"          
+                  />
+                  <mat-hint>Valor a agregar</mat-hint>                  
                 </mat-form-field>
-                <button class="circular-button" mat-mini-fab (click)="handleEditPossibleValue()" color="primary" [disabled]="!variableForm.controls.possibleValue.value">
-                  <mat-icon svgIcon="check"></mat-icon>
-                </button>
-                <button class="button circular-button" mat-mini-fab (click)="handleCancelPossibleValue()" [disabled]="!variableForm.controls.possibleValue.value">
-                  <mat-icon svgIcon="cancel"></mat-icon>
-                </button>
-                </div>
-              </fieldset>
-            </div>
+                <mat-form-field appearance="fill" class="field__field">
+                  <mat-select
+                    #selection
+                    formControlName="possibleValuePosition"
+                    [disabled]="variableForm.controls.possibleValuePosition.disabled"
+                    name="possibleValuePosition"                    
+                  >
+                    <mat-option *ngFor="let item of possibleValuePositions; let i = index" [value]="item.id">
+                      <div class="option-container">
+                        {{ item.description }}
+                      </div>
+                    </mat-option>
+                  </mat-select>
+                  <mat-hint>Orden que ocupará el valor</mat-hint>                  
+              </mat-form-field>
+              <button class="circular-button" mat-mini-fab (click)="handleEditPossibleValue()" color="primary" [disabled]="!variableForm.controls.possibleValue.value">
+                <mat-icon svgIcon="check"></mat-icon>
+              </button>
+              <button class="button circular-button" mat-mini-fab (click)="handleCancelPossibleValue()" [disabled]="!variableForm.controls.possibleValue.value">
+                <mat-icon svgIcon="cancel"></mat-icon>
+              </button>
+              </div>
+            </fieldset>
+          </div>
+           
+
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.required"
@@ -792,6 +802,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.showChart"
@@ -803,6 +814,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.allowAlarm"
@@ -814,6 +826,7 @@
                 >
               </app-select-field>                
             </div>
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.notifyAlarm"                
@@ -922,7 +935,10 @@
               </app-multiple-selection-list>                
             </div>
           </div>
+
         </mat-expansion-panel> 
+
+        
         <mat-expansion-panel
           (opened)="panelOpenState[2] = true"
           (closed)="panelOpenState[2] = false"

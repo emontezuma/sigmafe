@@ -2,11 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { BehaviorSubject, Observable, combineLatest, map, of } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, DELETE_DEPARTMENT_TRANSLATIONS, INACTIVATE_DEPARTMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPDATE_CHECKLIST_TEMPLATE, ADD_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, ADD_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPDATE_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, ADD_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPDATE_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, ADD_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPDATE_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, ADD_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPDATE_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_TABLES, ADD_TABLE_TRANSLATIONS, GET_TABLE, GET_TABLE_TRANSLATIONS, UPDATE_TABLE, DELETE_TABLE_TRANSLATIONS, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_VARIABLE_COMPACT, UPDATE_CHECKLIST_TEMPLATE_DETAILS, GET_CHECKLIST_TEMPLATE_DETAILS } from 'src/app/graphql/graphql.queries';
-import { ChecklistTemplateDetail, ChecklistTemplateLine, } from '../models';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPDATE_CHECKLIST_TEMPLATE, ADD_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, ADD_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPDATE_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, ADD_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPDATE_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, ADD_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPDATE_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, ADD_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPDATE_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_CHECKLIST_TEMPLATE_DETAILS, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, DELETE_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, INACTIVATE_DEPARTMENT, GET_GENERICS, ADD_GENERIC_TRANSLATIONS, GET_GENERIC, GET_GENERIC_TRANSLATIONS, UPDATE_GENERIC, DELETE_GENERIC_TRANSLATIONS, GET_SHIFTS, ADD_SHIFT_TRANSLATIONS, GET_SHIFT, GET_SHIFT_TRANSLATIONS, UPDATE_SHIFT, DELETE_SHIFT_TRANSLATIONS, INACTIVATE_SHIFT, UPDATE_CHECKLIST_TEMPLATE_DETAILS } from 'src/app/graphql/graphql.queries';
+import { ChecklistTemplateDetail, ChecklistTemplateLine, ShiftDetail, } from '../models';
 import { Attachment, originProcess, GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 import { environment } from 'src/environments/environment';
-import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, LineDetail, PlantDetail, PositionDetail, UomDetail, VariableDetail, WorkgroupDetail } from '../models';
+import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, LineDetail, PlantDetail, PositionDetail, UomDetail, VariableDetail } from '../models';
+import { WorkgroupDetail } from '../models/catalogs-workgroups.models';
 @Injectable({
   providedIn: 'root'
 })
@@ -153,13 +154,6 @@ export class CatalogsService {
       query: GET_VARIABLES_LAZY_LOADING,
       variables,
     }).valueChanges;
-  }
-
-  getVariableCompactDataGql$(variables: any): Observable<any> {
-    return this._apollo.query({
-      query: GET_VARIABLE_COMPACT,
-      variables,
-    });
   }
 
   getMoldDataGql$(parameters: any): Observable<any> {
@@ -1552,38 +1546,41 @@ export class CatalogsService {
     });
   }
 
-  updateLineStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
-    return this._apollo.mutate({
-      mutation: INACTIVATE_LINE,
-      variables,
-    });
-  }
+updateLineStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  return this._apollo.mutate({
+    mutation: INACTIVATE_LINE, 
+    variables,       
+  });
+}
 
-  //======tables
+  
 
-  getTablesDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
-    const variables = {
+  
+  //======generics
+
+  getGenericsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any>{
+    const variables = {      
       ...(recordsToSkip !== 0) && { recordsToSkip },
       ...(recordsToTake !== 0) && { recordsToTake },
       ...(orderBy) && { orderBy },
       ...(filterBy) && { filterBy },
     }
-
-    return this._apollo.watchQuery({
-      query: GET_TABLES,
+    
+    return this._apollo.watchQuery({ 
+      query: GET_GENERICS,
       variables
-    }).valueChanges
+    }).valueChanges    
   }
-
-  addTableTransations$(variables: any): Observable<any> {
+  
+  addGenericTransations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_TABLE_TRANSLATIONS,
-      variables,
+      mutation: ADD_GENERIC_TRANSLATIONS, 
+      variables,       
     });
-  }
-
-  getTableDataGql$(parameters: any): Observable<any> {
-    const tableId = { tableId: parameters.tableId };
+  } 
+  
+  getGenericDataGql$(parameters: any): Observable<any> {
+    const genericId = { genericId: parameters.genericId};
 
     const variables = {
       ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
@@ -1592,51 +1589,53 @@ export class CatalogsService {
       ...(parameters.filter) && { filterBy: parameters.filter },
     }
 
-    return combineLatest([
-      this._apollo.query({
-        query: GET_TABLE,
-        variables: tableId,
+    return combineLatest([ 
+      this._apollo.query({ 
+      query: GET_GENERIC, 
+      variables: genericId,      
       }),
-
-      this._apollo.query({
-        query: GET_TABLE_TRANSLATIONS,
-        variables,
+      
+      this._apollo.query({ 
+        query: GET_GENERIC_TRANSLATIONS, 
+        variables, 
       })
     ]);
   }
 
-  updateTableCatalog$(variables: any): Observable<any> {
+  updateGenericCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_TABLE,
-      variables,
+      mutation: UPDATE_GENERIC, 
+      variables,      
     })
   }
-
-  mapOneTable(paramsData: any): CompanyDetail {
-    const { oneTable } = paramsData?.tableGqlData?.data;
-    const { data } = oneTable;
-    const translations = paramsData?.tableGqlTranslationsData?.data;
-
-
+  
+  mapOneGeneric(paramsData: any): CompanyDetail {
+    const { oneGeneric } = paramsData?.genericGqlData?.data;
+    const { data } = oneGeneric;
+    const translations = paramsData?.genericGqlTranslationsData?.data;
+    
+    
     return {
       ...data,
       translations: this.mapTranslations(translations),
     }
   }
 
-  deleteTableTranslations$(variables: any): Observable<any> {
+  deleteGenericTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: DELETE_TABLE_TRANSLATIONS,
-      variables,
+      mutation: DELETE_GENERIC_TRANSLATIONS, 
+      variables,       
     });
   }
 
-  updateTableStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  updateGenericStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
     return this._apollo.mutate({
-      mutation: INACTIVATE_MOLD,
-      variables,
+      mutation: INACTIVATE_MOLD, 
+      variables,       
     });
   }
+
+  
 
 
 
@@ -1721,12 +1720,92 @@ export class CatalogsService {
     });
   }
 
-  updateChecklistTemplateLine$(variables: any): Observable<any> { //warning missing in customer and repeated here
+  
+
+  getShiftsDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
+    const variables = {
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+
+    return this._apollo.watchQuery({
+      query: GET_SHIFTS,  //WARNING 
+      variables
+    }).valueChanges
+  }
+
+  addShiftTransations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_CHECKLIST_TEMPLATE_DETAILS,
+      mutation: ADD_SHIFT_TRANSLATIONS,
       variables,
     });
   }
+
+  getShiftDataGql$(parameters: any): Observable<any> {
+    const shiftId = { shiftId: parameters.shiftId };
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([
+      this._apollo.query({
+        query: GET_SHIFT,
+        variables: shiftId,
+      }),
+
+      this._apollo.query({
+        query: GET_SHIFT_TRANSLATIONS,
+        variables,
+      })
+    ]);
+  }
+
+  updateShiftCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPDATE_SHIFT,
+      variables,
+    })
+  }
+
+  mapOneShift(paramsData: any): ShiftDetail {
+    const { oneShift } = paramsData?.shiftGqlData?.data;
+    const { data } = oneShift;
+    const translations = paramsData?.shiftGqlTranslationsData?.data;
+ 
+
+    return {
+      ...data,
+    
+      translations: this.mapTranslations(translations),
+    }
+  }
+
+  deleteShiftTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_SHIFT_TRANSLATIONS,
+      variables,
+    });
+  }
+
+  updateShiftStatus$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: INACTIVATE_SHIFT,
+      variables,
+    });
+  }
+
+  
+
+
+
+
+  //................................................................
 
   getAllCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
@@ -1734,7 +1813,7 @@ export class CatalogsService {
     );
   }
 
-  getAllToCsv$(): Observable<any> {//warning repeated
+  getAllToCsv$(): Observable<any> {
     return this._apollo.watchQuery({
       query: GET_ALL_MOLDS_TO_CSV,
     }).valueChanges;
@@ -1744,5 +1823,13 @@ export class CatalogsService {
     this.checkListTemplateLineDataChangedBehaviorSubject.next({ line, data });
   }
 
+  updateChecklistTemplateLine$(variables: any): Observable<any> { //warning missing in customer and repeated here
+    return this._apollo.mutate({
+      mutation: UPDATE_CHECKLIST_TEMPLATE_DETAILS,
+      variables,
+    });
+
+  }
+  
   // End ======================  
 }

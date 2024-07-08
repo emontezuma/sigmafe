@@ -12,13 +12,13 @@
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container> 
-  <ng-container *ngIf="updateTableCatalog$ | async "></ng-container> 
+  <ng-container *ngIf="updateGeneric$ | async "></ng-container> 
 
   <mat-card class="card">
     <form
         class="layout"
         (ngSubmit)="onSubmit()"
-        [formGroup]="tableForm"
+        [formGroup]="genericForm"
         #f="ngForm"
       >
       <mat-accordion multi>
@@ -64,12 +64,12 @@
               <app-input-field
                 [focused]="focusThisField==='name'"
                 [bordered]="true"
-                [formField]="tableForm.controls.name"
+                [formField]="genericForm.controls.name"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="300"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn_line"
+                currentErrorIcon="warn-line"
                 [showCloseButton]="true"
                 fieldHelp="Especifique el nombre asignado a la tabla"
                 [initialFocus]="true"                
@@ -83,7 +83,7 @@
               <app-input-field
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
-                [formField]="tableForm.controls.prefix"
+                [formField]="genericForm.controls.prefix"
                 leftHint="Campo requerido"
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
@@ -99,7 +99,7 @@
             <div class="field-items">
               <app-input-field
                 [bordered]="true"
-                [formField]="tableForm.controls.reference"
+                [formField]="genericForm.controls.reference"
                 leftHint="Campo opcional"
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
@@ -114,7 +114,7 @@
             <div class="field-items field-items--bordered">
               <app-area-field
                 [bordered]="false"
-                [formField]="tableForm.controls.notes"
+                [formField]="genericForm.controls.notes"
                 [fieldMaxLength]="500"
                 [showRightHint]="true"
                 [showCloseButton]="true"
@@ -170,37 +170,37 @@
       </mat-accordion>
     </form>
     <div
-      *ngIf="table.id"
+      *ngIf="generic.id"
       class="catalog-footer"
     >
       <div class="grid-dates">
         <div class="flex">
-          <div class="readonly-value item-id">{{ table.id }}</div>
+          <div class="readonly-value item-id">{{ generic.id }}</div>
           <div class="label-with-no-index">ID del registro</div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(table.createdAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(generic.createdAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de creación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ table.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ generic.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Creado por</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(table.updatedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(generic.updatedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de modificación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ table.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ generic.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Modificado por</div>
@@ -208,16 +208,16 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="table.deletedById > 0">
+      <div class="grid-inactive" *ngIf="generic.deletedById > 0">
         <div class="flex">
-          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(table.deletedAt) | date :"medium" }}</div>
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(generic.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="event"></mat-icon>
             <div class="label-with-no-index">Fecha de inactivación</div>
           </div>
         </div>
         <div class="flex">
-          <div class="readonly-value">{{ table.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="readonly-value">{{ generic.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
           <div class="flex-row">
             <mat-icon class="small-icon" svgIcon="man"></mat-icon>
             <div class="label-with-no-index">Inactivado por</div>

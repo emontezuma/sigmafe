@@ -1310,7 +1310,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             combineLatest([ 
               this.processTranslations$(checklistTemplateId), 
               this.saveCatalogDetails$(checklistTemplateId),          
-              this.processDetails$(checklistTemplateId),                        
+              // this.processDetails$(checklistTemplateId),                        
               this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS, checklistTemplateId, files),              
             ])      
             .subscribe((data: any) => {
@@ -1447,7 +1447,7 @@ export class CatalogChecklistTemplatesEditionComponent {
 
   
 
-  processDetails$(processId: number): Observable<any> {
+  processDetails$(processId: number): any {
     const differences = this.storedLines.length !== this.checklistTemplateLines.length || this.storedLines.some((sl: any) => {
       return this.checklistTemplate.translations.find((l: any) => {        
         return sl.languageId === l.languageId &&
