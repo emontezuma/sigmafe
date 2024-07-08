@@ -1,27 +1,27 @@
 import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
-export interface TablesData {
-  tablesPaginated?: Tables;
+export interface GenericsData {
+  genericsPaginated?: Generics;
 }
 
-export interface TableData {
-  oneTable?: TableItem;
+export interface GenericData {
+  oneGeneric?: GenericItem;
   translations?: any;
 }
 
-export interface Tables {
-  items?: TableItem[];
+export interface Generics {
+  items?: GenericItem[];
   pageInfo?: PageInfo;
   totalCount?: number;
 }
 
-export interface TableItem {
+export interface GenericItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
-  data: TableDetail;
+  data: GenericDetail;
 }
 
-export interface TableDetail {
+export interface GenericDetail {
   name?: string;
   reference?: string;
   notes?: string;
@@ -44,18 +44,18 @@ export interface TableDetail {
   
 }
 
-export interface TablesState {
+export interface GenericsState {
   loading: boolean;
-  tablesData: TablesData;
+  genericsData: GenericsData;
 }
 
-export interface TableState {
+export interface GenericState {
   
   loading: boolean;
-  moldDetail: TableDetail;
+  moldDetail: GenericDetail;
 }
 
-export interface TableCatalog {
+export interface GenericCatalog {
   id: string;
   name: string;
 
@@ -66,7 +66,7 @@ export interface TableCatalog {
 
 
 
-export const emptyTableCatalog = {  
+export const emptyGenericCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
@@ -79,7 +79,7 @@ export const emptyTableCatalog = {
   },
 };
 
-export const emptyTableItem: TableDetail = {  
+export const emptyGenericItem: GenericDetail = {  
   name: null,
   id: null,
   customerId: null,

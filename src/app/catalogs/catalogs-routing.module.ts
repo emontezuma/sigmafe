@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogTablesListComponent, CatalogTableEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogGenericsListComponent, CatalogGenericEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -208,19 +208,34 @@ const routes: Routes = [
         data: { animation: 'CatalogLineEditionComponent' },
       },
       {
-        path: 'tables',
-        component: CatalogTablesListComponent,
-        data: { animation: 'CatalogTablesComponent' },
+        path: 'generics',
+        component: CatalogGenericsListComponent,
+        data: { animation: 'CatalogGenericsComponent' },
       },
       {
-        path: 'tables/create',
-        component: CatalogTableEditionComponent,
-        data: { animation: 'CatalogTableEditionComponent' },
+        path: 'generics/create',
+        component: CatalogGenericEditionComponent,
+        data: { animation: 'CatalogGenericEditionComponent' },
       },
       {
-        path: 'tables/edit/:id',
-        component: CatalogTableEditionComponent,
-        data: { animation: 'CatalogTableEditionComponent' },
+        path: 'generics/edit/:id',
+        component: CatalogGenericEditionComponent,
+        data: { animation: 'CatalogGenericEditionComponent' },
+      },
+      {
+        path: 'shifts',
+        component: CatalogShiftsListComponent,
+        data: { animation: 'CatalogShiftsComponent' },
+      },
+      {
+        path: 'shifts/create',
+        component: CatalogShiftEditionComponent,
+        data: { animation: 'CatalogShiftEditionComponent' },
+      },
+      {
+        path: 'shifts/edit/:id',
+        component: CatalogShiftEditionComponent,
+        data: { animation: 'CatalogShiftEditionComponent' },
       },
       {
         path: '**',

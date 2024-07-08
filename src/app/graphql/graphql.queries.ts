@@ -3966,24 +3966,23 @@ export const INACTIVATE_LINE = gql`
 `;
 
 
-//tables===========================
+//=======generics
 
-export const GET_TABLE = gql`
-  query OneTable (
-    $tableId: Long!,
+
+export const GET_GENERIC = gql`
+  query OneGeneric (
+    $genericId: Long!,
   ) {
-  oneTable (
-    id: $tableId        
+  oneGeneric (
+    id: $genericId        
   ) {
     data {
       name
       reference
       notes
       prefix
-     
       id
       customerId
-     
       status
       createdById
       createdAt
@@ -4001,19 +4000,19 @@ export const GET_TABLE = gql`
         name
       }      
     }
-    friendlyStatus
+    friendlyStatus    
   }
 }
 `;
 
-export const GET_TABLES = gql`
-  query TablesPaginated (
+export const GET_GENERICS = gql`
+  query GenericsPaginated (
     $recordsToSkip: Int,
     $recordsToTake: Int,
-    $orderBy: [TranslatedTableDtoSortInput!],
-    $filterBy: TranslatedTableDtoFilterInput,
+    $orderBy: [TranslatedGenericDtoSortInput!],
+    $filterBy: TranslatedGenericDtoFilterInput,
   ) {
-  tablesPaginated (
+  genericsPaginated (
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -4023,10 +4022,9 @@ export const GET_TABLES = gql`
         friendlyStatus
         data {
           name
-       
+          reference
           id
           customerId
-          reference
           status
           updatedAt
           updatedBy {
@@ -4043,14 +4041,14 @@ export const GET_TABLES = gql`
   }
 `;
 
-export const GET_TABLE_TRANSLATIONS = gql`
-  query TablesTranslationsTable (
+export const GET_GENERIC_TRANSLATIONS = gql`
+  query GenericsTranslationsTable (
     $recordsToSkip: Int,
     $recordsToTake: Int,
-    $orderBy: [TableTranslationTableSortInput!],
-    $filterBy: TableTranslationTableFilterInput,
+    $orderBy: [GenericTranslationTableSortInput!],
+    $filterBy: GenericTranslationTableFilterInput,
   ) {
-    tablesTranslationsTable(
+    genericsTranslationsTable(
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -4058,7 +4056,7 @@ export const GET_TABLE_TRANSLATIONS = gql`
   ) {
     totalCount
     items {
-        tableId
+        genericId
         name
         reference
         notes
@@ -4091,41 +4089,40 @@ export const GET_TABLE_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_TABLE_TRANSLATIONS = gql`
-  mutation CreateOrUpdateTableTranslationTable (
-    $translations: [TableTranslationTableDtoInput!]!    
+export const ADD_GENERIC_TRANSLATIONS = gql`
+  mutation CreateOrUpdateGenericTranslationTable (
+    $translations: [GenericTranslationTableDtoInput!]!    
   ) {
-    createOrUpdateTableTranslationTable (
+    createOrUpdateGenericTranslationTable (
       inputs: $translations
     ) {
       id,
-      tableId,
+      genericId,
       languageId      
     }
   }
 `;
 
-export const UPDATE_TABLE = gql`
-  mutation CreateOrUpdateTable (
+export const UPDATE_GENERIC = gql`
+  mutation CreateOrUpdateGeneric (
     $customerId: Long,
-  
     $id: Long,
     $status: String    
     $name: String,
+    $prefix: String,
     $reference: String,
     $notes: String,
-   
+        
   ) {
-  createOrUpdateTable (
+  createOrUpdateGeneric (
     inputs: [{
       customerId: $customerId
-     
       id: $id      
       status: $status
       name: $name,
+      prefix: $prefix,
       reference: $reference,
       notes: $notes,
-   
     }]) {
       id
       createdAt
@@ -4144,20 +4141,36 @@ export const UPDATE_TABLE = gql`
   }
 `;
 
-export const DELETE_TABLE_TRANSLATIONS = gql`
-  mutation DeleteTablesTranslationsTable (
+export const DELETE_GENERIC_TRANSLATIONS = gql`
+  mutation DeleteGenericsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
     $customerId: Long!
-  
+ 
   ) {
-    deleteTablesTranslationsTable (      
+    deleteGenericsTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-    
     ) 
   }
 `;
 
+export const INACTIVATE_GENERIC = gql`
+  mutation CreateOrUpdateGeneric (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateGeneric (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
 
 
 //workgroups===========================
@@ -4657,6 +4670,7 @@ export const INACTIVATE_SHIFT = gql`
     } 
   }
 `;
+
 
 
 

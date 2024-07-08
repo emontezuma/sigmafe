@@ -11,7 +11,7 @@ table {
   border-radius: 8px 8px 0px 0px;    
 }
 
-.tables-table {
+.shifts-table {
   width: calc(100% - 11px);
   flex: 1;
   min-height: 0;
@@ -75,9 +75,6 @@ table {
   min-width: 70px;
   padding: 10px;
   text-align: right;
-  ::ng-deep .mat-sort-header-container {
-    justify-content: end;
-  }
 }
 
 .mat-column-mainImagePath {
@@ -91,39 +88,34 @@ table {
 .mat-column-name {
   word-wrap: break-word !important;
   white-space: unset !important;
-  width: 26%;
-  max-width: 26% !important;
-  min-width: 26%;
+  width: 20%;
+  max-width: 20% !important;
+  min-width: 20%;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
   padding: 10px;
 }
 
-
-.mat-column-uom {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
-.mat-column-sigmaType {
-  word-wrap: break-word !important;
-  white-space: unset !important;
-  word-break: break-word;
-  overflow-wrap: break-word;  
-  width: 17%;
-  max-width: 17% !important;
-  min-width: 17%;
-  padding: 10px;
-}
-
 .mat-column-status {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;  
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
+}
+
+.mat-column-recipient {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  word-break: break-word;  
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
+}
+
+.mat-column-plant {
   word-wrap: break-word !important;
   white-space: unset !important;
   word-break: break-word;  
@@ -142,6 +134,19 @@ table {
   min-width: 20%;
 }
 
+.mat-column-reference {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 12%;
+  max-width: 12% !important;
+  min-width: 12%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
+
 .mat-mdc-header-row {
   font-size: 1.5rem;
   font-weight: 700;
@@ -157,8 +162,6 @@ table {
   // padding: 5px 16px;
 }
 
-
-
 .mat-mdc-row {
   font-size: 1.3rem;
   cursor: pointer;
@@ -173,7 +176,7 @@ tr:nth-child(2n+1) {
   background-color: var(--z-colors-table-even-background-color);
 }
 
-.table-image {
+.shift-image {
   width: inherit;
   max-width: calc(100% - 4px);
   max-height: calc(100% - 4px);
