@@ -737,32 +737,45 @@ export class CatalogUomEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.uom.id || this.uom.id === null || this.uom.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateUomCatalog$ = this._catalogsService.updateUomCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateUom.length > 0) {
-          const uomId = data?.data?.createOrUpdateUom[0].id;          
-          this.processTranslations$(uomId).subscribe(() => {
-            this.requestUomData(uomId);
-            setTimeout(() => {              
-              let message = $localize`Ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`Ha sido creado satisfactoriamente con el id <strong>${this.uom.id}</strong>`;
-                this._location.replaceState(`/catalogs/uoms/edit/${uomId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateUomCatalog$ = this._catalogsService.updateUomCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateUom.length > 0) {
+            const uomId = data?.data?.createOrUpdateUom[0].id;          
+            this.processTranslations$(uomId).subscribe(() => {
+              this.requestUomData(uomId);
+              setTimeout(() => {              
+                let message = $localize`Ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`Ha sido creado satisfactoriamente con el id <strong>${this.uom.id}</strong>`;
+                  this._location.replaceState(`/catalogs/uoms/edit/${uomId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    } 
+    
   }
 
   requestUomData(uomId: number): void { 
@@ -876,7 +889,7 @@ export class CatalogUomEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.uomForm.controls;
     return  {
         id: this.uom.id,

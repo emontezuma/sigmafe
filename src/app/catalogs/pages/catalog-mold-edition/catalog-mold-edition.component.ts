@@ -57,7 +57,9 @@ export class CatalogMoldEditionComponent {
   maintenances$: Observable<any>;
   moldThresholdTypeChanges$: Observable<any>;
   // moldFormChanges$: Observable<any>;
-  toolbarClick$: Observable<ToolbarButtonClicked>;    
+  toolbarClick$: Observable<ToolbarButtonClicked>; 
+  notifyRedChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;    
+  notifyYellowChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;    
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
   mold$: Observable<MoldDetail>;
@@ -70,11 +72,16 @@ export class CatalogMoldEditionComponent {
   addOrUpdateCatalogDetails$: Observable<any>;  
   deleteMoldMaintenanceHistory$: Observable<any>;  
   addMoldTranslations$: Observable<any>;  
+  macros$: Observable<any>;    
+  notificationChannels$: Observable<any>;
+  recipients$: Observable<any>;
+  genYesNoValues$: Observable<any>;
   
   moldFormChangesSubscription: Subscription;
   
   providers: GeneralCatalogData = emptyGeneralCatalogData; 
-  manufacturers: GeneralCatalogData = emptyGeneralCatalogData; 
+  genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  recipients: GeneralCatalogData = emptyGeneralCatalogData;manufacturers: GeneralCatalogData = emptyGeneralCatalogData; 
   moldTypes: GeneralCatalogData = emptyGeneralCatalogData; 
   moldClasses: GeneralCatalogData = emptyGeneralCatalogData; 
   moldThresholdTypes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
@@ -86,7 +93,10 @@ export class CatalogMoldEditionComponent {
   maintenances: MaintenanceHistoricalData = emptyMaintenanceHistoricalData; 
   checklistTemplatesYellow: GeneralCatalogData = emptyGeneralCatalogData; 
   checklistTemplatesRed: GeneralCatalogData = emptyGeneralCatalogData; 
+  macros: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
 
+  notifyRedChannelsSelected: number = 0;
+  notifyYellowChannelsSelected: number = 0;
   uploadFiles: Subscription;
   
   catalogIcon: string = 'treasure_chest';
@@ -94,11 +104,13 @@ export class CatalogMoldEditionComponent {
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   orderMaintenance: any = JSON.parse(`{ "data": { "id": "${'DESC'}" } }`);
+  macrosValuesOrder: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   storedTranslations: [];
-  translationChanged: boolean = false
-  imageChanged: boolean = false
-  submitControlled: boolean = false
-  loadingMaintenance: boolean = false
+  translationChanged: boolean = false;
+  pendingRecord: boolean = false;
+  imageChanged: boolean = false;
+  submitControlled: boolean = false;
+  loadingMaintenance: boolean = false;
   loading: boolean;
   elements: ToolbarElement[] = [];  
   panelOpenState: boolean[] = [true, false, false];
@@ -109,6 +121,7 @@ export class CatalogMoldEditionComponent {
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
+  showMacros: boolean = false;
 
   moldForm = new FormGroup({
     description: new FormControl(
@@ -143,6 +156,14 @@ export class CatalogMoldEditionComponent {
     reference: new FormControl(''),    
     templatesYellow: new FormControl(''),
     templatesRed: new FormControl(''),
+    notifyRedRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    notifyYellowRecipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    notifyYellowState: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyRedState: new FormControl(emptyGeneralHardcodedValuesItem),
+    notifyRedSubject:  new FormControl(''),    
+    notifyRedBody:  new FormControl(''),
+    notifyYellowSubject:  new FormControl(''),    
+    notifyYellowBody:  new FormControl(''),
   });
 
   maintenanceHistoricalTableColumns: string[] = ['item', 'provider', 'operator', 'friendlyState', 'notes', 'range', 'actions'];
@@ -240,6 +261,9 @@ export class CatalogMoldEditionComponent {
         this.requestMoldThresholdTypesData(currentPage);
         this.requestLabelColorsData(currentPage);
         this.requestStatesData(currentPage);
+        this.requestMacrosData(currentPage);
+        this.requestNotifyChannelsData(currentPage);   
+        this.requestGenYesNoValuesData(currentPage);             
       })
     );   
     
@@ -247,35 +271,74 @@ export class CatalogMoldEditionComponent {
     .subscribe((moldFormChanges: any) => {
       if (this.loaded) {
         this.setEditionButtonsState();
+      } else {
+        return;
       }
       if (moldFormChanges.thresholdType === GeneralValues.N_A) {
-        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable();
-        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable();
-        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable();
-        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable();
-        if (this.moldForm.get('templatesYellow').enabled) this.moldForm.get('templatesYellow').disable();        
-        if (this.moldForm.get('templatesRed').enabled) this.moldForm.get('templatesRed').disable();        
+        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable({ emitEvent: false });
+        if (this.moldForm.get('templatesYellow').enabled) this.moldForm.get('templatesYellow').disable({ emitEvent: false });        
+        if (this.moldForm.get('templatesRed').enabled) this.moldForm.get('templatesRed').disable({ emitEvent: false });        
+        if (this.moldForm.get('notifyRedState').enabled) this.moldForm.get('notifyRedState').disable({ emitEvent: false });                
+        if (this.moldForm.get('notifyYellowState').enabled) this.moldForm.get('notifyYellowState').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowBody').enabled) this.moldForm.get('notifyYellowBody').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedBody').enabled) this.moldForm.get('notifyRedBody').disable({ emitEvent: false });  
+        if (this.moldForm.get('notifyYellowBody').enabled) this.moldForm.get('notifyYellowBody').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowSubject').enabled) this.moldForm.get('notifyYellowSubject').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').enabled) this.moldForm.get('notifyRedSubject').disable({ emitEvent: false });  
+        if (this.moldForm.get('notifyYellowRecipient').enabled) this.moldForm.get('notifyYellowRecipient').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedRecipient').enabled) this.moldForm.get('notifyRedRecipient').disable({ emitEvent: false });   
+        
       } else if (moldFormChanges.thresholdType === MoldThresoldTypes.HITS) {
-        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable();
-        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable();
-        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable();
-        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable();
-        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
-        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();        
+        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateYellow').enabled) this.moldForm.get('thresholdDateYellow').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateRed').enabled) this.moldForm.get('thresholdDateRed').disable({ emitEvent: false });
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable({ emitEvent: false });
+        if (this.moldForm.get('notifyRedState').disabled) this.moldForm.get('notifyRedState').enable({ emitEvent: false });                
+        if (this.moldForm.get('notifyYellowState').disabled) this.moldForm.get('notifyYellowState').enable({ emitEvent: false });                 
+        if (this.moldForm.get('notifyYellowBody').disabled) this.moldForm.get('notifyYellowBody').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedBody').disabled) this.moldForm.get('notifyRedBody').enable({ emitEvent: false });    
+        if (this.moldForm.get('notifyYellowSubject').disabled) this.moldForm.get('notifyYellowSubject').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').disabled) this.moldForm.get('notifyRedSubject').enable({ emitEvent: false });  
+        if (this.moldForm.get('notifyYellowRecipient').disabled) this.moldForm.get('notifyYellowRecipient').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedRecipient').disabled) this.moldForm.get('notifyRedRecipient').enable({ emitEvent: false });          
+
       } else if (moldFormChanges.thresholdType === MoldThresoldTypes.DAYS) {
-        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable();
-        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable();
-        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable();
-        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable();
-        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
-        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();        
+        if (this.moldForm.get('thresholdYellow').enabled) this.moldForm.get('thresholdYellow').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdRed').enabled) this.moldForm.get('thresholdRed').disable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable({ emitEvent: false });
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable({ emitEvent: false });
+        if (this.moldForm.get('notifyRedState').disabled) this.moldForm.get('notifyRedState').enable({ emitEvent: false });                
+        if (this.moldForm.get('notifyYellowState').disabled) this.moldForm.get('notifyYellowState').enable({ emitEvent: false });    
+        if (this.moldForm.get('notifyYellowBody').disabled) this.moldForm.get('notifyYellowBody').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedBody').disabled) this.moldForm.get('notifyRedBody').enable({ emitEvent: false });     
+        if (this.moldForm.get('notifyYellowSubject').disabled) this.moldForm.get('notifyYellowSubject').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').disabled) this.moldForm.get('notifyRedSubject').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowRecipient').disabled) this.moldForm.get('notifyYellowRecipient').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedRecipient').disabled) this.moldForm.get('notifyRedRecipient').enable({ emitEvent: false });                      
+
       } else if (moldFormChanges.thresholdType === MoldThresoldTypes.BOTH) {
-        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable();
-        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable();
-        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable();
-        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable();
-        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable();
-        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable();         
+        if (this.moldForm.get('thresholdYellow').disabled) this.moldForm.get('thresholdYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdRed').disabled) this.moldForm.get('thresholdRed').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateYellow').disabled) this.moldForm.get('thresholdDateYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('thresholdDateRed').disabled) this.moldForm.get('thresholdDateRed').enable({ emitEvent: false });
+        if (this.moldForm.get('templatesYellow').disabled) this.moldForm.get('templatesYellow').enable({ emitEvent: false });
+        if (this.moldForm.get('templatesRed').disabled) this.moldForm.get('templatesRed').enable({ emitEvent: false }); 
+        if (this.moldForm.get('notifyRedState').disabled) this.moldForm.get('notifyRedState').enable({ emitEvent: false });                
+        if (this.moldForm.get('notifyYellowState').disabled) this.moldForm.get('notifyYellowState').enable({ emitEvent: false });     
+        if (this.moldForm.get('notifyYellowBody').disabled) this.moldForm.get('notifyYellowBody').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedBody').disabled) this.moldForm.get('notifyRedBody').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowSubject').disabled) this.moldForm.get('notifyYellowSubject').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').disabled) this.moldForm.get('notifyRedSubject').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowRecipient').disabled) this.moldForm.get('notifyYellowRecipient').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedRecipient').disabled) this.moldForm.get('notifyRedRecipient').enable({ emitEvent: false });                        
+
       }
       if (moldFormChanges.thresholdYellow && moldFormChanges.thresholdRed && (+moldFormChanges.thresholdYellow >= +moldFormChanges.thresholdRed)) {
         this.moldForm.controls.thresholdYellow.setErrors({ invalidValue: true });
@@ -287,6 +350,25 @@ export class CatalogMoldEditionComponent {
       } else {
         this.moldForm.controls.thresholdDateYellow.setErrors(null);
       }
+      if (moldFormChanges.notifyRedState !== GeneralValues.YES) {
+        if (this.moldForm.get('notifyRedBody').enabled) this.moldForm.get('notifyRedBody').disable({ emitEvent: false });  
+        if (this.moldForm.get('notifyRedRecipient').enabled) this.moldForm.get('notifyRedRecipient').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').enabled) this.moldForm.get('notifyRedSubject').disable({ emitEvent: false });
+      } else if (moldFormChanges.notifyRedState === GeneralValues.YES) {
+        if (this.moldForm.get('notifyRedBody').disabled) this.moldForm.get('notifyRedBody').enable({ emitEvent: false });  
+        if (this.moldForm.get('notifyRedRecipient').disabled) this.moldForm.get('notifyRedRecipient').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyRedSubject').disabled) this.moldForm.get('notifyRedSubject').enable({ emitEvent: false });
+      }
+
+      if (moldFormChanges.notifyYellowState !== GeneralValues.YES) {
+        if (this.moldForm.get('notifyYellowBody').enabled) this.moldForm.get('notifyYellowBody').disable({ emitEvent: false });  
+        if (this.moldForm.get('notifyYellowRecipient').enabled) this.moldForm.get('notifyYellowRecipient').disable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowSubject').enabled) this.moldForm.get('notifyYellowSubject').disable({ emitEvent: false });
+      } else if (moldFormChanges.notifyYellowState === GeneralValues.YES) {
+        if (this.moldForm.get('notifyYellowBody').disabled) this.moldForm.get('notifyYellowBody').enable({ emitEvent: false });  
+        if (this.moldForm.get('notifyYellowRecipient').disabled) this.moldForm.get('notifyYellowRecipient').enable({ emitEvent: false });   
+        if (this.moldForm.get('notifyYellowSubject').disabled) this.moldForm.get('notifyYellowSubject').enable({ emitEvent: false });
+      }        
     });    
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
@@ -344,6 +426,121 @@ export class CatalogMoldEditionComponent {
   }
   
 // Functions ================
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  requestGenYesNoValuesData(currentPage: number) {
+    this.genYesNoValues = {
+      ...this.genYesNoValues,
+      currentPage,
+      loading: true,
+    }        
+    this.genYesNoValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.GEN_VALUES_YES_NO)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);
+        this.genYesNoValues = {
+          ...this.genYesNoValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+
+  requestNotifyChannelsData(currentPage: number) {
+    this.notifyYellowChannels = {
+      ...this.notifyYellowChannels,
+      currentPage,
+      loading: true,
+    }        
+    this.notifyRedChannels = {
+      ...this.notifyRedChannels,
+      currentPage,
+      loading: true,
+    }            
+    this.notificationChannels$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.CHANNELS)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.notifyYellowChannels.items?.concat(data?.data?.hardcodedValues?.items);
+        this.notifyYellowChannels = {
+          ...this.notifyYellowChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        this.notifyRedChannels = {
+          ...this.notifyRedChannels,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems.map((i) => {
+            return {
+              ...i,
+              selected: false,
+            }
+          }),
+          totalCount: data?.data?.hardcodedValues?.totalCount,
+        }
+        if (this.pendingRecord) {
+          this.updateMultiSelections();
+          this.pendingRecord = false;
+        } 
+      }),
+      catchError(() => EMPTY)
+    )
+  }
 
   requestMoldTypessData(currentPage: number, filterStr: string = null) {
     this.moldTypes = {
@@ -532,6 +729,9 @@ export class CatalogMoldEditionComponent {
           this.elements.find(e => e.action === action.action).loading = false;
           this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
         }, 750);        
+      } else if (action.action === ButtonActions.MACROS) { 
+        this.showMacros = !this.showMacros;
+        this.elements.find(e => e.action === action.action).class = this.showMacros ? 'accent' : '';
       } else if (action.action === ButtonActions.SAVE) {        
         this.elements.find(e => e.action === action.action).loading = true;
         this.submitControlled = true;        
@@ -910,6 +1110,19 @@ export class CatalogMoldEditionComponent {
       loading: false,
       disabled: !!!this.mold.id,
       action: ButtonActions.TRANSLATIONS,      
+    },{
+      type: 'button',
+      caption: $localize`Macros`,
+      tooltip: $localize`Macros disponibles...`,
+      class: '',
+      icon: 'transcode',
+      iconSize: '24px',
+      showIcon: true,
+      showTooltip: true,
+      showCaption: true,
+      loading: false,
+      disabled: false,
+      action: ButtonActions.MACROS,      
     },];
   }
 
@@ -951,7 +1164,7 @@ export class CatalogMoldEditionComponent {
     this.moldForm.markAllAsTouched();        
     this.moldForm.updateValueAndValidity();    
     if (this.moldForm.valid) {      
-      this.saveMold();
+      this.saveRecord();
     } else {
       let fieldsMissing = '';
       let fieldsMissingCounter = 0;
@@ -1016,39 +1229,51 @@ export class CatalogMoldEditionComponent {
     }
   }
 
-  saveMold() {
+  saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateMoldCatalog$ = this._catalogsService.updateMoldCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateMold.length > 0) {
-          const moldId = data?.data?.createOrUpdateMold[0].id;
-          combineLatest([ 
-            this.processTranslations$(moldId), 
-            this.saveCatalogDetails$(moldId) 
-          ])
-          .subscribe(() => {
-            this.requestMoldData(moldId);          
-            setTimeout(() => {              
-              let message = $localize`El Molde ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`El Molde ha sido creado satisfactoriamente con el id <strong>${moldId}</strong>`;
-                this._location.replaceState(`/catalogs/molds/edit/${moldId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
-            }, 200);
-          })
-        }      
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);  
+      this.updateMoldCatalog$ = this._catalogsService.updateMoldCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateMold.length > 0) {
+            const moldId = data?.data?.createOrUpdateMold[0].id;
+            combineLatest([ 
+              this.processTranslations$(moldId), 
+              this.saveCatalogDetails$(moldId) 
+            ])
+            .subscribe(() => {
+              this.requestMoldData(moldId);          
+              setTimeout(() => {              
+                let message = $localize`El Molde ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El Molde ha sido creado satisfactoriamente con el id <strong>${moldId}</strong>`;
+                  this._location.replaceState(`/catalogs/molds/edit/${moldId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;   
+              }, 200);
+            })
+          }      
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;         
+    }    
   }
 
   requestProvidersData(currentPage: number, filterStr: string = null) {    
@@ -1480,7 +1705,8 @@ export class CatalogMoldEditionComponent {
         this.imageChanged = false;        
         this.storedTranslations = JSON.parse(JSON.stringify(this.mold.translations));
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';    
+        this.pendingRecord = true;
         this.updateFormFromData();
         this.changeInactiveButton(this.mold.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
@@ -1517,6 +1743,29 @@ export class CatalogMoldEditionComponent {
     const variables = this._sharedService.setGraphqlGen(moldParameters);   
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
+
+  requestMacrosData(currentPage: number) {
+    this.macros = {
+      ...this.macros,
+      currentPage,
+      loading: true,
+    }        
+    this.macros$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.macrosValuesOrder, SystemTables.MOLDS_CATALOGS_MACROS)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.macros.items?.concat(data?.data?.hardcodedValues?.items);        
+        this.macros = {
+          ...this.macros,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+  
 
   getMoreData(getMoreDataParams: GeneralCatalogParams) {    
     if (getMoreDataParams.catalogName === SystemTables.PROVIDERS) {
@@ -1645,6 +1894,19 @@ export class CatalogMoldEditionComponent {
         this.checklistTemplatesRed.currentPage,
         getMoreDataParams.textToSearch,  
       );    
+    } else if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
     }    
   }
 
@@ -1680,7 +1942,7 @@ export class CatalogMoldEditionComponent {
     console.log('[handleOptionSelected]', getMoreDataParams)
   }
 
-  handleMultipleSelectionChanged(catalog: string){    
+  handleMultipleSelectionChanged(catalog: string){        
     this.setEditionButtonsState();
   }
 
@@ -1830,15 +2092,45 @@ export class CatalogMoldEditionComponent {
       thresholdType: this.mold.thresholdType,      
       thresholdState: this.mold.thresholdState,
       mainImageName: this.mold.mainImageName,
+      
       label: this.mold.label,      
       state: this.mold.state,
       startingDate: this.mold.startingDate,
       templatesYellow: this.mold.templatesYellow,
       templatesRed: this.mold.templatesRed,
+      
+      notifyYellowState: this.mold.notifyYellowState,
+      notifyYellowSubject: this.mold.notifyYellowSubject,
+      notifyYellowBody:  this.mold.notifyYellowBody,
+      notifyYellowRecipient: this.mold.notifyYellowRecipient,
+      
+      notifyRedState: this.mold.notifyRedState,      
+      notifyRedRecipient: this.mold.notifyRedRecipient,            
+      notifyRedSubject: this.mold.notifyRedSubject,
+      notifyRedBody:  this.mold.notifyRedBody,      
     });
+
+    this.updateMultiSelections();
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  updateMultiSelections() {
+    if (this.notifyYellowChannels.items.length === 0) return;
+    const selectedYellowChannels = this.mold.notifyYellowChannels.split(',');
+    for (const item of this.notifyYellowChannels.items) {
+      item.selected = selectedYellowChannels.includes(item.value);
+    }
+
+    this.notifyYellowChannelsSelected = this.notifyYellowChannels.items.filter(r => r.selected).length;
+
+    const selectedRedChannels = this.mold.notifyRedChannels.split(',');
+    for (const item of this.notifyRedChannels.items) {
+      item.selected = selectedRedChannels.includes(item.value);
+    }
+
+    this.notifyRedChannelsSelected = this.notifyRedChannels.items.filter(r => r.selected).length;    
+  }
+
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.moldForm.controls;
     let startingDate = null;
     let manufacturingDate = null;
@@ -1861,6 +2153,9 @@ export class CatalogMoldEditionComponent {
       manufacturingDate = null;
     }
 
+    const selectedYellowChannels = this.notifyYellowChannels.items.filter((n) => n.selected).map((n) => n.value).join();
+    const selectedRedChannels = this.notifyRedChannels.items.filter((n) => n.selected).map((n) => n.value).join();
+
     return  {
         id: this.mold.id,
         customerId: 1, // TODO: Get from profile
@@ -1872,22 +2167,36 @@ export class CatalogMoldEditionComponent {
         ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
         ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
         ...(fc.startingDate.dirty || fc.startingDate.touched || newRecord) && { startingDate: startingDate },
-        ...(fc.moldType.dirty || fc.moldType.touched || newRecord) && { moldTypeId: fc.moldType.value.id },      
-        ...(fc.moldClass.dirty || fc.moldClass.touched || newRecord) && { moldClassId: fc.moldClass.value.id },
-        ...(fc.provider.dirty || fc.provider.touched || newRecord) && { providerId: fc.provider.value.id },
-        ...(fc.manufacturer.dirty || fc.manufacturer.touched || newRecord) && { manufacturerId: fc.manufacturer.value.id },
+        ...(fc.moldType.dirty || fc.moldType.touched || newRecord) && { moldTypeId: fc.moldType.value ? fc.moldType.value.id : null },      
+        ...(fc.moldClass.dirty || fc.moldClass.touched || newRecord) && { moldClassId: fc.moldClass.value ? fc.moldClass.value.id  : null},
+        ...(fc.provider.dirty || fc.provider.touched || newRecord) && { providerId: fc.provider.value ? fc.provider.value.id  : null},
+        ...(fc.manufacturer.dirty || fc.manufacturer.touched || newRecord) && { manufacturerId: fc.manufacturer.value ? fc.manufacturer.value.id  : null},
         ...(fc.manufacturingDate.dirty || fc.manufacturingDate.touched || newRecord) && { manufacturingDate: manufacturingDate },
         ...(fc.state.dirty || fc.state.touched || newRecord) && { state: fc.state.value },
         ...(fc.label.dirty || fc.label.touched || newRecord) && { label: fc.label.value },
-        ...(fc.partNumber.dirty || fc.partNumber.touched || newRecord) && { partNumberId: fc.partNumber.value.id },
+        ...(fc.partNumber.dirty || fc.partNumber.touched || newRecord) && { partNumberId: fc.partNumber.value ? fc.partNumber.value.id : null},
         ...(fc.position.dirty || fc.position.touched || newRecord) && { position: +fc.position.value },
-        ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value.id },
-        ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value.id },
+        ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value ? fc.line.value.id : null},
+        ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value ? fc.equipment.value.id : null},
+        
+        ...(fc.notifyYellowRecipient.dirty || fc.notifyYellowRecipient.touched || newRecord) && { notifyYellowRecipientId: fc.notifyYellowRecipient.value ? fc.notifyYellowRecipient.value.id : null },
+        ...(fc.notifyRedRecipient.dirty || fc.notifyRedRecipient.touched || newRecord) && { notifyRedRecipientId: fc.notifyRedRecipient.value ? fc.notifyRedRecipient.value.id : null },
+        ...(fc.notifyYellowState.dirty || fc.notifyYellowState.touched || newRecord) && { notifyYellowState: fc.notifyYellowState.value },
+        ...(fc.notifyRedState.dirty || fc.notifyRedState.touched || newRecord) && { notifyRedState: fc.notifyRedState.value },
+        ...(this.mold?.notifyYellowChannels !== selectedYellowChannels || newRecord) && { notifyYellowChannels: selectedYellowChannels },
+        ...(this.mold?.notifyRedChannels !== selectedRedChannels || newRecord) && { notifyRedChannels: selectedRedChannels },
+        ...(fc.notifyRedSubject.dirty || fc.notifyRedSubject.touched || newRecord) && { notifyRedSubject: fc.notifyRedSubject.value },
+        ...(fc.notifyRedBody.dirty || fc.notifyRedBody.touched || newRecord) && { notifyRedBody: fc.notifyRedBody.value },
+        ...(fc.notifyYellowSubject.dirty || fc.notifyYellowSubject.touched || newRecord) && { notifyYellowSubject: fc.notifyYellowSubject.value },
+        ...(fc.notifyYellowBody.dirty || fc.notifyYellowBody.touched || newRecord) && { notifyYellowBody: fc.notifyYellowBody.value },
+
+
         ...(fc.thresholdType.dirty || fc.thresholdType.touched || newRecord) && { thresholdType: fc.thresholdType.value },
         ...(fc.thresholdYellow.dirty || fc.thresholdYellow.touched || newRecord) && { thresholdYellow: fc.thresholdYellow.value ? +fc.thresholdYellow.value : null },
         ...(fc.thresholdRed.dirty || fc.thresholdRed.touched || newRecord) && { thresholdRed: fc.thresholdRed.value ? +fc.thresholdRed.value : null },
         ...(fc.thresholdDateYellow.dirty || fc.thresholdDateYellow.touched || newRecord) && { thresholdDateYellow: fc.thresholdDateYellow.value ? +fc.thresholdDateYellow.value : null },
         ...(fc.thresholdDateRed.dirty || fc.thresholdDateRed.touched || newRecord) && { thresholdDateRed: fc.thresholdDateRed.value ? +fc.thresholdDateRed.value : null },
+
         ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.mold.mainImagePath,
@@ -1921,7 +2230,18 @@ export class CatalogMoldEditionComponent {
     this.storedTranslations = [];
     this.translationChanged = false;
     this.mold = emptyMoldItem;        
+    this.checklistRedTemplatesCurrentSelection = [];
+    this.checklistYellowTemplatesCurrentSelection = [];
+    this.checklistTemplatesYellow.currentPage = 0;   
+    this.checklistTemplatesYellow.items = [];
+    this.checklistTemplatesRed.currentPage = 0;   
+    this.checklistTemplatesRed.items = [];
+    this.requestChecklistTemplatesYellowData(0);
+    this.requestChecklistTemplatesRedData(0);
+
+    
     this.focusThisField = 'description';
+    this.updateMultiSelections();
     setTimeout(() => {
       this.moldCatalogEdition.nativeElement.scrollIntoView({            
         behavior: 'smooth',
@@ -2004,6 +2324,8 @@ export class CatalogMoldEditionComponent {
       return $localize`Umbral de número de días para Advertencia`
     } else if (fieldControlName === 'thresholdDateRed') {
       return $localize`Umbral de número de días para ALARMA`
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente`
     }
     return '';
   }
@@ -2023,25 +2345,49 @@ export class CatalogMoldEditionComponent {
   validateTables(): void {
     if (this.moldForm.controls.provider.value && this.moldForm.controls.provider.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.provider.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.provider.setErrors(null);      
     }
     if (this.moldForm.controls.manufacturer.value && this.moldForm.controls.manufacturer.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.manufacturer.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.manufacturer.setErrors(null);      
     }
     if (this.moldForm.controls.equipment.value && this.moldForm.controls.equipment.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.equipment.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.equipment.setErrors(null);      
     }
     if (this.moldForm.controls.line.value && this.moldForm.controls.line.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.line.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.line.setErrors(null);      
     }
     if (this.moldForm.controls.moldClass.value && this.moldForm.controls.moldClass.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.moldClass.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.moldClass.setErrors(null);      
     }
     if (this.moldForm.controls.moldType.value && this.moldForm.controls.moldType.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.moldType.setErrors({ inactive: true });      
+    } else {
+      this.moldForm.controls.moldType.setErrors(null);      
     }    
     if (this.moldForm.controls.partNumber.value && this.moldForm.controls.partNumber.value.status === RecordStatus.INACTIVE) {
       this.moldForm.controls.partNumber.setErrors({ inactive: true });      
-    }        
+    } else {
+      this.moldForm.controls.partNumber.setErrors(null);      
+    }
+    if (this.moldForm.controls.notifyRedState.value === GeneralValues.YES && this.moldForm.controls.notifyRedRecipient.value && this.moldForm.controls.notifyRedRecipient.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.notifyRedRecipient.setErrors({ inactive: true });   
+    } else {
+      this.moldForm.controls.notifyRedRecipient.setErrors(null);      
+    }
+    if (this.moldForm.controls.notifyYellowState.value === GeneralValues.YES && this.moldForm.controls.notifyYellowRecipient.value && this.moldForm.controls.notifyYellowRecipient.value.status === RecordStatus.INACTIVE) {
+      this.moldForm.controls.notifyYellowRecipient.setErrors({ inactive: true });   
+    } else {
+      this.moldForm.controls.notifyYellowRecipient.setErrors(null);      
+    }
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
@@ -2093,7 +2439,7 @@ export class CatalogMoldEditionComponent {
   }
 
   saveCatalogDetails$(processId: number): Observable<any> {
-    if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistYellowTemplatesCurrentSelection.length > 0) {
+    if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistRedTemplatesCurrentSelection.length > 0) {
       const checklistTemplatesYellowToDelete = this.checklistYellowTemplatesCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
       .map(ct => {
@@ -2194,6 +2540,19 @@ export class CatalogMoldEditionComponent {
       this.elements.find(e => e.action === action).loading = false;
     });       
   }
+  
+  handleNotifyChannelsSelectItem(origin: string, formField: FormControl, item: any) {
+    if (formField.disabled) return;
+    if (formField.value === GeneralValues.YES) {
+      item.selected = !item.selected;
+      if (origin === 'red') {
+        this.notifyRedChannelsSelected = this.notifyRedChannels.items.filter(r => r.selected).length;
+      } else if (origin === 'yellow') {
+        this.notifyYellowChannelsSelected = this.notifyYellowChannels.items.filter(r => r.selected).length;
+      }
+      this.setEditionButtonsState();
+    }
+  }
 
   setEditionButtonsState() {
     if (!this.mold.id || this.mold.id === null || this.mold.id === 0) {
@@ -2202,6 +2561,15 @@ export class CatalogMoldEditionComponent {
       this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
     }
   }
+
+  handleKeyDown(event: KeyboardEvent) { }
+
+  chengeSelection(event: any) { 
+  }
+
+  handleChangeSelection(event: any) { 
+  }
+
 
   get MoldControlStates() {
     return MoldControlStates;

@@ -10,6 +10,30 @@ export interface GeneralCatalogData {
   cadRight?: string;  
 }
 
+export interface CatalogCompactResponseData {
+  loading?: boolean;  
+  items?: CatalogCompactItemData[];  
+}
+
+export interface CatalogCompactItemData {
+  customerId?: number;
+  id?: number;
+  name?: string;  
+  notes?: string;  
+  prefix?: string;  
+  reference?: string;  
+  status?: string;  
+  translations: CatalogCompactItemTrsnslationData[];
+}
+ 
+ export interface CatalogCompactItemTrsnslationData {
+  name?: string;  
+  reference?: string;  
+  notes?: string;  
+  prefix?: string;  
+  languageId?: number;
+  id?: number;
+ }
 export interface GeneralCatalogTranslationsData {
   loading?: boolean;
   totalCount?: number;

@@ -74,11 +74,11 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       true,
     );    
     // Observables
@@ -111,7 +111,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.CHEKLIST_TEMPLATES_CATALOG) {
+        if (searchBox.from === ApplicationModules.CHECKLIST_TEMPLATES_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -127,7 +127,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.CHEKLIST_TEMPLATES_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.CHECKLIST_TEMPLATES_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -138,7 +138,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -147,7 +147,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       false,
     );        
   }
@@ -255,7 +255,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+          from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -276,7 +276,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.CHEKLIST_TEMPLATES_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.CHECKLIST_TEMPLATES_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -424,11 +424,11 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.CHEKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       loading,
     );         
   }

@@ -18,7 +18,7 @@ import { GenericDialogComponent } from '../generic-dialog';
   animations: [ dissolve, ],
   styleUrls: ['./translations-dialog.component.scss']
 })
-export class TranslationsDialogComponent implements OnDestroy, AfterViewInit {
+export class TranslationsDialogComponent implements AfterViewInit, OnDestroy {
   @ViewChild('translationsDialog') translationsDialog: ElementRef;
   
 // Variables ================

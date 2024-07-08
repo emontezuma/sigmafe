@@ -1,4 +1,5 @@
 import { Attachment, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import { ChecklistTemplatePossibleValue } from './catalogs-checklist-templates.models';
 
 export interface VariablesData {
   variablesPaginated?: Variables;
@@ -33,6 +34,8 @@ export interface VariableDetail {
   id?: number;
   customerId?: number;
   uom?: GeneralCatalogInternalData,
+  uomName?: string;
+  uomPrefix?: string;
   recipient?: GeneralCatalogInternalData,
   sigmaType?: GeneralCatalogInternalData,
   valueType?: string,
@@ -53,6 +56,7 @@ export interface VariableDetail {
   byDefault?: string; 
   byDefaultDateType?: string; 
   resetValueMode?: string; 
+  valuesList?: ChecklistTemplatePossibleValue[]; 
   minimum?: string; 
   maximum?: string; 
   createdById?: any;
@@ -64,6 +68,9 @@ export interface VariableDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;  
+  friendlyValueType?: string;
+  uomId?: number;
+  recipientId?: number;
 }
 
 export interface VariablesState {
@@ -144,3 +151,11 @@ export interface VariablePossibleValue {
   byDefault?: boolean;
   alarmedValue?: boolean;  
 }
+
+export interface VariableSelection {
+  id?: number;
+  customerId?: number;
+  name?: string;  
+}
+
+

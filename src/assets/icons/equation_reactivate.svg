@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="addmask" version="1.1"  x="0px" y="0px" width="32" height="32" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve" style="fill: rgb(0, 0, 0);" viewbox="0 0 32 32">
+<g class="addon_content" transform="translate(0,13) scale(1,1)">
+	<g>
+		<defs>
+			<path class="mask_container" id="263_checkmark_SVGID_1_" d="M-18.5-31v72h72v-72H-18.5z M16,12.12L8.88,5L13,0.88l3,3l6-6L26.12,2L16,12.12z" transform="translate(0,13) scale(1,1)" style="fill: rgb(0, 0, 0);"></path>
+		</defs>
+		<clipPath id="263_checkmark_SVGID_2_">
+			<use xlink:href="#263_checkmark_SVGID_1_" overflow="visible"></use>
+		</clipPath>
+	</g>
+	<polygon id="263_checkmark_addon" points="16,10 11,5 13,3 16,6 22,0 24,2 "></polygon>
+</g>
+<g id="263_checkmark_icon_placeholder" clip-path="url(#263_checkmark_SVGID_2_)">
+	<g class="icnplhld"><!--?xml version="1.0" encoding="utf-8"?-->
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<g xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve" preserveAspectRatio="none" class="svgmask">
+<path id="2634351383__x3C_Trazado_x3E_" d="M20.513,18C19.924,17.989,18,17.778,18,15.5V6h3V3H3v3h3v5.5c0,6.186-3.166,6.486-3.5,6.5v3  C2.565,21,9,20.892,9,11.5V6h6v9.5c0,4.035,3.289,5.5,5.5,5.5h1v-3H20.513z" style="fill: rgb(0, 0, 0);"></path>
+</g>
+</g>
+</g>
+</svg>

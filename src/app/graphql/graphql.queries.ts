@@ -433,6 +433,16 @@ export const GET_MOLD = gql`
         thresholdRedDateReached
         moldTypeId
         moldClassId
+        notifyYellowState
+        notifyRedState
+        notifyYellowRecipientId
+        notifyRedRecipientId
+        notifyYellowChannels
+        notifyRedChannels
+        notifyYellowSubject
+        notifyYellowBody
+        notifyRedSubject
+        notifyRedBody
         id
         customerId
         status
@@ -511,6 +521,28 @@ export const GET_MOLD = gql`
           }
         }
         moldClass {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        notifyYellowRecipient {
+          id
+          status
+          name
+          reference
+          translations {
+            name
+            reference
+            languageId
+          }
+        }
+        notifyRedRecipient {
           id
           status
           name
@@ -627,6 +659,22 @@ export const GET_MOLD = gql`
         translatedNotes
         friendlyStatus
       } 
+      translatedNotifyYellowRecipient { 
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
+      translatedNotifyRedRecipient { 
+        isTranslated
+        translatedName
+        translatedReference
+        translatedNotes
+        translatedPrefix
+        friendlyStatus
+      }
     }
   }
 `;
@@ -775,6 +823,18 @@ export const UPDATE_MOLD = gql`
     $thresholdDateRed: Long,        
     $templatesRed: String,        
     $templatesYellow: String
+
+    $notifyYellowState: String
+    $notifyYellowChannels: String
+    $notifyYellowSubject: String
+    $notifyYellowBody: String
+    $notifyYellowRecipientId: Long
+    
+    $notifyRedState: String
+    $notifyRedChannels: String
+    $notifyRedRecipientId: Long
+    $notifyRedSubject: String
+    $notifyRedBody: String
   ) {
   createOrUpdateMold (
     inputs: [{
@@ -807,6 +867,17 @@ export const UPDATE_MOLD = gql`
       thresholdDateRed: $thresholdDateRed
       templatesRed: $templatesRed        
       templatesYellow: $templatesYellow
+      notifyYellowState: $notifyYellowState
+      notifyYellowChannels: $notifyYellowChannels
+      notifyYellowSubject: $notifyYellowSubject
+      notifyYellowBody: $notifyYellowBody
+      notifyYellowRecipientId: $notifyYellowRecipientId
+      
+      notifyRedState: $notifyRedState
+      notifyRedChannels: $notifyRedChannels
+      notifyRedRecipientId: $notifyRedRecipientId
+      notifyRedSubject: $notifyRedSubject
+      notifyRedBody: $notifyRedBody
     }]) {
       id
       createdAt
@@ -1059,7 +1130,7 @@ export const ADD_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
       inputs: $translations
     ) {
       id,
-      variableId,
+      checklistTemplateId,
       languageId      
     }
   }
@@ -1067,67 +1138,125 @@ export const ADD_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
 
 export const UPDATE_CHECKLIST_TEMPLATE = gql`
   mutation CreateOrUpdateChecklistTemplate (
-    $customerId: Long,
-    $id: Long,
-    $status: String    
-    $name: String,
-    $reference: String,
-    $notes: String,
-    $valueType: String,
-    $prefix: String,
-    $required: String,
-    $allowComments: String,
-    $allowNoCapture: String,
+    $alarmNotificationChannels: String,
+    $alarmNotificationMessageBody: String,
+    $alarmNotificationMessageSubject: String,
+    $alarmNotificationMode: String,
+    $alarmRecipientId: Long,
     $allowAlarm: String,
-    $resetValueMode: String,
-    $notifyAlarm: String,    
-    $accumulative: String,
-    $showChart: String,
-    $possibleValues: String,
-    $minimum: String,
-    $maximum: String,
-    $showNotes: String,
-    $automaticActionPlan: String,
-    $actionPlansToGenerate: String,
-    $byDefaultDateType: String,
-    $byDefault: String,
-    $uomId: Long,
-    $sigmaTypeId: Long,
+    $allowApprovalByGroup: String,
+    $allowDiscard: String,
+    $allowExpiring: String,
+    $allowManualMode: String,
+    $allowPartialSaving: String,
+    $allowReassignment: String,
+    $allowRejection: String,
+    $allowRestarting: String,
+    $anticipationChannels: String,
+    $anticipationMessageBody: String,
+    $anticipationMessageSubject: String,
+    $anticipationNotificationMode: String,
+    $anticipationRecipientId: Long,
+    $anticipationSeconds: Long,
+    $approvalNotificationMode: String,
+    $approvalRecipientId: Long,
+    $approvalRequestChannels: String,
+    $approvalRequestMessageBody: String,
+    $approvalRequestMessageSubject: String,
+    $approverId: Long,    
+    $cancelOpenChecklists: String,    
+    $expiringChannels: String,
+    $expiringMessageBody: String,
+    $expiringMessageSubject: String,
+    $expiringNotificationMode: String,
+    $expiringRecipientId: Long,
+    $generationChannels: String,    
+    $generationMessageBody: String,
+    $generationMessageSubject: String,
+    $generationNotificationMode: String,
+    $generationRecipientId: Long,
+    $id: Long,
     $mainImageGuid: String,
     $mainImageName: String,
-    $mainImagePath: String,    
+    $mainImagePath: String,
+    $moldStates: String,
+    $name: String,
+    $notes: String,
+    $notifyAnticipation: String,
+    $notifyApproval: String,
+    $notifyExpiring: String,
+    $notifyGeneration: String,
+    $notifyAlarm: String,
+    $prefix: String,
+    $reference: String,
+    $requiresActivation: String,
+    $requiresApproval: String,
+    $status: String,
+    $templateTypeId: Long,
+    $timeToFill: Int,
+    $customerId: Long,
+    $molds: String,    
   ) {
   createOrUpdateChecklistTemplate (
-    inputs: [{
-      customerId: $customerId
-      id: $id      
+    inputs: [{      
+      alarmNotificationChannels: $alarmNotificationChannels
+      alarmNotificationMessageBody: $alarmNotificationMessageBody
+      alarmNotificationMessageSubject: $alarmNotificationMessageSubject
+      alarmNotificationMode: $alarmNotificationMode
+      alarmRecipientId: $alarmRecipientId
+      allowAlarm: $allowAlarm
+      allowApprovalByGroup: $allowApprovalByGroup
+      allowDiscard: $allowDiscard
+      allowExpiring: $allowExpiring
+      allowManualMode: $allowManualMode
+      allowPartialSaving: $allowPartialSaving
+      allowReassignment: $allowReassignment
+      allowRejection: $allowRejection
+      allowRestarting: $allowRestarting
+      anticipationChannels: $anticipationChannels
+      anticipationMessageBody: $anticipationMessageBody
+      anticipationMessageSubject: $anticipationMessageSubject
+      anticipationNotificationMode: $anticipationNotificationMode
+      anticipationRecipientId: $anticipationRecipientId
+      anticipationSeconds: $anticipationSeconds
+      approvalNotificationMode: $approvalNotificationMode
+      approvalRecipientId: $approvalRecipientId
+      approvalRequestChannels: $approvalRequestChannels
+      approvalRequestMessageBody: $approvalRequestMessageBody
+      approvalRequestMessageSubject: $approvalRequestMessageSubject
+      approverId: $approverId
+      cancelOpenChecklists: $cancelOpenChecklists
+      expiringChannels: $expiringChannels
+      expiringMessageBody: $expiringMessageBody
+      expiringMessageSubject: $expiringMessageSubject
+      expiringNotificationMode: $expiringNotificationMode
+      expiringRecipientId: $expiringRecipientId
+      generationChannels: $generationChannels
+      generationMessageBody: $generationMessageBody
+      generationMessageSubject: $generationMessageSubject
+      generationNotificationMode: $generationNotificationMode
+      generationRecipientId: $generationRecipientId
+      id: $id
+      mainImageGuid: $mainImageGuid
+      mainImageName: $mainImageName
+      mainImagePath: $mainImagePath
+      moldStates: $moldStates
+      name: $name
+      notes: $notes
+      notifyAnticipation: $notifyAnticipation
+      notifyApproval: $notifyApproval
+      notifyExpiring: $notifyExpiring
+      notifyGeneration: $notifyGeneration
+      prefix: $prefix
+      reference: $reference
+      requiresActivation: $requiresActivation
+      requiresApproval: $requiresApproval
       status: $status
-      name: $name,
-      reference: $reference,
-      notes: $notes,
-      showNotes: $showNotes,
-      prefix: $prefix,
-      valueType: $valueType,
-      minimum: $minimum,
-      maximum: $maximum,
-      required: $required,
-      resetValueMode: $resetValueMode,
-      allowComments: $allowComments,
-      notifyAlarm: $notifyAlarm,      
-      allowNoCapture: $allowNoCapture,
-      automaticActionPlan: $automaticActionPlan,
-      actionPlansToGenerate: $actionPlansToGenerate,
-      possibleValues: $possibleValues,
-      byDefaultDateType: $byDefaultDateType,
-      byDefault: $byDefault,
-      allowAlarm: $allowAlarm,
-      showChart: $showChart,
-      accumulative: $accumulative,
-      uomId: $uomId,
-      sigmaTypeId: $sigmaTypeId,
-      mainImageGuid: $mainImageGuid,
-      mainImageName: $mainImageName,
-      mainImagePath: $mainImagePath,
+      templateTypeId: $templateTypeId
+      timeToFill: $timeToFill
+      customerId: $customerId
+      notifyAlarm: $notifyAlarm    
+      molds: $molds    
     }]) {
       id
       createdAt
@@ -1381,6 +1510,38 @@ export const GET_RECIPIENTS_LAZY_LOADING = gql`
   }
 `;
 
+export const GET_VARIABLES_LAZY_LOADING = gql`
+  query VariablessPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedVariableDtoSortInput!],
+    $filterBy: TranslatedVariableDtoFilterInput
+  ) {
+    variablesPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+    ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 export const GET_APPROVERS_LAZY_LOADING = gql`
   query UsersPaginated (
     $recordsToSkip: Int,
@@ -1459,6 +1620,7 @@ export const GET_VARIABLE = gql`
       resetValueDate
       resetValueChecklistId
       automaticActionPlan
+      byDefaultDateType
       actionPlansToGenerate
       resetValueById
       alarmed
@@ -1588,22 +1750,247 @@ export const INACTIVATE_VARIABLE = gql`
 `;
 
 export const GET_CHECKLIST_TEMPLATE = gql`
-  query oneChecklistTemplate (
-    $checklistTemplateId: Long!,
-  ) {
-  oneChecklistTemplate (
-    id: $checklistTemplateId        
-  ) {
-    data {
+  query oneChecklistTemplate ($checklistTemplateId: Long!) {
+    oneChecklistTemplate (id: $checklistTemplateId) {      
+      isTranslated
+      translatedName
+      translatedReference
+      translatedNotes
+      translatedPrefix
+      translatedApprovalRequestMessageSubject
+      translatedApprovalRequestMessageBody
+      translatedAnticipationMessageSubject
+      translatedAnticipationMessageBody
+      translatedExpiringMessageSubject
+      translatedExpiringMessageBody
+      translatedGenerationMessageSubject
+      translatedGenerationMessageBody
+      translatedAlarmNotificationMessageSubject
+      translatedAlarmNotificationMessageBody
+      friendlyStatus
+      friendlyType
+      data {
+          name
+          reference
+          notes
+          prefix
+          mainImagePath
+          mainImageGuid
+          mainImageName
+          templateTypeId
+          equipmentId
+          allowDiscard
+          allowRejection
+          allowManualMode
+          allowPartialSaving
+          allowApprovalByGroup
+          allowExpiring
+          timeToFill
+          notifyExpiring
+          expiringNotificationMode
+          expiringChannels
+          expiringMessageSubject
+          expiringMessageBody
+          notifyApproval
+          notifyAlarm
+          approvalNotificationMode
+          approvalRequestChannels
+          approvalRequestMessageSubject
+          approvalRequestMessageBody
+          requiresApproval
+          cancelOpenChecklists
+          notifyAnticipation
+          anticipationChannels
+          anticipationMessageSubject
+          anticipationMessageBody
+          anticipationNotificationMode
+          anticipationSeconds
+          notifyGeneration
+          generationChannels
+          generationMessageSubject
+          generationMessageBody
+          generationNotificationMode
+          generationMode
+          molds
+          moldStates
+          approvalRepeatNotification
+          approvalRepeatNotificationFrequency
+          approvalRepeatNotificationLimit
+          approverId
+          allowReassignment
+          requiresActivation
+          allowRestarting
+          generationCount
+          lastGeneratedDate
+          anticipationRecipientId
+          expiringRecipientId
+          approvalRecipientId
+          generationRecipientId
+          alarmNotificationMode
+          alarmNotificationChannels
+          alarmNotificationMessageSubject
+          alarmNotificationMessageBody
+          alarmRecipientId
+          allowAlarm
+          id
+          customerId
+          status
+          createdById
+          createdAt
+          updatedById
+          updatedAt
+          deletedById
+          deletedAt
+          templateType {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }               
+          }
+          equipment {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          translations {
+              checklistTemplateId
+              name
+              reference
+              notes
+              prefix
+              approvalRequestMessageSubject
+              approvalRequestMessageBody
+              anticipationMessageSubject
+              anticipationMessageBody
+              expiringMessageSubject
+              expiringMessageBody
+              generationMessageSubject
+              generationMessageBody
+              alarmNotificationMessageSubject
+              alarmNotificationMessageBody
+              languageId
+              id                
+          }
+          alarmRecipient  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          generationRecipient  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          approvalRecipient  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          expiringRecipient  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          anticipationRecipient  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          approver  {
+              id
+              status
+              name
+              reference                  
+          }
+          calendar  {
+              id
+              status
+              name
+              reference
+              translations {
+                name
+                reference
+                languageId
+              }
+          }
+          
+      }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_CHECKLIST_TEMPLATE_DETAILS = gql`
+query ChecklistTemplateDetails (
+  $recordsToSkip: Int,
+  $recordsToTake: Int,
+  $orderBy: [ChecklistTemplateTranslationTableSortInput!],
+  $filterBy: ChecklistTemplateTranslationTableFilterInput,
+) {
+  checklistTemplateDetails(
+  skip: $recordsToSkip,
+  take: $recordsToTake,
+  order: $orderBy,
+  where: $filterBy
+) {
+  totalCount
+  items {
+      checklistTemplateId
       name
       reference
       notes
-      prefix
-      mainImagePath
-      mainImageGuid
-      mainImageName
-      molds
-      templateTypeId
+      approvalRequestMessageSubject
+      approvalRequestMessageBody
+      anticipationMessageSubject
+      anticipationMessageBody
+      expiringMessageSubject
+      expiringMessageBody
+      alarmNotificationMessageSubject
+      alarmNotificationMessageBody
+      generationMessageSubject
+      generationMessageBody
+      languageId
       id
       customerId
       status
@@ -1613,31 +2000,24 @@ export const GET_CHECKLIST_TEMPLATE = gql`
       updatedAt
       deletedById
       deletedAt
-      templateType {
-        id
-        status
-        name
-        reference
-        translations {
+      language {
           name
           reference
-          languageId
-        }
-      }
-      createdBy {
-        name
+          id
+          iso
       }
       updatedBy {
         name
       }
-      deletedBy {
-        name
-      }      
-    }
-    friendlyStatus    
   }
+  pageInfo {
+      hasNextPage
+      hasPreviousPage
+  }      
+}
 }
 `;
+
 
 export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
   query ChecklistTemplatesTranslationsTable (
@@ -4660,5 +5040,98 @@ export const GET_PLANTS_LAZY_LOADING = gql`
   }
 `;
 
+export const GET_VARIABLE_COMPACT = gql`
+  query OneVariable (
+    $variableId: Long!,
+  ) {
+  oneVariable (
+    id: $variableId        
+  ) {
+    data {
+      customerId
+      id
+      name
+      notes
+      prefix
+      reference
+      status
+      translations {        
+        name
+        reference
+        notes
+        prefix
+        languageId
+        id
+      }
+    }    
+  }
+}
+`;
+
+export const UPDATE_CHECKLIST_TEMPLATE_DETAILS = gql`
+  mutation CreateOrUpdateChecklistTemplateDetail (
+    $accumulative: String
+    $allowAlarm: String
+    $allowComments: String
+    $allowNoCapture: String
+    $byDefault: String
+    $customerId: Long
+    $maximun: String
+    $minimun: String
+    $checklistTemplateId: Long
+    $id: Long
+    $line: Int
+    $notes: String
+    $notifyAlarm: String
+    $possibleValues: String
+    $recipientId: Long
+    $required: String
+    $showChart: String
+    $showLastValue: String
+    $showNotes: String
+    $showParameters: String
+    $status: String
+    $useVariableSettings: String
+    $variableId: Long
+  ) {
+  createOrUpdateChecklistTemplateDetail (
+    inputs: [{
+      accumulative: $accumulative
+      allowAlarm: $allowAlarm
+      allowComments: $allowComments
+      allowNoCapture: $allowNoCapture
+      byDefault: $byDefault
+      customerId: $customerId
+      maximun: $maximun
+      minimun: $minimun
+      checklistTemplateId: $checklistTemplateId
+      id: $id
+      line: $line
+      notes: $notes
+      notifyAlarm: $notifyAlarm
+      possibleValues: $possibleValues
+      recipientId: $recipientId
+      required: $required
+      showChart: $showChart
+      showLastValue: $showLastValue
+      showNotes: $showNotes
+      showParameters: $showParameters
+      status: $status
+      useVariableSettings: $useVariableSettings
+      variableId: $variableId
+
+
+    }]) {
+      id
+      line
+      checklistTemplateId
+      customerId
+      createdAt
+      updatedAt
+      deletedAt
+     
+    } 
+  }
+`;
 
 //=========END

@@ -46,7 +46,7 @@ export class CatalogTableEditionComponent {
   table$: Observable<TableDetail>;
   translations$: Observable<any>;
   updateTable$: Observable<any>;
-  updateTableCatalog: Subscription;
+  updateTableCatalog$: Observable<any>;
   deleteTableTranslations$: Observable<any>;  
   addTableTranslations$: Observable<any>;  
   
@@ -746,31 +746,45 @@ export class CatalogTableEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.table.id || this.table.id === null || this.table.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateTableCatalog = this._catalogsService.updateTableCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const tableId = data?.data?.createOrUpdateMold[0].id;
-      if (tableId > 0) {        
-        this.processTranslations$(tableId)
-        .subscribe(() => {
-          this.requestTableData(tableId);
-          setTimeout(() => {              
-            let message = $localize`La tabla ha sido actualizada`;
-            if (newRecord) {                
-              message = $localize`La tabla ha sido creada satisfactoriamente con el id <strong>${this.table.id}</strong>`;
-              this._location.replaceState(`/catalogs/tables/edit/${this.table.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateTableCatalog$ = this._catalogsService.updateTableCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateTable.length > 0) {      
+            const tableId = data?.data?.createOrUpdateTable[0].id;                
+            this.processTranslations$(tableId)
+            .subscribe(() => {
+              this.requestTableData(tableId);
+              setTimeout(() => {              
+                let message = $localize`La tabla ha sido actualizada`;
+                if (newRecord) {                
+                  message = $localize`La tabla ha sido creada satisfactoriamente con el id <strong>${this.table.id}</strong>`;
+                  this._location.replaceState(`/catalogs/tables/edit/${this.table.id}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
             });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
-      }
-    });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
 
@@ -916,7 +930,7 @@ export class CatalogTableEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.tableForm.controls;
     return  {
         id: this.table.id,

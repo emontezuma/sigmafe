@@ -109,9 +109,21 @@ export interface MoldDetail {
     moldClass?: GeneralCatalogMappedItem;
     line?: GeneralCatalogMappedItem;
     equipment?: GeneralCatalogMappedItem;
+    notifyRedRecipient?: GeneralCatalogMappedItem;
+    notifyYellowRecipient?: GeneralCatalogMappedItem;
     translations?: GeneralTranslation[];
     templatesYellow?: string;
     templatesRed?: string;
+    notifyYellowRecipientId?: string;
+    notifyRedRecipientId?: string;
+    notifyYellowState?: string;
+    notifyRedState?: string;
+    notifyRedChannels?: string;
+    notifyRedSubject?: string;
+    notifyRedBody?: string;
+    notifyYellowChannels?: string;
+    notifyYellowSubject?: string;
+    notifyYellowBody?: string;
   }
   
   export interface GeneralTranslatedFields {
@@ -222,6 +234,10 @@ export interface MoldDetail {
     lastLocationId: null,
     thresholdYellowDateReached: null,
     thresholdRedDateReached: null,
+    notifyRedRecipient: null,
+    notifyYellowRecipient: null,
+    notifyRedRecipientId: null,
+    notifyYellowRecipientId: null,
     id: null,
     customerId: null,
     status: null,
@@ -241,6 +257,14 @@ export interface MoldDetail {
     templatesRed: '',
     templatesYellow: '',    
     translations: [],
+    notifyYellowState: '',
+    notifyRedState: '',
+    notifyRedChannels: '',
+    notifyRedSubject: '',
+    notifyRedBody: '',
+    notifyYellowChannels: '',
+    notifyYellowSubject: '',
+    notifyYellowBody: '',
   };
   
   export const emptyMoldCatalog = {

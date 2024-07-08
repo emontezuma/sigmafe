@@ -737,32 +737,44 @@ export class CatalogEquipmentEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.equipment.id || this.equipment.id === null || this.equipment.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateEquipmentCatalog$ = this._catalogsService.updateEquipmentCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateEquipment.length > 0) {
-          const equipmentId = data?.data?.createOrUpdateEquipment[0].id;          
-          this.processTranslations$(equipmentId).subscribe(() => {
-            this.requestEquipmentData(equipmentId);
-            setTimeout(() => {              
-              let message = $localize`El equipo ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`El equipo ha sido creado satisfactoriamente con el id <strong>${this.equipment.id}</strong>`;
-                this._location.replaceState(`/catalogs/equipments/edit/${equipmentId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateEquipmentCatalog$ = this._catalogsService.updateEquipmentCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateEquipment.length > 0) {
+            const equipmentId = data?.data?.createOrUpdateEquipment[0].id;          
+            this.processTranslations$(equipmentId).subscribe(() => {
+              this.requestEquipmentData(equipmentId);
+              setTimeout(() => {              
+                let message = $localize`El equipo ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El equipo ha sido creado satisfactoriamente con el id <strong>${this.equipment.id}</strong>`;
+                  this._location.replaceState(`/catalogs/equipments/edit/${equipmentId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
   requestEquipmentData(equipmentId: number): void { 
@@ -901,7 +913,7 @@ export class CatalogEquipmentEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.equipmentForm.controls;
     return  {
         id: this.equipment.id,

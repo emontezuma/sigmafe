@@ -41,7 +41,7 @@
             : selection?.value.length + " / " + fieldMaxLength
         }}
       </mat-hint>
-      <mat-error
+      <!--<mat-error
         *ngIf="currentErrorIcon || currentErrorMessage"
         class="field__error field__required"
       >
@@ -52,7 +52,7 @@
         <span class="field__required-label"
           ><strong>{{ currentErrorMessage }}</strong></span
         >
-      </mat-error>      
+      </mat-error>-->
       <button
         *ngIf="
           selection?.value.length > 0 &&

@@ -737,32 +737,44 @@ export class CatalogLineEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.line.id || this.line.id === null || this.line.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateLineCatalog$ = this._catalogsService.updateLineCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateLine.length > 0) {
-          const lineId = data?.data?.createOrUpdateLine[0].id;          
-          this.processTranslations$(lineId).subscribe(() => {
-            this.requestLineData(lineId);
-            setTimeout(() => {              
-              let message = $localize`La linea ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`La linea ha sido creado satisfactoriamente con el id <strong>${this.line.id}</strong>`;
-                this._location.replaceState(`/catalogs/lines/edit/${lineId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateLineCatalog$ = this._catalogsService.updateLineCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateLine.length > 0) {
+            const lineId = data?.data?.createOrUpdateLine[0].id;          
+            this.processTranslations$(lineId).subscribe(() => {
+              this.requestLineData(lineId);
+              setTimeout(() => {              
+                let message = $localize`La linea ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`La linea ha sido creado satisfactoriamente con el id <strong>${this.line.id}</strong>`;
+                  this._location.replaceState(`/catalogs/lines/edit/${lineId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
   requestLineData(lineId: number): void { 
@@ -901,7 +913,7 @@ export class CatalogLineEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.lineForm.controls;
     return  {
         id: this.line.id,

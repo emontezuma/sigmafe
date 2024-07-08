@@ -1,4 +1,4 @@
-<section
+<div
   class="container"
   #catalogEdition
   @routingAnimation
@@ -30,11 +30,11 @@
 
   <mat-card class="card">
     <form
-        class="layout"
-        (ngSubmit)="onSubmit()"
-        [formGroup]="variableForm"
-        #f="ngForm"
-      >
+      class="layout"
+      (ngSubmit)="onSubmit()"
+      [formGroup]="variableForm"
+      #f="ngForm"
+    >
       <mat-accordion multi>
         <mat-expansion-panel
           (opened)="panelOpenState[0] = true"
@@ -657,13 +657,13 @@
               >
                 <span class="label field__label">Fecha y hora por defecto</span>
                 <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field">
+                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
                     <input
                       class="field__input"
                       matInput
-                      formControlName="byDefault"
+                      formControlName="byDefaultDate"
                       #byDefault
-                      name="byDefault"
+                      name="byDefaultDate"
                       [matDatepicker]="byDefaultPicker"
                     />
                     <mat-hint>DD/MM/AAAA</mat-hint>
@@ -686,9 +686,10 @@
                     <input
                       class="field__input"
                       matInput
-                      formControlName="byDefault"
+                      formControlName="byDefaultTime"
                       #byDefault
-                      name="byDefault"
+                      name="byDefaultTime"
+                      style="min-height: 22px"
                       type="time"
                     />
                     <mat-hint>HH:MM AM/PM</mat-hint>                  
@@ -770,6 +771,7 @@
                       #byDefault
                       name="byDefault"
                       type="time"
+                      style="min-height: 22px"
                     />
                     <mat-hint>HH:MM AM/PM</mat-hint>                  
                   </mat-form-field>
@@ -1044,7 +1046,7 @@
                           matTooltipShowDelay="100"
                           [disabled]="i === 0"
                         >
-                          <mat-icon>keyboard_capslock</mat-icon>
+                          <mat-icon class="icon-rotated-90">first_page</mat-icon>
                         </button>
                         <button
                           mat-icon-button
@@ -1054,7 +1056,7 @@
                           matTooltipShowDelay="100"
                           [disabled]="i === variable.attachments.length - 1"
                         >
-                          <mat-icon class="icon-rotated">keyboard_capslock</mat-icon>
+                          <mat-icon class="icon-rotated-90">last_page</mat-icon>
                         </button>
                         <button
                           mat-icon-button (click)="handleAttachmentRemove(i)"
@@ -1098,7 +1100,7 @@
                     matTooltip="Agrega un nuevo adjunto a la variablee"
                     matTooltipClass="tooltip-general"
                     matTooltipShowDelay="100"
-                    (click)="(variable.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttchment() : fileInputAttachment.click();"
+                    (click)="(variable.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttachment() : fileInputAttachment.click();"
                   >
                     <mat-icon                                    
                       class="svgicon icon-medium"                
@@ -1207,4 +1209,4 @@
       </div>
     </div>
   </mat-card>
-</section>
+</div>

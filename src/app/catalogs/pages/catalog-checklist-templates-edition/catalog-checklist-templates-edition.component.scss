@@ -67,15 +67,15 @@ mat-card-subtitle {
 
 .flex {
   @include mixins.flexbox(column, wrap, 5px, flex-start, flex-start);
-  min-width: 250px;
-  flex: 1;
-  margin-top: 10px
+  min-width: 150px;  
+  margin-top: 10px;
+  padding: 5px;
 }
 
 .flex-inactive {
   @include mixins.flexbox(column, wrap, 5px, flex-start, flex-start);
   min-width: 250px;
-  flex: 3;
+  flex: 3
 }
 
 .flex-row {
@@ -114,6 +114,8 @@ mat-card-subtitle {
 
 ::ng-deep .mat-expansion-panel-body {
   padding: 0 5px 5px;
+  display: flex;
+  flex-direction: column;
 }
 
 mat-expansion-panel {
@@ -221,6 +223,7 @@ mat-panel-title {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;    
+  justify-content: space-between;
 }
 
 .grid-inactive {
@@ -870,8 +873,8 @@ mat-hint {
   margin: auto;
 }
 
-.icon-rotated {
-  transform: rotate(180deg);
+.icon-rotated-90 {
+  transform: rotate(90deg);
 }
 
 .image-container-table {    
@@ -1125,9 +1128,51 @@ mat-list-option {
   border: 2px solid var(--theme-accent-500);  
 }
 
+.control-panel-warn {
+  ::ng-deep mat-panel-title {
+    color: var(--theme-warn-700) !important;    
+  }
+  border: 2px solid var(--theme-warn-500);  
+}
+
+.control-panel-disabled {
+  ::ng-deep mat-panel-title {
+    color: var(--z-colors-page-button-disabled-fore) !important;    
+  }
+  border: 4px solid var(--z-colors-page-button-disabled-border);  
+}
+
 .flex-accordion {
   display: flex;
   flex-direction: row;  
   justify-content: space-between;
   width: 100%;
+}
+
+.box-row-variable {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  margin-right: 50px;  
+}
+
+.variable-button {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.checklist-template-line {
+  width: 100%;
+}
+
+.variable-container {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+}
+
+.control-panel-animated {
+  ::ng-deep mat-panel-title {
+    color: var(--theme-accent-700) !important;    
+  }
+  border: 1.5px solid var(--theme-accent-500);  
 }

@@ -443,6 +443,7 @@ export const sampleSettings: SettingsData = {
   attachments: {
     variables: 10,
     checklistTemplateHeader: 5,
+    checklistTemplateLines: 5,
   },
   checklistTemplate: {
     variablesLimit: 50,

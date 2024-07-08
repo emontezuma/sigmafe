@@ -6,16 +6,13 @@
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
-
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
-
   <ng-container *ngIf="settingsData$ | async"></ng-container>
-
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
-  <ng-container *ngIf="translations$ | async "></ng-container>  
-     
+  <ng-container *ngIf="translations$ | async "></ng-container> 
+  <ng-container *ngIf="updateTableCatalog$ | async "></ng-container> 
 
   <mat-card class="card">
     <form

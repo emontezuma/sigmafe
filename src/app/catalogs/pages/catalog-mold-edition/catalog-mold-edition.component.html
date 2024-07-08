@@ -36,7 +36,26 @@
   <ng-container *ngIf="deleteMoldMaintenanceHistory$ | async "></ng-container>       
   <ng-container *ngIf="checklistTemplatesYellow$ | async "></ng-container>       
   <ng-container *ngIf="checklistTemplatesRed$ | async "></ng-container>   
-  <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>           
+  <ng-container *ngIf="updateMoldCatalog$ | async "></ng-container>    
+  <ng-container *ngIf="macros$ | async"></ng-container>       
+  <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
+  <ng-container *ngIf="notificationChannels$ | async"></ng-container>  
+  <ng-container *ngIf="recipients$ | async"></ng-container>  
+
+  <div @dissolve class="sticky" *ngIf="showMacros">
+    <mat-card>
+      <div class="card-macros">
+        <div
+          class="macro-element"  
+          *ngFor="let macro of macros.items; let i = index"
+          [innerHTML]="macro.friendlyText"
+        >        
+        </div>      
+      </div>
+      <mat-divider style="margin: 0px 10px 5px 10px;"></mat-divider>
+      <div style="padding: 0px 10px 10px 10px;"><strong>Inserte en el campo el id de la macro incluyendo los corchetes. Estas macros serán sustituidas por su valor correspondiente al momento de generar el checklist.</strong></div>
+    </mat-card>  
+  </div>
 
   <mat-card class="card">
     <div *ngIf="mold.thresholdState" class="grid-multiple margin-top">
@@ -621,6 +640,35 @@
                 >
               </fieldset>
             </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="moldForm.controls.label"
+                selectType="colored"
+                [list]="labelColors.items"
+                leftHint="Seleccione un valor de la lista"
+                rightHint="Campo opcional"
+                [showRightHint]="true"
+                fieldHelp="Especifique el color de la etiqueta"
+              >
+                <span fieldTitle class="label field__label"
+                  >Color de la etiqueta</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="moldForm.controls.state"
+                [list]="states.items"
+                leftHint="Seleccione un valor de la lista"
+                rightHint="Campo opcional"
+                [showRightHint]="true"
+                fieldHelp="Especifique el Estado actual del molde"
+              >
+                <span fieldTitle class="label field__label"
+                  >Estado actual del molde</span
+                >
+              </app-select-field>
+            </div>
           </div>
         </mat-expansion-panel>
         <mat-expansion-panel
@@ -679,6 +727,13 @@
                   >
                 </app-select-field>
               </div>
+            </div>
+            <div class="grid-multiple">
+              <div class="flex-accordion subtitle">                
+                <label class="accordion-label-no-counter">Gestión al alcanzar la Advertencia</label>                
+              </div>  
+            </div>                      
+            <div class="grid-multiple">
               <div class="field-items">
                 <app-input-field
                   [bordered]="true"
@@ -700,23 +755,6 @@
               <div class="field-items">
                 <app-input-field
                   [bordered]="true"
-                  [formField]="moldForm.controls.thresholdRed"
-                  rightHint="Campo opcional"
-                  fieldInputType="number"
-                  currentErrorIcon="warn_line"
-                  [showCloseButton]="true"
-                  [showRightHint]="true"
-                  leftHint="Deje el valor vacío para no aplicar umbral"
-                  fieldHelp="Especifique el número de golpes que de alcanzarse se generará una ALARMA"
-                >
-                  <span fieldTitle class="label field__label"
-                    >Umbral de golpes (hits) para ALARMA</span
-                  >
-                </app-input-field>
-              </div>
-              <div class="field-items">
-                <app-input-field
-                  [bordered]="true"
                   [formField]="moldForm.controls.thresholdDateYellow"
                   rightHint="Campo opcional"
                   fieldInputType="number"
@@ -729,6 +767,245 @@
                 >
                   <span fieldTitle class="label field__label"
                     >Umbral de número de dias para advertencia</span
+                  >
+                </app-input-field>
+              </div>              
+              <div class="field-items">
+                <app-select-field
+                  [formField]="moldForm.controls.notifyYellowState"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el molde notifica al alcanzar la el valor de la Advertencia"
+                >
+                  <span fieldTitle class="label field__label"
+                    >¿El molde notifica al alcanzar el valor de la Advertencia?</span
+                  >
+                </app-select-field>                
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="moldForm.controls.notifyYellowState.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      moldForm.controls.notifyYellowState.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="notifyYellowChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="notifyYellowChannels?.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        moldForm.controls.notifyYellowState.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChangeSelection($event)"
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of notifyYellowChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('yellow', moldForm.controls.notifyYellowState, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="notifyYellowChannels?.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ notifyYellowChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="notifyYellowChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ notifyYellowChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      moldForm.controls.notifyYellowRecipient.touched &&
+                      !moldForm.controls.notifyYellowRecipient.valid
+                  }"
+                  [disabled]="moldForm.controls.notifyYellowRecipient.disabled ||moldForm.controls.notifyYellowState.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="moldForm.controls.notifyYellowRecipient?.value?.id">Id: {{ moldForm.controls.notifyYellowRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='notifyYellowRecipient'"
+                    [formField]="moldForm.controls.notifyYellowRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div>
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : moldForm.controls.notifyYellowBody.enabled,
+                  'field-items--bordered-disabled' : moldForm.controls.notifyYellowBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="moldForm.controls.notifyYellowBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar al alcanzar el valor de la advertencia</span
+                  >
+                </app-area-field>               
+              </div> 
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : moldForm.controls.notifyYellowSubject.enabled,
+                  'field-items--bordered-disabled' : moldForm.controls.notifyYellowSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="moldForm.controls.notifyYellowSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>  
+              <div class="field-items">
+                <app-multiple-selection-list
+                  [bordered]="true"
+                  [showSelect]="true"                  
+                  [selectOptions]="checklistTemplatesOptions"
+                  [currentSelections]="checklistYellowTemplatesCurrentSelection"        
+                  [formField]="moldForm.controls.templatesYellow"
+                  [list]="checklistTemplatesYellow.items"
+                  [totalCount]="checklistTemplatesYellow.totalCount"
+                  [loading]="checklistTemplatesYellow.loading"                                    
+                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_YELLOW"                  
+                  (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                <span fieldTitle class="label field__label">Checklist a generar si se alcanza el valor de la Advertencia</span>
+                </app-multiple-selection-list>                
+              </div>
+            </div>
+            <div class="grid-multiple">
+              <div class="flex-accordion subtitle">                
+                <label class="accordion-label-no-counter">Gestión al alcanzar la ALARMA!</label>                
+              </div>  
+            </div>                      
+            <div class="grid-multiple">                
+              <div class="field-items">
+                <app-input-field
+                  [bordered]="true"
+                  [formField]="moldForm.controls.thresholdRed"
+                  rightHint="Campo opcional"
+                  fieldInputType="number"
+                  currentErrorIcon="warn_line"
+                  [showCloseButton]="true"
+                  [showRightHint]="true"
+                  leftHint="Deje el valor vacío para no aplicar umbral"
+                  fieldHelp="Especifique el número de golpes que de alcanzarse se generará una ALARMA"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Umbral de golpes (hits) para ALARMA</span
                   >
                 </app-input-field>
               </div>
@@ -750,22 +1027,203 @@
                 </app-input-field>
               </div>
               <div class="field-items">
-                <app-multiple-selection-list
-                  [bordered]="true"
-                  [showSelect]="true"                  
-                  [selectOptions]="checklistTemplatesOptions"
-                  [currentSelections]="checklistYellowTemplatesCurrentSelection"        
-                  [formField]="moldForm.controls.templatesYellow"
-                  [list]="checklistTemplatesYellow.items"
-                  [totalCount]="checklistTemplatesYellow.totalCount"
-                  [loading]="checklistTemplatesYellow.loading"                                    
-                  [catalog]="SystemTables.CHECKLIST_TEMPLATES_YELLOW"                  
-                  (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
-                  (getMoreData)="getMoreData($event)"
+                <app-select-field
+                  [formField]="moldForm.controls.notifyRedState"
+                  [list]="genYesNoValues.items"                
+                  fieldHelp="Especifique si el molde notifica al alcanzar la el valor de la Advertencia"
                 >
-                <span fieldTitle class="label field__label">Checklist a generar en la advertencia</span>
-                </app-multiple-selection-list>                
+                  <span fieldTitle class="label field__label"
+                    >¿El molde notifica al alcanzar el valor de la ALARMA!?</span
+                  >
+                </app-select-field>                
               </div>
+              <div class="field-items">
+                <fieldset
+                  class="multiple-selection-list__field-container"
+                  [disabled]="moldForm.controls.notifyRedState.value !== 'y'"                
+                >
+                  <span class="label field__label">Canal de notificación</span>
+                  <div
+                    class="multiple-selection-list__list-options-container"
+                    [ngStyle]="{
+                      'border-color':
+                      moldForm.controls.notifyRedState.value !== 'y'
+                          ? 'var(--z-colors-page-button-disabled-border)'
+                          : 'var(--theme-primary-300)'
+                    }"
+                  >
+                    <div
+                      *ngIf="loading"
+                      class="multiple-selection-list__progress-container"
+                    >
+                      <mat-progress-spinner
+                        mode="indeterminate"
+                        color="primary"
+                        class="multiple-selection-list__progress"
+                        diameter="64"
+                      >
+                      </mat-progress-spinner>
+                    </div>
+                    <div          
+                      class="multiple-selection-list__list-options-box no-selections"
+                      *ngIf="notifyRedChannels.items.length === 0 && !loading"
+                    >
+                      <span>No hay elementos a mostrar...</span>
+                    </div>
+                    <mat-selection-list
+                      *ngIf="notifyRedChannels?.items.length > 0 || loading"
+                      class="multiple-selection-list__list-options-box"
+                      [disabled]="
+                        moldForm.controls.notifyRedState.value !== 'y'
+                      "
+                      name="multipleSelection"
+                      (click)="handleChangeSelection($event)"
+                      (keydown)="handleKeyDown($event)"
+                      cdkScrollable
+                    >
+                      <mat-list-option
+                        *ngFor="let item of notifyRedChannels.items; let i = index"            
+                        [value]="item.id"
+                        (click)="handleNotifyChannelsSelectItem('red', moldForm.controls.notifyRedState, item)"
+                        (keydown)="handleKeyDown($event)"
+                        [selected]="!!item.selected"
+                        checkboxPosition="before"
+                        
+                        color="primary"
+                      >
+                        <div class="multiple-selection-list__list-option-container">
+                          <div class="multiple-selection-list__list-option">
+                            {{ item.friendlyText }}
+                          </div>
+                        </div>
+                      </mat-list-option>
+                    </mat-selection-list>
+                  </div>
+                  <div
+                    class="multiple-selection-list__search-container"        
+                  >
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="start"          
+                    >
+                      <span
+                        *ngIf="notifyRedChannels?.items.length > 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        Item(s): {{ notifyRedChannels.items.length }}
+                      </span>
+                      <span 
+                        *ngIf="notifyRedChannels.items.length === 0"
+                        class="auto-complete__hint--normal"
+                      >
+                        No hay items a mostrar...
+                      </span>
+                    </mat-hint>
+                    <mat-hint
+                      class="auto-complete__hint"
+                      align="end"          
+                    >
+                      <span class="auto-complete__hint--normal">
+                          Seleccionados en la lista: {{ notifyRedChannelsSelected }}
+                      </span>
+                    </mat-hint>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="field-items">
+                <fieldset
+                  class="field__container"
+                  style="min-width: 350px; height: calc(100% - 22px);"
+                  [ngClass]="{
+                    'field__container--error':
+                      moldForm.controls.notifyRedRecipient.touched &&
+                      !moldForm.controls.notifyRedRecipient.valid
+                  }"
+                  [disabled]="moldForm.controls.notifyRedRecipient.disabled ||moldForm.controls.notifyRedState.value !== 'y'"
+                >
+                  <div class="title-with-id">
+                    <span class="label field__label">Recipiente asociado</span>
+                    <span class="field__label" *ngIf="moldForm.controls.notifyRedRecipient?.value?.id">Id: {{ moldForm.controls.notifyRedRecipient?.value?.id }}</span>
+                  </div>
+                  <app-auto-complete-field
+                    [focused]="focusThisField==='notifyRedRecipient'"
+                    [formField]="moldForm.controls.notifyRedRecipient"
+                    [list]="recipients.items"
+                    [totalCount]="recipients.totalCount"
+                    leftHint="Escriba el Nombre del recipiente a buscar"
+                    [catalog]="SystemTables.RECIPIENTS"
+                    [loading]="recipients.loading"
+                    noItemsError="No hay recipientes con este nombre"
+                    [showDataState]="true"
+                    (optionSelected)="handleOptionSelected($event)"
+                    (getMoreData)="getMoreData($event)"
+                  >
+                  </app-auto-complete-field>
+                  <span class="field__help"
+                    >Especifique el Recipiente a notificar</span
+                  >
+                </fieldset>
+              </div>
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : moldForm.controls.notifyRedBody.enabled,
+                  'field-items--bordered-disabled' : moldForm.controls.notifyRedBody.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="moldForm.controls.notifyRedBody"                
+                  [fieldMaxLength]="1000"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el mensaje que se enviará"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Notificación a enviar al alcanzar el valor de la ALARMA!</span
+                  >
+                </app-area-field>               
+              </div> 
+              <div
+                class="field-items"
+                [ngClass]="{ 
+                  'field-items--bordered' : moldForm.controls.notifyRedSubject.enabled,
+                  'field-items--bordered-disabled' : moldForm.controls.notifyRedSubject.disabled
+                }"
+              >
+                <mat-icon
+                  class="macros-icon"
+                  svgIcon="transcode"
+                  matTooltip="Este campo soporta macros"
+                  matTooltipClass="tooltip-general"
+                  matTooltipShowDelay="100"
+                >
+                </mat-icon>              
+                <app-area-field
+                  [bordered]="false"
+                  [formField]="moldForm.controls.notifyRedSubject"
+                  [fieldMaxLength]="200"
+                  [showRightHint]="true"
+                  [showCloseButton]="true"
+                  [minRows]="1"
+                  [maxRows]="5"
+                  fieldHelp="Especifique el título de la notificación que se enviará por correo"
+                >
+                  <span fieldTitle class="label field__label"
+                    >Título del mensaje a enviar (sólo para envío de correos)</span
+                  >
+                </app-area-field>               
+              </div>  
               <div class="field-items">
                 <app-multiple-selection-list
                   [bordered]="true"
@@ -782,37 +1240,9 @@
                 >
                 <span fieldTitle class="label field__label">Checklist a generar en la ALARMA</span>
                 </app-multiple-selection-list>                
-              </div>
-              <div class="field-items">
-                <app-select-field
-                  [formField]="moldForm.controls.label"
-                  selectType="colored"
-                  [list]="labelColors.items"
-                  leftHint="Seleccione un valor de la lista"
-                  rightHint="Campo opcional"
-                  [showRightHint]="true"
-                  fieldHelp="Especifique el color de la etiqueta"
-                >
-                  <span fieldTitle class="label field__label"
-                    >Color de la etiqueta</span
-                  >
-                </app-select-field>
-              </div>
-              <div class="field-items">
-                <app-select-field
-                  [formField]="moldForm.controls.state"
-                  [list]="states.items"
-                  leftHint="Seleccione un valor de la lista"
-                  rightHint="Campo opcional"
-                  [showRightHint]="true"
-                  fieldHelp="Especifique el Estado actual del molde"
-                >
-                  <span fieldTitle class="label field__label"
-                    >Estado actual del molde</span
-                  >
-                </app-select-field>
-              </div>
+              </div>              
             </div>
+
             <mat-divider style="margin: 5px 10px"> </mat-divider>
             <div class="grid-multiple" style="padding: 0px 10px">
               <div class="flex grid-center">

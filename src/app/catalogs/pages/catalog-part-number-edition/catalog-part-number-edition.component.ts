@@ -35,10 +35,6 @@ export class CatalogPartNumberEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
-
-
-
-  
   // partNumberFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -46,16 +42,11 @@ export class CatalogPartNumberEditionComponent {
   partNumber$: Observable<PartNumberDetail>;
   translations$: Observable<any>;
   updatePartNumber$: Observable<any>;
-  updatePartNumberCatalog: Subscription;
+  updatePartNumberCatalog$: Observable<any>;
   deletePartNumberTranslations$: Observable<any>;  
   addPartNumberTranslations$: Observable<any>;  
-  
   partNumberFormChangesSubscription: Subscription;
-  
-
-  
   uploadFiles: Subscription;
-  
   catalogIcon: string = "equation";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
@@ -746,31 +737,45 @@ export class CatalogPartNumberEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.partNumber.id || this.partNumber.id === null || this.partNumber.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updatePartNumberCatalog = this._catalogsService.updatePartNumberCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const partNumberId = data?.data?.createOrUpdateMold[0].id;
-      if (partNumberId > 0) {        
-        this.processTranslations$(partNumberId)
-        .subscribe(() => {
-          this.requestPartNumberData(partNumberId);
-          setTimeout(() => {              
-            let message = $localize`Ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`Ha sido creado satisfactoriamente con el id <strong>${this.partNumber.id}</strong>`;
-              this._location.replaceState(`/catalogs/part-numbers/edit/${this.partNumber.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updatePartNumberCatalog$ = this._catalogsService.updatePartNumberCatalog$(dataToSave)    
+      .pipe(
+        tap((data: any) => {        
+          if (data?.data?.createOrUpdatPartNumber.length > 0) {
+            const partNumberId = data?.data?.createOrUpdatPartNumber[0].id;        
+            this.processTranslations$(partNumberId)
+            .subscribe(() => {
+              this.requestPartNumberData(partNumberId);
+              setTimeout(() => {              
+                let message = $localize`El Número de parte ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El Número de parte ha sido creado satisfactoriamente con el id <strong>${partNumberId}</strong>`;
+                  this._location.replaceState(`/catalogs/part-numbers/edit/${partNumberId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
             });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
-      }
-    });
+          }
+        })
+      )
+     } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }    
   }
 
 
@@ -916,7 +921,7 @@ export class CatalogPartNumberEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.partNumberForm.controls;
     return  {
         id: this.partNumber.id,

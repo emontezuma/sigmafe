@@ -5,6 +5,8 @@ export interface ProfileData {
     lastName?: string;
     userProfile: string;
     email?: string;
+    languageId?: number;
+    customerId?: number;
     id: string;
 }
 

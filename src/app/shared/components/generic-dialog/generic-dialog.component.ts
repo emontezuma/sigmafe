@@ -129,7 +129,7 @@ export class GenericDialogComponent implements AfterViewInit {
     );    
   }
 
-  ngOnDestro(): void {
+  ngOnDestroy(): void {
     if (this.keypressSubscription) this.keypressSubscription.unsubscribe();
   }
 
