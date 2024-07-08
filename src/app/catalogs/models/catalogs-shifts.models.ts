@@ -36,12 +36,13 @@ export interface ShiftDetail {
   calendar?: GeneralCatalogInternalData;
   
   twoDays?: string;
-  moveToDate?: number;
-  fromTime?: Date;
-  toTime?: Date;
-  sequence?: number;
   isFirstSequence?: string;
   isLastSequence?: string;
+  
+  fromTime?: Date;
+  toTime?: Date;
+  moveToDate?: number;
+  sequence?: number;
 
   status?: string;
   createdById?: any;
@@ -70,7 +71,7 @@ export interface ShiftState {
 export interface ShiftCatalog {
   id: string;
   name: string;
-  mainImagePath: string;
+  
   status: string;
   updatedAt: string;
 }

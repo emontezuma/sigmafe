@@ -4429,13 +4429,13 @@ export const GET_SHIFT = gql`
           }
       }
      
-      twoDays
-      moveToDate
       fromTime
       toTime
-      sequence
+      twoDays
       isFirstSequence
       isLastSequence          
+      moveToDate
+      sequence
 
      
       status
@@ -4574,6 +4574,17 @@ export const ADD_SHIFT_TRANSLATIONS = gql`
   }
 `;
 
+/*
+
+   
+    $sequence:Int!,
+    $moveToDate:Int!,  
+==
+
+     moveToDate: $moveToDate
+    sequence: $sequence
+          
+*/
 export const UPDATE_SHIFT = gql`
   mutation CreateOrUpdateShift (
     $customerId: Long,
@@ -4581,12 +4592,13 @@ export const UPDATE_SHIFT = gql`
     $calendarId: Long,
 
     $twoDays:String!,
-    $moveToDate:Int!,
+    $isFirstSequence:String!,
+    $isLastSequence:String!,
+    
     $fromTime:DateTime,
     $toTime:DateTime,
-    $sequence:Int!,
-    $isFirstSequence:String!,
-    $isLastSequence:String!,          
+
+    
    
     $id: Long,
     $status: String    
@@ -4603,12 +4615,12 @@ export const UPDATE_SHIFT = gql`
       calendarId: $calendarId
 
       twoDays: $twoDays
-      moveToDate: $moveToDate
+      isFirstSequence: $isFirstSequence
+      isLastSequence: $isLastSequence  
       fromTime: $fromTime
       toTime: $toTime
-      sequence: $sequence
-      isFirstSequence: $isFirstSequence
-      isLastSequence: $isLastSequence       
+
+      
 
      
       id: $id      

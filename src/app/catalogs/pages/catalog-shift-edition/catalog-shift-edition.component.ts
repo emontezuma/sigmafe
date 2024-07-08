@@ -80,7 +80,18 @@ export class CatalogShiftEditionComponent {
     ),   
     notes: new FormControl(''),   
     reference: new FormControl(''),    
-    prefix: new FormControl(''),  
+    prefix: new FormControl(''),
+    
+    twoDays: new FormControl(''), 
+    fromTime: new FormControl(new Date()), 
+    toTime: new FormControl(new Date()),
+    
+    sequence: new FormControl(''), 
+    moveToDate: new FormControl(''), 
+
+    isFirstSequence: new FormControl(''), 
+    isLastSequence : new FormControl(''),     
+
     
     calendar: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
   });
@@ -97,6 +108,14 @@ export class CatalogShiftEditionComponent {
   tmpDate: number = 112;
   loaded: boolean = false;
 
+
+  genYesNoValues$: Observable<any>;
+  genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+
+  variableByDefaultDate$: Observable<any>;
+  variableByDefaultDate: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+
+  harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   
   constructor(
     private _store: Store<AppState>,
@@ -140,7 +159,8 @@ export class CatalogShiftEditionComponent {
         this.settingsData = settingsData;
         this.takeRecords = this.settingsData.catalog?.pageSize || 50
         const currentPage = 0;
-
+        this.requestGenYesNoValuesData(currentPage);
+        this.requestVariableByDefaultDateValuesData(currentPage);   
       })
     );
     this.shiftFormChangesSubscription = this.shiftForm.valueChanges.subscribe((shiftFormChanges: any) => {
@@ -172,6 +192,8 @@ export class CatalogShiftEditionComponent {
       })
     ); 
     this.calcElements();
+
+
    
     setTimeout(() => {
       this.focusThisField = 'name';
@@ -741,6 +763,10 @@ export class CatalogShiftEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.shift.id || this.shift.id === null || this.shift.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
+
+    console.log("dataToSave")
+    console.log(dataToSave)
+
     this.updateShiftCatalog$ = this._catalogsService.updateShiftCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
@@ -869,9 +895,17 @@ export class CatalogShiftEditionComponent {
   }
 
   updateFormFromData(): void {    
+
     this.shiftForm.patchValue({
       name: this.shift.name,
       reference: this.shift.reference,      
+
+      twoDays: this.shift.twoDays,
+      isFirstSequence: this.shift.isFirstSequence,
+      isLastSequence: this.shift.isLastSequence,
+      
+      fromTime: this.shift.fromTime,
+      toTime:this.shift.toTime,
 
       prefix: this.shift.prefix,      
       notes: this.shift.notes,
@@ -891,6 +925,12 @@ export class CatalogShiftEditionComponent {
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
+      ...(fc.twoDays.dirty || fc.twoDays.touched || newRecord) && { twoDays: fc.twoDays.value },
+      ...(fc.isFirstSequence.dirty || fc.isFirstSequence.touched || newRecord) && { isFirstSequence: fc.isFirstSequence.value },
+      ...(fc.isLastSequence.dirty || fc.isLastSequence.touched || newRecord) && { isLastSequence: fc.isLastSequence.value },
+      ...(fc.fromTime.dirty || fc.fromTime.touched || newRecord) && { fromTime: new Date(fc.fromTime.value) },
+      ...(fc.toTime.dirty || fc.toTime.touched || newRecord) && { toTime: new Date(fc.toTime.value) },
+
       ...(fc.calendar.dirty || fc.calendar.touched || newRecord) && { calendarId: fc.calendar.value ? fc.calendar.value.id : null },      
       
     }
@@ -1018,6 +1058,51 @@ export class CatalogShiftEditionComponent {
       return of(null);
     }
     
+  }
+
+  requestGenYesNoValuesData(currentPage: number) {
+    this.genYesNoValues = {
+      ...this.genYesNoValues,
+      currentPage,
+      loading: true,
+    }        
+    this.genYesNoValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.GEN_VALUES_YES_NO)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.genYesNoValues.items?.concat(data?.data?.hardcodedValues?.items);
+        this.genYesNoValues = {
+          ...this.genYesNoValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+
+
+  requestVariableByDefaultDateValuesData(currentPage: number) {
+    this.variableByDefaultDate = {
+      ...this.variableByDefaultDate,
+      currentPage,
+      loading: true,
+    }        
+    this.variableByDefaultDate$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrderById, SystemTables.VARIABLE_BY_DEFAULT_DATE)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.variableByDefaultDate.items?.concat(data?.data?.hardcodedValues?.items);
+        this.variableByDefaultDate = {
+          ...this.genYesNoValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
   }
 
   get SystemTables () {

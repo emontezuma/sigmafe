@@ -17,6 +17,7 @@
   <ng-container *ngIf="updateShiftCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deleteShiftTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addShiftTranslations$ | async "></ng-container>   
+  <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
 
   <mat-card class="card">
     <form
@@ -155,7 +156,7 @@
           >
             <mat-panel-title>
               <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
+              <label class="accordion-label">USO GENERAL</label>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -173,43 +174,86 @@
               </button>
             </div>
           </mat-expansion-panel-header>
- <!--
+ 
           <div class="grid-multiple margin-top">
+
             <div class="field-items">
-              <fieldset
-                class="field__container"
-                style="min-width: 350px; height: calc(100% - 22px);"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.uom.touched &&
-                    !variableForm.controls.uom.valid
-                }"
-                [disabled]="variableForm.controls.uom.disabled"
+              <app-select-field
+                [formField]="shiftForm.controls.twoDays"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si shift es dos dias"
               >
-                <div class="title-with-id">
-                  <span class="label field__label">Unidad de medida para variable</span>
-                  <span class="field__label" *ngIf="variableForm.controls.uom?.value?.id">Id: {{ variableForm.controls.uom?.value?.id }}</span>
-                </div>
-                <app-auto-complete-field
-                  [focused]="focusThisField==='uom'"
-                  [formField]="variableForm.controls.uom"
-                  [list]="uoms.items"
-                  [totalCount]="uoms.totalCount"
-                  leftHint="Escriba el nombre de la Unidad de medida a buscar"
-                  [catalog]="SystemTables.UOMS"
-                  [loading]="uoms.loading"
-                  noItemsError="No hay unidades de medida con este nombre"
-                  [showDataState]="true"
-                  (optionSelected)="handleOptionSelected($event)"
-                  (getMoreData)="getMoreData($event)"
+                <span fieldTitle class="label field__label"
+                  >dos dias?</span
                 >
-                </app-auto-complete-field>
-                <span class="field__help"
-                  >Especifique el Nombre de la Unidad de medida de la variable</span
-                >
-              </fieldset>
-            </div>   
+              </app-select-field>                
+            </div>
+
             <div class="field-items">
+              <app-select-field
+                [formField]="shiftForm.controls.isFirstSequence"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si es primera secuencia"
+              >
+                <span fieldTitle class="label field__label"
+                  >Primera secuencia</span
+                >
+              </app-select-field>                
+            </div>
+
+            <div class="field-items">
+              <app-select-field
+                [formField]="shiftForm.controls.isLastSequence"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si es ultima secuencia"
+              >
+                <span fieldTitle class="label field__label"
+                  >Ultima secuencia</span
+                >
+              </app-select-field>                
+            </div>
+
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="shiftForm.controls.fromTime"
+                leftHint="Campo opcional"
+                fieldInputType="datetime-local"
+                currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje el valor vacío para no aplicar el rango mínimo"
+                fieldHelp="Especifique el rango minimo para esta variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Rango mínimo</span
+                >
+              </app-input-field>
+            </div>
+
+
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="shiftForm.controls.toTime"
+                leftHint="Campo opcional"
+                fieldInputType="datetime-local"
+                currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                rightHint="Deje el valor vacío para no aplicar el rango mínimo"
+                fieldHelp="Especifique el rango minimo para esta variable"
+              >
+                <span fieldTitle class="label field__label"
+                  >Rango maximo</span
+                >
+              </app-input-field>
+            </div>
+
+
+             <!--  <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.valueType"
                 [list]="valueTypes.items"
@@ -225,6 +269,8 @@
                 >
               </app-select-field>                
             </div>
+
+
             <div class="field-items">
               <app-input-field
                 [bordered]="true"
@@ -243,6 +289,8 @@
                 >
               </app-input-field>
             </div>
+
+
             <div class="field-items">
               <app-input-field
                 [bordered]="true"
@@ -260,6 +308,8 @@
                 >
               </app-input-field>
             </div>
+
+
             <div              
               class="field-items"              
               *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
@@ -449,6 +499,8 @@
                 </div>
               </fieldset>
             </div>
+
+
             <div class="field-items">
               <app-select-field
                 [formField]="variableForm.controls.required"
@@ -797,9 +849,9 @@
               >
               <span fieldTitle class="label field__label">Lista de Planes de acción a generar de forma automática en caso de alarmarse</span>
               </app-multiple-selection-list>                
-            </div>
+            </div>-->
           </div>
--->
+
         </mat-expansion-panel> 
         
         

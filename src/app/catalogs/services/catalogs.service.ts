@@ -1724,12 +1724,11 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     const { oneShift } = paramsData?.shiftGqlData?.data;
     const { data } = oneShift;
     const translations = paramsData?.shiftGqlTranslationsData?.data;
-    const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
+ 
 
     return {
       ...data,
-      mainImage,
+    
       translations: this.mapTranslations(translations),
     }
   }
