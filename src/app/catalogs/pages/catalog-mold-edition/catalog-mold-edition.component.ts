@@ -2429,7 +2429,7 @@ export class CatalogMoldEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteMoldTranslations$(varToDelete) : of(null) 
       ]);
     } else {

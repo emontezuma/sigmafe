@@ -31,6 +31,7 @@
   <ng-container *ngIf="approvers$ | async "></ng-container>   
   <ng-container *ngIf="states$ | async "></ng-container>   
   <ng-container *ngIf="updateChecklistTemplateLine$ | async "></ng-container>     
+  <ng-container *ngIf="checklistDetailAttachments$ | async "></ng-container>       
 
   <div @dissolve class="sticky" *ngIf="showMacros">
     <mat-card>
@@ -2814,6 +2815,7 @@
                 <div class="grid-multiple">
                   <app-checklist-template-edition-line
                     [line]="line"                    
+                    [updatingCount]="updatingCount"
                     class="checklist-template-line"
                     (formChange)="handleLineFormChange($event)"
                   >

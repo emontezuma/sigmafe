@@ -48,7 +48,9 @@ export class SnackComponent implements OnInit, AfterViewInit{
     setTimeout(() => {
       this.screenData$ = this._store.select(selectSharedScreen).pipe(
         tap(screenData => {
-          this.maxWidth = screenData.innerWidth * 0.33;
+          setTimeout(() => {
+            this.maxWidth = screenData.innerWidth * 0.33;
+          }, 50);
         })
       );
     });

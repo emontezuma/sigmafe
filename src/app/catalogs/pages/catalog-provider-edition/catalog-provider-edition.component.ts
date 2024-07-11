@@ -1049,7 +1049,7 @@ export class CatalogProviderEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addProviderTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addProviderTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteProviderTranslations$(varToDelete) : of(null) 
       ]);
     } else {

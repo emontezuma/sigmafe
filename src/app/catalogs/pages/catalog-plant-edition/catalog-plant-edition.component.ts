@@ -1151,7 +1151,7 @@ export class CatalogPlantEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addPlantTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addPlantTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePlantTranslations$(varToDelete) : of(null) 
       ]);
     } else {

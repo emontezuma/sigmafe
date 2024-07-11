@@ -1206,7 +1206,7 @@ export class CatalogCustomerEditionComponent {
 
       return combineLatest([
         varToAdd.translations.length > 0
-          ? this._catalogsService.addCustomerTransations$(varToAdd)
+          ? this._catalogsService.addCustomerTranslations$(varToAdd)
           : of(null),
         varToDelete.ids.length > 0
           ? this._catalogsService.deleteCustomerTranslations$(varToDelete)

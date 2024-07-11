@@ -117,8 +117,13 @@ export class ToolbarComponent implements AfterViewInit {
     const toolbarElements = document.getElementsByName("toolbar-element");
     toolbarElements.forEach((element) => {       
       this.totalElementsWidth = this.totalElementsWidth + element.clientWidth;
-    });    
-    this.validateScrollbar();
+    });
+
+    setTimeout(() => {
+      this.validateScrollbar();
+    }, 200)
+      
+    
   }
 
   ngOnChanges(): void {

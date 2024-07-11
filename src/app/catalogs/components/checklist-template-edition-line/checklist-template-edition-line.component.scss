@@ -561,6 +561,18 @@ form {
   margin: auto;
 }
 
+.image-container-table {    
+  max-height: 56px;    
+  max-width: 56px;    
+  min-height: 56px;    
+  min-width: 56px;    
+  position: relative;
+  display: flex;
+  margin: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
 .variable-image {
   width: inherit;
   max-width: calc(100% - 4px);

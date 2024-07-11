@@ -1029,7 +1029,7 @@ export class CatalogGenericEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addGenericTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addGenericTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteGenericTranslations$(varToDelete) : of(null) 
       ]);
     } else {

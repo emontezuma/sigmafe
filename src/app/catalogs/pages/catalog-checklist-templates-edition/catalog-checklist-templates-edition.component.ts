@@ -62,9 +62,10 @@ export class CatalogChecklistTemplatesEditionComponent {
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
-  checklistTemplate$: Observable<ChecklistTemplateDetail>;
+  checklistTemplate$: Observable<any>;
   translations$: Observable<any>;
   updateChecklistTemplate$: Observable<any>;
+  checklistDetailAttachments$: Observable<any>;  
   updateChecklistTemplateCatalog$: Observable<any>;
   deleteChecklistTemplateTranslations$: Observable<any>;  
   addChecklistTemplateTranslations$: Observable<any>;  
@@ -106,8 +107,9 @@ export class CatalogChecklistTemplatesEditionComponent {
   alarmNotificationChannelsSelected: number = 0;
 
   statesSelected: number = 0;
+  updatingCount: number = 0;
 
-  checklistTemplateLines: ChecklistTemplateLine[] = []; 
+  checklistTemplateLines: ChecklistTemplateLine[] = [];
   
   attachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'actions-attachments' ];
   attachmentsTable = new MatTableDataSource<Attachment>([]);
@@ -129,7 +131,8 @@ export class CatalogChecklistTemplatesEditionComponent {
   linesOrder: any = JSON.parse(`{ "line": "${'ASC'}" }`);
   approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
   storedTranslations: [];
-  storedLines: ChecklistTemplateDetail[] = [];
+  storedLines: ChecklistTemplateLine[] = [];
+  changedLines: ChecklistTemplateLine[] = [];
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false
@@ -224,6 +227,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
+  editing: boolean = false;
   showMacros: boolean = false;
   movedVariable: number = -1;
 
@@ -325,14 +329,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
-          this.requestChecklistTemplateData(+params['id']);
-        }
-      })
-    ); 
-
-    this.parameters$ = this._route.params.pipe(
-      tap((params: Params) => {
-        if (params['id']) {
+          this.editing = true;
           this.requestChecklistTemplateData(+params['id']);
         }
       })
@@ -405,7 +402,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     setTimeout(() => {
       this.focusThisField = 'name';
       if (!this.checklistTemplate.id) {
-        this.loaded = true;
+        this.loaded = !this.editing || this.loaded;
         this.initForm();
       }      
     }, 200);         
@@ -1232,7 +1229,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       }
       this._catalogsService.updateCheklistTemplateLineData(line.line, lineValidation);
     }
-    this.checklistTemplateForm.markAllAsTouched();
+    // this.checklistTemplateForm.markAllAsTouched();
     this.checklistTemplateForm.updateValueAndValidity(); 
     if (this.checklistTemplateForm.valid && !this.checklistTemplateLines.find((line) => line.error)) {      
       this.saveRecord();   
@@ -1298,42 +1295,52 @@ export class CatalogChecklistTemplatesEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.checklistTemplate.id || this.checklistTemplate.id === null || this.checklistTemplate.id === 0;
+    let checklistTemplateId = 0;
     try {
       const dataToSave = this.prepareRecordToSave(newRecord);
       this.updateChecklistTemplateCatalog$ = this._catalogsService.updateChecklistTemplateCatalog$(dataToSave)
       .pipe(
-        tap((data: any) => {
+        switchMap((data: any) => {
           if (data?.data?.createOrUpdateChecklistTemplate.length > 0) {
-            const checklistTemplateId = data?.data?.createOrUpdateChecklistTemplate[0].id;
+            checklistTemplateId = data?.data?.createOrUpdateChecklistTemplate[0].id;
             const files = this.checklistTemplate.attachments.map((a) => a.id);
-            // const arrayOfLines$ = this.prepareLinesUpdating$(checklistTemplateId);
-            combineLatest([ 
+            return combineLatest([ 
               this.processTranslations$(checklistTemplateId), 
               this.saveCatalogDetails$(checklistTemplateId),          
-              // this.processDetails$(checklistTemplateId),                        
+              this.processDetails$(checklistTemplateId),                        
               this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS, checklistTemplateId, files),              
-            ])      
-            .subscribe((data: any) => {
-              this.requestChecklistTemplateData(checklistTemplateId);
-              setTimeout(() => {              
-                let message = $localize`La plantilla de checklist ha sido actualizada`;
-                if (newRecord) {                
-                  message = $localize`La plantilla de checklist ha sido creada satisfactoriamente con el id <strong>${checklistTemplateId}</strong>`;
-                  this._location.replaceState(`/catalogs/checklist-templates/edit/${checklistTemplateId}`);
-                }
-                this._sharedService.showSnackMessage({
-                  message,
-                  snackClass: 'snack-accent',
-                  progressBarColor: 'accent',                
-                });
-                this.setViewLoading(false);
-                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-              }, 200);
-            })
-          }        
+            ])
+          } else {
+            return of([])
+          }
         }),
-        catchError(() => {
+        tap((data: any) => {          
+          this.requestChecklistTemplateData(checklistTemplateId);
+          setTimeout(() => {              
+            let message = $localize`La plantilla de checklist ha sido actualizada`;
+            if (newRecord) {                
+              message = $localize`La plantilla de checklist ha sido creada satisfactoriamente con el id <strong>${checklistTemplateId}</strong>`;
+              this._location.replaceState(`/catalogs/checklist-templates/edit/${checklistTemplateId}`);
+            }
+            this._sharedService.showSnackMessage({
+              message,
+              snackClass: 'snack-accent',
+              progressBarColor: 'accent',                
+            });
+            this.setViewLoading(false);
+            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+          }, 200);
+        }),
+        catchError((error) => {          
+          const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 5000,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          }); 
           this.setViewLoading(false);
+          this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
           return of(null);        
         })
       )    
@@ -1350,319 +1357,61 @@ export class CatalogChecklistTemplatesEditionComponent {
     }    
   }
 
-  prepareLinesUpdating$(processId: number): Observable<any>[] {
-    const arrayOfLines$: Observable<any>[] = [];
-    if (this.checklistTemplateLines.length > 0) {
-      const sortedDetail = this.checklistTemplateLines.sort((a, b) => a.order - b.order)
-      for (const line of sortedDetail) {
-        const newRecord = !line.id || line.id === null || line.id === 0;
-        let lineData = null;
-        if (line.formData) {
-          const fc = line.formData;
-          if (fc.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && fc.byDefaultDateType.value === GeneralValues.SPECIFIC && fc.byDefault.value) {
-            const dateAndTime = this._sharedService.formatDate(
-              (fc.byDefault.value ? fc.byDefault.value : new Date()),
-              'yyyy/MM/dd HH:mm:ss'
-            )
-            .split(' ');      
-            fc.byDefault.setValue(`${dateAndTime[0]} ${dateAndTime[1]}`);
-          }
-
-          lineData = {
-            id: line.id,
-            checklistTemplateId: processId,
-            variableId: line.variableId,
-            line: line.order,            
-            customerId: 1, // TODO: Get from profile
-            status: newRecord ? RecordStatus.ACTIVE : line.status,    
-            possibleValues: line.valuesList ? JSON.stringify(line.valuesList) : null,    
-            ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id : null },      
-            ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value ? fc.uom.value.id : null },      
-            ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value  },
-            ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value  },
-            ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value  },
-            ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value  },
-            ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value  },
-            ...(fc.showParameters.dirty || fc.showParameters.touched || newRecord) && { showParameters: fc.showParameters.value  },
-            ...(fc.showLastValue.dirty || fc.showLastValue.touched || newRecord) && { showLastValue: fc.showLastValue.value  },
-            ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value  },
-            ...(fc.useVariableAttachments.dirty || fc.useVariableAttachments.touched || newRecord) && { useVariableAttachments: fc.useVariableAttachments.value  },
-            ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value  },
-            ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value  },
-            ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO },
-            
-            ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
-            ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },        
-          }
-        } else {
-          lineData = {
-            id: line.id,
-            checklistTemplateId: processId,
-            customerId: 1, // TODO: Get from profile
-            status: newRecord ? RecordStatus.ACTIVE : line.status,    
-            line: line.order,
-            possibleValues: JSON.stringify(line.valuesList),    
-            ...(newRecord) && { uomId: line.uom.id  },
-            ...(newRecord) && { recipientId: line.recipientId },
-            ...(newRecord) && { variableId: line.variableId },
-            ...(newRecord) && { required: line.required  },
-            ...(newRecord) && { allowComments: line.allowComments  },
-            ...(newRecord) && { allowNoCapture: line.allowNoCapture  },
-            ...(newRecord) && { allowAlarm: line.allowAlarm  },
-            ...(newRecord) && { showChart: line.showChart  },
-            ...(newRecord) && { showParameters: line.showParameters ? line.showParameters : GeneralValues.NO },
-            ...(newRecord) && { showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO },
-            ...(newRecord) && { notifyAlarm: line.notifyAlarm  },
-
-            ...(newRecord) && { useVariableAttachments: line.useVariableAttachments ? line.useVariableAttachments : GeneralValues.NO  },
-            ...(newRecord) && { notes: line.notes  },
-            ...(newRecord) && { byDefault: line.byDefault  },
-            ...(newRecord) && { showNotes: line.showNotes ? GeneralValues.YES : GeneralValues.NO },
-            ...(newRecord) && { maximum: line.maximum  },
-            ...(newRecord) && { minimum: line.minimum  },
-          }
-        }
-
-        arrayOfLines$.push(
-          this._catalogsService.updateChecklistTemplateLine$(lineData)
-          .pipe(
-            switchMap((data: any) => {
-              if (data?.data?.createOrUpdateChecklistTemplateDetail.length > 0) {
-                const checklistTemplateDetailId = data?.data?.createOrUpdateChecklistTemplateDetail[0].id;   
-                line.id = checklistTemplateDetailId;
-                line.customerId = data?.data?.createOrUpdateChecklistTemplateDetail[0].customerId;
-                const files = line.attachments.map((a) => a.id);              
-                return this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, checklistTemplateDetailId, files)              
-              } else {
-                return of(null);
-              }
-            })
-          )
-        )
-      }      
-    }
-    return arrayOfLines$;
-  }
-
-
-  
-
-  processDetails$(processId: number): any {
-    const differences = this.storedLines.length !== this.checklistTemplateLines.length || this.storedLines.some((sl: any) => {
-      return this.checklistTemplate.translations.find((l: any) => {        
-        return sl.languageId === l.languageId &&
-        sl.id === l.id &&
-        (sl.notes !== l.notes || 
-        sl.status !== l.status || 
-        sl.required !== l.required || 
-        sl.uomId !== l.uomId || 
-        sl.allowComments !== l.allowComments || 
-        sl.allowAlarm !== l.allowAlarm || 
-        sl.showChart !== l.showChart || 
-        sl.showParameters !== l.showParameters || 
-        sl.showLastValue !== l.showLastValue || 
-        sl.useVariableAttachments !== l.useVariableAttachments || 
-        sl.byDefault !== l.byDefault || 
-        sl.showNotes !== l.showNotes || 
-        sl.maximum !== l.maximum || 
-        sl.minimum !== l.minimum || 
-        sl.variableId !== l.variableId || 
-        sl.recipientId !== l.recipientId);
-      });
-    });
-    if (differences) {
-      const linesToDelete = [];
-      const linesToAdd = [];
-      for (const line of this.storedLines) {
-        const lineToRemove = this.checklistTemplateLines.find((l) => { l.id === line.id });
-        if (lineToRemove) {
-          linesToDelete.push({
-            id: lineToRemove.id,
-            deletePhysically: true,
-          });
-        }
-      }      
-      const varToDelete = {
-        ids: linesToDelete,
-        customerId: 1, // TODO: Get from profile
-      }      
-
-      const sortedDetail = this.checklistTemplateLines.sort((a, b) => a.order - b.order)
-      for (const line of sortedDetail) {      
-        const lineToAdd = this.storedLines.find((l) => { l.id === line.id });
-        if (!lineToAdd) {
-          const newRecord = !line.id || line.id === null || line.id === 0;
-          if (!newRecord) {
-          }
-          let lineData = null;
-          if (line.formData) {
-            const fc = line.formData;
-            if (fc.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && fc.byDefaultDateType.value === GeneralValues.SPECIFIC && fc.byDefault.value) {
-              const dateAndTime = this._sharedService.formatDate(
-                (fc.byDefault.value ? fc.byDefault.value : new Date()),
-                'yyyy/MM/dd HH:mm:ss'
-              )
-              .split(' ');      
-              fc.byDefault.setValue(`${dateAndTime[0]} ${dateAndTime[1]}`);
-            }
-  
-            lineData = {
-              id: line.id,
-              checklistTemplateId: processId,
-              variableId: line.variableId,
-              customerId: 1, // TODO: Get from profile
-              status: newRecord ? RecordStatus.ACTIVE : line.status,    
-              possibleValues: line.valuesList ? JSON.stringify(line.valuesList) : null,    
-              ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id : null },      
-              ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value ? fc.uom.value.id : null },      
-              ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value  },
-              ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value  },
-              ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value  },
-              ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value  },
-              ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value  },
-              ...(fc.showParameters.dirty || fc.showParameters.touched || newRecord) && { showParameters: fc.showParameters.value  },
-              ...(fc.showLastValue.dirty || fc.showLastValue.touched || newRecord) && { showLastValue: fc.showLastValue.value  },
-              ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value  },
-              ...(fc.useVariableAttachments.dirty || fc.useVariableAttachments.touched || newRecord) && { useVariableAttachments: fc.useVariableAttachments.value  },
-              ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value  },
-              ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value  },
-              ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO },
-              
-              ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
-              ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },        
-            }
-          } else {
-            lineData = {
-              id: line.id,
-              checklistTemplateId: processId,
-              customerId: 1, // TODO: Get from profile
-              status: newRecord ? RecordStatus.ACTIVE : line.status,    
-              possibleValues: JSON.stringify(line.valuesList),    
-              ...(newRecord) && { uomId: line.uom.id  },
-              ...(newRecord) && { recipientId: line.recipientId },
-              ...(newRecord) && { variableId: line.variableId },
-              ...(newRecord) && { required: line.required  },
-              ...(newRecord) && { allowComments: line.allowComments  },
-              ...(newRecord) && { allowNoCapture: line.allowNoCapture  },
-              ...(newRecord) && { allowAlarm: line.allowAlarm  },
-              ...(newRecord) && { showChart: line.showChart  },
-              ...(newRecord) && { showParameters: line.showParameters ? line.showParameters : GeneralValues.NO },
-              ...(newRecord) && { showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO },
-              ...(newRecord) && { notifyAlarm: line.notifyAlarm  },
-  
-              ...(newRecord) && { useVariableAttachments: line.useVariableAttachments ? line.useVariableAttachments : GeneralValues.NO  },
-              ...(newRecord) && { notes: line.notes  },
-              ...(newRecord) && { byDefault: line.byDefault  },
-              ...(newRecord) && { showNotes: line.showNotes ? GeneralValues.YES : GeneralValues.NO },
-              ...(newRecord) && { maximum: line.maximum  },
-              ...(newRecord) && { minimum: line.minimum  },
-            }
-          }
-  
-          return this._catalogsService.updateChecklistTemplateLine$(lineData).pipe(
-            switchMap((data: any) => {
-              if (data?.data?.createOrUpdateChecklistTemplateDetail.length > 0) {
-                const checklistTemplateDetailId = data?.data?.createOrUpdateChecklistTemplateDetail[0].id;   
-                line.id = checklistTemplateDetailId;
-                line.customerId = data?.data?.createOrUpdateChecklistTemplateDetail[0].customerId;
-                const files = line.attachments.map((a) => a.id);              
-                return this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, checklistTemplateDetailId, files)              
-              } else {
-                return of(null);
-              }
-            })
-          )
-        }
+  processDetails$(processId: number): Observable<any> {
+    const linesToDelete = [];      
+    const linesToAdd = [];
+    for (const line of this.storedLines) {
+      const lineToRemove = this.checklistTemplateLines.find((l) => l.id === line.id );
+      if (!lineToRemove) {
+        linesToDelete.push({
+          id: line.id,
+          deletePhysically: true,
+        });
       }
-    }
-  }
+    }      
+    const varToDelete = {
+      ids: linesToDelete,
+      customerId: 1, // TODO: Get from profile
+    }      
 
-  processDetailsBkp$(processId: number): Observable<any> {
-    if (this.checklistTemplateLines.length > 0) {
-      const sortedDetail = this.checklistTemplateLines.sort((a, b) => a.order - b.order)
-      for (const line of sortedDetail) {
-        const newRecord = !line.id || line.id === null || line.id === 0;
-        let lineData = null;
-        if (line.formData) {
-          const fc = line.formData;
-          if (fc.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && fc.byDefaultDateType.value === GeneralValues.SPECIFIC && fc.byDefault.value) {
-            const dateAndTime = this._sharedService.formatDate(
-              (fc.byDefault.value ? fc.byDefault.value : new Date()),
-              'yyyy/MM/dd HH:mm:ss'
-            )
-            .split(' ');      
-            fc.byDefault.setValue(`${dateAndTime[0]} ${dateAndTime[1]}`);
-          }
+    let i = 0;
+    const sortedDetail = this.changedLines.sort((a, b) => a.order - b.order)
+    
+    for (const line of sortedDetail) {      
+      i++;
+      const newRecord: boolean = !line.id || line.id === null || line.id === 0;
+        
+      const lineData = {
+        id: line.id,              
+        line: i,
+        checklistTemplateId: processId,
+        customerId: 1, // TODO: Get from profile        
+        possibleValues: JSON.stringify(line.valuesList),            
+        recipientId: line.recipientId,
+        variableId: line.variableId,
+        required: line.required,
+        allowComments: line.allowComments,
+        allowNoCapture: line.allowNoCapture,
+        allowAlarm: line.allowAlarm,
+        showChart: line.showChart,
+        showParameters: line.showParameters ? line.showParameters : GeneralValues.NO,
+        showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO,
+        notifyAlarm: line.notifyAlarm,
 
-          lineData = {
-            id: line.id,
-            checklistTemplateId: processId,
-            variableId: line.variableId,
-            customerId: 1, // TODO: Get from profile
-            status: newRecord ? RecordStatus.ACTIVE : line.status,    
-            possibleValues: line.valuesList ? JSON.stringify(line.valuesList) : null,    
-            ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id : null },      
-            ...(fc.uom.dirty || fc.uom.touched || newRecord) && { uomId: fc.uom.value ? fc.uom.value.id : null },      
-            ...(fc.required.dirty || fc.required.touched || newRecord) && { required: fc.required.value  },
-            ...(fc.allowComments.dirty || fc.allowComments.touched || newRecord) && { allowComments: fc.allowComments.value  },
-            ...(fc.allowNoCapture.dirty || fc.allowNoCapture.touched || newRecord) && { allowNoCapture: fc.allowNoCapture.value  },
-            ...(fc.allowAlarm.dirty || fc.allowAlarm.touched || newRecord) && { allowAlarm: fc.allowAlarm.value  },
-            ...(fc.showChart.dirty || fc.showChart.touched || newRecord) && { showChart: fc.showChart.value  },
-            ...(fc.showParameters.dirty || fc.showParameters.touched || newRecord) && { showParameters: fc.showParameters.value  },
-            ...(fc.showLastValue.dirty || fc.showLastValue.touched || newRecord) && { showLastValue: fc.showLastValue.value  },
-            ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value  },
-            ...(fc.useVariableAttachments.dirty || fc.useVariableAttachments.touched || newRecord) && { useVariableAttachments: fc.useVariableAttachments.value  },
-            ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value  },
-            ...(fc.byDefault.dirty || fc.byDefault.touched || newRecord) && { byDefault: fc.byDefault.value  },
-            ...(fc.showNotes.dirty || fc.showNotes.touched || newRecord) && { showNotes: fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO },
-            
-            ...(fc.minimum.dirty || fc.minimum.touched || newRecord) && { minimum: fc.minimum.value ? fc.minimum.value : null },
-            ...(fc.maximum.dirty || fc.maximum.touched || newRecord) && { maximum: fc.maximum.value ? fc.maximum.value : null },        
-          }
-        } else {
-          lineData = {
-            id: line.id,
-            checklistTemplateId: processId,
-            customerId: 1, // TODO: Get from profile
-            status: newRecord ? RecordStatus.ACTIVE : line.status,    
-            possibleValues: JSON.stringify(line.valuesList),    
-            ...(newRecord) && { uomId: line.uom.id  },
-            ...(newRecord) && { recipientId: line.recipientId },
-            ...(newRecord) && { variableId: line.variableId },
-            ...(newRecord) && { required: line.required  },
-            ...(newRecord) && { allowComments: line.allowComments  },
-            ...(newRecord) && { allowNoCapture: line.allowNoCapture  },
-            ...(newRecord) && { allowAlarm: line.allowAlarm  },
-            ...(newRecord) && { showChart: line.showChart  },
-            ...(newRecord) && { showParameters: line.showParameters ? line.showParameters : GeneralValues.NO },
-            ...(newRecord) && { showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO },
-            ...(newRecord) && { notifyAlarm: line.notifyAlarm  },
-
-            ...(newRecord) && { useVariableAttachments: line.useVariableAttachments ? line.useVariableAttachments : GeneralValues.NO  },
-            ...(newRecord) && { notes: line.notes  },
-            ...(newRecord) && { byDefault: line.byDefault  },
-            ...(newRecord) && { showNotes: line.showNotes ? GeneralValues.YES : GeneralValues.NO },
-            ...(newRecord) && { maximum: line.maximum  },
-            ...(newRecord) && { minimum: line.minimum  },
-          }
-        }
-
-        return this._catalogsService.updateChecklistTemplateLine$(lineData).pipe(
-          switchMap((data: any) => {
-            if (data?.data?.createOrUpdateChecklistTemplateDetail.length > 0) {
-              const checklistTemplateDetailId = data?.data?.createOrUpdateChecklistTemplateDetail[0].id;   
-              line.id = checklistTemplateDetailId;
-              line.customerId = data?.data?.createOrUpdateChecklistTemplateDetail[0].customerId;
-              const files = line.attachments.map((a) => a.id);              
-              return this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, checklistTemplateDetailId, files)              
-            } else {
-              return of(null);
-            }
-          })
-        )
+        useVariableAttachments: line.useVariableAttachments ? line.useVariableAttachments : GeneralValues.NO,
+        notes: line.notes,
+        byDefault: line.byDefault,
+        showNotes: line.showNotes ? GeneralValues.YES : GeneralValues.NO,
+        maximum: line.maximum,
+        minimum: line.minimum,
       }
+    
+      linesToAdd.push(lineData);
     }
-    return of(null);
+    return combineLatest([ 
+      linesToAdd.length > 0 ? this._catalogsService.updateChecklistTemplatLines$(linesToAdd) : of(null),
+      varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateDetails$(varToDelete) : of(null) 
+    ]);  
   }
 
   saveCatalogDetails$(processId: number): Observable<any> {
@@ -1756,30 +1505,58 @@ export class CatalogChecklistTemplatesEditionComponent {
       tap((checklistTemplateData: ChecklistTemplateDetail) => {
         if (!checklistTemplateData) return;
         this.checklistTemplate =  checklistTemplateData;
-
+        this.checklistTemplateLines =  checklistTemplateData.lines;        
+        this.storedLines = JSON.parse(JSON.stringify(this.checklistTemplateLines));
+      }),
+      switchMap((checklistTemplateData: ChecklistTemplateDetail) => {
+        const attachmentsObservablesArray: Observable<any>[] = [];
+        for (const line of checklistTemplateData?.lines) {
+          attachmentsObservablesArray.push(this.mapChecklistTemplatesDetailAttachments$(line['id']));
+        }
+        if (attachmentsObservablesArray.length > 0) {
+          return combineLatest(attachmentsObservablesArray);
+        } else {
+          return of([]);
+        }
+      }),
+      tap((attachments: any) => {
+        // this.mapLines(attachments);
+        for (const [index, line] of this.checklistTemplateLines.entries()) {
+          line.attachments = attachments[index]?.data?.uploadedFiles?.items?.map((a) => {
+            return {
+              index: a.line,
+              name: a.fileName, 
+              id: a.fileId, 
+              image: `${environment.serverUrl}/files/${a.path}`, 
+              icon: this._catalogsService.setIconName(a.fileType), 
+            }            
+          });
+          this.updatingCount++
+        }
         this.moldsCurrentSelection = [];
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.checklistTemplate.translations));        
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';   
-        this.pendingRecord = 0;
+        this.pendingRecord = 0;        
         this.updateFormFromData();
         this.changeInactiveButton(this.checklistTemplate.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = checklistTemplateData.translations.length > 0 ? $localize`Traducciones (${checklistTemplateData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = checklistTemplateData.translations.length > 0 ? 'accent' : '';
-        }
-        // this.storedLines = JSON.parse(JSON.stringify(this.checklistTemplate.translations)); //Lines
+          toolbarButton.class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';
+        }        
         this.molds.items = [];
         this.requestMoldsData(0);
-        this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
-        this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);
-        this.setAttachmentLabel();
-        this.setViewLoading(false);
         this.loaded = true;
+        setTimeout(() => {
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
+        }, 1000);        
+        this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);        
+        this.setAttachmentLabel();
+        this.setViewLoading(false);        
       }),
       catchError(err => {
         this.setViewLoading(false);
@@ -1788,6 +1565,14 @@ export class CatalogChecklistTemplatesEditionComponent {
     ); 
   }  
 
+  mapChecklistTemplatesDetailAttachments$(processId: number): Observable<any> {
+    return this._catalogsService.getAttachmentsDataGql$({
+      processId,
+      process: originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS,
+      customerId: 1, //TODO get Customer from user profile
+    });
+  }
+    
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
     if (getMoreDataParams.catalogName === SystemTables.CHECKLIST_TEMPLATE_TYPES) {
       if (getMoreDataParams.initArray) {
@@ -1890,7 +1675,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   setToolbarMode(mode: toolbarMode) {
-    if (this.elements.length === 0) return;
+    if (this.elements.length === 0 || !this.loaded) return;
     if (mode === toolbarMode.EDITING_WITH_DATA) {      
       // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
@@ -2079,7 +1864,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       
      
       ...(this.imageChanged) && { 
-        mainImageName: fc.mainImageName.value,
+        mainImageName: fc.mainImageName?.value,
         mainImagePath: this.checklistTemplate.mainImagePath,
         mainImageGuid: this.checklistTemplate.mainImageGuid, },
     }
@@ -2377,7 +2162,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addChecklistTemplateTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.updateChecklistTemplateTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2954,7 +2739,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             possibleValues: variableData.possibleValues,
             byDefaultDateType: variableData.byDefaultDateType,    
             friendlyValueType: variableData.friendlyValueType,
-            status: variableData.status,
+            status: RecordStatus.ACTIVE,
             showLastValue: GeneralValues.NO,
             showParameters: GeneralValues.NO,
             loading: false,
@@ -3061,6 +2846,7 @@ export class CatalogChecklistTemplatesEditionComponent {
           progressBarColor: 'warn',
           icon: 'garbage_can',
         });
+        this.setEditionButtonsState();
       }
       this.checklistTemplateLines[line].loading = false;
     });
@@ -3284,9 +3070,64 @@ export class CatalogChecklistTemplatesEditionComponent {
     for (let line of this.checklistTemplateLines) {
       if (line.line === event.lineNumber) {
         line.formData = event.formData;
+        this.updateChecklistTemplateLineFromForm(line.line);
       }
     }
-    this.setEditionButtonsState();
+  }
+   
+
+  updateChecklistTemplateLineFromForm(line: number) {
+    const fc = this.checklistTemplateLines[line].formData;
+    const updatedLine = this.changedLines?.find((l) => l.id === this.checklistTemplateLines[line].id);
+    if (updatedLine) {
+      // updatedLine.name = fc.name.value;
+      updatedLine.notes = fc.notes?.value;            
+      updatedLine.recipientId = fc.recipient?.value?.id;      
+      updatedLine.required = fc.required?.value;
+      updatedLine.allowAlarm = fc.allowAlarm?.value;
+      updatedLine.allowNoCapture = fc.allowComments?.value;
+      updatedLine.allowComments = fc.allowComments?.value;
+      updatedLine.showChart = fc.showChart?.value;   
+      updatedLine.useVariableAttachments = fc.useVariableAttachments?.value ? GeneralValues.YES : GeneralValues.NO,
+      updatedLine.showLastValue = fc.showLastValue?.value;
+      updatedLine.showParameters = fc.showParameters?.value;
+      updatedLine.notifyAlarm = fc.notifyAlarm?.value;      
+      updatedLine.byDefault = fc.byDefault?.value;    
+      updatedLine.showNotes = fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO,
+      updatedLine.minimum = fc.minimum.value ? fc.minimum.value : null;
+      updatedLine.maximum = fc.maximum.value ? fc.maximum.value : null;
+      updatedLine.byDefaultDateType = fc.byDefaultDateType?.value;    
+      updatedLine.attachmentsList = JSON.stringify(this.checklistTemplateLines[line]?.attachments);
+      updatedLine.valuesList = this.checklistTemplateLines[line]?.valuesList;      
+    } else {
+      const changedLine = {
+        id: this.checklistTemplateLines[line].id,
+        customerId: this.checklistTemplateLines[line].customerId,
+        order: this.checklistTemplateLines[line].order,
+        line: this.checklistTemplateLines[line].line,
+        notes: fc.notes?.value,        
+        recipientId: fc.recipient?.value?.id,
+        required: fc.required?.value,
+        allowAlarm: fc.allowAlarm?.value,
+        allowNoCapture: fc.allowComments?.value,
+        allowComments: fc.allowComments?.value,
+        showChart: fc.showChart?.value,
+        useVariableAttachments: fc.useVariableAttachments.value ? GeneralValues.YES : GeneralValues.NO,
+        showLastValue: fc.showLastValue?.value,
+        showParameters: fc.showParameters?.value,
+        notifyAlarm: fc.notifyAlarm?.value,        
+        byDefault: fc.byDefault?.value,    
+        showNotes: fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO,
+        minimum: fc.minimum?.value,
+        maximum: fc.maximum?.value,
+        byDefaultDateType: fc.byDefaultDateType?.value,    
+        attachmentsList: JSON.stringify(this.checklistTemplateLines[line]?.attachments),
+        valuesList: this.checklistTemplateLines[line]?.valuesList,        
+      }
+      this.changedLines.push(changedLine);
+    }
+    if (this.loaded) this.setEditionButtonsState();
+    
   }
 
   get SystemTables () {

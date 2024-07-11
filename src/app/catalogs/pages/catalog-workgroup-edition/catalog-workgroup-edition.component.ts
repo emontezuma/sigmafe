@@ -1072,7 +1072,7 @@ export class CatalogWorkgroupEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addWorkgroupTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addWorkgroupTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteWorkgroupTranslations$(varToDelete) : of(null) 
       ]);
     } else {

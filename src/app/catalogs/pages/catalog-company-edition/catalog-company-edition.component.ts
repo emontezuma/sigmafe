@@ -1061,7 +1061,7 @@ export class CatalogCompanyEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addCompanyTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addCompanyTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteCompanyTranslations$(varToDelete) : of(null) 
       ]);
     } else {

@@ -792,7 +792,7 @@ export const INACTIVATE_PLANT = gql`
   }
 `;
 
-export const UPDATE_MOLD = gql`
+export const UPSERT_MOLD = gql`
   mutation CreateOrUpdateMold (
     $customerId: Long,
     $id: Long,
@@ -920,9 +920,13 @@ export const DELETE_CATALOG_DETAILS = gql`
   }
 `;
 
-export const CREATE_OR_UPDATE_CATALOG_DETAILS = gql`
-  mutation CreateOrUpdateCatalogDetail ($catalogDetails: [CatalogDetailDtoInput!]!) {
-  createOrUpdateCatalogDetail (inputs: $catalogDetails) {
+export const UPSERT_CATALOG_DETAILS = gql`
+  mutation CreateOrUpdateCatalogDetail (
+    $catalogDetails: [CatalogDetailDtoInput!]!
+  ) {
+  createOrUpdateCatalogDetail (
+    inputs: $catalogDetails
+  ) {
       customerId
       processId
       process
@@ -932,7 +936,7 @@ export const CREATE_OR_UPDATE_CATALOG_DETAILS = gql`
   }
 `;
 
-export const ADD_MOLD_TRANSLATIONS = gql`
+export const UPSERT_MOLD_TRANSLATIONS = gql`
   mutation CreateOrUpdateMoldTranslationTable (
     $translations: [MoldTranslationTableDtoInput!]!    
   ) {
@@ -946,7 +950,7 @@ export const ADD_MOLD_TRANSLATIONS = gql`
   }
 `;
 
-export const ADD_MAINTENANCE_HISTORY = gql`
+export const UPSERT_MAINTENANCE_HISTORY = gql`
   mutation CreateOrUpdateMaintenanceHistorical (
     $id: Long,
     $customerId: Long,
@@ -1072,31 +1076,9 @@ export const GET_CHECKLIST_TEMPLATES = gql`
       items {
         friendlyStatus
         data {
-          name          
-          reference
-          mainImagePath
-          mainImageName
-          mainImageGuid
           id
           customerId
-          status
-          updatedAt
-          lastGeneratedDate
-          generationCount
-          templateType {
-            id
-            customerId
-            name
-            status
-            translations {
-              name
-              languageId
-              id
-            }
-          }          
-          updatedBy {
-            name
-          }          
+          status          
         }
       }
       pageInfo {
@@ -1108,7 +1090,7 @@ export const GET_CHECKLIST_TEMPLATES = gql`
   }
 `;
 
-export const ADD_VARIABLE_TRANSLATIONS = gql`
+export const UPSERT_VARIABLE_TRANSLATIONS = gql`
   mutation CreateOrUpdateVariableTranslationTable (
     $translations: [VariableTranslationTableDtoInput!]!    
   ) {
@@ -1122,8 +1104,8 @@ export const ADD_VARIABLE_TRANSLATIONS = gql`
   }
 `;
 
-export const ADD_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
-  mutation createOrUpdateChecklistTemplateTranslationTable (
+export const UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
+  mutation CreateOrUpdateChecklistTemplateTranslationTable (
     $translations: [ChecklistTemplateTranslationTableDtoInput!]!    
   ) {
     createOrUpdateChecklistTemplateTranslationTable (
@@ -1136,7 +1118,7 @@ export const ADD_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_CHECKLIST_TEMPLATE = gql`
+export const UPSERT_CHECKLIST_TEMPLATE = gql`
   mutation CreateOrUpdateChecklistTemplate (
     $alarmNotificationChannels: String,
     $alarmNotificationMessageBody: String,
@@ -1275,7 +1257,7 @@ export const UPDATE_CHECKLIST_TEMPLATE = gql`
   }
 `;
 
-export const UPDATE_VARIABLE = gql`
+export const UPSERT_VARIABLE = gql`
   mutation CreateOrUpdateVariable (
     $customerId: Long,
     $id: Long,
@@ -1376,6 +1358,18 @@ export const DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
     $customerId: Long!
   ) {
     deleteChecklistTemplatesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId
+    ) 
+  }
+`;
+
+export const DELETE_CHECKLIST_TEMPLATE_DETAILS = gql`
+  mutation DeleteChecklistTemplateDetails (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  ) {
+    deleteChecklistTemplateDetails (      
       ids: $ids,
       customerId: $customerId
     ) 
@@ -1962,62 +1956,87 @@ export const GET_CHECKLIST_TEMPLATE = gql`
 `;
 
 export const GET_CHECKLIST_TEMPLATE_DETAILS = gql`
-query ChecklistTemplateDetails (
-  $recordsToSkip: Int,
-  $recordsToTake: Int,
-  $orderBy: [ChecklistTemplateTranslationTableSortInput!],
-  $filterBy: ChecklistTemplateTranslationTableFilterInput,
+query ChecklistTemplateDetailsUnlimited (
+  $orderBy: [ChecklistTemplateDetailSortInput!],
+  $filterBy: ChecklistTemplateDetailFilterInput,
 ) {
-  checklistTemplateDetails(
-  skip: $recordsToSkip,
-  take: $recordsToTake,
-  order: $orderBy,
-  where: $filterBy
-) {
-  totalCount
-  items {
-      checklistTemplateId
-      name
-      reference
-      notes
-      approvalRequestMessageSubject
-      approvalRequestMessageBody
-      anticipationMessageSubject
-      anticipationMessageBody
-      expiringMessageSubject
-      expiringMessageBody
-      alarmNotificationMessageSubject
-      alarmNotificationMessageBody
-      generationMessageSubject
-      generationMessageBody
-      languageId
-      id
-      customerId
-      status
-      createdById
-      createdAt
-      updatedById
-      updatedAt
-      deletedById
-      deletedAt
-      language {
+    checklistTemplateDetailsUnlimited(
+      order: $orderBy,
+      where: $filterBy
+    ) {
+        checklistTemplateId
+        variableId
+        minimum
+        maximum
+        required
+        byDefault
+        allowNoCapture
+        allowComments
+        showChart
+        allowAlarm
+        notifyAlarm
+        recipientId
+        line
+        possibleValues
+        useVariableSettings
+        notes
+        showNotes
+        showLastValue
+        showParameters
+        useVariableAttachments
+        id
+        customerId
+        status
+        recipient {
           name
           reference
+          notes
+          prefix
+          languageId
           id
-          iso
-      }
-      updatedBy {
-        name
+          translations {
+              recipientId
+              name
+              languageId
+              id
+              customerId
+          }
+        }
+        variable {
+          name
+          name
+          reference
+          notes
+          prefix
+          id
+          status          
+          translations {
+              variableId
+              name
+              prefix
+              languageId
+              status
+          }
+          uom {
+            name
+            name
+            reference
+            notes
+            prefix
+            id
+            status          
+            translations {                
+                name
+                prefix
+                languageId
+                status
+            }
+          }
+          customerId
+        }        
       }
   }
-  pageInfo {
-      hasNextPage
-      hasPreviousPage
-  }      
-}
-}
 `;
-
 
 export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
   query ChecklistTemplatesTranslationsTable (
@@ -2340,7 +2359,7 @@ export const GET_CUSTOMER_TRANSLATIONS = gql`
 }
 `;
 
-export const ADD_CUSTOMER_TRANSLATIONS = gql`
+export const UPSERT_CUSTOMER_TRANSLATIONS = gql`
   mutation CreateOrUpdateCustomerTranslationTable (
     $translations: [CustomerTranslationTableDtoInput!]!    
   ) {
@@ -2354,7 +2373,7 @@ export const ADD_CUSTOMER_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_CUSTOMER = gql`
+export const UPSERT_CUSTOMER = gql`
   mutation CreateOrUpdateCustomer (
     $id: Long,
     $status: String    
@@ -2504,7 +2523,7 @@ export const GET_MANUFACTURER_TRANSLATIONS = gql`
 }
 `;
 
-export const ADD_MANUFACTURER_TRANSLATIONS = gql`
+export const UPSERT_MANUFACTURER_TRANSLATIONS = gql`
   mutation CreateOrUpdateManufacturerTranslationTable (
     $translations: [ManufacturerTranslationTableDtoInput!]!    
   ) {
@@ -2518,7 +2537,7 @@ export const ADD_MANUFACTURER_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_MANUFACTURER = gql`
+export const UPSERT_MANUFACTURER = gql`
   mutation CreateOrUpdateManufacturer (
     $id: Long,
     $status: String    
@@ -2705,7 +2724,7 @@ export const GET_PLANT_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_PLANT_TRANSLATIONS = gql`
+export const UPSERT_PLANT_TRANSLATIONS = gql`
   mutation CreateOrUpdatePlantTranslationTable (
     $translations: [PlantTranslationTableDtoInput!]!    
   ) {
@@ -2719,7 +2738,7 @@ export const ADD_PLANT_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_PLANT = gql`
+export const UPSERT_PLANT = gql`
   mutation CreateOrUpdatePlant (
     $customerId: Long,
     $companyId: Long,
@@ -2940,7 +2959,7 @@ export const GET_COMPANY_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_COMPANY_TRANSLATIONS = gql`
+export const UPSERT_COMPANY_TRANSLATIONS = gql`
   mutation CreateOrUpdateCompanyTranslationTable (
     $translations: [CompanyTranslationTableDtoInput!]!    
   ) {
@@ -2954,7 +2973,7 @@ export const ADD_COMPANY_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_COMPANY = gql`
+export const UPSERT_COMPANY = gql`
   mutation CreateOrUpdateCompany (
     $customerId: Long,  
     $id: Long,
@@ -3136,7 +3155,7 @@ export const GET_PROVIDER_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_PROVIDER_TRANSLATIONS = gql`
+export const UPSERT_PROVIDER_TRANSLATIONS = gql`
   mutation CreateOrUpdateProviderTranslationTable (
     $translations: [ProviderTranslationTableDtoInput!]!    
   ) {
@@ -3150,7 +3169,7 @@ export const ADD_PROVIDER_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_PROVIDER = gql`
+export const UPSERT_PROVIDER = gql`
   mutation CreateOrUpdateProvider (
     $customerId: Long,
   
@@ -3334,7 +3353,7 @@ export const GET_EQUIPMENT_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_EQUIPMENT_TRANSLATIONS = gql`
+export const UPSERT_EQUIPMENT_TRANSLATIONS = gql`
   mutation CreateOrUpdateEquipmentTranslationTable (
     $translations: [EquipmentTranslationTableDtoInput!]!    
   ) {
@@ -3348,7 +3367,7 @@ export const ADD_EQUIPMENT_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_EQUIPMENT = gql`
+export const UPSERT_EQUIPMENT = gql`
   mutation CreateOrUpdateEquipment (
     $customerId: Long,
     $plantId: Long,  
@@ -3612,7 +3631,7 @@ export const GET_UOM_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_UOM_TRANSLATIONS = gql`
+export const UPSERT_UOM_TRANSLATIONS = gql`
   mutation CreateOrUpdateUomTranslationTable (
     $translations: [UomTranslationTableDtoInput!]!    
   ) {
@@ -3626,7 +3645,7 @@ export const ADD_UOM_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_UOM = gql`
+export const UPSERT_UOM = gql`
   mutation CreateOrUpdateUom (
     $customerId: Long,
     $id: Long,
@@ -3830,7 +3849,7 @@ export const GET_POSITION_TRANSLATIONS = gql`
 }
 `;
 
-export const ADD_POSITION_TRANSLATIONS = gql`
+export const UPSERT_POSITION_TRANSLATIONS = gql`
   mutation CreateOrUpdatePositionTranslationTable (
     $translations: [PositionTranslationTableDtoInput!]!    
   ) {
@@ -3844,7 +3863,7 @@ export const ADD_POSITION_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_POSITION = gql`
+export const UPSERT_POSITION = gql`
   mutation CreateOrUpdatePosition (
     $customerId: Long,
     $plantId: Long,
@@ -4053,7 +4072,7 @@ export const GET_PART_NUMBER_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_PART_NUMBER_TRANSLATIONS = gql`
+export const UPSERT_PART_NUMBER_TRANSLATIONS = gql`
   mutation CreateOrUpdatePartNumberTranslationTable (
     $translations: [PartNumberTranslationTableDtoInput!]!    
   ) {
@@ -4067,7 +4086,7 @@ export const ADD_PART_NUMBER_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_PART_NUMBER = gql`
+export const UPSERT_PART_NUMBER = gql`
   mutation CreateOrUpdatePartNumber (
     $customerId: Long,
   
@@ -4252,7 +4271,7 @@ export const GET_LINE_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_LINE_TRANSLATIONS = gql`
+export const UPSERT_LINE_TRANSLATIONS = gql`
   mutation CreateOrUpdateLineTranslationTable (
     $translations: [LineTranslationTableDtoInput!]!    
   ) {
@@ -4266,7 +4285,7 @@ export const ADD_LINE_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_LINE = gql`
+export const UPSERT_LINE = gql`
   mutation CreateOrUpdateLine (
     $customerId: Long,
     $plantId: Long,  
@@ -4469,7 +4488,7 @@ export const GET_GENERIC_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_GENERIC_TRANSLATIONS = gql`
+export const UPSERT_GENERIC_TRANSLATIONS = gql`
   mutation CreateOrUpdateGenericTranslationTable (
     $translations: [GenericTranslationTableDtoInput!]!    
   ) {
@@ -4483,7 +4502,7 @@ export const ADD_GENERIC_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_GENERIC = gql`
+export const UPSERT_GENERIC = gql`
   mutation CreateOrUpdateGeneric (
     $customerId: Long,
     $id: Long,
@@ -4678,7 +4697,7 @@ export const GET_WORKGROUP_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_WORKGROUP_TRANSLATIONS = gql`
+export const UPSERT_WORKGROUP_TRANSLATIONS = gql`
   mutation CreateOrUpdateWorkgroupTranslationTable (
     $translations: [WorkgroupTranslationTableDtoInput!]!    
   ) {
@@ -4692,7 +4711,7 @@ export const ADD_WORKGROUP_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_WORKGROUP = gql`
+export const UPSERT_WORKGROUP = gql`
   mutation CreateOrUpdateWorkgroup (
     $customerId: Long,
   
@@ -4939,7 +4958,7 @@ export const GET_SHIFT_TRANSLATIONS = gql`
 `;
 
 
-export const ADD_SHIFT_TRANSLATIONS = gql`
+export const UPSERT_SHIFT_TRANSLATIONS = gql`
   mutation CreateOrUpdateShiftTranslationTable (
     $translations: [ShiftTranslationTableDtoInput!]!    
   ) {
@@ -4964,7 +4983,7 @@ export const ADD_SHIFT_TRANSLATIONS = gql`
     sequence: $sequence
           
 */
-export const UPDATE_SHIFT = gql`
+export const UPSERT_SHIFT = gql`
   mutation CreateOrUpdateShift (
     $customerId: Long,
 
@@ -5061,11 +5080,6 @@ export const INACTIVATE_SHIFT = gql`
     } 
   }
 `;
-
-
-
-
-//departments===========================
 
 export const GET_DEPARTMENT = gql`
   query OneDepartment (
@@ -5249,72 +5263,20 @@ export const GET_DEPARTMENT_TRANSLATIONS = gql`
 }
 `;
 
-export const UPDATE_CHECKLIST_TEMPLATE_DETAILS = gql`
-  mutation CreateOrUpdateChecklistTemplateDetail (
-    $accumulative: String
-    $allowAlarm: String
-    $allowComments: String
-    $allowNoCapture: String
-    $byDefault: String
-    $customerId: Long
-    $maximun: String
-    $minimun: String
-    $checklistTemplateId: Long
-    $id: Long
-    $line: Int
-    $notes: String
-    $notifyAlarm: String
-    $possibleValues: String
-    $recipientId: Long
-    $required: String
-    $showChart: String
-    $showLastValue: String
-    $showNotes: String
-    $showParameters: String
-    $status: String
-    $useVariableSettings: String
-    $variableId: Long
+export const UPSERT_CHECKLIST_TEMPLATE_DETAILS = gql`
+  mutation CreateOrUpdateChecklistTemplateDetail (  
+    $checklistTemplateDetail: [ChecklistTemplateDetailDtoInput!]!
   ) {
   createOrUpdateChecklistTemplateDetail (
-    inputs: [{
-      accumulative: $accumulative
-      allowAlarm: $allowAlarm
-      allowComments: $allowComments
-      allowNoCapture: $allowNoCapture
-      byDefault: $byDefault
-      customerId: $customerId
-      maximun: $maximun
-      minimun: $minimun
-      checklistTemplateId: $checklistTemplateId
-      id: $id
-      line: $line
-      notes: $notes
-      notifyAlarm: $notifyAlarm
-      possibleValues: $possibleValues
-      recipientId: $recipientId
-      required: $required
-      showChart: $showChart
-      showLastValue: $showLastValue
-      showNotes: $showNotes
-      showParameters: $showParameters
-      status: $status
-      useVariableSettings: $useVariableSettings
-      variableId: $variableId
-
-
-    }]) {
+    inputs: $checklistTemplateDetail
+  ) {    
       id
-      line
-      checklistTemplateId
-      customerId
-      createdAt
-      updatedAt
-      deletedAt
-     
+      line      
     } 
   }
 `;
-export const ADD_DEPARTMENT_TRANSLATIONS = gql`
+
+export const UPSERT_DEPARTMENT_TRANSLATIONS = gql`
   mutation CreateOrUpdateDepartmentTranslationTable (
     $translations: [DepartmentTranslationTableDtoInput!]!    
   ) {
@@ -5328,7 +5290,7 @@ export const ADD_DEPARTMENT_TRANSLATIONS = gql`
   }
 `;
 
-export const UPDATE_DEPARTMENT = gql`
+export const UPSERT_DEPARTMENT = gql`
   mutation CreateOrUpdateDepartment (
     $customerId: Long,
     $plantId: Long,
@@ -5410,8 +5372,5 @@ export const INACTIVATE_DEPARTMENT = gql`
     } 
   }
 `;
-
-
-
 
 //=========END

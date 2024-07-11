@@ -1061,7 +1061,7 @@ export class CatalogEquipmentEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addEquipmentTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addEquipmentTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteEquipmentTranslations$(varToDelete) : of(null) 
       ]);
     } else {

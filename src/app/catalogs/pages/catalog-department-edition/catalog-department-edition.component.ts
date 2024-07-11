@@ -1100,7 +1100,7 @@ export class CatalogDepartmentEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addDepartmentTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addDepartmentTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteDepartmentTranslations$(varToDelete) : of(null) 
       ]);
     } else {

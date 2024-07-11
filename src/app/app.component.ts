@@ -210,12 +210,14 @@ export class AppComponent implements AfterViewInit {
     }  
   }
 
-  calculateOutletPosition() {        
-    const toolbarHeight = this.scrollbarInToobar ? 80 : 61;
-    this.toolbarHeight = toolbarHeight - 61;
-    this.allHeight = (window.innerHeight - 98)  - (this.toolbarData.show ? (toolbarHeight + 15) : 0);    
-    this.outletHeight = (window.innerHeight - 106) + 'px';
-    this._sharedService.setAllHeight(this.allHeight);    
+  calculateOutletPosition() {
+    setTimeout(() => {
+      const toolbarHeight = this.scrollbarInToobar ? 80 : 61;
+      this.toolbarHeight = toolbarHeight - 61;
+      this.allHeight = (window.innerHeight - 98)  - (this.toolbarData.show ? (toolbarHeight + 15) : 0);    
+      this.outletHeight = (window.innerHeight - 106) + 'px';
+      this._sharedService.setAllHeight(this.allHeight);    
+    }, 50);    
   }
 
   handlerScreenSizeChange(screen: Screen | null) {

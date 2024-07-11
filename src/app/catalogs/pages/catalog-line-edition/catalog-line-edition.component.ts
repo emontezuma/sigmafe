@@ -1061,7 +1061,7 @@ export class CatalogLineEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addLineTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addLineTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteLineTranslations$(varToDelete) : of(null) 
       ]);
     } else {

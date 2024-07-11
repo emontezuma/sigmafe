@@ -1020,7 +1020,7 @@ export class CatalogUomEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addUomTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addUomTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteUomTranslations$(varToDelete) : of(null) 
       ]);
     } else {

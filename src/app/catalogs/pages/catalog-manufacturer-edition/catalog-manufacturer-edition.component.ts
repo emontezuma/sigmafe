@@ -1044,7 +1044,7 @@ export class CatalogManufacturerEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addManufacturerTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addManufacturerTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteManufacturerTranslations$(varToDelete) : of(null) 
       ]);
     } else {

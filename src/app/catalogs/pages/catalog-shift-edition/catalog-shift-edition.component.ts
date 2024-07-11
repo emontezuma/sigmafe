@@ -1051,7 +1051,7 @@ export class CatalogShiftEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addShiftTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addShiftTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteShiftTranslations$(varToDelete) : of(null) 
       ]);
     } else {

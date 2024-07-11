@@ -1039,7 +1039,7 @@ export class CatalogPartNumberEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addPartNumberTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addPartNumberTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePartNumberTranslations$(varToDelete) : of(null) 
       ]);
     } else {
