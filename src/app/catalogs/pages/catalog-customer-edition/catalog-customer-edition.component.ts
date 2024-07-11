@@ -937,14 +937,31 @@ export class CatalogCustomerEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/customers`)
     .set('processId', this.customer.id)
-    .set('process', originProcess.CATALOGS_CUSTOMERS);
+      .set('process', originProcess.CATALOGS_CUSTOMERS);
+    
+    console.log(this.customer)
+    console.log(event)
+    console.log(fd)
+    console.log(uploadUrl)
+    
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
+        
+        const uuidPattern = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.jpeg/;
+        const matches = res.filePath.match(uuidPattern);
+        let newPath = '';
+        if (matches && matches.length > 0) {
+          const uuid = matches[0];
+          newPath = res.filePath.replace(uuid, res.fileName);
+        }
+        console.log(res.fileGuid)
+
         this.imageChanged = true;
         this.customerForm.controls.mainImageName.setValue(res.fileName);
-        this.customer.mainImagePath = res.filePath;
-        this.customer.mainImageGuid = res.fileGuid;
-        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.customer.mainImageName = res.fileName;
+        this.customer.mainImagePath = newPath;
+        this.customer.mainImageGuid = res.fileGuid;//issue on table or backend, this dont let to save the length of uuid
+        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${newPath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el cliente para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1069,6 +1086,8 @@ export class CatalogCustomerEditionComponent {
 
   prepareRecordToAdd(newRecord: boolean): any {
     const fc = this.customerForm.controls;
+    console.log("this.customer")
+    console.log(this.customer)
     return {
       id: this.customer.id,
 
@@ -1086,7 +1105,7 @@ export class CatalogCustomerEditionComponent {
         prefix: fc.prefix.value,
       }),
       ...(this.imageChanged) && { 
-        mainImageName: fc.mainImageName.value,
+        mainImageName: this.customer.mainImageName,
         mainImagePath: this.customer.mainImagePath,
         mainImageGuid: this.customer.mainImageGuid, },
     };
