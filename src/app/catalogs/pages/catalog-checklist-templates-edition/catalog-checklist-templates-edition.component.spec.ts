@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CatalogVariableEditionComponent } from './catalog-checklist-templates-edition.component';
+import { CatalogChecklistTemplatesEditionComponent } from './catalog-checklist-templates-edition.component';
 
-describe('CatalogVariableEditionComponent', () => {
-  let component: CatalogVariableEditionComponent;
-  let fixture: ComponentFixture<CatalogVariableEditionComponent>;
+describe('CatalogChecklistTemplatesEditionComponent', () => {
+  let component: CatalogChecklistTemplatesEditionComponent;
+  let fixture: ComponentFixture<CatalogChecklistTemplatesEditionComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [CatalogVariableEditionComponent]
+      declarations: [CatalogChecklistTemplatesEditionComponent]
     });
-    fixture = TestBed.createComponent(CatalogVariableEditionComponent);
+    fixture = TestBed.createComponent(CatalogChecklistTemplatesEditionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

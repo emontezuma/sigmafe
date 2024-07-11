@@ -800,7 +800,7 @@ export class CatalogCustomerEditionComponent {
     this.setViewLoading(true);
     const newRecord =
       !this.customer.id || this.customer.id === null || this.customer.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
+    const dataToSave = this.prepareRecordToSave(newRecord);
     this.updateCustomerCatalog$ = this._catalogsService.updateCustomerCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
@@ -1084,7 +1084,7 @@ export class CatalogCustomerEditionComponent {
     });
   }
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.customerForm.controls;
     console.log("this.customer")
     console.log(this.customer)

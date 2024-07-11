@@ -1,1 +1,2 @@
-export * from '../../shared/components/maintenance-history-dialog';
+export * from './variable-selection-dialog';
+export * from './checklist-template-edition-line';

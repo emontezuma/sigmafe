@@ -47,7 +47,7 @@ export class CatalogManufacturerEditionComponent {
   manufacturer$: Observable<ManufacturerDetail>;
   translations$: Observable<any>;
   updateManufacturer$: Observable<any>;
-  updateManufacturerCatalog: Subscription;
+  updateManufacturerCatalog$: Observable<any>;
   deleteManufacturerTranslations$: Observable<any>;  
   addManufacturerTranslations$: Observable<any>;  
   
@@ -739,31 +739,45 @@ export class CatalogManufacturerEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateManufacturerCatalog = this._catalogsService.updateManufacturerCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const manufacturerId = data?.data?.createOrUpdateMold[0].id;
-      if (manufacturerId > 0) {        
-        this.processTranslations$(manufacturerId)
-        .subscribe(() => {
-          this.requestManufacturerData(manufacturerId);
-          setTimeout(() => {              
-            let message = $localize`El fabricante ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`El fabricante ha sido creado satisfactoriamente con el id <strong>${this.manufacturer.id}</strong>`;
-              this._location.replaceState(`/catalogs/manufacturers/edit/${this.manufacturer.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateManufacturerCatalog$ = this._catalogsService.updateManufacturerCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateManufacturer.length > 0) {        
+            const manufacturerId = data?.data?.createOrUpdateManufacturer[0].id;        
+            this.processTranslations$(manufacturerId)
+            .subscribe(() => {
+              this.requestManufacturerData(manufacturerId);
+              setTimeout(() => {              
+                let message = $localize`El fabricante ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El fabricante ha sido creado satisfactoriamente con el id <strong>${manufacturerId}</strong>`;
+                  this._location.replaceState(`/catalogs/manufacturers/edit/${manufacturerId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
             });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
-      }
-    });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
 
@@ -910,7 +924,7 @@ export class CatalogManufacturerEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.manufacturerForm.controls;
     return  {
         id: this.manufacturer.id,

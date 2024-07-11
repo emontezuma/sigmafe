@@ -46,7 +46,7 @@ export class CatalogProviderEditionComponent {
   provider$: Observable<ProviderDetail>;
   translations$: Observable<any>;
   updateProvider$: Observable<any>;
-  updateProviderCatalog: Subscription;
+  updateProviderCatalog$: Observable<any>;
   deleteProviderTranslations$: Observable<any>;  
   addProviderTranslations$: Observable<any>;  
   
@@ -746,31 +746,46 @@ export class CatalogProviderEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.provider.id || this.provider.id === null || this.provider.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateProviderCatalog = this._catalogsService.updateProviderCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const providerId = data?.data?.createOrUpdateMold[0].id;
-      if (providerId > 0) {        
-        this.processTranslations$(providerId)
-        .subscribe(() => {
-          this.requestProviderData(providerId);
-          setTimeout(() => {              
-            let message = $localize`El proveedor ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`El proveedor ha sido creado satisfactoriamente con el id <strong>${this.provider.id}</strong>`;
-              this._location.replaceState(`/catalogs/providers/edit/${this.provider.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateProviderCatalog$ = this._catalogsService.updateProviderCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateProvider.length > 0) {      
+            const providerId = data?.data?.createOrUpdateProvider[0].id;
+            this.processTranslations$(providerId)
+            .subscribe(() => {
+              this.requestProviderData(providerId);
+              setTimeout(() => {              
+                let message = $localize`El proveedor ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El proveedor ha sido creado satisfactoriamente con el id <strong>${providerId}</strong>`;
+                  this._location.replaceState(`/catalogs/providers/edit/${providerId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
             });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
-      }
-    });
+          }
+        })
+      );
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }   
+    
   }
 
 
@@ -916,7 +931,7 @@ export class CatalogProviderEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.providerForm.controls;
     return  {
         id: this.provider.id,

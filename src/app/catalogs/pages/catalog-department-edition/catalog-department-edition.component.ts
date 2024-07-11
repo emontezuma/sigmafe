@@ -751,32 +751,45 @@ export class CatalogDepartmentEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.department.id || this.department.id === null || this.department.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateDepartmentCatalog$ = this._catalogsService.updateDepartmentCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateDepartment.length > 0) {
-          const departmentId = data?.data?.createOrUpdateDepartment[0].id;          
-          this.processTranslations$(departmentId).subscribe(() => {
-            this.requestDepartmentData(departmentId);
-            setTimeout(() => {              
-              let message = $localize`El departamento ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`El departamento ha sido creado satisfactoriamente con el id <strong>${this.department.id}</strong>`;
-                this._location.replaceState(`/catalogs/departments/edit/${departmentId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateDepartmentCatalog$ = this._catalogsService.updateDepartmentCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateDepartment.length > 0) {
+            const departmentId = data?.data?.createOrUpdateDepartment[0].id;          
+            this.processTranslations$(departmentId).subscribe(() => {
+              this.requestDepartmentData(departmentId);
+              setTimeout(() => {              
+                let message = $localize`El departamento ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El departamento ha sido creado satisfactoriamente con el id <strong>${this.department.id}</strong>`;
+                  this._location.replaceState(`/catalogs/departments/edit/${departmentId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
   requestDepartmentData(departmentId: number): void { 
@@ -917,7 +930,7 @@ export class CatalogDepartmentEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.departmentForm.controls;
     return  {
       id: this.department.id,
@@ -1036,12 +1049,12 @@ export class CatalogDepartmentEditionComponent {
     } else {
       this.departmentForm.controls.plant.setErrors(null);   
     }
-    if (this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+    if (this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value && this.departmentForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
       this.departmentForm.controls.recipient.setErrors({ inactive: true });   
     } else {
       this.departmentForm.controls.recipient.setErrors(null);   
     }   
-    if (this.departmentForm.controls.approver.value && this.departmentForm.controls.approver.value.status === RecordStatus.INACTIVE) {
+    if (this.departmentForm.controls.approver.value && this.departmentForm.controls.approver.value && this.departmentForm.controls.approver.value.status === RecordStatus.INACTIVE) {
       this.departmentForm.controls.approver.setErrors({ inactive: true });   
     } else {
       this.departmentForm.controls.approver.setErrors(null);   

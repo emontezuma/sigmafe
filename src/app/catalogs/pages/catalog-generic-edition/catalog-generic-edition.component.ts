@@ -35,9 +35,6 @@ export class CatalogGenericEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
-
-
-
   
   // genericFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
@@ -765,12 +762,10 @@ export class CatalogGenericEditionComponent {
               snackClass: 'snack-accent',
               progressBarColor: 'accent',                
             });
-            this.setViewLoading(false);
-            this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-          }, 200);
-        });
+          })
+        })
       }
-    });
+    })
   }
 
 

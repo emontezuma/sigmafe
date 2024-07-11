@@ -37,25 +37,15 @@ export interface ChecklistTemplateDetail {
   valueType?: string,
   status?: string;
   showNotes?: string;
-  translations?: GeneralTranslation[];
-  required?: string;
+  translations?: GeneralTranslation[];  
   allowNoCapture?: string;
   allowComments?: string;
   showChart?: string;
   allowAlarm?: string;
-  notifyAlarm?: string;
-  accumulative?: string;
-  automaticActionPlan?: string;  
-  actionPlansToGenerate?: string;  
-  possibleValues?: string;  
-  byDefault?: string; 
-  byDefaultDateType?: string; 
-  resetValueMode?: string; 
+  notifyAlarm?: string;  
   lastGeneratedDate?: string; 
-  generationCount: number;
-  attachments?: Attachment[];
-  minimum?: string; 
-  maximum?: string; 
+  generationCount?: number;
+  attachments?: Attachment[];  
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -65,7 +55,59 @@ export interface ChecklistTemplateDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
+  allowDiscard?: string;
+  allowRejection?: string;
+  allowManualMode?: string;
+  allowPartialSaving?: string;
+  allowApprovalByGroup?: string;
+  allowExpiring?: string;
+  requiresApproval?: string;
+  cancelOpenChecklists?: string;
+  allowReassignment?: string;
+  requiresActivation?: string;
+  allowRestarting?: string;
   
+  expiringMessageSubject?: string;    
+  expiringMessageBody?: string;
+  expiringNotificationMode?: string;
+  expiringChannels?: string;
+  notifyExpiring?: string;
+  
+  alarmNotificationMode?: string;
+  alarmNotificationChannels?: string;
+  alarmNotificationMessageSubject?: string;
+  alarmNotificationMessageBody?: string;
+  
+  approvalNotificationMode?: string;
+  approvalRequestChannels?: string;
+  approvalRequestMessageSubject?: string;
+  approvalRequestMessageBody?: string;
+  notifyApproval?: string;
+  
+  anticipationMessageSubject?: string;
+  anticipationNotificationMode?: string;
+  anticipationChannels?: string;
+  anticipationMessageBody?: string;
+  notifyAnticipation?: string;
+  anticipationSeconds?: number;    
+  
+  notifyGeneration?: string;
+  generationNotificationMode?: string;
+  generationChannels?: string;    
+  generationMessageSubject?: string;
+  generationMessageBody?: string;    
+
+  moldStates?: string;    
+  
+  molds?: string;
+  expiringRecipient?: GeneralCatalogInternalData;
+  approvalRecipient?: GeneralCatalogInternalData;
+  alarmRecipient?: GeneralCatalogInternalData;
+  anticipationRecipient?: GeneralCatalogInternalData;
+  generationRecipient?: GeneralCatalogInternalData;
+  timeToFill?: number;    
+
+  approver?: GeneralCatalogInternalData,
 }
 
 export interface ChecklistTemplatesState {
@@ -108,37 +150,88 @@ export const emptyChecklistTemplateCatalog = {
 };
 
 export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {  
-  name: null,
+  name: '',
+  reference: '',
+  notes: '',
+  prefix: '',
+  mainImageGuid: '',
+  mainImagePath: '',
+  mainImageName: '',
+  mainImage: '',
   id: null,
   customerId: null,
-  prefix: null,
-  status: null,
-  maximum: null,
-  minimum: null,
+  templateType: null,
+  sigmaType: null,
+  status: '',
+  showNotes: '',  
+  allowNoCapture: '',
+  allowComments: '',
+  showChart: '',
+  allowAlarm: '',
+  notifyAlarm: '',  
+  lastGeneratedDate: '',     
   createdById: null,
   createdAt: null,
   updatedById: null,
-  updatedAt: null,
+  updatedAt: '',
   deletedById: null,
   deletedAt: null,
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
-  lastGeneratedDate: null,
-  generationCount: 0,
-  showNotes: GeneralValues.NO,
-  required: GeneralValues.NO,
-  allowNoCapture: GeneralValues.NO,
-  allowComments: GeneralValues.NO,
-  showChart: GeneralValues.NO,
-  allowAlarm: GeneralValues.NO,
-  accumulative: GeneralValues.NO,
-  automaticActionPlan: GeneralValues.NO,
-  notifyAlarm: GeneralValues.NO,
+  allowDiscard: '',
+  allowRejection: '',
+  allowManualMode: '',
+  allowPartialSaving: '',
+  allowApprovalByGroup: '',
+  allowExpiring: '',
+  requiresApproval: '',
+  moldStates: '',
+  cancelOpenChecklists: '',
+  allowReassignment: '',
+  requiresActivation: '',
+  allowRestarting: '',
+  
+  expiringMessageSubject: '',    
+  expiringMessageBody: '',
+  expiringNotificationMode: '',
+  expiringChannels: '',
+  notifyExpiring: '',
+  
+  alarmNotificationMode: '',
+  alarmNotificationChannels: '',
+  alarmNotificationMessageSubject: '',
+  alarmNotificationMessageBody: '',
+  
+  approvalNotificationMode: '',
+  approvalRequestChannels: '',
+  approvalRequestMessageSubject: '',
+  approvalRequestMessageBody: '',
+  notifyApproval: '',
+  
+  anticipationMessageSubject: '',
+  anticipationNotificationMode: '',
+  anticipationChannels: '',
+  anticipationMessageBody: '',
+  notifyAnticipation: '',
+  anticipationSeconds: null,
+  
+  notifyGeneration: '',
+  generationNotificationMode: '',
+  generationChannels: '',    
+  generationMessageSubject: '',
+  generationMessageBody: '',    
+  
+  molds: '',
+  expiringRecipient: null,
+  approvalRecipient: null,
+  alarmRecipient: null,
+  anticipationRecipient: null,
+  generationRecipient: null,
+  timeToFill: null,    
+  approver: null,    
   attachments: [],
-  translations: [],
-  byDefault: '',
-  byDefaultDateType: '-',
+  translations: [],  
 };
 
 export interface ChecklistTemplatePossibleValue {
@@ -149,17 +242,45 @@ export interface ChecklistTemplatePossibleValue {
 }
 
 export interface ChecklistTemplateLine {
+  checklistTemplateId?: number;
+  id?: number;
+  customerId?: number;
+  line?: number;
+  order?: number;
+  loading?: boolean;
+  enabled?: boolean;
+  error?: boolean;
+  validate?: boolean;
   variableId?: number;
-  minimum?: number;
-  maximum?: number;
+  recipientId?: number;
+  name?: string;
+  notes?: string;
+  minimum?: string;
+  maximum?: string;
   required?: string;
   byDefault?: string;
   allowNoCapture?: string;
   allowComments?: string;
+  possibleValues?: string;
+  possibleValue?: string;
+  byDefaultDateType?: string;
+  valueType?: string;
   sensorId?: number;
+  uomId?: number;
+  uomName?: string;
+  uomPrefix?: string;
   showChart?: string;
+  useVariableAttachments?: string;
+  showLastValue?: string;
+  showParameters?: string;
+  showNotes?: string;
   allowAlarm?: string;
   notifyAlarm?: string;  
   recipient?: GeneralCatalogInternalData,
-  status?: string;  
+  status?: string;
+  uom?: GeneralCatalogInternalData,
+  attachments?: Attachment[];
+  valuesList?: ChecklistTemplatePossibleValue[];
+  friendlyValueType?: string;
+  formData?: any;
 }

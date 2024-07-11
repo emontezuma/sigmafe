@@ -1,0 +1,799 @@
+<div class="container" #catalogEdition @dissolve>
+  <ng-container *ngIf="recipients$ | async"></ng-container>
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+  <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
+  <ng-container *ngIf="variableByDefaultDate$ | async"></ng-container>  
+  <ng-container *ngIf="checkListTemplateLineChanged$ | async"></ng-container>    
+  <ng-container *ngIf="duplicateAttachmentsList$ | async "></ng-container>        
+  <ng-container *ngIf="formStatus$ | async "></ng-container>          
+
+  <form class="layout" [formGroup]="variableForm" #f="ngForm">
+    <div class="grid-multiple">
+      <div class="flex-accordion subtitle">
+        <label class="accordion-label">Variable: {{ line.name }} (id: {{ line.variableId }})</label>
+        <label class="accordion-label">Unidad de medida: {{ line.uomName }} {{ line.uomPrefix ? ("(" + line.uomPrefix + ")") : "" }}</label>
+        <label class="accordion-label-no-counter">Tipo de valor: {{ line.friendlyValueType }}</label>                
+      </div>  
+    </div>
+    <div class="grid-multiple">
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.required"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si la variable es requerida"
+        >
+          <span fieldTitle class="label field__label"
+            >¿La variable es requerida?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.allowNoCapture"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si la variable permite la NO captura"
+        >
+          <span fieldTitle class="label field__label"
+            >¿El variable permite la NO captura?</span
+          >
+        </app-select-field>                
+      </div>
+      <div
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.NUMERIC_RANGE"
+        class="field-items"
+      >
+        <app-input-field
+          [bordered]="true"
+          [formField]="variableForm.controls.minimum"
+          leftHint="Campo opcional"
+          fieldInputType="number"
+          currentErrorMessage="El rango mínimo no debe ser mayor al rango máximo"
+          currentErrorIcon="warn_line"
+          [showCloseButton]="true"
+          [showRightHint]="true"
+          rightHint="Deje el valor vacío para no aplicar el rango mínimo"
+          fieldHelp="Especifique el rango minimo para esta variable"
+        >
+          <span fieldTitle class="label field__label"
+            >Rango mínimo</span
+          >
+        </app-input-field>
+      </div>
+      <div
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.NUMERIC_RANGE"
+        class="field-items"
+      >
+        <app-input-field
+          [bordered]="true"
+          [formField]="variableForm.controls.maximum"
+          leftHint="Campo opcional"
+          fieldInputType="number"
+          currentErrorIcon="warn_line"
+          [showCloseButton]="true"
+          [showRightHint]="true"
+          rightHint="Deje el valor vacío para no aplicar el rango máximo"
+          fieldHelp="Especifique el rango máximo para esta variable"
+        >
+          <span fieldTitle class="label field__label"
+            >Rango máximo</span
+          >
+        </app-input-field>
+      </div>      
+      <div class="field-items field-items--bordered">
+        <app-area-field
+          [bordered]="false"
+          [formField]="variableForm.controls.notes"
+          [fieldMaxLength]="500"
+          [showRightHint]="true"
+          [showCloseButton]="true"
+          [minRows]="1"
+          [maxRows]="5"
+          fieldHelp="Especifique las notas referentes a esta variable"
+        >
+          <span fieldTitle class="label field__label"
+            >Notas referentes a la variable</span
+          >
+        </app-area-field>
+        <mat-checkbox
+          style="margin-top: -10px; width: calc(100% - 30px)"
+          class="field__check-label"
+          formControlName="showNotes"
+          color="primary"
+        >
+          <span class="check-span"
+            >Utilizar éstas notas como título/pregunta en el checklist</span
+          >
+        </mat-checkbox>
+      </div>      
+      <div
+        *ngIf="
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO && 
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO_NA &&
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.LIST &&
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE &&
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE_AND_TIME &&
+          variableForm.controls.valueType.value !== HarcodedVariableValueType.TIME
+        "
+        class="field-items"
+      >            
+        <app-input-field
+          [bordered]="true"
+          [formField]="variableForm.controls.byDefault"
+          leftHint="Campo opcional"                
+          [fieldInputType]="byDefaultValueType"
+          currentErrorIcon="warn_line"
+          [showCloseButton]="true"
+          [showRightHint]="true"
+          rightHint="Deje el valor vacío para no aplicar el valor por defecto"
+          fieldHelp="Especifique el valor por defecto para esta variable"
+        >
+          <span fieldTitle class="label field__label"
+            >Valor por defecto para la variable</span
+          >
+        </app-input-field>
+      </div>
+      <div
+        *ngIf="
+          variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO || 
+          variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO_NA
+        "
+        class="field-items"
+      >
+        <app-select-field
+          [formField]="variableForm.controls.byDefault"
+          [list]="valuesByDefault.items"                
+          fieldHelp="Seleccione de la lista el valor por defecto"
+        >
+          <span fieldTitle class="label field__label"
+          >Valor por defecto para la variable</span
+          >
+        </app-select-field>
+      </div>
+      <div
+        *ngIf="
+          variableForm.controls.valueType.value === HarcodedVariableValueType.DATE ||
+          variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME ||
+          variableForm.controls.valueType.value === HarcodedVariableValueType.TIME
+        "
+        class="field-items"
+      >
+        <app-select-field
+          [formField]="variableForm.controls.byDefaultDateType"
+          [list]="variableByDefaultDate.items"                
+          fieldHelp="Especifique el tipo de valor por defecto"
+        >
+          <span fieldTitle class="label field__label"
+            >Tipo de fecha/hora por defecto</span
+          >
+        </app-select-field>                
+      </div>
+      <div
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME"
+        class="field-items"
+      >
+        <fieldset
+          class="field__container"
+          style="min-width: 250px"
+          [ngClass]="{
+            'field__container--error':
+              variableForm.controls.byDefault.touched &&
+              !variableForm.controls.byDefault.valid
+          }"
+          [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+        >
+          <span class="label field__label">Fecha y hora por defecto</span>
+          <div class="flex-columns">
+            <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+              <input
+                class="field__input"
+                matInput
+                formControlName="byDefaultDate"
+                #byDefault
+                name="byDefaultDate"
+                [matDatepicker]="byDefaultPicker"
+              />
+              <mat-hint>DD/MM/AAAA</mat-hint>
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="byDefaultPicker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #byDefaultPicker></mat-datepicker>
+              <mat-error class="field__error field__required">
+                <mat-icon
+                  class="field__required-icon"
+                  svgIcon="warn_line"
+                ></mat-icon>
+                <span class="field__required-label"
+                  ><strong>Error en el formato de la fecha</strong></span
+                >
+              </mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
+              <input
+                class="field__input"
+                matInput
+                formControlName="byDefaultTime"
+                #byDefault
+                name="byDefaultTime"
+                type="time"
+                style="min-height: 22px"
+              />
+              <mat-hint>HH:MM AM/PM</mat-hint>                  
+            </mat-form-field>
+          </div>
+          <span class="field__help"
+            >Especifique la fecha y hora por defecto</span
+          >
+        </fieldset>
+      </div>
+      <div
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE"
+        class="field-items"
+      >
+        <fieldset
+          class="field__container"
+          style="min-width: 250px"
+          [ngClass]="{
+            'field__container--error':
+              variableForm.controls.byDefault.touched &&
+              !variableForm.controls.byDefault.valid
+          }"
+          [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+        >
+          <span class="label field__label">Fecha por defecto</span>
+          <div class="flex-columns">
+            <mat-form-field appearance="fill" class="field__field" style="width: 100%">
+              <input
+                class="field__input"
+                matInput
+                formControlName="byDefault"
+                #byDefault
+                name="byDefault"
+                [matDatepicker]="byDefaultPicker"
+              />
+              <mat-hint>DD/MM/AAAA</mat-hint>
+              <mat-datepicker-toggle
+                matIconSuffix
+                [for]="byDefaultPicker"
+              ></mat-datepicker-toggle>
+              <mat-datepicker #byDefaultPicker></mat-datepicker>
+              <mat-error class="field__error field__required">
+                <mat-icon
+                  class="field__required-icon"
+                  svgIcon="warn_line"
+                ></mat-icon>
+                <span class="field__required-label"
+                  ><strong>Error en el formato de la fecha</strong></span
+                >
+              </mat-error>
+            </mat-form-field>                 
+          </div>
+          <span class="field__help"
+            >Especifique la fecha por defecto</span
+          >
+        </fieldset>
+      </div>
+      <div
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.TIME"
+        class="field-items"
+      >
+        <fieldset
+          class="field__container"
+          style="min-width: 250px"
+          [ngClass]="{
+            'field__container--error':
+              variableForm.controls.byDefault.touched &&
+              !variableForm.controls.byDefault.valid
+          }"
+          [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+        >
+          <span class="label field__label">Hora por defecto</span>
+          <div class="flex-columns">
+            <mat-form-field appearance="fill" class="field__field" style="width: 100%">
+              <input
+                class="field__input"
+                matInput
+                formControlName="byDefault"
+                #byDefault
+                name="byDefault"
+                type="time"
+                style="min-height: 22px"
+              />
+              <mat-hint>HH:MM AM/PM</mat-hint>                  
+            </mat-form-field>
+          </div>
+          <span class="field__help"
+            >Especifique la hora por defecto</span
+          >
+        </fieldset>
+      </div>
+      <div              
+        class="field-items"              
+        *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.LIST"          
+      >
+        <fieldset
+          class="field__container"
+          style="min-width: 500px; height: calc(100% - 22px);"
+          [ngClass]="{ 'field__container--error': !variableForm.controls.possibleValues.valid }"
+        >
+          <div class="title-with-id">
+            <span class="label field__label">Lista de posibles valores</span>                  
+            <span class="field__label">Total valores: {{ line?.valuesList?.length }}</span>
+          </div>
+          <div            
+            class="values-table values-table__container"    
+          >
+            <table mat-table [dataSource]="possibleValuesTable">
+
+              <ng-container matColumnDef="item">
+                <th mat-header-cell *matHeaderCellDef>#</th>                  
+                <td mat-cell *matCellDef="let row; let i = index">
+                  <ng-container>{{ row.order }}</ng-container>   
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>Valor</th>
+                <td mat-cell *matCellDef="let row">
+                  <ng-container>{{ row.value }}</ng-container>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="byDefault">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-icon
+                    svgIcon="check"
+                    matTooltip="Al seleccionar esta valor se alarmará la variable"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                  >
+                  </mat-icon>   
+                </th>
+                <td class="main-info" mat-cell *matCellDef="let row">
+                  <ng-container>      
+                    <button 
+                      mat-icon-button
+                      (click)="handleByDefault(row.order)"
+                      [matTooltip]="row.byDefault ? 'Valor por defecto de la variable' : ''"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                    >
+                      <mat-icon                            
+                        svgIcon="check"
+                        [ngStyle]="{ 'color': row.byDefault ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.05)' }"                              
+                      >
+                      </mat-icon>   
+                    </button>
+                  </ng-container>
+                </td>
+                <td mat-cell *matCellDef="let row">
+                  <ng-container>{{ row.byDefault }}</ng-container>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="alarmedValue">
+                
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-icon
+                    svgIcon="warn_fill"
+                    matTooltip="Al seleccionar esta valor se alarmará la variable"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                  >
+                  </mat-icon>   
+                </th>
+                
+                <td class="main-info" mat-cell *matCellDef="let row">
+                  <ng-container>      
+                    <button
+                      mat-icon-button
+                      (click)="handleAlarmed(row.order)"
+                      [matTooltip]="row.alarmedValue ? 'Se alarmará la variable' : 'No se alarma'"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                    >
+                      <mat-icon                            
+                        svgIcon="warn_fill"
+                        [ngStyle]="{ 'color': row.alarmedValue ? 'var(--z-colors-table-row-fore-color)' : 'rgba(0, 0, 0, 0.1)' }"                              
+                      >
+                      </mat-icon>   
+                    </button>      
+                  </ng-container>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Acciones</th>
+                <td class="general-info" mat-cell *matCellDef="let row">
+                  <div
+                    class="box-row"                          
+                  >
+                    <button
+                      mat-icon-button
+                      (click)="handleMoveToUp(row.order)"
+                      matTooltip="Sube el item a un orden"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="row.order === 1"
+                    >
+                      <mat-icon>keyboard_arrow_up</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      (click)="handleMoveToDown(row.order)"
+                      matTooltip="Baja el item a un orden"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="row.order === line.valuesList.length"
+                    >
+                      <mat-icon>keyboard_arrow_down</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      (click)="handleMoveToFirst(row.order)"
+                      matTooltip="Sube el item al primer orden"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                      [disabled]="row.order === 1"
+                    >
+                      <mat-icon>keyboard_capslock</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="handleEdit(row.order)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="handleRemove(row.order)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>   
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="possibleValuesTableColumns; sticky: 1"></tr>
+              <tr class="table-row" mat-row *matRowDef="let row; columns: possibleValuesTableColumns"></tr>
+
+              <!-- <div *ngIf="!loading">
+                <tr class="values-table-mat-row" *matNoDataRow>
+                  <td class="values-table__no-data" colspan="9">
+                    No hay valores a mostrar...
+                  </td>
+                </tr>
+              </div> -->
+            </table>
+          </div>
+          <div class="possible-value-fields" style="margin-top: 10px">
+            <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+              <input
+                class="field__input"
+                matInput
+                formControlName="possibleValue"
+                #possibleValue
+                name="possibleValue"                      
+                (keydown)="handleKeyDown($event)"          
+              />
+              <mat-hint>Valor a agregar</mat-hint>                  
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="field__field">
+              <mat-select
+                #selection
+                formControlName="possibleValuePosition"
+                [disabled]="variableForm.controls.possibleValuePosition.disabled"
+                name="possibleValuePosition"                    
+              >
+                <mat-option *ngFor="let item of possibleValuePositions; let i = index" [value]="item.id">
+                  <div class="option-container">
+                    {{ item.description }}
+                  </div>
+                </mat-option>
+              </mat-select>
+              <mat-hint>Orden que ocupará el valor</mat-hint>                  
+          </mat-form-field>
+          <button class="circular-button" mat-mini-fab (click)="handleEditPossibleValue()" color="primary" [disabled]="!variableForm.controls.possibleValue.value">
+            <mat-icon svgIcon="check"></mat-icon>
+          </button>
+          <button class="button circular-button" mat-mini-fab (click)="handleCancelPossibleValue()" [disabled]="!variableForm.controls.possibleValue.value">
+            <mat-icon svgIcon="cancel"></mat-icon>
+          </button>
+          </div>
+        </fieldset>
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.allowComments"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si la variable permite la entrada de comentarios"
+        >
+          <span fieldTitle class="label field__label"
+            >¿La variable permite la entrada de comentarios?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.showChart"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si en la captura de la variable se muestra el gráfico"
+        >
+          <span fieldTitle class="label field__label"
+            >¿Mostrar gráfico?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.showLastValue"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si se muestra el último valor capturado"
+        >
+          <span fieldTitle class="label field__label"
+            >¿Mostrar el último valor de la variable?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.showParameters"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si en la captura de la variable se muestra el rango numérico"
+        >
+          <span fieldTitle class="label field__label"
+            >¿Mostrar el rango de valores de la variable (si aplica)?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.allowAlarm"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si esta variable generará alarmas"
+        >
+          <span fieldTitle class="label field__label"
+            >¿La variable generará alarmas?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field
+          [formField]="variableForm.controls.notifyAlarm"                
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si la alarma de esta variable generará notificaciones"          
+        >
+          <span fieldTitle class="label field__label"
+            >¿La alarma de la variable generará notificaciones?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <fieldset
+          class="field__container"
+          style="min-width: 350px; height: calc(100% - 22px);"
+          [ngClass]="{
+            'field__container--error':
+              variableForm.controls.recipient.touched &&
+              !variableForm.controls.recipient.valid
+          }"
+          [disabled]="variableForm.controls.notifyAlarm.value !== 'y'"
+        >
+          <div class="title-with-id">
+            <span class="label field__label">Recipiente asociado</span>
+            <span class="field__label" *ngIf="variableForm.controls.recipient?.value?.id">Id: {{ variableForm.controls.recipient?.value?.id }}</span>
+          </div>
+          <app-auto-complete-field              
+            [formField]="variableForm.controls.recipient"
+            [list]="recipients.items"
+            [totalCount]="recipients.totalCount"
+            leftHint="Escriba el Nombre del recipiente a buscar"
+            [catalog]="SystemTables.RECIPIENTS"
+            [loading]="recipients.loading"
+            noItemsError="No hay recipientes con este nombre"
+            [showDataState]="true"              
+            (getMoreData)="getMoreData($event)"
+          >
+          </app-auto-complete-field>
+          <span class="field__help"
+            >Especifique el Recipiente a notificar</span
+          >
+        </fieldset>
+      </div>
+    </div>
+    <div class="grid-multiple">
+      <div class="flex-accordion subtitle">
+        <label class="accordion-label">ADJUNTOS DE LA LINEA</label>
+        <label class="accordion-label-no-counter">({{ line.attachments.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
+      </div>  
+    </div> 
+    <mat-checkbox      
+      class="field__check-label"      
+      formControlName="useVariableAttachments"
+      color="primary"
+      style="align-self: flex-start"
+    >
+      <span class="check-span"
+        >Utilizar adicionalmente los adjuntos de la Variable</span
+      >
+    </mat-checkbox>
+    <div class="grid-multiple margin-top">            
+      <div class="field-items">              
+        <div            
+          class="values-table values-table__container"    
+        >              
+          <table mat-table [dataSource]="attachmentsTable">
+
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef>#</th>                  
+              <td mat-cell *matCellDef="let row; let i = index">
+                <ng-container>{{ i + 1 }}</ng-container>   
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="icon">
+              <th mat-header-cell *matHeaderCellDef>Aplicación</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="card-image-icon">
+                  <div
+                    class="image-container-table"
+                    *ngIf="row.icon === 'field_image'"
+                  >
+                    <img                
+                      @dissolve
+                      appImageNotFound                
+                      class="variable-image"                        
+                      [src]="row.image"
+                      [alt]="row.image"         
+                      fill
+                    >      
+                  </div>
+                  <div
+                    *ngIf="row.icon !== 'field_image'"
+                    class="icon-container"
+                  >
+                    <mat-icon 
+                      class="file-type-icon"
+                      [svgIcon]="row.icon"
+                    >
+                    </mat-icon>
+                  </div>    
+                </div> 
+              </td>      
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>                  
+              <td mat-cell *matCellDef="let row">
+                <ng-container>{{ row.name }}</ng-container>   
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions-attachments">
+              <th mat-header-cell *matHeaderCellDef>Acciones</th>
+              <td class="general-info" mat-cell *matCellDef="let row; let i = index">
+                <div
+                  class="box-row"                          
+                >
+                  <button
+                    mat-icon-button
+                    (click)="handleAttachmentMoveToUp(i)"
+                    matTooltip="Sube el item a un orden"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    [disabled]="i === 0"
+                  >
+                    <mat-icon>keyboard_arrow_up</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="handleAttachmentMoveToDown(i)"
+                    matTooltip="Baja el item a un orden"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    [disabled]="i === line.attachments.length - 1"
+                  >
+                    <mat-icon>keyboard_arrow_down</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="handleAttachmentMoveToFirst(i)"
+                    matTooltip="Sube el item al primer orden"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    [disabled]="i === 0"
+                  >
+                    <mat-icon class="icon-rotated-90">first_page</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button
+                    (click)="handleAttachmentMoveToLast(i)"
+                    matTooltip="Baja el item al último orden"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"
+                    [disabled]="i === line.attachments.length - 1"
+                  >
+                    <mat-icon class="icon-rotated-90">last_page</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button (click)="handleAttachmentRemove(i)"
+                    matTooltip="Elimina este adjunto..."
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"                          
+                  >     
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                  <button
+                    mat-icon-button (click)="handleAttachmentDownload(i)"
+                    matTooltip="Descarga a su disco una copia del archivo"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"                          
+                  >
+                    <mat-icon>cloud_download</mat-icon>
+                  </button>
+                </div>   
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="attachmentsTableColumns; sticky: 1"></tr>
+            <tr class="table-row" mat-row *matRowDef="let row; columns: attachmentsTableColumns"></tr>
+            
+            <tr class="values-table-mat-row" *matNoDataRow>
+              <td class="values-table__no-data" colspan="9">
+                No hay adjuntos a mostrar...
+              </td>
+            </tr>                  
+          </table>                    
+        </div>        
+        <mat-divider style="margin: 10px 0px 0px 0px;"></mat-divider>
+        <div class="grid-multiple-rows no-flex">
+          <div class="maintenance-buttons" style="padding: 10px 10px 1px 0px;">
+            <input type="file" style="display: none" (change)="onAttachmentFileSelected($event)" #fileInputAttachment> 
+            <button
+              [disabled]="addAttachmentButtonClick"
+              mat-button
+              class="toolbar-button"
+              aria-label="icon-button with menu icon"
+              matTooltip="Agrega un nuevo adjunto a la variablee"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+              (click)="(line.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttachment() : fileInputAttachment.click();"
+            >
+              <mat-icon                                    
+                class="svgicon icon-medium"                
+                svgIcon="document"
+                [ngStyle]="{ visibility: addAttachmentButtonClick ? 'hidden' : 'visible' }"b
+              >
+              </mat-icon>
+              <mat-progress-spinner
+                *ngIf="addAttachmentButtonClick"
+                class="spinner-regular-button"
+                diameter="32"
+                mode="indeterminate"
+              >
+              </mat-progress-spinner>
+              <mat-label class="button-label">Agregar un adjunto...</mat-label>
+            </button>          
+            <button
+              [disabled]="line.attachments.length === 0"
+              mat-button
+              class="toolbar-button warn"
+              aria-label="icon-button with menu icon"
+              matTooltip="Elimina todos los adjuntos"
+              matTooltipClass="tooltip-general"
+              matTooltipShowDelay="100"
+              (click)="handleRemoveAllAttachments()"
+            >
+              <mat-icon                
+                class="svgicon icon-medium"                
+                svgIcon="garbage_can"
+              >
+              </mat-icon> 
+              <mat-label class="button-label">Eliminar todos los adjuntos...</mat-label>
+            </button>     
+            <app-label-ellipsis
+              class="readonly-value"
+              style="margin-left: auto"                         
+              [lines]="1"
+              [labelInnerHTML]="variableAttachmentLabel"
+            ></app-label-ellipsis>              
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>  
+</div>

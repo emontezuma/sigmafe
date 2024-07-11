@@ -21,7 +21,8 @@ export const initialState: SettingsState = {
     },
     attachments: {
       variables: 10,
-      checklistTemplateHeader: 5
+      checklistTemplateHeader: 5,
+      checklistTemplateLines: 10,
     },
     checklistTemplate: {
       variablesLimit: 50,

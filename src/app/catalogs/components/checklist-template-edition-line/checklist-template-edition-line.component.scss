@@ -1,9 +1,8 @@
 @use "../../../../assets/styles/mixins";
 
-.container {
-  margin: 5px 1px;
-  counter-reset: counter subCounter;
-  padding-bottom: 5px;
+.container {  
+  margin: 0px;
+  padding: 0px;
 }
 
 mat-card-title {
@@ -34,21 +33,6 @@ mat-card-subtitle {
   font-size: 1.5rem;
   @include mixins.text-ellipsis();  
   color: var(--z-colors-page-card-fore) !important;
-}
-
-.accordion-label {
-  cursor: pointer;
-}
-
-.accordion-label::before {
-    counter-reset: subCounter;
-    counter-increment: counter;
-    content: counter(counter) ": ";
-  }
-
-.label::before {  
-  counter-increment: subCounter;
-  content: counter(counter) "." counter(subCounter) ": ";
 }
 
 .label-with-no-index {
@@ -84,8 +68,7 @@ mat-card-subtitle {
 
 .layout {
   @include mixins.flexbox(column, wrap, 5px, flex-start);
-  width: -webkit-fill-available;
-  margin: 5px;
+  width: -webkit-fill-available;  
 }
 
 .grid-multiple-rows {
@@ -111,41 +94,8 @@ mat-card-subtitle {
   @include mixins.flexbox(row, nowrap, 5px, flex-start);
 }
 
-::ng-deep .mat-expansion-panel-body {
-  padding: 0 5px 5px;
-}
-
-mat-expansion-panel {
-  border: 1.5px solid var(--theme-primary-500);
-  box-shadow: unset;
-  margin-top: 5px;
-  background-color: var(--z-colors-page-card-background-color);
-  color: var(--z-colors-page-card-fore);
-}
-
-mat-expansion-panel-header {
-  padding: 0px;
-  display: flex;
-  align-items: center;
-  margin: 2px;
-}
-
 .mat-mdc-card-header {
   padding: 4px 4px;
-}
-
-mat-accordion {
-  width: -webkit-fill-available;
-}
-
-.margin-top {
-  margin-top: 5px;
-}
-
-.accordion-icon {
-  min-width: 32px;
-  min-height: 32px;
-  margin-right: 5px;
 }
 
 mat-panel-title {
@@ -858,31 +808,28 @@ mat-hint {
   padding: 3px 0px;
 }
 
-.file-type-icon {
-  width: 48px;
-  height: 48px;
-  margin: auto;
+.flex-accordion {
+  display: flex;
+  flex-direction: row;  
+  justify-content: space-between;
+  width: 100%;
+}
+
+.subtitle {
+  font-weight: 600;
+  font-size: 1.5rem;
+  margin: 0px 5px 0px 0px;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 4px;
 }
 
 .icon-rotated-90 {
   transform: rotate(90deg);
 }
 
-.image-container-table {    
-  max-height: 56px;    
-  max-width: 56px;    
-  min-height: 56px;    
-  min-width: 56px;    
-  position: relative;
-  display: flex;
-  margin: 2px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 5px;
-}
-
-.flex-accordion {
-  display: flex;
-  flex-direction: row;  
-  justify-content: space-between;
-  width: 100%;
+.file-type-icon {
+  width: 48px;
+  height: 48px;
+  margin: auto;
 }

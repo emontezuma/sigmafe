@@ -737,32 +737,45 @@ export class CatalogCompanyEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.company.id || this.company.id === null || this.company.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateCompanyCatalog$ = this._catalogsService.updateCompanyCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateCompany.length > 0) {
-          const companyId = data?.data?.createOrUpdateCompany[0].id;          
-          this.processTranslations$(companyId).subscribe(() => {
-            this.requestCompanyData(companyId);
-            setTimeout(() => {              
-              let message = $localize`La compañía ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`La compañía ha sido creado satisfactoriamente con el id <strong>${this.company.id}</strong>`;
-                this._location.replaceState(`/catalogs/companies/edit/${companyId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateCompanyCatalog$ = this._catalogsService.updateCompanyCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateCompany.length > 0) {
+            const companyId = data?.data?.createOrUpdateCompany[0].id;          
+            this.processTranslations$(companyId).subscribe(() => {
+              this.requestCompanyData(companyId);
+              setTimeout(() => {              
+                let message = $localize`La compañía ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`La compañía ha sido creado satisfactoriamente con el id <strong>${this.company.id}</strong>`;
+                  this._location.replaceState(`/catalogs/companies/edit/${companyId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )  
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
   requestCompanyData(companyId: number): void { 
@@ -900,7 +913,7 @@ export class CatalogCompanyEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.companyForm.controls;
     return  {
         id: this.company.id,

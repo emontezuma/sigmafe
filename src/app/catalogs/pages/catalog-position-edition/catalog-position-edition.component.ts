@@ -741,32 +741,45 @@ export class CatalogPositionEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.position.id || this.position.id === null || this.position.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updatePositionCatalog$ = this._catalogsService.updatePositionCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdatePosition.length > 0) {
-          const positionId = data?.data?.createOrUpdatePosition[0].id;          
-          this.processTranslations$(positionId).subscribe(() => {
-            this.requestPositionData(positionId);
-            setTimeout(() => {              
-              let message = $localize`El equipamento ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.position.id}</strong>`;
-                this._location.replaceState(`/catalogs/positions/edit/${positionId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updatePositionCatalog$ = this._catalogsService.updatePositionCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdatePosition.length > 0) {
+            const positionId = data?.data?.createOrUpdatePosition[0].id;          
+            this.processTranslations$(positionId).subscribe(() => {
+              this.requestPositionData(positionId);
+              setTimeout(() => {              
+                let message = $localize`El equipamento ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${positionId}</strong>`;
+                  this._location.replaceState(`/catalogs/positions/edit/${positionId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }   
+    
   }
 
   requestPositionData(positionId: number): void { 
@@ -905,7 +918,7 @@ export class CatalogPositionEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.positionForm.controls;
     return  {
         id: this.position.id,

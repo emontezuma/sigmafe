@@ -793,33 +793,45 @@ export class CatalogPlantEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.plant.id || this.plant.id === null || this.plant.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updatePlantCatalog$ = this._catalogsService.updatePlantCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdatePlant.length > 0) {
-          const plantId = data?.data?.createOrUpdatePlant[0].id;        
-          this.processTranslations$(plantId)
-          .subscribe(() => {
-            this.requestPlantData(plantId);
-            setTimeout(() => {              
-              let message = $localize`La planta ha sido actualizada`;
-              if (newRecord) {                
-                message = $localize`La planta ha sido creada satisfactoriamente con el id <strong>${plantId}</strong>`;
-                this._location.replaceState(`/catalogs/plants/edit/${plantId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updatePlantCatalog$ = this._catalogsService.updatePlantCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdatePlant.length > 0) {
+            const plantId = data?.data?.createOrUpdatePlant[0].id;        
+            this.processTranslations$(plantId)
+            .subscribe(() => {
+              this.requestPlantData(plantId);
+              setTimeout(() => {              
+                let message = $localize`La planta ha sido actualizada`;
+                if (newRecord) {                
+                  message = $localize`La planta ha sido creada satisfactoriamente con el id <strong>${plantId}</strong>`;
+                  this._location.replaceState(`/catalogs/plants/edit/${plantId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }      
   }
 
   requestPlantData(plantId: number): void { 
@@ -984,7 +996,7 @@ export class CatalogPlantEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.plantForm.controls;
     return  {
       id: this.plant.id,
@@ -1094,7 +1106,9 @@ export class CatalogPlantEditionComponent {
       this.plantForm.controls.company.setErrors({ required: true });   
     } else if (this.plantForm.controls.company.value && this.plantForm.controls.company.value.status === RecordStatus.INACTIVE) {
       this.plantForm.controls.company.setErrors({ inactive: true });   
-    }    
+    } else {
+      this.plantForm.controls.company.setErrors(null);   
+    }
   }
 
   processTranslations$(plantId: number): Observable<any> { 

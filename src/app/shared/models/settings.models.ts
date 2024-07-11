@@ -29,6 +29,7 @@ export interface SettingsCatalog {
 export interface SettingAttachments {
     variables?: number;    
     checklistTemplateHeader?: number;    
+    checklistTemplateLines?: number;    
 }
 
 export interface SettingChecklistTemplate {

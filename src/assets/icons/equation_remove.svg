@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="addmask" version="1.1"  x="0px" y="0px" width="32" height="32" viewBox="0 0 24 24" enable-background="new 0 0 24 24" xml:space="preserve" style="fill: rgb(0, 0, 0);" viewbox="0 0 32 32">
+<g class="addon_content" transform="translate(0,0) scale(1,1)">
+	<g>
+		<defs>
+			<path class="mask_container" id="263_close_mask" d="M-16.95-16.95v72h72v-72H-16.95z M26.12,21.87l-4.24,4.25l-2.83-2.83l-2.83,2.83l-4.24-4.25l2.83-2.82    l-2.83-2.83l4.24-4.24l2.83,2.83l2.83-2.83l4.24,4.24l-2.83,2.83L26.12,21.87z" transform="translate(0,0) scale(1,1)" style="fill: rgb(0, 0, 0);"></path>
+		</defs>
+		<clipPath id="263_close_mask_1_">
+			<use xlink:href="#263_close_mask" overflow="visible"></use>
+		</clipPath>
+		
+	</g>
+	<polygon id="263_close_addon" points="21.17,19.055 24,21.875 21.88,23.995 19.05,21.165 16.221,23.995 14.1,21.875 16.93,19.055 14.1,16.225   16.221,14.105 19.05,16.936 21.88,14.105 24,16.225 "></polygon>
+</g>
+<g id="263_close_icon_placeholder" clip-path="url(#263_close_mask_1_)">
+	<g class="icnplhld"><!--?xml version="1.0" encoding="utf-8"?-->
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<g xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 24 24" style="enable-background:new 0 0 24 24;" xml:space="preserve" preserveAspectRatio="none" class="svgmask">
+<path id="2634351383__x3C_Trazado_x3E_" d="M20.513,18C19.924,17.989,18,17.778,18,15.5V6h3V3H3v3h3v5.5c0,6.186-3.166,6.486-3.5,6.5v3  C2.565,21,9,20.892,9,11.5V6h6v9.5c0,4.035,3.289,5.5,5.5,5.5h1v-3H20.513z" style="fill: rgb(0, 0, 0);"></path>
+</g></g>
+</g>
+</svg>

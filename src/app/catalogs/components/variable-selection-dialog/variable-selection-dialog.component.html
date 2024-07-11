@@ -1,0 +1,93 @@
+<div i18n class="container">
+  <div mat-dialog-title class="simple-flex title" #variableSelectionDialog>
+    <ng-container *ngIf="settingsData$ | async"></ng-container>
+    <ng-container *ngIf="variables$ | async"></ng-container>
+
+    <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
+    <div class="title-text" [innerHTML]="data.title"></div>
+    <button
+      *ngIf="data.showCloseButton"
+      mat-icon-button
+      class="close-button open"
+      aria-label="icon-button with menu icon"
+      (click)="handleCloseButtonClick()"
+    >
+      <mat-icon class="icon-button">close</mat-icon>
+    </button>
+  </div>
+  <mat-divider class="divider-title"></mat-divider>
+  <div class="dialog-content" mat-dialog-content>
+    <form
+      #translationsDialog
+      focusInvalidInput
+      class="layout"      
+      [formGroup]="selectionForm"
+      #f="ngForm"
+    >
+      <div class="grid-multiple margin-top" @dissolve>                
+        <div class="field-items">
+          <fieldset
+            class="field__container"
+            style="min-width: 350px; height: calc(100% - 22px);"                        
+          >
+            <div class="title-with-id">
+              <span class="label field__label">Variable a agregar</span>
+              <span class="field__label" *ngIf="selectionForm.controls.variable?.value?.id">Id: {{ selectionForm.controls.variable?.value?.id }}</span>
+            </div>
+            <app-auto-complete-field        
+              [formField]="selectionForm.controls.variable"
+              [list]="variables.items"
+              [totalCount]="variables.totalCount"
+              leftHint="Escriba el Nombre de la variable a buscar"
+              [catalog]="SystemTables.VARIABLES"
+              [loading]="variables.loading"
+              noItemsError="No hay variablse con este nombre"
+              [showDataState]="true"
+              (optionSelected)="handleOptionSelected($event)"
+              (getMoreData)="getMoreData($event)"
+            >
+            </app-auto-complete-field>            
+          </fieldset>
+        </div>
+      </div>
+    </form>
+  </div>
+  <mat-divider class="divider"></mat-divider>
+  <div class="simple-flex dialog-actions" mat-dialog-actions>    
+    <div
+      class="toolbar-button-container"
+      *ngFor="let button of data.buttons; let i = index; trackBy: trackByFn"
+    >
+      <button
+        mat-button
+        class="toolbar-button"
+        aria-label="icon-button with menu icon"
+        [ngClass]="button.class"
+        [matTooltipDisabled]="!button.showTooltip"
+        [matTooltip]="button.tooltip"
+        matTooltipClass="tooltip-general"
+        matTooltipShowDelay="100"
+        [disabled]="button.disabled || button.loading"
+        (click)="handleClick(button.action)"
+      >
+        <mat-icon
+          *ngIf="button.showIcon"
+          class="svgicon icon-medium"
+          [ngStyle]="{ visibility: button.loading ? 'hidden' : 'visible' }"
+          [svgIcon]="button.icon"
+        >
+        </mat-icon>
+        <mat-progress-spinner
+          *ngIf="button.loading"
+          class="spinner-medium-button"
+          diameter="24"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+        <label class="button-label">{{
+          button.showCaption ? button.caption : ""
+        }}</label>
+      </button>
+    </div>
+  </div>
+</div>

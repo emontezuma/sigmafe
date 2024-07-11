@@ -741,32 +741,45 @@ export class CatalogWorkgroupEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.workgroup.id || this.workgroup.id === null || this.workgroup.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateWorkgroupCatalog$ = this._catalogsService.updateWorkgroupCatalog$(dataToSave)
-    .pipe(
-      tap((data: any) => {
-        if (data?.data?.createOrUpdateWorkgroup.length > 0) {
-          const workgroupId = data?.data?.createOrUpdateWorkgroup[0].id;          
-          this.processTranslations$(workgroupId).subscribe(() => {
-            this.requestWorkgroupData(workgroupId);
-            setTimeout(() => {              
-              let message = $localize`El equipamento ha sido actualizado`;
-              if (newRecord) {                
-                message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
-                this._location.replaceState(`/catalogs/workgroups/edit/${workgroupId}`);
-              }
-              this._sharedService.showSnackMessage({
-                message,
-                snackClass: 'snack-accent',
-                progressBarColor: 'accent',                
-              });
-              this.setViewLoading(false);
-              this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
-            }, 200);
-          });
-        }
-      })
-    )
+    try {
+      const dataToSave = this.prepareRecordToSave(newRecord);
+      this.updateWorkgroupCatalog$ = this._catalogsService.updateWorkgroupCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateWorkgroup.length > 0) {
+            const workgroupId = data?.data?.createOrUpdateWorkgroup[0].id;          
+            this.processTranslations$(workgroupId).subscribe(() => {
+              this.requestWorkgroupData(workgroupId);
+              setTimeout(() => {              
+                let message = $localize`El equipamento ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
+                  this._location.replaceState(`/catalogs/workgroups/edit/${workgroupId}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;
+              }, 200);
+            });
+          }
+        })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    } 
+    
   }
 
   requestWorkgroupData(workgroupId: number): void { 
@@ -905,7 +918,7 @@ export class CatalogWorkgroupEditionComponent {
     });
   } 
 
-  prepareRecordToAdd(newRecord: boolean): any {
+  prepareRecordToSave(newRecord: boolean): any {
     const fc = this.workgroupForm.controls;
     return  {
         id: this.workgroup.id,

@@ -103,7 +103,7 @@
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Posición actual</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">
-            {{ row.translatedPartNumber.translatedName }} / <strong>{{ row.data.position }}</strong>
+            {{ row.translatedPartNumber?.translatedName }} / <strong>{{ row.data.position }}</strong>
           </ng-container>        
           <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
         </td>

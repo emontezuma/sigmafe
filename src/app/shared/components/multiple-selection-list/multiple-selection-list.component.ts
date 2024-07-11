@@ -88,7 +88,7 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
       this.list.sort((a, b) => {        
         return a.sortedField < b.sortedField ? -1 : 1;        
       })
-    }    
+    } 
   }
 
   ngAfterViewInit() {

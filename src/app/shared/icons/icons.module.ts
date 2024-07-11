@@ -301,6 +301,22 @@ export class IconsModule {
       'equation_add',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_add.svg`)
     );
+    iconRegistry.addSvgIcon(
+      'equation_refresh',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_refresh.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equation_inactivate',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_inactivate.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equation_remove',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_remove.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equation_reactivate',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_reactivate.svg`)
+    );
   }
   
 }
