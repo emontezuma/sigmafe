@@ -3212,7 +3212,7 @@ export const GET_EQUIPMENT = gql`
   oneEquipment (
     id: $equipmentId        
   ) {
-    data {
+    
       name
       reference
       notes
@@ -3222,6 +3222,7 @@ export const GET_EQUIPMENT = gql`
       mainImageName
       id
       customerId
+      
       plantId     
       status
       createdById
@@ -3230,6 +3231,18 @@ export const GET_EQUIPMENT = gql`
       updatedAt
       deletedById
       deletedAt
+      plant {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+      
       createdBy {
         name
       }
@@ -3239,8 +3252,8 @@ export const GET_EQUIPMENT = gql`
       deletedBy {
         name
       }      
-    }
-    friendlyStatus    
+    
+        
   }
 }
 `;
@@ -3268,7 +3281,18 @@ export const GET_EQUIPMENTS = gql`
           mainImageGuid
           id
           customerId
-          plantId       
+          plantId
+          plant {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
           status
           updatedAt
           updatedBy {
@@ -3304,10 +3328,10 @@ export const GET_EQUIPMENT_TRANSLATIONS = gql`
         name
         reference
         notes
+        prefix
         languageId
         id
         customerId
-        plantId
         status
         createdById
         createdAt
@@ -3351,7 +3375,8 @@ export const ADD_EQUIPMENT_TRANSLATIONS = gql`
 export const UPDATE_EQUIPMENT = gql`
   mutation CreateOrUpdateEquipment (
     $customerId: Long,
-    $plantId: Long,  
+    $plantId: Long,
+    
     $id: Long,
     $status: String    
     $name: String,
@@ -3365,7 +3390,8 @@ export const UPDATE_EQUIPMENT = gql`
   createOrUpdateEquipment (
     inputs: [{
       customerId: $customerId
-      plantId: $plantId     
+      plantId: $plantId 
+    
       id: $id      
       status: $status
       name: $name,
@@ -3396,13 +3422,13 @@ export const UPDATE_EQUIPMENT = gql`
 export const DELETE_EQUIPMENT_TRANSLATIONS = gql`
   mutation DeleteEquipmentsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
-    $customerId: Long!
-  $plantId: Long!
+    $customerId: Long!   
+    $plantId: Long!
   ) {
     deleteEquipmentsTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-    plantId: $plantId,
+      plantId: $plantId,
     ) 
   }
 `;
@@ -4225,7 +4251,7 @@ export const GET_LINE_TRANSLATIONS = gql`
         languageId
         id
         customerId
-        plantId
+        
         status
         createdById
         createdAt
