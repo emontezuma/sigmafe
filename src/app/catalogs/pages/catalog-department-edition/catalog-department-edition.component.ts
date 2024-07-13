@@ -39,8 +39,8 @@ export class CatalogDepartmentEditionComponent {
   settingsData$: Observable<SettingsData>; 
 
   plants$: Observable<any>; 
-  approvers$: Observable<any>; 
   plants: GeneralCatalogData = emptyGeneralCatalogData; 
+  approvers$: Observable<any>; 
   approvers: GeneralCatalogData = emptyGeneralCatalogData; 
   recipients$: Observable<any>; 
   duplicateMainImage$: Observable<any>; 
@@ -818,6 +818,7 @@ export class CatalogDepartmentEditionComponent {
       }),
       tap((departmentData: DepartmentDetail) => {
         if (!departmentData) return;
+        console.log("here")
         this.department =  departmentData;
         this.translationChanged = false;
         this.imageChanged = false;

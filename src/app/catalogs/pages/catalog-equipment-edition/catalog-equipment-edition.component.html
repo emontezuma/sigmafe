@@ -12,12 +12,18 @@
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="plants$ | async "></ng-container>  
+  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateEquipment$ | async "></ng-container>
   <ng-container *ngIf="updateEquipmentCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deleteEquipmentTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addEquipmentTranslations$ | async "></ng-container>   
+<<<<<<< HEAD
   <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
+=======
+
+>>>>>>> a5283464dc6dfe2a231bf4c8edc0e1cb17cb8435
   
   <mat-card class="card">
     <form
@@ -45,7 +51,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DEL EQUIPAMENTO</label
+                >INFORMACIÓN PRINCIPAL DEL EQUIPO</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -76,11 +82,11 @@
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn_line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado al equipamento"
+                fieldHelp="Especifique el nombre asignado al equipo"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre del equipamento</span
+                  >Descripción/Nombre del equipo  </span
                 >
               </app-input-field>
             </div>
@@ -93,11 +99,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación del equipamento"
+                fieldHelp="Especifique la abreviación del equipo"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación del equipamento</span
+                  >Abreviación del equipo</span
                 >
               </app-input-field>
             </div>
@@ -109,7 +115,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia del equipamento"
+                fieldHelp="Especifique la referencia del equipo"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -125,13 +131,13 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a este equipamento"
+                fieldHelp="Especifique las notas referentes a este equipo"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes al equipamento</span
+                  >Notas referentes al equipo</span
                 >
               </app-area-field>              
-            </div>                     
+            </div>
             <div class="field-items">
               <fieldset class="field__container">
                 <div class="image-and-field">
@@ -162,14 +168,14 @@
                         mat-icon-button
                         (click)="removeImage()"
                         style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen del equipamento"
+                        matTooltip="Remueve la imagen del equipo"
                         matTooltipClass="tooltip-general"
                         matTooltipShowDelay="100"
                       >
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este equipamento</span>
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este equipo</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
@@ -195,7 +201,42 @@
                 </div>                
               </fieldset>              
             </div>
-                   
+         
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    equipmentForm.controls.plant.touched &&
+                    !equipmentForm.controls.plant.valid
+                }"
+                [disabled]="equipmentForm.controls.plant.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Planta del equipo</span>
+                  <span class="field__label" *ngIf="equipmentForm.controls.plant?.value?.id">Id: {{ equipmentForm.controls.plant?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='plant'"
+                  [formField]="equipmentForm.controls.plant"
+                  [list]="plants.items"
+                  [totalCount]="plants.totalCount"
+                  leftHint="Escriba el nombre de la Planta a buscar"
+                  [catalog]="SystemTables.PLANTS"
+                  [loading]="plants.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la planta</span
+                >
+              </fieldset>
+            </div>
+           
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>

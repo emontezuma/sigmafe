@@ -1146,6 +1146,7 @@ export class CatalogsService {
       ...data,
       mainImage,
       translations: this.mapTranslations(translations),
+      plant: this.mapDetailTranslationsData(data.plant),
     }
   }
 

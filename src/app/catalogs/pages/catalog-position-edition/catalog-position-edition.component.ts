@@ -321,7 +321,7 @@ export class CatalogPositionEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.position.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará la posicion con el Id <strong>${this.position.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -350,7 +350,7 @@ export class CatalogPositionEditionComponent {
                   if (data?.data?.createOrUpdatePosition.length > 0 && data?.data?.createOrUpdatePosition[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`El equipamento ha sido inhabilitada`;
+                      const message = $localize`La posicion ha sido inhabilitada`;
                       this.position.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -423,7 +423,7 @@ export class CatalogPositionEditionComponent {
                   if (data?.data?.createOrUpdatePosition.length > 0 && data?.data?.createOrUpdatePosition[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`El equipamento ha sido reactivada`;
+                      const message = $localize`La posicion ha sido reactivada`;
                       this.position.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -751,9 +751,9 @@ export class CatalogPositionEditionComponent {
             this.processTranslations$(positionId).subscribe(() => {
               this.requestPositionData(positionId);
               setTimeout(() => {              
-                let message = $localize`El equipamento ha sido actualizado`;
+                let message = $localize`La posicion ha sido actualizado`;
                 if (newRecord) {                
-                  message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${positionId}</strong>`;
+                  message = $localize`La posicion ha sido creado satisfactoriamente con el id <strong>${positionId}</strong>`;
                   this._location.replaceState(`/catalogs/positions/edit/${positionId}`);
                 }
                 this._sharedService.showSnackMessage({
@@ -847,7 +847,7 @@ export class CatalogPositionEditionComponent {
         this.position.mainImagePath = res.filePath;
         this.position.mainImageGuid = res.fileGuid;
         this.position.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la posicion para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -953,7 +953,7 @@ export class CatalogPositionEditionComponent {
     this.position.mainImagePath = '';
     this.position.mainImageGuid = '';
     this.position.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la posicion<br>Guarde el equipamento para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen de la posicion<br>Guarde la posicion para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
