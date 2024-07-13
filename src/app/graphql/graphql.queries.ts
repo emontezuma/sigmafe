@@ -2437,6 +2437,7 @@ export const UPSERT_CUSTOMER = gql`
 export const DELETE_CUSTOMER_TRANSLATIONS = gql`
   mutation DeleteCustomersTranslationsTable (
     $ids: [IdToDeleteInput!]!,
+    $customerId: Long!,
   ) {
     deleteCustomersTranslationsTable (      
       ids: $ids,
