@@ -804,12 +804,17 @@ export class CatalogCustomerEditionComponent {
     this.updateCustomerCatalog$ = this._catalogsService.updateCustomerCatalog$(dataToSave)
     .pipe(
       tap((data: any) => {
+      
         if (data?.data?.createOrUpdateCustomer.length > 0) {
           const customerId = data?.data?.createOrUpdateCustomer[0].id;        
+         
           this.processTranslations$(customerId).subscribe(() => {
+            console.log("here")
             this.requestCustomerData(customerId);
+            console.log("there")
             setTimeout(() => {
               let message = $localize`El cliente ha sido actualizado`;
+             
               if (newRecord) {
                 message = $localize`El cliente ha sido creado satisfactoriamente con el id <strong>${customerId}</strong>`;
                 this._location.replaceState(
@@ -833,6 +838,7 @@ export class CatalogCustomerEditionComponent {
   }
 
   requestCustomerData(customerId: number): void {
+    console.log("bringing")
     let customers = undefined;
     customers = { customerId };
 
@@ -1183,57 +1189,55 @@ export class CatalogCustomerEditionComponent {
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  processTranslations$(customerId: number): Observable<any> {
-    const differences =
-      this.storedTranslations.length !== this.customer.translations.length ||
-      this.storedTranslations.some((st: any) => {
-        return this.customer.translations.find((t: any) => {
-          return (
-            st.languageId === t.languageId &&
-            st.id === t.id &&
-            (st.name !== t.name ||
-              st.reference !== t.reference ||
-              st.notes !== t.notes)
-          );
-        });
-      });
-    if (differences) {
+
+  //elvis revisa aqui y me avisas solo cuando comento este sector de traducciones ejecuta correctamente el guardado
+  processTranslations$(customerId: number): Observable<any> { 
+    // const differences = this.storedTranslations.length !== this.customer.translations.length || this.storedTranslations.some((st: any) => {
+    //   return this.customer.translations.find((t: any) => {        
+    //     return st.languageId === t.languageId &&
+    //     st.id === t.id &&
+    //     (st.reference !== t.reference || 
+    //     st.name !== t.name || 
+    //     st.notes !== t.notes);
+    //   });
+    // });
+
+    // console.log(differences)
+    if (false) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
           deletePhysically: true,
-        };
+        }
       });
       const varToDelete = {
         ids: translationsToDelete,
-        customerId: 1, // TODO: Get from profile
-      };
+     
+      }      
       const translationsToAdd = this.customer.translations.map((t: any) => {
         return {
           id: null,
           customerId,
-          name: t.name,          
+          name: t.name,
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
+        
           status: RecordStatus.ACTIVE,
-        };
+        }
       });
       const varToAdd = {
         translations: translationsToAdd,
-      };
-
-      return combineLatest([
-        varToAdd.translations.length > 0
-          ? this._catalogsService.addCustomerTransations$(varToAdd)
-          : of(null),
-        varToDelete.ids.length > 0
-          ? this._catalogsService.deleteCustomerTranslations$(varToDelete)
-          : of(null),
+      }
+  
+      return combineLatest([ 
+        varToAdd.translations.length > 0 ? this._catalogsService.addCustomerTransations$(varToAdd) : of(null),
+        varToDelete.ids.length > 0 ? this._catalogsService.deleteCustomerTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);
     }
+    
   }
 
   get SystemTables() {

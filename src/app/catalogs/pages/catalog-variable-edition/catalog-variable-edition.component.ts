@@ -1857,6 +1857,7 @@ export class CatalogVariableEditionComponent {
         st.notes !== t.notes);
       });
     });
+   
     if (differences) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
@@ -1883,12 +1884,13 @@ export class CatalogVariableEditionComponent {
       const varToAdd = {
         translations: translationsToAdd,
       }
-  
+     
       return combineLatest([ 
         varToAdd.translations.length > 0 ? this._catalogsService.addVariableTransations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteVariableTranslations$(varToDelete) : of(null) 
       ]);
     } else {
+    
       return of(null);
     }
     
