@@ -15,6 +15,7 @@ import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 
 import { ManufacturerItem, Manufacturers, ManufacturersData, emptyManufacturerCatalog } from '../../models';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-manufacturers',
@@ -209,7 +210,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
                 }
               }
             })          

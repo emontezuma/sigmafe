@@ -158,6 +158,9 @@ export const GET_PROVIDERS_LAZY_LOADING = gql`
             name
             id      
             status  
+            mainImagePath
+            mainImageName
+            mainImageGuid
         }      
       }
       pageInfo {
@@ -185,11 +188,14 @@ export const GET_MANUFACTURERS_LAZY_LOADING = gql`
       items {
         translatedName
         translatedReference
-        isTranslated
+        isTranslated        
         data {
             name
             id  
-            status      
+            status  
+            mainImagePath
+            mainImageGuid
+            mainImageName    
         }      
       }
       pageInfo {
@@ -1077,8 +1083,28 @@ export const GET_CHECKLIST_TEMPLATES = gql`
         friendlyStatus
         data {
           id
+          name
+          reference
+          notes
+          prefix
+          mainImagePath
+          mainImageGuid
+          mainImageName      
           customerId
-          status          
+          lastGeneratedDate
+          generationCount
+          status
+          templateType {
+            id
+            status
+            name
+            reference
+            translations {
+              name
+              reference
+              languageId
+            }
+          }   
         }
       }
       pageInfo {
@@ -1977,7 +2003,7 @@ query ChecklistTemplateDetailsUnlimited (
         notifyAlarm
         recipientId
         line
-        possibleValues
+        possibleValues        
         useVariableSettings
         notes
         showNotes
@@ -1986,6 +2012,9 @@ query ChecklistTemplateDetailsUnlimited (
         useVariableAttachments
         id
         customerId
+        recipientId
+        variableId
+        customerId        
         status
         recipient {
           name
@@ -2003,9 +2032,9 @@ query ChecklistTemplateDetailsUnlimited (
           }
         }
         variable {
-          name
-          name
+          name          
           reference
+          valueType
           notes
           prefix
           id
@@ -2018,7 +2047,6 @@ query ChecklistTemplateDetailsUnlimited (
               status
           }
           uom {
-            name
             name
             reference
             notes
@@ -2438,6 +2466,9 @@ export const GET_MANUFACTURERS = gql`
           id         
           status
           updatedAt
+          mainImagePath
+          mainImageGuid
+          mainImageName    
         }
       }
       pageInfo {
@@ -2461,6 +2492,9 @@ export const GET_MANUFACTURER = gql`
       reference
       notes
       prefix
+      mainImagePath
+      mainImageGuid
+      mainImageName    
       id
       status
       createdById
@@ -2544,6 +2578,9 @@ export const UPSERT_MANUFACTURER = gql`
     $name: String,
     $reference: String,
     $notes: String,   
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
   ) {
   createOrUpdateManufacturer (
     inputs: [{
@@ -2552,6 +2589,9 @@ export const UPSERT_MANUFACTURER = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
     }]) {
       id
       createdAt
@@ -3044,10 +3084,11 @@ export const GET_PROVIDER = gql`
       reference
       notes
       prefix
-     
+      mainImageGuid
+      mainImageName
+      mainImagePath     
       id
-      customerId
-     
+      customerId     
       status
       createdById
       createdAt
@@ -3087,7 +3128,9 @@ export const GET_PROVIDERS = gql`
         friendlyStatus
         data {
           name
-       
+          mainImagePath
+          mainImageGuid
+          mainImageName
           id
           customerId
           reference
@@ -3178,7 +3221,9 @@ export const UPSERT_PROVIDER = gql`
     $name: String,
     $reference: String,
     $notes: String,
-   
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,    
   ) {
   createOrUpdateProvider (
     inputs: [{
@@ -3189,6 +3234,9 @@ export const UPSERT_PROVIDER = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
    
     }]) {
       id
@@ -3390,7 +3438,7 @@ export const UPSERT_EQUIPMENT = gql`
       name: $name,
       prefix: $prefix,
       reference: $reference,
-      notes: $notes,
+      notes: $notes, 
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
       mainImagePath: $mainImagePath,
@@ -4586,7 +4634,9 @@ export const GET_WORKGROUP = gql`
       reference
       notes
       prefix
-     
+      mainImageGuid
+      mainImageName
+      mainImagePath     
       id
       customerId
      
@@ -4629,7 +4679,9 @@ export const GET_WORKGROUPS = gql`
         friendlyStatus
         data {
           name
-       
+          mainImagePath
+          mainImageName
+          mainImageGuid
           id
           customerId
           reference
@@ -4696,7 +4748,6 @@ export const GET_WORKGROUP_TRANSLATIONS = gql`
 }
 `;
 
-
 export const UPSERT_WORKGROUP_TRANSLATIONS = gql`
   mutation CreateOrUpdateWorkgroupTranslationTable (
     $translations: [WorkgroupTranslationTableDtoInput!]!    
@@ -4720,6 +4771,9 @@ export const UPSERT_WORKGROUP = gql`
     $name: String,
     $reference: String,
     $notes: String,
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,   
    
   ) {
   createOrUpdateWorkgroup (
@@ -4731,6 +4785,9 @@ export const UPSERT_WORKGROUP = gql`
       name: $name,
       reference: $reference,
       notes: $notes,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
    
     }]) {
       id
@@ -5271,7 +5328,7 @@ export const UPSERT_CHECKLIST_TEMPLATE_DETAILS = gql`
     inputs: $checklistTemplateDetail
   ) {    
       id
-      line      
+      line
     } 
   }
 `;

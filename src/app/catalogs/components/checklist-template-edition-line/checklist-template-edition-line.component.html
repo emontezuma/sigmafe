@@ -8,6 +8,7 @@
   <ng-container *ngIf="formStatus$ | async "></ng-container>          
 
   <form class="layout" [formGroup]="variableForm" #f="ngForm">
+    <div>{{variableForm.controls.valueType.value}}</div>
     <div class="grid-multiple">
       <div class="flex-accordion subtitle">
         <label class="accordion-label">Variable: {{ line.name }} (id: {{ line.variableId }})</label>

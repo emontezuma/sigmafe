@@ -26,7 +26,10 @@ export interface ProviderDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
-
+  mainImageGuid?: string;
+  mainImagePath?: string;
+  mainImageName?: string;
+  mainImage?: string;
   id?: number;
   customerId?: number;
   status?: string;
@@ -82,6 +85,10 @@ export const emptyProviderCatalog = {
 export const emptyProviderItem: ProviderDetail = {  
   name: null,
   id: null,
+  mainImagePath: null,    
+  mainImageGuid: null,  
+  mainImageName: null,
+  mainImage: null,
   customerId: null,
   prefix: null,
   status: null,

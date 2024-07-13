@@ -270,7 +270,7 @@ export interface ChecklistTemplateLine {
   valueType?: string;
   sensorId?: number;
   uomId?: number;
-  uomName?: string;
+  uomName?: string;  
   uomPrefix?: string;
   showChart?: string;
   useVariableAttachments?: string;
@@ -279,12 +279,11 @@ export interface ChecklistTemplateLine {
   showNotes?: string;
   allowAlarm?: string;
   notifyAlarm?: string;  
-  recipient?: GeneralCatalogInternalData,
+  recipient?: GeneralCatalogInternalData,  
   status?: string;
   uom?: GeneralCatalogInternalData,
   attachments?: Attachment[];
   attachmentsList?: string;
   valuesList?: ChecklistTemplatePossibleValue[];
-  friendlyValueType?: string;
-  formData?: any;  
+  friendlyValueType?: string;  
 }

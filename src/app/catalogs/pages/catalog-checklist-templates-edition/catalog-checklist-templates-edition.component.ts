@@ -9,7 +9,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
 import { AppState, selectSettingsData } from 'src/app/state';
 import { SharedService } from 'src/app/shared/services';
-import { EMPTY, Observable, Subscription, catchError, combineLatest, forkJoin, map, mergeMap, of, skip, switchMap, tap } from 'rxjs';
+import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, skip, switchMap, tap } from 'rxjs';
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
@@ -46,6 +46,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   notificationModes$: Observable<any>;
   notificationChannels$: Observable<any>;
   duplicateAttachmentsList$: Observable<any>;
+  duplicateMainImage$: Observable<any>; 
   macros$: Observable<any>;    
   recipients$: Observable<any>;
   variable$: Observable<any>;
@@ -110,6 +111,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   updatingCount: number = 0;
 
   checklistTemplateLines: ChecklistTemplateLine[] = [];
+  checklistTemplateLineForms: any[];
   
   attachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'actions-attachments' ];
   attachmentsTable = new MatTableDataSource<Attachment>([]);
@@ -131,8 +133,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   linesOrder: any = JSON.parse(`{ "line": "${'ASC'}" }`);
   approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
   storedTranslations: [];
-  storedLines: ChecklistTemplateLine[] = [];
-  changedLines: ChecklistTemplateLine[] = [];
+  storedLines: ChecklistTemplateLine[] = [];  
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false
@@ -560,6 +561,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/checklist-templates/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -1248,7 +1250,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       for (const line of this.checklistTemplateLines) {
         if (line.error) {
           fieldsMissingCounter++;
-          fieldsMissing += $localize`<strong>${fieldsMissingCounter}.</strong> La variable <strong>${line.name}</strong> tiene errores<br>`;
+          fieldsMissing += $localize`<strong>${fieldsMissingCounter}.</strong> La variable <strong>${line.name} / línea ${line.order + 1}</strong> tiene errores<br>`;
         }
       }      
       const dialogResponse = this._dialog.open(GenericDialogComponent, {
@@ -1314,7 +1316,35 @@ export class CatalogChecklistTemplatesEditionComponent {
             return of([])
           }
         }),
-        tap((data: any) => {          
+        switchMap((data: any) => {  
+          const attachmentsObservablesArray: Observable<any>[] = [];
+          if (data && data?.length > 1) {
+            const linesUpdateData = data[2];
+            if (linesUpdateData && linesUpdateData?.length > 1) {
+              const linesAddedData = linesUpdateData[0]?.data?.createOrUpdateChecklistTemplateDetail;
+              if (linesAddedData && linesAddedData.length > 0) {
+                let index = 0;                
+                for (const line of this.checklistTemplateLines) {      
+                  line.line = linesAddedData[index].line;
+                  line.id = linesAddedData[index].id;
+                  line.customerId = linesAddedData[index].customerId;
+                  line.order = index;                  
+                  const files = line.attachments.map((a) => a.id);
+                  if (files?.length > 0) {
+                    attachmentsObservablesArray.push(this._catalogsService.saveAttachments$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, linesAddedData[index].id, files),              );
+                  }
+                  index++;
+                }
+              }
+            }
+          }
+          if (attachmentsObservablesArray.length > 0) {
+            return combineLatest(attachmentsObservablesArray);
+          } else {
+            return of([]);
+          }
+        }),
+        tap((data: any) => {
           this.requestChecklistTemplateData(checklistTemplateId);
           setTimeout(() => {              
             let message = $localize`La plantilla de checklist ha sido actualizada`;
@@ -1375,10 +1405,9 @@ export class CatalogChecklistTemplatesEditionComponent {
     }      
 
     let i = 0;
-    const sortedDetail = this.changedLines.sort((a, b) => a.order - b.order)
+    const sortedDetail = this.checklistTemplateLines.sort((a, b) => a.order - b.order)
     
-    for (const line of sortedDetail) {      
-      i++;
+    for (const line of sortedDetail) {            
       const newRecord: boolean = !line.id || line.id === null || line.id === 0;
         
       const lineData = {
@@ -1386,7 +1415,6 @@ export class CatalogChecklistTemplatesEditionComponent {
         line: i,
         checklistTemplateId: processId,
         customerId: 1, // TODO: Get from profile        
-        possibleValues: JSON.stringify(line.valuesList),            
         recipientId: line.recipientId,
         variableId: line.variableId,
         required: line.required,
@@ -1404,12 +1432,14 @@ export class CatalogChecklistTemplatesEditionComponent {
         showNotes: line.showNotes ? GeneralValues.YES : GeneralValues.NO,
         maximum: line.maximum,
         minimum: line.minimum,
+        possibleValues: JSON.stringify(line.valuesList),
       }
     
       linesToAdd.push(lineData);
+      i++;
     }
     return combineLatest([ 
-      linesToAdd.length > 0 ? this._catalogsService.updateChecklistTemplatLines$(linesToAdd) : of(null),
+      linesToAdd.length > 0 ? this._catalogsService.updateChecklistTemplatLines$({ checklistTemplateDetail: linesToAdd }) : of(null),
       varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateDetails$(varToDelete) : of(null) 
     ]);  
   }
@@ -1505,7 +1535,10 @@ export class CatalogChecklistTemplatesEditionComponent {
       tap((checklistTemplateData: ChecklistTemplateDetail) => {
         if (!checklistTemplateData) return;
         this.checklistTemplate =  checklistTemplateData;
-        this.checklistTemplateLines =  checklistTemplateData.lines;        
+        this.checklistTemplateLines =  checklistTemplateData.lines;                
+        this.checklistTemplateLineForms = this.checklistTemplateLines.map((l) => {
+          return null;
+        })
         this.storedLines = JSON.parse(JSON.stringify(this.checklistTemplateLines));
       }),
       switchMap((checklistTemplateData: ChecklistTemplateDetail) => {
@@ -1638,7 +1671,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/checklist-templates`)
     .set('processId', this.checklistTemplate.id)
-    .set('process', originProcess.CATALOGS_VARIABLES_TEMPLATES);
+    .set('process', originProcess.CATALOGS_CHECKLIST_TEMPLATES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1896,6 +1929,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.translationChanged = false;
     this.checklistTemplate = emptyChecklistTemplateItem;
     this.checklistTemplateLines = [];
+    this.checklistTemplateLineForms = [];
 
     // Default values
     this.checklistTemplateForm.controls.timeToFill.setValue(null);
@@ -2176,7 +2210,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     for (const line of this.checklistTemplateLines) {      
       if (line.order < order) {
         line.order++;
-      }
+      }       
     }
     this.checklistTemplateLines[id].order = 0;
     this.movedVariable = this.checklistTemplateLines[id].order;
@@ -2676,7 +2710,7 @@ export class CatalogChecklistTemplatesEditionComponent {
           updatedLine.enabled = true;
           updatedLine.error = false;
           updatedLine.recipient = variableData.recipient;
-          updatedLine.uomName = variableData.uom?.['translatedName'] ?? variableData.uom.name;
+          updatedLine.uomName = variableData.uom?.['translatedName'] ?? variableData.uom.name;          
           updatedLine.uomPrefix = variableData.uom?.['translatedPrefix'] ?? variableData.uom.prefix;
           updatedLine.required = variableData.required;
           updatedLine.allowComments = variableData.allowComments;
@@ -2691,7 +2725,6 @@ export class CatalogChecklistTemplatesEditionComponent {
           updatedLine.maximum = variableData.maximum;
           updatedLine.valueType = variableData.valueType
           updatedLine.byDefault = variableData.byDefault;    
-          updatedLine.valuesList =  JSON.parse(this.variable.possibleValues);              
           updatedLine.attachments = variableData.attachments;    
           updatedLine.possibleValue = '';
           updatedLine.possibleValues = variableData.possibleValues;
@@ -2707,7 +2740,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         } else {
           const newLine: ChecklistTemplateLine = {
             id: null,
-            customerId: null,
+            customerId: 1, // TODO 
             line: this.checklistTemplateLines.length,
             order: this.checklistTemplateLines.length,
             name: translatedName,
@@ -2727,7 +2760,6 @@ export class CatalogChecklistTemplatesEditionComponent {
             valueType: variableData.valueType,
             showNotes: variableData.showNotes,
             minimum: variableData.minimum,
-            valuesList: JSON.parse(variableData.possibleValues),
             attachments:  variableData.attachments,    
             uom: variableData.uom,
             uomName: variableData.uom?.['translatedName'] ?? variableData.uom.name,
@@ -2745,6 +2777,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             loading: false,
           };
           this.checklistTemplateLines.push(newLine);
+          this.checklistTemplateLineForms.push(null);
         }
         this.addVariableButtonClick = false;
       }),
@@ -2838,7 +2871,12 @@ export class CatalogChecklistTemplatesEditionComponent {
     });
     dialogResponse.afterClosed().subscribe((response) => {
       if (response.action === ButtonActions.OK) {              
-        this.checklistTemplateLines.splice(line, 1);      
+        this.checklistTemplateLines.splice(line, 1); 
+        let i = 0;
+        for (const line of this.checklistTemplateLines) {
+          line.order = i++;
+        }
+        this.checklistTemplateLineForms.splice(line, 1);         
         const message = $localize`La variable ha sido removida de la plantilla de checklist`;
         this._sharedService.showSnackMessage({
           message,
@@ -3067,18 +3105,16 @@ export class CatalogChecklistTemplatesEditionComponent {
   }
 
   handleLineFormChange(event: any) {
-    for (let line of this.checklistTemplateLines) {
-      if (line.line === event.lineNumber) {
-        line.formData = event.formData;
-        this.updateChecklistTemplateLineFromForm(line.line);
-      }
-    }
+    const lineAffected = this.checklistTemplateLines.find((l) => l.line === event.lineNumber);
+    if (lineAffected) {
+      this.checklistTemplateLineForms[event.lineNumber] = event.formData,        
+      this.updateChecklistTemplateLineFromForm(event.lineNumber);
+    }    
   }
-   
 
   updateChecklistTemplateLineFromForm(line: number) {
-    const fc = this.checklistTemplateLines[line].formData;
-    const updatedLine = this.changedLines?.find((l) => l.id === this.checklistTemplateLines[line].id);
+    const fc = this.checklistTemplateLineForms[line];
+    const updatedLine = this.checklistTemplateLines[line];
     if (updatedLine) {
       // updatedLine.name = fc.name.value;
       updatedLine.notes = fc.notes?.value;            
@@ -3098,7 +3134,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       updatedLine.maximum = fc.maximum.value ? fc.maximum.value : null;
       updatedLine.byDefaultDateType = fc.byDefaultDateType?.value;    
       updatedLine.attachmentsList = JSON.stringify(this.checklistTemplateLines[line]?.attachments);
-      updatedLine.valuesList = this.checklistTemplateLines[line]?.valuesList;      
+      // updatedLine.valuesList = this.checklistTemplateLines[line]?.valuesList;      
     } else {
       const changedLine = {
         id: this.checklistTemplateLines[line].id,
@@ -3122,12 +3158,29 @@ export class CatalogChecklistTemplatesEditionComponent {
         maximum: fc.maximum?.value,
         byDefaultDateType: fc.byDefaultDateType?.value,    
         attachmentsList: JSON.stringify(this.checklistTemplateLines[line]?.attachments),
-        valuesList: this.checklistTemplateLines[line]?.valuesList,        
+        // valuesList: this.checklistTemplateLines[line]?.valuesList,        
       }
-      this.changedLines.push(changedLine);
+      this.checklistTemplateLineForms.push(changedLine);
     }
     if (this.loaded) this.setEditionButtonsState();
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_CHECKLIST_TEMPLATES, this.checklistTemplate.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.checklistTemplate.mainImageGuid = newAttachments.mainImageGuid;
+          this.checklistTemplate.mainImageName = newAttachments.mainImageName;
+          this.checklistTemplate.mainImagePath = newAttachments.mainImagePath;   
+
+          this.checklistTemplate.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.checklistTemplate.mainImagePath}`;
+          this.checklistTemplateForm.controls.mainImageName.setValue(this.checklistTemplate.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

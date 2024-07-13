@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, originProcess } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -15,11 +15,12 @@ import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@an
 import { CatalogsService } from '../../services';
 import {ManufacturerDetail, ManufacturerItem, emptyManufacturerItem } from '../../models';
 
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
 import { emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-manufacturer-edition',
@@ -37,10 +38,6 @@ export class CatalogManufacturerEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
-
-
-
-  // manufacturerFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
@@ -50,9 +47,8 @@ export class CatalogManufacturerEditionComponent {
   updateManufacturerCatalog$: Observable<any>;
   deleteManufacturerTranslations$: Observable<any>;  
   addManufacturerTranslations$: Observable<any>;  
-  
+  duplicateMainImage$: Observable<any>;   
   manufacturerFormChangesSubscription: Subscription;
-  
   
   uploadFiles: Subscription;
   
@@ -81,6 +77,7 @@ export class CatalogManufacturerEditionComponent {
       Validators.required,      
     ),
     required: new FormControl(emptyGeneralHardcodedValuesItem),
+    mainImageName: new FormControl(''),    
     notes: new FormControl(''),
     reference: new FormControl(''),    
     prefix: new FormControl(''),      
@@ -146,11 +143,7 @@ export class CatalogManufacturerEditionComponent {
 
     this.manufacturerFormChangesSubscription = this.manufacturerForm.valueChanges.subscribe((manufacturerFormChanges: any) => {
       if (!this.loaded) return;
-      if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-      }      
+      this.setEditionButtonsState()
     }); 
 
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
@@ -261,6 +254,7 @@ export class CatalogManufacturerEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/manufacturers/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -866,11 +860,7 @@ export class CatalogManufacturerEditionComponent {
   }
 
   handleMultipleSelectionChanged(catalog: string){    
-    if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState()
   }
 
   pageChange(event: any) {
@@ -933,8 +923,10 @@ export class CatalogManufacturerEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-   
-
+      ...(this.imageChanged) && { 
+        mainImageName: fc.mainImageName.value,
+        mainImagePath: this.manufacturer.mainImagePath,
+        mainImageGuid: this.manufacturer.mainImageGuid, },
     }
   }
   
@@ -1051,6 +1043,74 @@ export class CatalogManufacturerEditionComponent {
       return of(null);
     }
     
+  }
+
+  onFileSelected(event: any) {
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/manufacturers`)
+    .set('processId', this.manufacturer.id)
+    .set('process', originProcess.CATALOGS_MANUFACTURERS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        this.imageChanged = true;
+        this.manufacturerForm.controls.mainImageName.setValue(res.fileName);
+        this.manufacturer.mainImagePath = res.filePath;
+        this.manufacturer.mainImageGuid = res.fileGuid;
+        this.manufacturer.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el fabricante para aplicar el cambio`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 5000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.setEditionButtonsState();      }      
+    });
+  }
+
+  removeImage() {
+    this.imageChanged = true;
+    this.manufacturerForm.controls.mainImageName.setValue('');
+    this.manufacturer.mainImagePath = '';
+    this.manufacturer.mainImageGuid = '';
+    this.manufacturer.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen del fabricante<br>Guarde El departamento para aplicar el cambio`;
+    this._sharedService.showSnackMessage({
+      message,
+      duration: 5000,
+      snackClass: 'snack-primary',
+      icon: 'check',
+    });
+    this.setEditionButtonsState();    
+  }
+
+  setEditionButtonsState() {
+    if (!this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_MANUFACTURERS, this.manufacturer.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.manufacturer.mainImageGuid = newAttachments.mainImageGuid;
+          this.manufacturer.mainImageName = newAttachments.mainImageName;
+          this.manufacturer.mainImagePath = newAttachments.mainImagePath;   
+
+          this.manufacturer.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.manufacturer.mainImagePath}`;
+          this.manufacturerForm.controls.mainImageName.setValue(this.manufacturer.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

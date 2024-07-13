@@ -43,6 +43,7 @@ export class CatalogDepartmentEditionComponent {
   plants: GeneralCatalogData = emptyGeneralCatalogData; 
   approvers: GeneralCatalogData = emptyGeneralCatalogData; 
   recipients$: Observable<any>; 
+  duplicateMainImage$: Observable<any>; 
   recipients: GeneralCatalogData = emptyGeneralCatalogData; 
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
@@ -261,6 +262,7 @@ export class CatalogDepartmentEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/departments/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -849,7 +851,7 @@ export class CatalogDepartmentEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/departments`)
     .set('processId', this.department.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    .set('process', originProcess.CATALOGS_DEPARTMENTS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1288,6 +1290,23 @@ export class CatalogDepartmentEditionComponent {
       }),
       catchError(() => EMPTY)
     )    
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_VARIABLES, this.department.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.department.mainImageGuid = newAttachments.mainImageGuid;
+          this.department.mainImageName = newAttachments.mainImageName;
+          this.department.mainImagePath = newAttachments.mainImagePath;   
+
+          this.department.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.department.mainImagePath}`;
+          this.departmentForm.controls.mainImageName.setValue(this.department.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

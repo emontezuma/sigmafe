@@ -34,8 +34,8 @@ export class CatalogEquipmentEditionComponent {
   equipment: EquipmentDetail = emptyEquipmentItem;
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
-  settingsData$: Observable<SettingsData>; 
-
+  settingsData$: Observable<SettingsData>;
+  duplicateMainImage$: Observable<any>; 
   valueTypeChanges$: Observable<any>;
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
@@ -251,6 +251,7 @@ export class CatalogEquipmentEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/equipments/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -1068,6 +1069,23 @@ export class CatalogEquipmentEditionComponent {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_VARIABLES, this.equipment.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.equipment.mainImageGuid = newAttachments.mainImageGuid;
+          this.equipment.mainImageName = newAttachments.mainImageName;
+          this.equipment.mainImagePath = newAttachments.mainImagePath;   
+
+          this.equipment.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.equipment.mainImagePath}`;
+          this.equipmentForm.controls.mainImageName.setValue(this.equipment.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

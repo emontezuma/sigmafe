@@ -37,6 +37,7 @@ export class CatalogWorkgroupEditionComponent {
   settingsData$: Observable<SettingsData>; 
 
   valueTypeChanges$: Observable<any>;
+  duplicateMainImage$: Observable<any>;
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -251,6 +252,7 @@ export class CatalogWorkgroupEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/workgroups/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -321,7 +323,7 @@ export class CatalogWorkgroupEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará el equipamento con el Id <strong>${this.workgroup.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el Grupo de trabajo con el Id <strong>${this.workgroup.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -350,7 +352,7 @@ export class CatalogWorkgroupEditionComponent {
                   if (data?.data?.createOrUpdateWorkgroup.length > 0 && data?.data?.createOrUpdateWorkgroup[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`El equipamento ha sido inhabilitada`;
+                      const message = $localize`el Grupo de trabajo ha sido inhabilitada`;
                       this.workgroup.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -423,7 +425,7 @@ export class CatalogWorkgroupEditionComponent {
                   if (data?.data?.createOrUpdateWorkgroup.length > 0 && data?.data?.createOrUpdateWorkgroup[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`El equipamento ha sido reactivada`;
+                      const message = $localize`el Grupo de trabajo ha sido reactivada`;
                       this.workgroup.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -751,9 +753,9 @@ export class CatalogWorkgroupEditionComponent {
             this.processTranslations$(workgroupId).subscribe(() => {
               this.requestWorkgroupData(workgroupId);
               setTimeout(() => {              
-                let message = $localize`El equipamento ha sido actualizado`;
+                let message = $localize`el Grupo de trabajo ha sido actualizado`;
                 if (newRecord) {                
-                  message = $localize`El equipamento ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
+                  message = $localize`el Grupo de trabajo ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
                   this._location.replaceState(`/catalogs/workgroups/edit/${workgroupId}`);
                 }
                 this._sharedService.showSnackMessage({
@@ -834,12 +836,11 @@ export class CatalogWorkgroupEditionComponent {
   onFileSelected(event: any) {
     const fd = new FormData();
     fd.append('image', event.target.files[0], event.target.files[0].name);
-
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/workgroups`)
     .set('processId', this.workgroup.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    .set('process', originProcess.CATALOGS_PROVIDERS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -847,7 +848,7 @@ export class CatalogWorkgroupEditionComponent {
         this.workgroup.mainImagePath = res.filePath;
         this.workgroup.mainImageGuid = res.fileGuid;
         this.workgroup.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el equipamento para aplicar el cambio`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el Grupo de trabajo para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -953,7 +954,7 @@ export class CatalogWorkgroupEditionComponent {
     this.workgroup.mainImagePath = '';
     this.workgroup.mainImageGuid = '';
     this.workgroup.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen del grupo de trabajo<br>Guarde el equipamento para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen del grupo de trabajo<br>Guarde el Grupo de trabajo para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -1079,6 +1080,23 @@ export class CatalogWorkgroupEditionComponent {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_WORKGROUPS, this.workgroup.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.workgroup.mainImageGuid = newAttachments.mainImageGuid;
+          this.workgroup.mainImageName = newAttachments.mainImageName;
+          this.workgroup.mainImagePath = newAttachments.mainImagePath;   
+
+          this.workgroup.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.workgroup.mainImagePath}`;
+          this.workgroupForm.controls.mainImageName.setValue(this.workgroup.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

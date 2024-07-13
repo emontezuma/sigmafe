@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems, originProcess } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -44,6 +44,7 @@ export class CatalogPartNumberEditionComponent {
   updatePartNumber$: Observable<any>;
   updatePartNumberCatalog$: Observable<any>;
   deletePartNumberTranslations$: Observable<any>;  
+  duplicateMainImage$: Observable<any>; 
   addPartNumberTranslations$: Observable<any>;  
   partNumberFormChangesSubscription: Subscription;
   uploadFiles: Subscription;
@@ -70,14 +71,11 @@ export class CatalogPartNumberEditionComponent {
     name: new FormControl(
       '', 
       Validators.required,      
-    ),
-   
+    ),   
     notes: new FormControl(''),
-   
+    mainImageName: new FormControl(''),
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
-
-
   });
 
   pageInfo: PageInfo = {
@@ -144,11 +142,7 @@ export class CatalogPartNumberEditionComponent {
 
     this.partNumberFormChangesSubscription = this.partNumberForm.valueChanges.subscribe((partNumberFormChanges: any) => {
       if (!this.loaded) return;
-      if (!this.partNumber.id || this.partNumber.id === null || this.partNumber.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-      }      
+      this.setEditionButtonsState();
     }); 
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
@@ -259,6 +253,7 @@ export class CatalogPartNumberEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/part-numbers/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -863,11 +858,7 @@ export class CatalogPartNumberEditionComponent {
   }
 
   handleMultipleSelectionChanged(catalog: string){    
-    if (!this.partNumber.id || this.partNumber.id === null || this.partNumber.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   pageChange(event: any) {
@@ -930,7 +921,10 @@ export class CatalogPartNumberEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-
+      ...(this.imageChanged) && { 
+        mainImageName: fc.mainImageName.value,
+        mainImagePath: this.partNumber.mainImagePath,
+        mainImageGuid: this.partNumber.mainImageGuid, },
     }
   }
   
@@ -1046,6 +1040,74 @@ export class CatalogPartNumberEditionComponent {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_PART_NUMBERS, this.partNumber.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.partNumber.mainImageGuid = newAttachments.mainImageGuid;
+          this.partNumber.mainImageName = newAttachments.mainImageName;
+          this.partNumber.mainImagePath = newAttachments.mainImagePath;   
+
+          this.partNumber.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.partNumber.mainImagePath}`;
+          this.partNumberForm.controls.mainImageName.setValue(this.partNumber.mainImageName);
+        }        
+      })
+    );
+  }
+
+  removeImage() {
+    this.imageChanged = true;
+    this.partNumberForm.controls.mainImageName.setValue('');
+    this.partNumber.mainImagePath = '';
+    this.partNumber.mainImageGuid = '';
+    this.partNumber.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen del número de parte<br>Guarde El proveedor para aplicar el cambio`;
+    this._sharedService.showSnackMessage({
+      message,
+      duration: 5000,
+      snackClass: 'snack-primary',
+      icon: 'check',
+    });
+    this.setEditionButtonsState();    
+  }
+
+  onFileSelected(event: any) {
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/part-numbers`)
+    .set('processId', this.partNumber.id)
+    .set('process', originProcess.CATALOGS_PART_NUMBERS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        this.imageChanged = true;
+        this.partNumberForm.controls.mainImageName.setValue(res.fileName);
+        this.partNumber.mainImagePath = res.filePath;
+        this.partNumber.mainImageGuid = res.fileGuid;
+        this.partNumber.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el número de parte para aplicar el cambio`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 5000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.setEditionButtonsState();      }      
+    });
+  }
+
+  setEditionButtonsState() {
+    if (!this.partNumber.id || this.partNumber.id === null || this.partNumber.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
   }
 
   get SystemTables () {

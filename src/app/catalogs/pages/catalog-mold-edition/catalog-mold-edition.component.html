@@ -41,6 +41,7 @@
   <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
   <ng-container *ngIf="notificationChannels$ | async"></ng-container>  
   <ng-container *ngIf="recipients$ | async"></ng-container>  
+  <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
 
   <div @dissolve class="sticky" *ngIf="showMacros">
     <mat-card>

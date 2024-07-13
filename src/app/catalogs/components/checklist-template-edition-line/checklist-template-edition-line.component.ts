@@ -123,7 +123,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     );
         
     this.variableFormChangesSubscription = this.variableForm.valueChanges
-    .subscribe(() => {      
+    .subscribe(() => {
       this.formChange.emit({ lineNumber: this.line.line, formData: this.variableForm.controls });      
     });
 
@@ -312,7 +312,6 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       minimum: this.line.minimum,
       maximum: this.line.maximum,            
       byDefaultDateType: this.line.byDefaultDateType,    
-      
     });
     if (this.variableForm.controls.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && this.variableForm.controls.byDefaultDateType.value === GeneralValues.SPECIFIC && this.variableForm.controls.byDefault.value) {
       const dateAndTime = this.variableForm.controls.byDefault.value.split(' ');
@@ -445,10 +444,11 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     this.editingValue = -1;   
     this.variableForm.controls.possibleValue.setValue('');
     this.variableForm.controls.possibleValuePosition.setValue('l');      
+    this.setEditionButtonsState();
     setTimeout(() => {
       if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
-      this.possibleValue.nativeElement.focus();      
-    }, 100)
+      this.possibleValue.nativeElement.focus();
+    }, 100);
   }
 
   addPossibleValueAtFirst() {
@@ -487,10 +487,10 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       try {
         this.line.valuesList = JSON.parse(this.line.possibleValues);
       } catch (error) {
-        this.line.valuesList = null;
+        this.line.valuesList = [];
       }          
     } else {
-      this.line.valuesList = null;
+      this.line.valuesList = [];
     }
     this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);        
   }
@@ -618,7 +618,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/checklist-templates-lines`)
-    .set('processId', this.line.variableId)
+    .set('processId', this.line.id)
     .set('process', originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
@@ -703,7 +703,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, files)
     .pipe(
       tap((newAttachments) => {
-        if (newAttachments.data.duplicateAttachments.length !== this.line.attachments) {
+        if (newAttachments.data.duplicateAttachments.length !== this.line.attachments.length) {
           const message = $localize`No se pudieron duplicar todos los adjuntos...`;
           this._sharedService.showSnackMessage({
             message,
@@ -748,8 +748,8 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
-  setEditionButtonsState() {
-    this.formChange.emit({ lineNumber: this.line.line, formData: this.variableForm.controls });      
+  setEditionButtonsState() {    
+    this.formChange.emit({ lineNumber: this.line.line, formData: this.variableForm.controls });          
   }
 
   get SystemTables () {

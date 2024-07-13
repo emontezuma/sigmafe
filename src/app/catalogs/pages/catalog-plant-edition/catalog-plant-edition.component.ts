@@ -42,6 +42,7 @@ export class CatalogPlantEditionComponent {
   companies: GeneralCatalogData = emptyGeneralCatalogData; 
 
   valueTypeChanges$: Observable<any>;
+  duplicateMainImage$: Observable<any>; 
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -261,6 +262,7 @@ export class CatalogPlantEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/plants/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -908,7 +910,7 @@ export class CatalogPlantEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/plants`)
     .set('processId', this.plant.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    .set('process', originProcess.CATALOGS_PLANTS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1158,6 +1160,23 @@ export class CatalogPlantEditionComponent {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_PLANTS, this.plant.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.plant.mainImageGuid = newAttachments.mainImageGuid;
+          this.plant.mainImageName = newAttachments.mainImageName;
+          this.plant.mainImagePath = newAttachments.mainImagePath;   
+
+          this.plant.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.plant.mainImagePath}`;
+          this.plantForm.controls.mainImageName.setValue(this.plant.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

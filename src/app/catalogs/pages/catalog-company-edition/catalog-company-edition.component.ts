@@ -35,6 +35,7 @@ export class CatalogCompanyEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
+  duplicateMainImage$: Observable<any>; 
 
   valueTypeChanges$: Observable<any>;
 
@@ -251,6 +252,7 @@ export class CatalogCompanyEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/companies/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -835,7 +837,7 @@ export class CatalogCompanyEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/companies`)
     .set('processId', this.company.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    .set('process', originProcess.CATALOGS_COMPANIES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1068,6 +1070,23 @@ export class CatalogCompanyEditionComponent {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_COMPANIES, this.company.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.company.mainImageGuid = newAttachments.mainImageGuid;
+          this.company.mainImageName = newAttachments.mainImageName;
+          this.company.mainImagePath = newAttachments.mainImagePath;   
+
+          this.company.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.company.mainImagePath}`;
+          this.companyForm.controls.mainImageName.setValue(this.company.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {
