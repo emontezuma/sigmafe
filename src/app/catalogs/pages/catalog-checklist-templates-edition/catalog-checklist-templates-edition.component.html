@@ -31,8 +31,8 @@
   <ng-container *ngIf="approvers$ | async "></ng-container>   
   <ng-container *ngIf="states$ | async "></ng-container>   
   <ng-container *ngIf="updateChecklistTemplateLine$ | async "></ng-container>     
-  <ng-container *ngIf="checklistDetailAttachments$ | async "></ng-container>
-  <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>         
+  <ng-container *ngIf="checklistDetailAttachments$ | async "></ng-container>  
+  <ng-container *ngIf="copyChecklistTemplate$ | async "></ng-container>           
 
   <div @dissolve class="sticky" *ngIf="showMacros">
     <mat-card>

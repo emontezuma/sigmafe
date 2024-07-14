@@ -597,8 +597,8 @@
     </div>
     <div class="grid-multiple">
       <div class="flex-accordion subtitle">
-        <label class="accordion-label">ADJUNTOS DE LA LINEA</label>
-        <label class="accordion-label-no-counter">({{ line.attachments?.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
+        <label class="accordion-label">ADJUNTOS DE LA VARIABLE</label>
+        <label class="accordion-label-no-counter">({{ line.variableAttachments?.length }} de un máximo de {{ settingsData?.attachments?.variables ?? 10 }})</label>                
       </div>  
     </div> 
     <mat-checkbox      
@@ -611,6 +611,96 @@
         >Utilizar adicionalmente los adjuntos de la Variable</span
       >
     </mat-checkbox>
+    <div class="grid-multiple margin-top">            
+      <div class="field-items">              
+        <div            
+          class="values-table values-table__container"    
+        >              
+          <table mat-table [dataSource]="variableAttachmentsTable">
+
+            <ng-container matColumnDef="index">
+              <th mat-header-cell *matHeaderCellDef>#</th>                  
+              <td mat-cell *matCellDef="let row; let i = index">
+                <ng-container>{{ i + 1 }}</ng-container>   
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="icon">
+              <th mat-header-cell *matHeaderCellDef>Aplicación</th>
+              <td mat-cell *matCellDef="let row">
+                <div class="card-image-icon">
+                  <div
+                    class="image-container-table"
+                    *ngIf="row.icon === 'field_image'"
+                  >
+                    <img                
+                      @dissolve
+                      appImageNotFound                
+                      class="variable-image"                        
+                      [src]="row.image"
+                      [alt]="row.image"         
+                      fill
+                    >      
+                  </div>
+                  <div
+                    *ngIf="row.icon !== 'field_image'"
+                    class="icon-container"
+                  >
+                    <mat-icon 
+                      class="file-type-icon"
+                      [svgIcon]="row.icon"
+                    >
+                    </mat-icon>
+                  </div>    
+                </div> 
+              </td>      
+            </ng-container>
+
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef>Nombre</th>                  
+              <td mat-cell *matCellDef="let row">
+                <ng-container>{{ row.name }}</ng-container>   
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="variable-actions-attachments">
+              <th mat-header-cell *matHeaderCellDef>Acción</th>
+              <td class="general-info" mat-cell *matCellDef="let row; let i = index">
+                <div
+                  class="box-row"                          
+                >                  
+                  <button
+                    mat-icon-button (click)="handleVariableAttachmentDownload(i)"
+                    matTooltip="Descarga a su disco una copia del archivo"
+                    matTooltipClass="tooltip-general"
+                    matTooltipShowDelay="100"                          
+                  >
+                    <mat-icon>cloud_download</mat-icon>
+                  </button>
+                </div>   
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="variableAttachmentsTableColumns; sticky: 1"></tr>
+            <tr class="table-row" mat-row *matRowDef="let row; columns: variableAttachmentsTableColumns"></tr>
+            
+            <tr class="values-table-mat-row" *matNoDataRow>
+              <td class="values-table__no-data" colspan="9">
+                La variable no tiene adjuntos...
+              </td>
+            </tr>                  
+          </table>                    
+        </div>                
+      </div>
+    </div>
+
+
+    <div class="grid-multiple">
+      <div class="flex-accordion subtitle">
+        <label class="accordion-label">ADJUNTOS DE LA LINEA</label>
+        <label class="accordion-label-no-counter">({{ line.attachments?.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
+      </div>  
+    </div> 
     <div class="grid-multiple margin-top">            
       <div class="field-items">              
         <div            
