@@ -1,13 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { BehaviorSubject, Observable, combineLatest, map, of } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPDATE_MOLD, DELETE_MOLD_TRANSLATIONS, ADD_MOLD_TRANSLATIONS, ADD_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, ADD_VARIABLE_TRANSLATIONS, UPDATE_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, CREATE_OR_UPDATE_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, ADD_CUSTOMER_TRANSLATIONS, UPDATE_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, ADD_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPDATE_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, ADD_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPDATE_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPDATE_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, ADD_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, ADD_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPDATE_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, ADD_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPDATE_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPDATE_CHECKLIST_TEMPLATE, ADD_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, ADD_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPDATE_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, ADD_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPDATE_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, ADD_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPDATE_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, ADD_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPDATE_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_CHECKLIST_TEMPLATE_DETAILS, GET_DEPARTMENTS, ADD_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, DELETE_DEPARTMENT_TRANSLATIONS, UPDATE_DEPARTMENT, INACTIVATE_DEPARTMENT, GET_GENERICS, ADD_GENERIC_TRANSLATIONS, GET_GENERIC, GET_GENERIC_TRANSLATIONS, UPDATE_GENERIC, DELETE_GENERIC_TRANSLATIONS, GET_SHIFTS, ADD_SHIFT_TRANSLATIONS, GET_SHIFT, GET_SHIFT_TRANSLATIONS, UPDATE_SHIFT, DELETE_SHIFT_TRANSLATIONS, INACTIVATE_SHIFT, UPDATE_CHECKLIST_TEMPLATE_DETAILS } from 'src/app/graphql/graphql.queries';
+import { BehaviorSubject, Observable, combineLatest, map, of, tap } from 'rxjs';
+import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPSERT_MOLD, DELETE_MOLD_TRANSLATIONS, UPSERT_MOLD_TRANSLATIONS, UPSERT_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, UPSERT_VARIABLE_TRANSLATIONS, UPSERT_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, UPSERT_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, UPSERT_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPSERT_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, UPSERT_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPSERT_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPSERT_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, UPSERT_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, UPSERT_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPSERT_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, UPSERT_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPSERT_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPSERT_CHECKLIST_TEMPLATE, UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, UPSERT_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPSERT_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, UPSERT_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPSERT_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, UPSERT_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPSERT_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, UPSERT_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPSERT_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_CHECKLIST_TEMPLATE_DETAILS, GET_DEPARTMENTS, UPSERT_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, DELETE_DEPARTMENT_TRANSLATIONS, UPSERT_DEPARTMENT, INACTIVATE_DEPARTMENT, GET_GENERICS, UPSERT_GENERIC_TRANSLATIONS, GET_GENERIC, GET_GENERIC_TRANSLATIONS, UPSERT_GENERIC, DELETE_GENERIC_TRANSLATIONS, GET_SHIFTS, UPSERT_SHIFT_TRANSLATIONS, GET_SHIFT, GET_SHIFT_TRANSLATIONS, UPSERT_SHIFT, DELETE_SHIFT_TRANSLATIONS, INACTIVATE_SHIFT, UPSERT_CHECKLIST_TEMPLATE_DETAILS, DELETE_CHECKLIST_TEMPLATE_DETAILS, UPSERT_WORKGROUP } from 'src/app/graphql/graphql.queries';
 import { ChecklistTemplateDetail, ChecklistTemplateLine, ShiftDetail, } from '../models';
 import { Attachment, originProcess, GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 import { environment } from 'src/environments/environment';
 import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, LineDetail, PlantDetail, PositionDetail, UomDetail, VariableDetail } from '../models';
 import { WorkgroupDetail } from '../models/catalogs-workgroups.models';
+import { SharedService } from 'src/app/shared/services';
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +21,7 @@ export class CatalogsService {
   constructor(
     private _apollo: Apollo,
     private _http: HttpClient,
+    public _sharedService: SharedService,
   ) { }
 
   // Functions ================  
@@ -235,8 +237,6 @@ export class CatalogsService {
 
     const variablesForLines = {
       order: parameters.orderForDetails,
-      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
-      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
       ...(parameters.filter) && { filterBy: parameters.filter },      
     }
 
@@ -262,6 +262,19 @@ export class CatalogsService {
       }),
 
     ]);
+  }
+
+  getAttachmentsDataGql$(parameters: any): Observable<any> {
+    const variablesForAttachments = {
+      processId: parameters.processId,
+      process: parameters.process,
+      customerId: parameters.customerId,
+    }
+
+    return this._apollo.query({
+      query: GET_ALL_ATTACHMENTS,
+      variables: variablesForAttachments,
+    })
   }
 
   updateMoldStatus$(variables: any): Observable<any> {
@@ -295,21 +308,21 @@ export class CatalogsService {
 
   updateMoldCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_MOLD,
+      mutation: UPSERT_MOLD,
       variables,
     })
   }
 
   updateVariableCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_VARIABLE,
+      mutation: UPSERT_VARIABLE,
       variables,
     })
   }
 
   updateChecklistTemplateCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_CHECKLIST_TEMPLATE,
+      mutation: UPSERT_CHECKLIST_TEMPLATE,
       variables,
     })
   }
@@ -335,6 +348,13 @@ export class CatalogsService {
     });
   }
 
+  deleteChecklistTemplateDetails$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CHECKLIST_TEMPLATE_DETAILS,
+      variables,
+    });
+  }
+
   deleteMoldMaintenanceHistory$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: DELETE_MAINTENANCE_HISTORY,
@@ -349,37 +369,44 @@ export class CatalogsService {
     });
   }
 
-  addMoldTransations$(variables: any): Observable<any> {
+  addMoldTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_MOLD_TRANSLATIONS,
+      mutation: UPSERT_MOLD_TRANSLATIONS,
       variables,
     });
   }
 
   addOrUpdateCatalogDetails$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: CREATE_OR_UPDATE_CATALOG_DETAILS,
+      mutation: UPSERT_CATALOG_DETAILS,
       variables,
     });
   }
 
-  addVariableTransations$(variables: any): Observable<any> {
+  addVariableTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_VARIABLE_TRANSLATIONS,
+      mutation: UPSERT_VARIABLE_TRANSLATIONS,
       variables,
     });
   }
 
-  addChecklistTemplateTransations$(variables: any): Observable<any> {
+  updateChecklistTemplateTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_CHECKLIST_TEMPLATE_TRANSLATIONS,
+      mutation: UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS,
+      variables,
+    });
+  }
+
+  updateChecklistTemplatLines$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPSERT_CHECKLIST_TEMPLATE_DETAILS,
       variables,
     });
   }
 
   addMoldMaintenanceHistory$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_MAINTENANCE_HISTORY,
+      mutation: UPSERT_MAINTENANCE_HISTORY,
       variables,
     });
   }
@@ -422,27 +449,7 @@ export class CatalogsService {
       recipient: this.mapDetailTranslationsData(data.recipient),
       sigmaType: this.mapDetailTranslationsData(data.sigmaType),
       translations: this.mapTranslations(translations),
-      attachments: this.mapAttachments(attachments),
-    }
-  }
-
-  mapChecklistTemplateLine(paramsData: any): VariableDetail {
-    const { oneVariable } = paramsData?.variableGqlData?.data;
-    const { data } = oneVariable;
-
-    const translations = paramsData?.variableGqlTranslationsData?.data;
-    const attachments = paramsData?.variableGqlAttachments?.data?.uploadedFiles;
-    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
-    const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
-    return {
-      ...data,
-      friendlyValueType: oneVariable.friendlyValueType,
-      mainImage,
-      uom: this.mapDetailTranslationsData(data.uom),
-      recipient: this.mapDetailTranslationsData(data.recipient),
-      sigmaType: this.mapDetailTranslationsData(data.sigmaType),
-      translations: this.mapTranslations(translations),
-      attachments: this.mapAttachments(attachments),
+      attachments: this.mapAttachments(attachments?.items),
     }
   }
 
@@ -452,7 +459,7 @@ export class CatalogsService {
 
     const translations = paramsData?.checklistTemplateGqlTranslationsData?.data;
     const attachments = paramsData?.checklistTemplateGqlAttachments?.data?.uploadedFiles;
-    const lines = paramsData?.checklistTemplateGqlLines?.data?.lines;
+    const lines = paramsData?.checklistTemplateGqlLines?.data?.checklistTemplateDetailsUnlimited;
     // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
     // const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
     const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
@@ -467,19 +474,61 @@ export class CatalogsService {
       generationRecipient: this.mapDetailTranslationsData(data.generationRecipient),
       approver: this.mapApproverData(data.approver),
       translations: this.mapTranslations(translations),
-      attachments: this.mapAttachments(attachments),
+      attachments: this.mapAttachments(attachments?.items),
       lines: this.mapChecklistTemplatesDetails(lines),
     }
   }
 
-  mapChecklistTemplatesDetails(data: any) {
+  mapChecklistTemplatesDetails(data: any): ChecklistTemplateLine[] {
+    let order = 0;
+    return data.map(line => {
 
-  } 
+      let name = '';
+      if (line.variable) {
+        name = line.variable.name;
+        if (line.variable.translations?.length > 0 && line.variable?.translations.find((t) => t.languageId === 1)) { // TODO: tomar el lenguaje del profile
+          name = line.variable.translations.find((t) => t.languageId === 1).name;
+        }
+      }      
+      
+      return {
+        order: order++,
+        name,        
+        id: line.id,        
+        checklistTemplateId: line.checklistTemplateId,
+        uomName: line.variable?.uom?.['translatedName'] ?? line.variable?.uom?.name,
+        valueType: line.variable?.valueType,
+        uomPrefix: line.variable?.uom?.['translatedPrefix'] ?? line.variable?.uom?.prefix,
+        variable: this.mapDetailTranslationsData(line.variable),
+        variableId: line.variableId,
+        line: line.line,                    
+        customerId: line.customerId, // TODO: Get from profile
+        status: line.status,            
+        possibleValues: line.possibleValues,
+        recipient: this.mapDetailTranslationsData(line.recipient),
+        recipientId: line.recipientId,
+        required: line.required,
+        allowComments: line.allowComments,
+        allowNoCapture: line.allowNoCapture,
+        allowAlarm: line.allowAlarm,
+        showChart: line.showChart,
+        showParameters: line.showParameters,
+        showLastValue: line.showLastValue,
+        notifyAlarm: line.notifyAlarm,
+        useVariableAttachments: line.useVariableAttachments,
+        notes: line.notes,
+        byDefault: line.byDefault,
+        showNotes: line.showNotes,
+        minimum: line.minimum,
+        maximum: line.maximum,           
+      }
+    });
+  }
 
   mapAttachments(data: any): Attachment[] {
-    const { items } = data;
+    if (!data) return [];
     let line = 0;
-    return items.map(t => {
+    return data?.map(t => {
       return {
         index: line++,
         name: t.fileName,
@@ -617,23 +666,18 @@ export class CatalogsService {
     }).valueChanges
   }
 
-
-
-
-  //====customers
-
   getAllCustomersToCsv$(): Observable<any> { //warning repeated
     return this._apollo.watchQuery({
       query: GET_ALL_MOLDS_TO_CSV,
     }).valueChanges;
   }
+
   getAllCustomersCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
     );
   }
-
-
+  
   getCustomersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
     const variables = {
       ...(recordsToSkip !== 0) && { recordsToSkip },
@@ -648,9 +692,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addCustomerTransations$(variables: any): Observable<any> {
+  addCustomerTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_CUSTOMER_TRANSLATIONS,
+      mutation: UPSERT_CUSTOMER_TRANSLATIONS,
       variables,
     });
   }
@@ -680,7 +724,7 @@ export class CatalogsService {
 
   updateCustomerCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_CUSTOMER,
+      mutation: UPSERT_CUSTOMER,
       variables,
     })
   }
@@ -718,10 +762,6 @@ export class CatalogsService {
     );
   }
 
-
-  //manufacturers=================================
-
-
   getManufacturersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
     const variables = {
       ...(recordsToSkip !== 0) && { recordsToSkip },
@@ -738,9 +778,9 @@ export class CatalogsService {
 
 
 
-  addManufacturerTransations$(variables: any): Observable<any> {
+  addManufacturerTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_MANUFACTURER_TRANSLATIONS,
+      mutation: UPSERT_MANUFACTURER_TRANSLATIONS,
       variables,
     });
   }
@@ -770,7 +810,7 @@ export class CatalogsService {
 
   updateManufacturerCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_MANUFACTURER,
+      mutation: UPSERT_MANUFACTURER,
       variables,
     })
   }
@@ -779,8 +819,11 @@ export class CatalogsService {
     const { oneManufacturer } = paramsData?.manufacturerGqlData?.data;
     const { data } = oneManufacturer;
     const translations = paramsData?.manufacturerGqlTranslationsData?.data;
+    const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
+
     return {
       ...data,
+      mainImage,
       translations: this.mapTranslations(translations),
     }
   }
@@ -815,9 +858,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addPlantTransations$(variables: any): Observable<any> {
+  addPlantTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_PLANT_TRANSLATIONS,
+      mutation: UPSERT_PLANT_TRANSLATIONS,
       variables,
     });
   }
@@ -847,7 +890,7 @@ export class CatalogsService {
 
   updatePlantCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_PLANT,
+      mutation: UPSERT_PLANT,
       variables,
     })
   }
@@ -893,9 +936,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addCompanyTransations$(variables: any): Observable<any> {
+  addCompanyTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_COMPANY_TRANSLATIONS,
+      mutation: UPSERT_COMPANY_TRANSLATIONS,
       variables,
     });
   }
@@ -925,7 +968,7 @@ export class CatalogsService {
 
   updateCompanyCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_COMPANY,
+      mutation: UPSERT_COMPANY,
       variables,
     })
   }
@@ -974,9 +1017,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addProviderTransations$(variables: any): Observable<any> {
+  addProviderTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_PROVIDER_TRANSLATIONS,
+      mutation: UPSERT_PROVIDER_TRANSLATIONS,
       variables,
     });
   }
@@ -1006,7 +1049,7 @@ export class CatalogsService {
 
   updateProviderCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_PROVIDER,
+      mutation: UPSERT_PROVIDER,
       variables,
     })
   }
@@ -1015,10 +1058,11 @@ export class CatalogsService {
     const { oneProvider } = paramsData?.providerGqlData?.data;
     const { data } = oneProvider;
     const translations = paramsData?.providerGqlTranslationsData?.data;
-
+    const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
 
     return {
       ...data,
+      mainImage,
       translations: this.mapTranslations(translations),
     }
   }
@@ -1054,9 +1098,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addEquipmentTransations$(variables: any): Observable<any> {
+  addEquipmentTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_EQUIPMENT_TRANSLATIONS,
+      mutation: UPSERT_EQUIPMENT_TRANSLATIONS,
       variables,
     });
   }
@@ -1086,7 +1130,7 @@ export class CatalogsService {
 
   updateEquipmentCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_EQUIPMENT,
+      mutation: UPSERT_EQUIPMENT,
       variables,
     })
   }
@@ -1136,9 +1180,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addDepartmentTransations$(variables: any): Observable<any> {
+  addDepartmentTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_DEPARTMENT_TRANSLATIONS,
+      mutation: UPSERT_DEPARTMENT_TRANSLATIONS,
       variables,
     });
   }
@@ -1168,7 +1212,7 @@ export class CatalogsService {
 
   updateDepartmentCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_DEPARTMENT,
+      mutation: UPSERT_DEPARTMENT,
       variables,
     })
   }
@@ -1249,9 +1293,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addUomTransations$(variables: any): Observable<any> {
+  addUomTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_UOM_TRANSLATIONS,
+      mutation: UPSERT_UOM_TRANSLATIONS,
       variables,
     });
   }
@@ -1281,7 +1325,7 @@ export class CatalogsService {
 
   updateUomCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_UOM,
+      mutation: UPSERT_UOM,
       variables,
     })
   }
@@ -1329,9 +1373,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addPositionTransations$(variables: any): Observable<any> {
+  addPositionTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_POSITION_TRANSLATIONS,
+      mutation: UPSERT_POSITION_TRANSLATIONS,
       variables,
     });
   }
@@ -1361,7 +1405,7 @@ export class CatalogsService {
 
   updatePositionCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_POSITION,
+      mutation: UPSERT_POSITION,
       variables,
     })
   }
@@ -1408,9 +1452,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addPartNumberTransations$(variables: any): Observable<any> {
+  addPartNumberTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_PART_NUMBER_TRANSLATIONS,
+      mutation: UPSERT_PART_NUMBER_TRANSLATIONS,
       variables,
     });
   }
@@ -1440,7 +1484,7 @@ export class CatalogsService {
 
   updatePartNumberCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_PART_NUMBER,
+      mutation: UPSERT_PART_NUMBER,
       variables,
     })
   }
@@ -1489,9 +1533,9 @@ export class CatalogsService {
     }).valueChanges
   }
 
-  addLineTransations$(variables: any): Observable<any> {
+  addLineTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_LINE_TRANSLATIONS,
+      mutation: UPSERT_LINE_TRANSLATIONS,
       variables,
     });
   }
@@ -1521,7 +1565,7 @@ export class CatalogsService {
 
   updateLineCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_LINE,
+      mutation: UPSERT_LINE,
       variables,
     })
   }
@@ -1573,9 +1617,9 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     }).valueChanges    
   }
   
-  addGenericTransations$(variables: any): Observable<any> {
+  addGenericTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_GENERIC_TRANSLATIONS, 
+      mutation: UPSERT_GENERIC_TRANSLATIONS, 
       variables,       
     });
   } 
@@ -1605,7 +1649,7 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
 
   updateGenericCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_GENERIC, 
+      mutation: UPSERT_GENERIC, 
       variables,      
     })
   }
@@ -1656,9 +1700,9 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     }).valueChanges
   }
 
-  addWorkgroupTransations$(variables: any): Observable<any> {
+  addWorkgroupTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_DEPARTMENT_TRANSLATIONS,
+      mutation: UPSERT_DEPARTMENT_TRANSLATIONS,
       variables,
     });
   }
@@ -1688,7 +1732,7 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
 
   updateWorkgroupCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_DEPARTMENT,
+      mutation: UPSERT_WORKGROUP,
       variables,
     })
   }
@@ -1737,9 +1781,9 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     }).valueChanges
   }
 
-  addShiftTransations$(variables: any): Observable<any> {
+  addShiftTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: ADD_SHIFT_TRANSLATIONS,
+      mutation: UPSERT_SHIFT_TRANSLATIONS,
       variables,
     });
   }
@@ -1769,7 +1813,7 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
 
   updateShiftCatalog$(variables: any): Observable<any> {
     return this._apollo.mutate({
-      mutation: UPDATE_SHIFT,
+      mutation: UPSERT_SHIFT,
       variables,
     })
   }
@@ -1801,13 +1845,6 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     });
   }
 
-  
-
-
-
-
-  //................................................................
-
   getAllCsvData$(fileName: string): Observable<any> {
     return this._http.get(`${environment.serverUrl}/api/file/download?fileName=${fileName}`, { responseType: 'text' }).pipe(
       map(data => data)
@@ -1824,13 +1861,41 @@ updateLineStatus$(variables: any): Observable<any> { //warning missing in custom
     this.checkListTemplateLineDataChangedBehaviorSubject.next({ line, data });
   }
 
-  updateChecklistTemplateLine$(variables: any): Observable<any> { //warning missing in customer and repeated here
-    return this._apollo.mutate({
-      mutation: UPDATE_CHECKLIST_TEMPLATE_DETAILS,
-      variables,
+  duplicateMainImage$(process: originProcess, mainImageGuid: string): Observable<any> {
+    if (!mainImageGuid) return of({
+      duplicated: false,            
     });
+    
+    const files = [mainImageGuid];
+    return this.duplicateAttachmentsList$(process, files)
+    .pipe(
+      map((newAttachments) => {
+        if (newAttachments.data.duplicateAttachments.length === 0) {
+          const message = $localize`No se pudo duplicar la imagen...`;
+          this._sharedService.showSnackMessage({
+            message,
+            snackClass: 'snack-warn',
+            progressBarColor: 'warn',
+            icon: 'delete',
+          });
+          return {
+            duplicated: false,            
+          }
+        } else {
+          return {
+            duplicated: true,            
+            mainImageGuid: newAttachments?.data?.duplicateAttachments[0]?.fileId,
+            mainImageName: newAttachments?.data?.duplicateAttachments[0]?.fileName,
+            mainImagePath: newAttachments?.data?.duplicateAttachments[0]?.path,
+          }
+        }        
+      })
+    );
+
 
   }
+
+  //................................................................
   
   // End ======================  
 }

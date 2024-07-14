@@ -48,6 +48,7 @@ export class CatalogVariableEditionComponent {
   genYesNoValues$: Observable<any>;
   variableByDefaultDate$: Observable<any>;
   duplicateAttachmentsList$: Observable<any>;  
+  duplicateMainImage$: Observable<any>;  
 
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
   molds$: Observable<any>;  
@@ -103,7 +104,8 @@ export class CatalogVariableEditionComponent {
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false
-  loading: boolean;
+  loading: boolean = false;
+  editing: boolean = false;
   elements: ToolbarElement[] = [];  
   panelOpenState: boolean[] = [true, false, false];
   onTopStatus: string;
@@ -344,6 +346,7 @@ export class CatalogVariableEditionComponent {
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
         if (params['id']) {
+          this.editing = true;
           this.requestVariableData(+params['id']);
         }
       })
@@ -361,7 +364,7 @@ export class CatalogVariableEditionComponent {
     setTimeout(() => {
       this.focusThisField = 'name';
       if (!this.variable.id) {
-        this.loaded = true;
+        this.loaded = !this.editing || this.loaded;
         this.initForm();
       }      
     }, 200);         
@@ -669,6 +672,7 @@ export class CatalogVariableEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.duplicateAttachments();
+        this.duplicateMainImage();
         this.initUniqueField();        
         this._location.replaceState('/catalogs/variables/create');
         setTimeout(() => {
@@ -1451,11 +1455,12 @@ export class CatalogVariableEditionComponent {
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
           toolbarButton.class = variableData.translations.length > 0 ? 'accent' : '';
         }        
+        this.loaded = true;
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);
         this.setAttachmentLabel();
-        this.loaded = true;
+        
       }),
       catchError(err => {
         this.setViewLoading(false);
@@ -1886,7 +1891,7 @@ export class CatalogVariableEditionComponent {
       }
      
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addVariableTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addVariableTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteVariableTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2282,7 +2287,7 @@ export class CatalogVariableEditionComponent {
     this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_VARIABLES_ATTACHMENTS, files)
     .pipe(
       tap((newAttachments) => {
-        if (newAttachments.data.duplicateAttachments.length !== this.variable.attachments) {
+        if (newAttachments.data.duplicateAttachments.length !== this.variable.attachments.length) {
           const message = $localize`No se pudieron duplicar todos los adjuntos...`;
           this._sharedService.showSnackMessage({
             message,
@@ -2322,6 +2327,23 @@ export class CatalogVariableEditionComponent {
     }          
     this.variableForm.controls.byDefault.setValue(byDefaulDAT);
   }  
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_VARIABLES, this.variable.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.variable.mainImageGuid = newAttachments.mainImageGuid;
+          this.variable.mainImageName = newAttachments.mainImageName;
+          this.variable.mainImagePath = newAttachments.mainImagePath;   
+
+          this.variable.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.variable.mainImagePath}`;
+          this.variableForm.controls.mainImageName.setValue(this.variable.mainImageName);
+        }        
+      })
+    );
+  }
 
   get SystemTables () {
     return SystemTables;

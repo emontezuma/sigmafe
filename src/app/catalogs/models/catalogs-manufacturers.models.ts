@@ -26,6 +26,10 @@ export interface ManufacturerDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
+  mainImageGuid?: string;
+  mainImagePath?: string;
+  mainImageName?: string;
+  mainImage?: string;
   id?: number;
   status?: string;
   createdById?: any;
@@ -72,6 +76,10 @@ export const emptyManufacturerCatalog = {
 export const emptyManufacturerItem: ManufacturerDetail = {
   name: null,
   id: null,
+  mainImageGuid: null,
+  mainImagePath: null,
+  mainImage: null,
+  mainImageName: null,
   prefix: null,
   status: null,
   createdById: null,

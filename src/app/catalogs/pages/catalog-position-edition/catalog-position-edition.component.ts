@@ -1072,7 +1072,7 @@ export class CatalogPositionEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addPositionTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addPositionTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePositionTranslations$(varToDelete) : of(null) 
       ]);
     } else {

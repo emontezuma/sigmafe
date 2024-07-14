@@ -56,6 +56,7 @@ export class CatalogMoldEditionComponent {
   equipments$: Observable<any>;
   maintenances$: Observable<any>;
   moldThresholdTypeChanges$: Observable<any>;
+  duplicateMainImage$: Observable<any>; 
   // moldFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   notifyRedChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;    
@@ -724,6 +725,7 @@ export class CatalogMoldEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/molds/create');        
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -2429,7 +2431,7 @@ export class CatalogMoldEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteMoldTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2570,6 +2572,22 @@ export class CatalogMoldEditionComponent {
   handleChangeSelection(event: any) { 
   }
 
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_MOLDS, this.mold.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.mold.mainImageGuid = newAttachments.mainImageGuid;
+          this.mold.mainImageName = newAttachments.mainImageName;
+          this.mold.mainImagePath = newAttachments.mainImagePath;   
+
+          this.mold.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.mold.mainImagePath}`;
+          this.moldForm.controls.mainImageName.setValue(this.mold.mainImageName);
+        }        
+      })
+    );
+  }
 
   get MoldControlStates() {
     return MoldControlStates;

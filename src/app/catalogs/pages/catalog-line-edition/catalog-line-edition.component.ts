@@ -47,6 +47,7 @@ export class CatalogLineEditionComponent {
   updateLineCatalog$: Observable<any>;
   deleteLineTranslations$: Observable<any>;  
   addLineTranslations$: Observable<any>;  
+  duplicateMainImage$: Observable<any>;  
   
   lineFormChangesSubscription: Subscription;
   
@@ -251,6 +252,7 @@ export class CatalogLineEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/lines/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -834,7 +836,7 @@ export class CatalogLineEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/lines`)
     .set('processId', this.line.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
+    .set('process', originProcess.CATALOGS_LINES);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1061,13 +1063,30 @@ export class CatalogLineEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addLineTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addLineTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteLineTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);
     }
     
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_LINES, this.line.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.line.mainImageGuid = newAttachments.mainImageGuid;
+          this.line.mainImageName = newAttachments.mainImageName;
+          this.line.mainImagePath = newAttachments.mainImagePath;   
+
+          this.line.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.line.mainImagePath}`;
+          this.lineForm.controls.mainImageName.setValue(this.line.mainImageName);
+        }        
+      })
+    );
   }
 
   get SystemTables () {

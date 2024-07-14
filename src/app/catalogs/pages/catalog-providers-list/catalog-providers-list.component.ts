@@ -15,6 +15,7 @@ import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 
 import { ProviderItem, Providers, ProvidersData, emptyProviderCatalog } from '../../models';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-providers',
@@ -27,7 +28,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Providers ===============
-  providersTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  providersTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   providersCatalogData = new MatTableDataSource<ProviderItem>([]);      
   
   providersData$: Observable<ProvidersData>;
@@ -209,7 +210,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -390,7 +391,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.providersTableColumns = ['id',  'name', 'reference', 'status', 'updatedAt'];
+    this.providersTableColumns = ['id',  'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

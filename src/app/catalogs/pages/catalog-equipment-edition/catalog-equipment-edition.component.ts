@@ -37,7 +37,9 @@ export class CatalogEquipmentEditionComponent {
   scroll$: Observable<any>;JSON: any;
 ;
   showGoTop$: Observable<GoTopButtonStatus>;
-  settingsData$: Observable<SettingsData>; 
+  settingsData$: Observable<SettingsData>;
+  duplicateMainImage$: Observable<any>; 
+  valueTypeChanges$: Observable<any>;
 
   plants$: Observable<any>; 
   plants: GeneralCatalogData = emptyGeneralCatalogData; 
@@ -260,6 +262,7 @@ export class CatalogEquipmentEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/equipments/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -1090,7 +1093,7 @@ export class CatalogEquipmentEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addEquipmentTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addEquipmentTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteEquipmentTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -1099,9 +1102,23 @@ export class CatalogEquipmentEditionComponent {
     
   }
 
- 
-  
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_VARIABLES, this.equipment.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.equipment.mainImageGuid = newAttachments.mainImageGuid;
+          this.equipment.mainImageName = newAttachments.mainImageName;
+          this.equipment.mainImagePath = newAttachments.mainImagePath;   
 
+          this.equipment.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.equipment.mainImagePath}`;
+          this.equipmentForm.controls.mainImageName.setValue(this.equipment.mainImageName);
+        }        
+      })
+    );
+  }
+ 
   getMoreData(getMoreDataParams: GeneralCatalogParams) {
     if (getMoreDataParams.catalogName === SystemTables.PLANTS) {
       if (getMoreDataParams.initArray) {
@@ -1117,8 +1134,6 @@ export class CatalogEquipmentEditionComponent {
         getMoreDataParams.textToSearch,  
       ); 
     } 
-   
-        
   }
 
   requestPlantsData(currentPage: number, filterStr: string = null) {    

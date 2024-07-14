@@ -809,9 +809,7 @@ export class CatalogCustomerEditionComponent {
           const customerId = data?.data?.createOrUpdateCustomer[0].id;        
          
           this.processTranslations$(customerId).subscribe(() => {
-            console.log("here")
             this.requestCustomerData(customerId);
-            console.log("there")
             setTimeout(() => {
               let message = $localize`El cliente ha sido actualizado`;
              
@@ -943,31 +941,15 @@ export class CatalogCustomerEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/customers`)
     .set('processId', this.customer.id)
-      .set('process', originProcess.CATALOGS_CUSTOMERS);
-    
-    console.log(this.customer)
-    console.log(event)
-    console.log(fd)
-    console.log(uploadUrl)
+    .set('process', originProcess.CATALOGS_CUSTOMERS);
     
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
-      if (res) {
-        
-        const uuidPattern = /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\.jpeg/;
-        const matches = res.filePath.match(uuidPattern);
-        let newPath = '';
-        if (matches && matches.length > 0) {
-          const uuid = matches[0];
-          newPath = res.filePath.replace(uuid, res.fileName);
-        }
-        console.log(res.fileGuid)
-
+      if (res) {       
         this.imageChanged = true;
         this.customerForm.controls.mainImageName.setValue(res.fileName);
-        this.customer.mainImageName = res.fileName;
-        this.customer.mainImagePath = newPath;
-        this.customer.mainImageGuid = res.fileGuid;//issue on table or backend, this dont let to save the length of uuid
-        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${newPath}`;
+        this.customer.mainImagePath = res.filePath;
+        this.customer.mainImageGuid = res.fileGuid;
+        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el cliente para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1192,18 +1174,18 @@ export class CatalogCustomerEditionComponent {
 
   //elvis revisa aqui y me avisas solo cuando comento este sector de traducciones ejecuta correctamente el guardado
   processTranslations$(customerId: number): Observable<any> { 
-    // const differences = this.storedTranslations.length !== this.customer.translations.length || this.storedTranslations.some((st: any) => {
-    //   return this.customer.translations.find((t: any) => {        
-    //     return st.languageId === t.languageId &&
-    //     st.id === t.id &&
-    //     (st.reference !== t.reference || 
-    //     st.name !== t.name || 
-    //     st.notes !== t.notes);
-    //   });
-    // });
+    const differences = this.storedTranslations.length !== this.customer.translations.length || 
+    this.storedTranslations.some((st: any) => {
+      return this.customer.translations.find((t: any) => {
+        return st.languageId === t.languageId &&
+        st.id === t.id &&
+        (st.reference !== t.reference || 
+        st.name !== t.name || 
+        st.notes !== t.notes);
+      });
+    });
 
-    // console.log(differences)
-    if (false) {
+    if (differences) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
@@ -1212,7 +1194,7 @@ export class CatalogCustomerEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-     
+        customerId,
       }      
       const translationsToAdd = this.customer.translations.map((t: any) => {
         return {
@@ -1231,7 +1213,7 @@ export class CatalogCustomerEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addCustomerTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addCustomerTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteCustomerTranslations$(varToDelete) : of(null) 
       ]);
     } else {

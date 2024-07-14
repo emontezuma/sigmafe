@@ -25,6 +25,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestroy {
   @ViewChild('possibleValue', { static: false }) possibleValue: ElementRef;  
   @Input() line: ChecklistTemplateLine;
+  @Input() updatingCount: number;
 
   @Output() formChange = new EventEmitter<{ lineNumber: number, formData: any }>();
   checkListTemplateLineChanged$: Observable<any>;
@@ -122,7 +123,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     );
         
     this.variableFormChangesSubscription = this.variableForm.valueChanges
-    .subscribe(() => {      
+    .subscribe(() => {
       this.formChange.emit({ lineNumber: this.line.line, formData: this.variableForm.controls });      
     });
 
@@ -170,6 +171,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
   }
     
   ngOnChanges() : void {
+    this.setAttachmentLabel();
     this.updateFormFromData();
   }  
 
@@ -310,7 +312,6 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       minimum: this.line.minimum,
       maximum: this.line.maximum,            
       byDefaultDateType: this.line.byDefaultDateType,    
-      
     });
     if (this.variableForm.controls.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && this.variableForm.controls.byDefaultDateType.value === GeneralValues.SPECIFIC && this.variableForm.controls.byDefault.value) {
       const dateAndTime = this.variableForm.controls.byDefault.value.split(' ');
@@ -339,7 +340,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       v.order = index++;
     });
     this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);    
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleMoveToUp(id: number) {
@@ -357,7 +358,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       editingItem.alarmedValue = tmpValue.alarmedValue;
       
       this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);    
-      // this.setEditionButtonsState();      
+      this.setEditionButtonsState();      
     }
   }
 
@@ -376,7 +377,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       editingItem.alarmedValue = tmpValue.alarmedValue;      
       
       this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);    
-      // this.setEditionButtonsState();      
+      this.setEditionButtonsState();      
     }
   }
 
@@ -399,13 +400,13 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     });
     this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);
     if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable({ emitEvent: false });
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleAlarmed(id: number) {
     const value = this.line.valuesList.find((v: VariablePossibleValue) => v.order === id);
     value.alarmedValue = !value.alarmedValue;
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleByDefault(id: number) {
@@ -417,7 +418,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       });    
     }
     
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleEditPossibleValue() {
@@ -443,10 +444,11 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     this.editingValue = -1;   
     this.variableForm.controls.possibleValue.setValue('');
     this.variableForm.controls.possibleValuePosition.setValue('l');      
+    this.setEditionButtonsState();
     setTimeout(() => {
       if (this.variableForm.controls.possibleValuePosition.disabled) this.variableForm.controls.possibleValuePosition.enable();
-      this.possibleValue.nativeElement.focus();      
-    }, 100)
+      this.possibleValue.nativeElement.focus();
+    }, 100);
   }
 
   addPossibleValueAtFirst() {
@@ -485,10 +487,10 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       try {
         this.line.valuesList = JSON.parse(this.line.possibleValues);
       } catch (error) {
-        this.line.valuesList = null;
+        this.line.valuesList = [];
       }          
     } else {
-      this.line.valuesList = null;
+      this.line.valuesList = [];
     }
     this.possibleValuesTable = new MatTableDataSource<VariablePossibleValue>(this.line.valuesList);        
   }
@@ -509,7 +511,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       v.index = index++;
     });
     this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleAttachmentMoveToLast(id: number) {
@@ -528,7 +530,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       v.index = index++;
     });
     this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   handleAttachmentMoveToUp(id: number) {
@@ -548,7 +550,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       editingItem.image = tmpValue.image;
       
       this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-      // this.setEditionButtonsState();      
+      this.setEditionButtonsState();      
     }
   }
 
@@ -569,7 +571,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       editingItem.image = tmpValue.image;      
       
       this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-      // this.setEditionButtonsState();      
+      this.setEditionButtonsState();      
     }
   }
 
@@ -582,7 +584,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     });
     this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);
     this.setAttachmentLabel();
-    // this.setEditionButtonsState();
+    this.setEditionButtonsState();
   }
 
   messageMaxAttachment() {
@@ -616,7 +618,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     const uploadUrl = `${environment.apiUploadUrl}`;
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/checklist-templates-lines`)
-    .set('processId', this.line.variableId)
+    .set('processId', this.line.id)
     .set('process', originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
@@ -635,7 +637,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
           icon: this._catalogsService.setIconName(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-        // this.setEditionButtonsState();
+        this.setEditionButtonsState();
         this.setAttachmentLabel();
         this.addAttachmentButtonClick = false;
       }      
@@ -663,15 +665,14 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       if (response.action === ButtonActions.OK) {
         this.line.attachments = [];
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
-        // this.setEditionButtonsState();
+        this.setEditionButtonsState();
         this.setAttachmentLabel();
       }
     });       
-  }
-    
+  }    
 
   setAttachmentLabel() {
-    if (this.line.attachments.length === 0) {
+    if (!this.line.attachments || this.line.attachments?.length === 0) {
       this.variableAttachmentLabel = $localize`Este registro no tiene adjuntos...`;
     } else {
       this.variableAttachmentLabel = $localize`Este registro tiene ${this.line.attachments.length} adjunto(s)...`;
@@ -702,7 +703,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, files)
     .pipe(
       tap((newAttachments) => {
-        if (newAttachments.data.duplicateAttachments.length !== this.line.attachments) {
+        if (newAttachments.data.duplicateAttachments.length !== this.line.attachments.length) {
           const message = $localize`No se pudieron duplicar todos los adjuntos...`;
           this._sharedService.showSnackMessage({
             message,
@@ -745,6 +746,10 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     }
     this.line.validate = false;
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+  }
+
+  setEditionButtonsState() {    
+    this.formChange.emit({ lineNumber: this.line.line, formData: this.variableForm.controls });          
   }
 
   get SystemTables () {

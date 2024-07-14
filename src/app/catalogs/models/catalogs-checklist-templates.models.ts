@@ -46,6 +46,7 @@ export interface ChecklistTemplateDetail {
   lastGeneratedDate?: string; 
   generationCount?: number;
   attachments?: Attachment[];  
+  attachmentsList?: string
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -108,6 +109,7 @@ export interface ChecklistTemplateDetail {
   timeToFill?: number;    
 
   approver?: GeneralCatalogInternalData,
+  lines?: [],  
 }
 
 export interface ChecklistTemplatesState {
@@ -232,6 +234,7 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   approver: null,    
   attachments: [],
   translations: [],  
+  lines: [],  
 };
 
 export interface ChecklistTemplatePossibleValue {
@@ -267,7 +270,7 @@ export interface ChecklistTemplateLine {
   valueType?: string;
   sensorId?: number;
   uomId?: number;
-  uomName?: string;
+  uomName?: string;  
   uomPrefix?: string;
   showChart?: string;
   useVariableAttachments?: string;
@@ -276,11 +279,11 @@ export interface ChecklistTemplateLine {
   showNotes?: string;
   allowAlarm?: string;
   notifyAlarm?: string;  
-  recipient?: GeneralCatalogInternalData,
+  recipient?: GeneralCatalogInternalData,  
   status?: string;
   uom?: GeneralCatalogInternalData,
   attachments?: Attachment[];
+  attachmentsList?: string;
   valuesList?: ChecklistTemplatePossibleValue[];
-  friendlyValueType?: string;
-  formData?: any;
+  friendlyValueType?: string;  
 }

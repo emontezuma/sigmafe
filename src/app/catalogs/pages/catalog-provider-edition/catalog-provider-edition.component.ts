@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems, originProcess } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -35,9 +35,7 @@ export class CatalogProviderEditionComponent {
   scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
-
-
-
+  duplicateMainImage$: Observable<any>; 
   
   // providerFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
@@ -80,12 +78,10 @@ export class CatalogProviderEditionComponent {
       '', 
       Validators.required,      
     ),
-   
+    mainImageName: new FormControl(''),
     notes: new FormControl(''),
-   
     reference: new FormControl(''),    
-    prefix: new FormControl(''),    
-
+    prefix: new FormControl(''),
 
   });
 
@@ -150,14 +146,9 @@ export class CatalogProviderEditionComponent {
       })
     );
 
-
     this.providerFormChangesSubscription = this.providerForm.valueChanges.subscribe((providerFormChanges: any) => {
       if (!this.loaded) return;
-      if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-      } else {
-        this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-      }      
+      this.setEditionButtonsState();
     }); 
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
       tap((animationFinished: boolean) => {
@@ -268,6 +259,7 @@ export class CatalogProviderEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+        this.duplicateMainImage();
         this._location.replaceState('/catalogs/providers/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -788,12 +780,7 @@ export class CatalogProviderEditionComponent {
     
   }
 
-
-
-
-
-
-  requestProviderData(providerId: number): void { 
+requestProviderData(providerId: number): void { 
     let providers = undefined;
     providers = { providerId };
 
@@ -860,10 +847,6 @@ export class CatalogProviderEditionComponent {
     return this._catalogsService.getGenericsLazyLoadingDataGql$(providers).pipe();
   }
 
-
-
-
-
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
   }
@@ -873,19 +856,14 @@ export class CatalogProviderEditionComponent {
   }
 
   handleMultipleSelectionChanged(catalog: string){    
-    if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
-    } else {
-      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
-    }
+    this.setEditionButtonsState();
   }
 
   pageChange(event: any) {
     this.pageInfo = { 
       ...this.pageInfo, 
       currentPage: event?.pageIndex, 
-    }; 
-    //this.requestData(this.pageInfo.currentPage * this.pageInfo.pageSize, this.pageInfo.pageSize, this.order);
+    };     
   }
 
   setToolbarMode(mode: toolbarMode) {
@@ -940,11 +918,12 @@ export class CatalogProviderEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
-
+      ...(this.imageChanged) && { 
+        mainImageName: fc.mainImageName.value,
+        mainImagePath: this.provider.mainImagePath,
+        mainImageGuid: this.provider.mainImageGuid, },
     }
   }
-  
-
 
   initForm(): void {
     this.providerForm.reset();
@@ -1049,13 +1028,81 @@ export class CatalogProviderEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addProviderTransations$(varToAdd) : of(null),
+        varToAdd.translations.length > 0 ? this._catalogsService.addProviderTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteProviderTranslations$(varToDelete) : of(null) 
       ]);
     } else {
       return of(null);
     }
     
+  }
+
+  removeImage() {
+    this.imageChanged = true;
+    this.providerForm.controls.mainImageName.setValue('');
+    this.provider.mainImagePath = '';
+    this.provider.mainImageGuid = '';
+    this.provider.mainImage = '';     
+    const message = $localize`Se ha quitado la imagen dEl proveedor<br>Guarde El proveedor para aplicar el cambio`;
+    this._sharedService.showSnackMessage({
+      message,
+      duration: 5000,
+      snackClass: 'snack-primary',
+      icon: 'check',
+    });
+    this.setEditionButtonsState();    
+  }
+
+  onFileSelected(event: any) {
+    const fd = new FormData();
+    fd.append('image', event.target.files[0], event.target.files[0].name);
+
+    const uploadUrl = `${environment.apiUploadUrl}`;
+    const params = new HttpParams()
+    .set('destFolder', `${environment.uploadFolders.catalogs}/providers`)
+    .set('processId', this.provider.id)
+    .set('process', originProcess.CATALOGS_PROVIDERS);
+    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
+      if (res) {
+        this.imageChanged = true;
+        this.providerForm.controls.mainImageName.setValue(res.fileName);
+        this.provider.mainImagePath = res.filePath;
+        this.provider.mainImageGuid = res.fileGuid;
+        this.provider.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde El proveedor para aplicar el cambio`;
+        this._sharedService.showSnackMessage({
+          message,
+          duration: 5000,
+          snackClass: 'snack-primary',
+          icon: 'check',
+        });
+        this.setEditionButtonsState();      }      
+    });
+  }
+
+  duplicateMainImage() {    
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_PROVIDERS, this.provider.mainImageGuid)
+    .pipe(
+      tap((newAttachments) => {
+        if (newAttachments.duplicated) {       
+          this.imageChanged = true;   
+          this.provider.mainImageGuid = newAttachments.mainImageGuid;
+          this.provider.mainImageName = newAttachments.mainImageName;
+          this.provider.mainImagePath = newAttachments.mainImagePath;   
+
+          this.provider.mainImage = `${environment.uploadFolders.completePathToFiles}/${this.provider.mainImagePath}`;
+          this.providerForm.controls.mainImageName.setValue(this.provider.mainImageName);
+        }        
+      })
+    );
+  }
+
+  setEditionButtonsState() {
+    if (!this.provider.id || this.provider.id === null || this.provider.id === 0) {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_NO_DATA);
+    } else {
+      this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
+    }
   }
 
   get SystemTables () {

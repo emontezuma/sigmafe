@@ -56,12 +56,20 @@ export interface PageInfo {
  
   export enum originProcess {
     CATALOGS_MOLDS = 'catalogs-molds',    
+    CATALOGS_PLANTS = 'catalogs-plants',    
+    CATALOGS_COMPANIES = 'catalogs-companies',    
+    CATALOGS_LINES = 'catalogs-lines',    
+    CATALOGS_MANUFACTURERS = 'catalogs-manufacturers',    
+    CATALOGS_PART_NUMBERS = 'catalogs-part-numbers',    
+    CATALOGS_DEPARTMENTS = 'catalogs-departments',    
     CATALOGS_VARIABLES = 'catalogs-variables',
     CATALOGS_VARIABLES_ATTACHMENTS = 'catalogs-variables-attachments',
-    CATALOGS_VARIABLES_TEMPLATES = 'catalogs-checklist-templates',
+    CATALOGS_CHECKLIST_TEMPLATES = 'catalogs-checklist-templates',
     CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS = 'catalogs-checklist-template-header-attachments',
     CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS = 'catalogs-checklist-template-lines-attachments',
     CATALOGS_CUSTOMERS = 'catalogs-custmomers',
+    CATALOGS_WORKGROUPS = 'catalogs-workgroups',
+    CATALOGS_PROVIDERS = 'catalogs-providers',
 }
   
 export enum SystemTables {

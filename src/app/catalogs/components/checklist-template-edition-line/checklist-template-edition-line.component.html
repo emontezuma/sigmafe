@@ -8,6 +8,7 @@
   <ng-container *ngIf="formStatus$ | async "></ng-container>          
 
   <form class="layout" [formGroup]="variableForm" #f="ngForm">
+    <div>{{variableForm.controls.valueType.value}}</div>
     <div class="grid-multiple">
       <div class="flex-accordion subtitle">
         <label class="accordion-label">Variable: {{ line.name }} (id: {{ line.variableId }})</label>
@@ -598,7 +599,7 @@
     <div class="grid-multiple">
       <div class="flex-accordion subtitle">
         <label class="accordion-label">ADJUNTOS DE LA LINEA</label>
-        <label class="accordion-label-no-counter">({{ line.attachments.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
+        <label class="accordion-label-no-counter">({{ line.attachments?.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
       </div>  
     </div> 
     <mat-checkbox      
@@ -685,7 +686,7 @@
                     matTooltip="Baja el item a un orden"
                     matTooltipClass="tooltip-general"
                     matTooltipShowDelay="100"
-                    [disabled]="i === line.attachments.length - 1"
+                    [disabled]="i === line.attachments?.length - 1"
                   >
                     <mat-icon>keyboard_arrow_down</mat-icon>
                   </button>
@@ -705,7 +706,7 @@
                     matTooltip="Baja el item al último orden"
                     matTooltipClass="tooltip-general"
                     matTooltipShowDelay="100"
-                    [disabled]="i === line.attachments.length - 1"
+                    [disabled]="i === line.attachments?.length - 1"
                   >
                     <mat-icon class="icon-rotated-90">last_page</mat-icon>
                   </button>
@@ -751,7 +752,7 @@
               matTooltip="Agrega un nuevo adjunto a la variablee"
               matTooltipClass="tooltip-general"
               matTooltipShowDelay="100"
-              (click)="(line.attachments.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttachment() : fileInputAttachment.click();"
+              (click)="(line.attachments?.length >= (settingsData?.attachments?.variables ?? 10)) ? messageMaxAttachment() : fileInputAttachment.click();"
             >
               <mat-icon                                    
                 class="svgicon icon-medium"                
@@ -769,7 +770,7 @@
               <mat-label class="button-label">Agregar un adjunto...</mat-label>
             </button>          
             <button
-              [disabled]="line.attachments.length === 0"
+              [disabled]="line.attachments?.length === 0"
               mat-button
               class="toolbar-button warn"
               aria-label="icon-button with menu icon"
