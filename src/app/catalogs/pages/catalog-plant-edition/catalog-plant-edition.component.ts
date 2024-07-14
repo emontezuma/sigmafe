@@ -61,7 +61,7 @@ export class CatalogPlantEditionComponent {
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
-  storedTranslations: [];
+  storedTranslations: [] = [];
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false
@@ -1139,7 +1139,7 @@ export class CatalogPlantEditionComponent {
       const translationsToAdd = this.plant.translations.map((t: any) => {
         return {
           id: null,
-          plantId:t.plantId,
+          plantId,
           name: t.name,
           reference: t.reference,
           notes: t.notes,

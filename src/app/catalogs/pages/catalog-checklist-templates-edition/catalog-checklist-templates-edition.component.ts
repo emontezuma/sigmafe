@@ -133,7 +133,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   linesOrder: any = JSON.parse(`{ "line": "${'ASC'}" }`);
   approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
-  storedTranslations: [];
+  storedTranslations: [] = [];
   storedLines: ChecklistTemplateLine[] = [];  
   translationChanged: boolean = false
   imageChanged: boolean = false
