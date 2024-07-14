@@ -1002,13 +1002,13 @@ export class CatalogPlantEditionComponent {
     return  {
       id: this.plant.id,
       customerId: 1, // TODO: Get from profile
-      companyId: this.plant.companyId,
+     
       status: newRecord ? RecordStatus.ACTIVE : this.plant.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
-
+      ...(fc.company.dirty || fc.company.touched || newRecord) && { companyId: fc.company.value ? fc.company.value.id : null },      
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.plant.mainImagePath,
@@ -1133,12 +1133,13 @@ export class CatalogPlantEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,        
-        customerId: 1, // TODO        
+        customerId: 1, // TODO   
+        
       }      
       const translationsToAdd = this.plant.translations.map((t: any) => {
         return {
           id: null,
-          plantId,
+          plantId:t.plantId,
           name: t.name,
           reference: t.reference,
           notes: t.notes,

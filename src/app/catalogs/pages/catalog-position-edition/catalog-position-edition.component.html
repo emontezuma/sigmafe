@@ -131,69 +131,7 @@
                 >
               </app-area-field>              
             </div>                     
-            <div class="field-items">
-              <fieldset class="field__container">
-                <div class="image-and-field">
-                  <div class="field-components">
-                    <span class="label field__label">Imagen a mostrar</span>                
-                    <mat-form-field appearance="fill" class="field__field">
-                      <input
-                        class="field__input"
-                        matInput
-                        [formControl]="positionForm.controls.mainImageName"                        
-                        [readonly]="true"
-                      />
-                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
-                      <button
-                        matSuffix
-                        mat-icon-button
-                        (click)="fileInput.click()"
-                        style="margin-right: 5px;"
-                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
-                        matTooltipClass="tooltip-general"
-                        matTooltipShowDelay="100"
-                      >
-                        <mat-icon>search</mat-icon>
-                      </button>
-                      <button
-                        *ngIf="position.mainImage"
-                        matSuffix
-                        mat-icon-button
-                        (click)="removeImage()"
-                        style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen de la posicion"
-                        matTooltipClass="tooltip-general"
-                        matTooltipShowDelay="100"
-                      >
-                        <mat-icon>close</mat-icon>
-                      </button>
-                    </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta posicion</span>
-                  </div>                  
-                  <div *ngIf="!loading" class="card-image">
-                    <div
-                      class="image-container"
-                      *ngIf="this.position.mainImage"
-                    >
-                      <img                
-                        @dissolve
-                        appImageNotFound                
-                        class="mold-image"                        
-                        [src]="this.position.mainImage"
-                        [alt]="this.position.mainImage"            
-                        fill
-                      >      
-                    </div>
-                    <div
-                      *ngIf="!this.position.mainImage"
-                      class="icon-container"
-                    >
-                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
-                    </div>    
-                  </div>
-                </div>                
-              </fieldset>              
-            </div>
+        
                    
           </div>          
         </mat-expansion-panel>        

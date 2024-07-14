@@ -734,7 +734,9 @@ export class CatalogManufacturerEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.manufacturer.id || this.manufacturer.id === null || this.manufacturer.id === 0;
     try {
-      const dataToSave = this.prepareRecordToSave(newRecord);
+    const dataToSave = this.prepareRecordToSave(newRecord);
+    console.log(dataToSave)
+
       this.updateManufacturerCatalog$ = this._catalogsService.updateManufacturerCatalog$(dataToSave)
       .pipe(
         tap((data: any) => {
@@ -773,11 +775,6 @@ export class CatalogManufacturerEditionComponent {
       this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
     }
   }
-
-
-
-
-
 
 
   requestManufacturerData(manufacturerId: number): void { 
@@ -923,6 +920,7 @@ export class CatalogManufacturerEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.manufacturer.mainImagePath,

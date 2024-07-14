@@ -26,10 +26,10 @@ export interface PositionDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
-  mainImageGuid?: string;
-  mainImagePath?: string;
-  mainImageName?: string;
-  mainImage?: string;
+ 
+  ImagePath?: string;
+
+
   id?: number;
   customerId?: number;
   plantId?: number;
@@ -76,7 +76,7 @@ export const emptyPositionCatalog = {
 
     plantId:null,
     name: null,
-    mainImagePath: null,    
+    ImagePath: null,    
     updatedBy: null,
     status: null,
     updatedAt: null,
@@ -90,7 +90,7 @@ export const emptyPositionItem: PositionDetail = {
   plantId: null,
   recipientId: null,
 
-  mainImagePath: null,    
+  ImagePath: null,    
   prefix: null,
   status: null,
   createdById: null,

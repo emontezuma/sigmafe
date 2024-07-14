@@ -238,37 +238,8 @@ export const GET_LINES_LAZY_LOADING = gql`
   }
 `;
 
-export const GET_EQUIPMENTS_LAZY_LOADING = gql`
-  query EquipmentsPaginated (
-    $recordsToSkip: Int,
-    $recordsToTake: Int,
-    $orderBy: [TranslatedEquipmentDtoSortInput!],
-    $filterBy: TranslatedEquipmentDtoFilterInput
-  ) {
-  equipmentsPaginated (
-    where: $filterBy, 
-    order: $orderBy, 
-    skip: $recordsToSkip, 
-    take: $recordsToTake
-  ) {
-      totalCount
-      items {
-        translatedName
-        translatedReference
-        isTranslated
-        data {
-            status
-            name
-            id        
-        }      
-      }
-      pageInfo {
-        hasNextPage
-        hasPreviousPage
-      }  
-    }
-  }
-`;
+
+//partnumbers==============
 
 export const GET_PART_NUMBERS_LAZY_LOADING = gql`
   query PartNumbersPaginated (
@@ -2448,6 +2419,46 @@ export const DELETE_CUSTOMER_TRANSLATIONS = gql`
 
 //manufacturers================================================
 
+
+export const GET_MANUFACTURER = gql`
+  query OneManufacturer (
+    $manufacturerId: Long!,
+  ) {
+  oneManufacturer (
+    id: $manufacturerId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      mainImageGuid
+      mainImageName
+      mainImagePath     
+      id
+      customerId     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+  }
+}
+`;
+
 export const GET_MANUFACTURERS = gql`
   query ManufacturersPaginated (
     $recordsToSkip: Int,
@@ -2455,7 +2466,7 @@ export const GET_MANUFACTURERS = gql`
     $orderBy: [TranslatedManufacturerDtoSortInput!],
     $filterBy: TranslatedManufacturerDtoFilterInput,
   ) {
-  customersPaginated (
+  manufacturersPaginated (
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -2464,13 +2475,18 @@ export const GET_MANUFACTURERS = gql`
       items {
         friendlyStatus
         data {
-          name          
-          id         
-          status
-          updatedAt
+          name
           mainImagePath
           mainImageGuid
-          mainImageName    
+          mainImageName
+          id
+          customerId
+          reference
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
         }
       }
       pageInfo {
@@ -2482,37 +2498,6 @@ export const GET_MANUFACTURERS = gql`
   }
 `;
 
-export const GET_MANUFACTURER = gql`
-  query OneManufacturer (
-    $customerId: Long!,
-  ) {
-  oneManufacturer (
-    id: $customerId        
-  ) {
-    data {
-      name
-      reference
-      notes
-      prefix
-      mainImagePath
-      mainImageGuid
-      mainImageName    
-      id
-      status
-      createdById
-      createdAt
-      updatedById
-      updatedAt
-      deletedById
-      deletedAt      
-     
-    }
-    friendlyStatus
- 
-  }
-}
-`;
-
 export const GET_MANUFACTURER_TRANSLATIONS = gql`
   query ManufacturersTranslationsTable (
     $recordsToSkip: Int,
@@ -2520,7 +2505,7 @@ export const GET_MANUFACTURER_TRANSLATIONS = gql`
     $orderBy: [ManufacturerTranslationTableSortInput!],
     $filterBy: ManufacturerTranslationTableFilterInput,
   ) {
-    customersTranslationsTable(
+    manufacturersTranslationsTable(
     skip: $recordsToSkip,
     take: $recordsToTake,
     order: $orderBy,
@@ -2528,6 +2513,7 @@ export const GET_MANUFACTURER_TRANSLATIONS = gql`
   ) {
     totalCount
     items {
+        manufacturerId
         name
         reference
         notes
@@ -2567,7 +2553,7 @@ export const UPSERT_MANUFACTURER_TRANSLATIONS = gql`
       inputs: $translations
     ) {
       id,
-      customerId,
+      manufacturerId,
       languageId      
     }
   }
@@ -2575,31 +2561,46 @@ export const UPSERT_MANUFACTURER_TRANSLATIONS = gql`
 
 export const UPSERT_MANUFACTURER = gql`
   mutation CreateOrUpdateManufacturer (
+    $customerId: Long,
+  
     $id: Long,
     $status: String    
     $name: String,
+     $prefix: String,
     $reference: String,
-    $notes: String,   
+    $notes: String,
     $mainImageGuid: String,
     $mainImageName: String,
     $mainImagePath: String,    
   ) {
   createOrUpdateManufacturer (
     inputs: [{
+      customerId: $customerId
+     
       id: $id      
       status: $status
       name: $name,
+      prefix: $prefix,
       reference: $reference,
       notes: $notes,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
       mainImagePath: $mainImagePath,
+   
     }]) {
       id
       createdAt
       updatedAt
       deletedAt
-     
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
     } 
   }
 `;
@@ -2607,13 +2608,17 @@ export const UPSERT_MANUFACTURER = gql`
 export const DELETE_MANUFACTURER_TRANSLATIONS = gql`
   mutation DeleteManufacturersTranslationsTable (
     $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
   ) {
     deleteManufacturersTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
+    
     ) 
   }
 `;
+
 
 //plants===========================
 
@@ -3196,7 +3201,6 @@ export const GET_PROVIDER_TRANSLATIONS = gql`
 }
 `;
 
-
 export const UPSERT_PROVIDER_TRANSLATIONS = gql`
   mutation CreateOrUpdateProviderTranslationTable (
     $translations: [ProviderTranslationTableDtoInput!]!    
@@ -3218,6 +3222,7 @@ export const UPSERT_PROVIDER = gql`
     $id: Long,
     $status: String    
     $name: String,
+     $prefix: String,
     $reference: String,
     $notes: String,
     $mainImageGuid: String,
@@ -3231,6 +3236,7 @@ export const UPSERT_PROVIDER = gql`
       id: $id      
       status: $status
       name: $name,
+      prefix: $prefix,
       reference: $reference,
       notes: $notes,
       mainImageGuid: $mainImageGuid,
@@ -3271,6 +3277,38 @@ export const DELETE_PROVIDER_TRANSLATIONS = gql`
 
 //equipments===========================
 
+export const GET_EQUIPMENTS_LAZY_LOADING = gql`
+  query EquipmentsPaginated (
+      $recordsToSkip: Int,
+      $recordsToTake: Int,
+      $orderBy: [TranslatedEquipmentDtoSortInput!],
+      $filterBy: TranslatedEquipmentDtoFilterInput
+  ) {
+    equipmentsPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id      
+            status  
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 export const GET_EQUIPMENT = gql`
   query OneEquipment (
     $equipmentId: Long!,
@@ -3278,7 +3316,7 @@ export const GET_EQUIPMENT = gql`
   oneEquipment (
     id: $equipmentId        
   ) {
-    
+    data {
       name
       reference
       notes
@@ -3288,7 +3326,7 @@ export const GET_EQUIPMENT = gql`
       mainImageName
       id
       customerId
-      
+     
       plantId     
       status
       createdById
@@ -3308,7 +3346,8 @@ export const GET_EQUIPMENT = gql`
           id
         }
       }
-      
+    
+     
       createdBy {
         name
       }
@@ -3318,8 +3357,8 @@ export const GET_EQUIPMENT = gql`
       deletedBy {
         name
       }      
-    
-        
+    }
+    friendlyStatus    
   }
 }
 `;
@@ -3359,6 +3398,7 @@ export const GET_EQUIPMENTS = gql`
               id
             }
           }
+       
           status
           updatedAt
           updatedBy {
@@ -3442,7 +3482,7 @@ export const UPSERT_EQUIPMENT = gql`
   mutation CreateOrUpdateEquipment (
     $customerId: Long,
     $plantId: Long,
-    
+   
     $id: Long,
     $status: String    
     $name: String,
@@ -3457,13 +3497,13 @@ export const UPSERT_EQUIPMENT = gql`
     inputs: [{
       customerId: $customerId
       plantId: $plantId 
-    
+      
       id: $id      
       status: $status
       name: $name,
       prefix: $prefix,
       reference: $reference,
-      notes: $notes, 
+      notes: $notes,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
       mainImagePath: $mainImagePath,
@@ -3518,6 +3558,8 @@ export const INACTIVATE_EQUIPMENT = gql`
     } 
   }
 `;
+
+
 
 //attachments===========
 
@@ -3803,8 +3845,7 @@ export const GET_POSITION = gql`
       notes
       prefix
       mainImagePath
-      mainImageGuid
-      mainImageName
+   
       id
       customerId
       recipientId
@@ -3850,9 +3891,8 @@ export const GET_POSITIONS = gql`
         data {
           name
           reference
-          mainImagePath
-          mainImageName
-          mainImageGuid
+          ImagePath
+       
           id
           customerId
           plantId
@@ -3948,8 +3988,7 @@ export const UPSERT_POSITION = gql`
     $prefix: String,
     $reference: String,
     $notes: String,
-    $mainImageGuid: String,
-    $mainImageName: String,
+  
     $mainImagePath: String,    
   ) {
   createOrUpdatePosition (
@@ -3964,9 +4003,8 @@ export const UPSERT_POSITION = gql`
       prefix: $prefix,
       reference: $reference,
       notes: $notes,
-      mainImageGuid: $mainImageGuid,
-      mainImageName: $mainImageName,
-      mainImagePath: $mainImagePath,
+    
+      ImagePath: $ImagePath,
     }]) {
       id
       createdAt
@@ -4215,6 +4253,7 @@ export const DELETE_PART_NUMBER_TRANSLATIONS = gql`
 
 //lines===========================
 
+
 export const GET_LINE = gql`
   query OneLine (
     $lineId: Long!,
@@ -4232,6 +4271,7 @@ export const GET_LINE = gql`
       mainImageName
       id
       customerId
+     
       plantId     
       status
       createdById
@@ -4240,6 +4280,19 @@ export const GET_LINE = gql`
       updatedAt
       deletedById
       deletedAt
+      plant {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+    
+     
       createdBy {
         name
       }
@@ -4278,7 +4331,19 @@ export const GET_LINES = gql`
           mainImageGuid
           id
           customerId
-          plantId       
+          plantId
+          plant {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
+       
           status
           updatedAt
           updatedBy {
@@ -4314,10 +4379,10 @@ export const GET_LINE_TRANSLATIONS = gql`
         name
         reference
         notes
+        prefix
         languageId
         id
         customerId
-        
         status
         createdById
         createdAt
@@ -4361,7 +4426,8 @@ export const UPSERT_LINE_TRANSLATIONS = gql`
 export const UPSERT_LINE = gql`
   mutation CreateOrUpdateLine (
     $customerId: Long,
-    $plantId: Long,  
+    $plantId: Long,
+   
     $id: Long,
     $status: String    
     $name: String,
@@ -4375,7 +4441,8 @@ export const UPSERT_LINE = gql`
   createOrUpdateLine (
     inputs: [{
       customerId: $customerId
-      plantId: $plantId     
+      plantId: $plantId 
+      
       id: $id      
       status: $status
       name: $name,
@@ -4406,13 +4473,13 @@ export const UPSERT_LINE = gql`
 export const DELETE_LINE_TRANSLATIONS = gql`
   mutation DeleteLinesTranslationsTable (
     $ids: [IdToDeleteInput!]!,
-    $customerId: Long!
-  $plantId: Long!
+    $customerId: Long!   
+    $plantId: Long!
   ) {
     deleteLinesTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-    plantId: $plantId,
+      plantId: $plantId,
     ) 
   }
 `;
@@ -5162,6 +5229,8 @@ export const INACTIVATE_SHIFT = gql`
     } 
   }
 `;
+
+//departments================================
 
 export const GET_DEPARTMENT = gql`
   query OneDepartment (

@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-position-edition',
@@ -78,7 +80,9 @@ export class CatalogPositionEditionComponent {
     ),   
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
-    reference: new FormControl(''),    
+    reference: new FormControl(''),
+    plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),  
     prefix: new FormControl(''),       
   });
 
@@ -844,9 +848,9 @@ export class CatalogPositionEditionComponent {
       if (res) {
         this.imageChanged = true;
         this.positionForm.controls.mainImageName.setValue(res.fileName);
-        this.position.mainImagePath = res.filePath;
-        this.position.mainImageGuid = res.fileGuid;
-        this.position.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
+        this.position.ImagePath = res.filePath;
+        
+        
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la posicion para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -911,7 +915,7 @@ export class CatalogPositionEditionComponent {
     this.positionForm.patchValue({
       name: this.position.name,
       reference: this.position.reference,      
-      mainImageName: this.position.mainImageName,
+      mainImageName: this.position.ImagePath,
       prefix: this.position.prefix,      
       notes: this.position.notes,      
 
@@ -931,11 +935,12 @@ export class CatalogPositionEditionComponent {
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
-
+      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value ? fc.plant.value.id : null },      
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id  : null},      
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
-        mainImagePath: this.position.mainImagePath,
-        mainImageGuid: this.position.mainImageGuid, },
+        mainImagePath: this.position.ImagePath,
+         },
     }
   }
 
@@ -950,9 +955,9 @@ export class CatalogPositionEditionComponent {
   removeImage() {
     this.imageChanged = true;
     this.positionForm.controls.mainImageName.setValue('');
-    this.position.mainImagePath = '';
-    this.position.mainImageGuid = '';
-    this.position.mainImage = '';     
+    this.position.ImagePath = '';
+    
+    
     const message = $localize`Se ha quitado la imagen de la posicion<br>Guarde la posicion para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
