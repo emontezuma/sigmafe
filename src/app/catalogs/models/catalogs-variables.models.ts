@@ -53,8 +53,10 @@ export interface VariableDetail {
   automaticActionPlan?: string;  
   actionPlansToGenerate?: string;  
   possibleValues?: string;  
+
   byDefault?: string; 
   byDefaultDateType?: string; 
+  
   resetValueMode?: string; 
   valuesList?: ChecklistTemplatePossibleValue[]; 
   minimum?: string; 

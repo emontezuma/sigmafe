@@ -1172,7 +1172,7 @@ export class CatalogCustomerEditionComponent {
   }
 
 
-  //elvis revisa aqui y me avisas solo cuando comento este sector de traducciones ejecuta correctamente el guardado
+
   processTranslations$(customerId: number): Observable<any> { 
     const differences = this.storedTranslations.length !== this.customer.translations.length || 
     this.storedTranslations.some((st: any) => {
