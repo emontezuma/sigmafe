@@ -562,6 +562,8 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
         this.duplicateMainImage();
+        this.duplicateAttachments();
+        this.markLinesAsNew();
         this._location.replaceState('/catalogs/checklist-templates/create');
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;
@@ -2488,7 +2490,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS, files)
     .pipe(
       tap((newAttachments) => {
-        if (newAttachments.length !== this.checklistTemplate.attachments) {
+        if (newAttachments.length !== this.checklistTemplate.attachments.length) {
           const message = $localize`No se pudieron duplicar todos los adjuntos...`;
           this._sharedService.showSnackMessage({
             message,
@@ -2511,6 +2513,18 @@ export class CatalogChecklistTemplatesEditionComponent {
 
     )
   }
+  
+  markLinesAsNew() {
+    this.checklistTemplateLines = this.checklistTemplateLines.map((line) => {
+      return {
+        ...line,
+        id: null,
+
+      }
+    })
+    this.checklistTemplateLineForms = [];
+  }
+
 
   handleMultipleSelectionChanged(catalog: string){    
     this.setEditionButtonsState();
@@ -2725,7 +2739,8 @@ export class CatalogChecklistTemplatesEditionComponent {
           updatedLine.maximum = variableData.maximum;
           updatedLine.valueType = variableData.valueType
           updatedLine.byDefault = variableData.byDefault;    
-          updatedLine.attachments = variableData.attachments;    
+          updatedLine.attachments = variableData.attachments;   
+          updatedLine.variableAttachments = variableData.attachments, 
           updatedLine.possibleValue = '';
           updatedLine.possibleValues = variableData.possibleValues;
           updatedLine.byDefaultDateType = variableData.byDefaultDateType;    
@@ -2760,13 +2775,15 @@ export class CatalogChecklistTemplatesEditionComponent {
             valueType: variableData.valueType,
             showNotes: variableData.showNotes,
             minimum: variableData.minimum,
-            attachments:  variableData.attachments,    
+            useVariableAttachments: GeneralValues.YES,
+            attachments: [],
+            variableAttachments: variableData.attachments,
             uom: variableData.uom,
             uomName: variableData.uom?.['translatedName'] ?? variableData.uom.name,
             uomPrefix: variableData.uom?.['translatedPrefix'] ?? variableData.uom.prefix,
             notes: variableData.notes,
             maximum: variableData.maximum,
-            byDefault: variableData.byDefault,    
+            byDefault: variableData.byDefault,
             possibleValue: '',
             possibleValues: variableData.possibleValues,
             byDefaultDateType: variableData.byDefaultDateType,    

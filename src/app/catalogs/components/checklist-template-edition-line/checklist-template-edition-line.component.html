@@ -3,8 +3,7 @@
   <ng-container *ngIf="settingsData$ | async"></ng-container>
   <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
   <ng-container *ngIf="variableByDefaultDate$ | async"></ng-container>  
-  <ng-container *ngIf="checkListTemplateLineChanged$ | async"></ng-container>    
-  <ng-container *ngIf="duplicateAttachmentsList$ | async "></ng-container>        
+  <ng-container *ngIf="checkListTemplateLineChanged$ | async"></ng-container>      
   <ng-container *ngIf="formStatus$ | async "></ng-container>          
 
   <form class="layout" [formGroup]="variableForm" #f="ngForm">

@@ -317,6 +317,10 @@ export class IconsModule {
       'equation_reactivate',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equation_reactivate.svg`)
     );
+    iconRegistry.addSvgIcon(
+      'deliverytruck',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/deliverytruck.svg`)
+    );
   }
   
 }

@@ -193,42 +193,6 @@
               </fieldset>              
             </div>  
           </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DEL PROVEEDOR</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
-              >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
-            </div>
-          </mat-expansion-panel-header>
-        
         </mat-expansion-panel>        
       </mat-accordion>
     </form>

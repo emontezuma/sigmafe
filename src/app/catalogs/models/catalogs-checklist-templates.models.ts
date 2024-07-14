@@ -285,5 +285,6 @@ export interface ChecklistTemplateLine {
   attachments?: Attachment[];
   attachmentsList?: string;
   valuesList?: ChecklistTemplatePossibleValue[];
-  friendlyValueType?: string;  
+  friendlyValueType?: string;
+  variableAttachments?: Attachment[];
 }

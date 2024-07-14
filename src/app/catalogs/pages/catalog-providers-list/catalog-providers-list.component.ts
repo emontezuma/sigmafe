@@ -41,7 +41,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
   allProvidersToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "deliverytruck";  
 
   loading: boolean;
   onTopStatus: string;

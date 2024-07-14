@@ -66,8 +66,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
   genYesNoValues$: Observable<any>;
   settingsData: SettingsData;
   valuesByDefault: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;
-  duplicateAttachmentsList$: Observable<any>;   
-  
+    
   downloadFiles: Subscription;  
   uploadFiles: Subscription;
   formStatus$: Observable<any>;  
@@ -694,39 +693,6 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
         link.remove();    
       }      
     });
-  }
-
-  duplicateAttachments() {
-    if (this.line.attachments.length === 0) return
-
-    const files = this.line.attachments.map((a) => a.id);
-    this.duplicateAttachmentsList$ = this._catalogsService.duplicateAttachmentsList$(originProcess.CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS, files)
-    .pipe(
-      tap((newAttachments) => {
-        if (newAttachments.data.duplicateAttachments.length !== this.line.attachments.length) {
-          const message = $localize`No se pudieron duplicar todos los adjuntos...`;
-          this._sharedService.showSnackMessage({
-            message,
-            snackClass: 'snack-warn',
-            progressBarColor: 'warn',
-            icon: 'delete',
-          });
-        }
-        let line = 0;
-        this.line.attachments = newAttachments.data.duplicateAttachments.sort((a, b) => a.index - b.index).map(na => {
-          return {
-            index: line++,
-            name: na.fileName, 
-            image: `${environment.serverUrl}/files/${na.path}`, 
-            id: na.fileId, 
-            icon: this._catalogsService.setIconName(na.fileType), 
-          }
-        });
-        this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);
-        this.setAttachmentLabel();
-      })
-
-    )
   }
 
   validateTables(): void {
