@@ -145,12 +145,12 @@ export class CatalogVariableEditionComponent {
     maximum:  new FormControl(''),
     molds:  new FormControl(''),
     actionPlansToGenerate:  new FormControl(''),
-    byDefault:  new FormControl(''),    
-    byDefaultDate:  new FormControl(new Date()),    
-    byDefaultTime:  new FormControl(''),    
     possibleValue: new FormControl(''),
     possibleValues: new FormControl(''),
     possibleValuePosition: new FormControl('l'),
+    byDefault:  new FormControl(''),    
+    byDefaultDate:  new FormControl(new Date()),    
+    byDefaultTime:  new FormControl(''),    
     byDefaultDateType: new FormControl(emptyGeneralHardcodedValuesItem),    
   });
 

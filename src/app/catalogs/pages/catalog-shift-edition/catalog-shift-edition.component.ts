@@ -18,7 +18,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
-import { emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
 import { CustomValidators } from '../../custom-validators';
 
 @Component({
@@ -83,8 +83,17 @@ export class CatalogShiftEditionComponent {
     prefix: new FormControl(''),
     
     twoDays: new FormControl(''), 
-    fromTime: new FormControl(new Date()), 
-    toTime: new FormControl(new Date()),
+
+    fromTime:  new FormControl(''),    
+    fromTimeDate:  new FormControl(new Date()),    
+    fromTimeTime: new FormControl(''),  
+ 
+
+
+    toTime:  new FormControl(''),    
+    toTimeDate:  new FormControl(new Date()),    
+    toTimeTime: new FormControl(''),  
+
     
     sequence: new FormControl(''), 
     moveToDate: new FormControl(''), 
@@ -154,6 +163,7 @@ export class CatalogShiftEditionComponent {
         this.getScrolling(data);
       })
     );  
+
     this.settingsData$ = this._store.select(selectSettingsData).pipe(
       tap(settingsData => {
         this.settingsData = settingsData;
@@ -163,6 +173,24 @@ export class CatalogShiftEditionComponent {
         this.requestVariableByDefaultDateValuesData(currentPage);   
       })
     );
+
+    this.shiftFormChangesSubscription = this.shiftForm.controls.fromTimeDate.valueChanges
+    .subscribe((value: any) => {
+      this.calculateByDefaultValue('from');
+    });
+    this.shiftFormChangesSubscription = this.shiftForm.controls.fromTimeTime.valueChanges
+    .subscribe((value: any) => {
+      this.calculateByDefaultValue('from');
+    });
+    this.shiftFormChangesSubscription = this.shiftForm.controls.toTimeDate.valueChanges
+    .subscribe((value: any) => {
+      this.calculateByDefaultValue('to');
+    });
+    this.shiftFormChangesSubscription = this.shiftForm.controls.toTimeTime.valueChanges
+    .subscribe((value: any) => {
+      this.calculateByDefaultValue('to');
+    });
+
     this.shiftFormChangesSubscription = this.shiftForm.valueChanges.subscribe((shiftFormChanges: any) => {
       if (!this.loaded) return;
       this.setEditionButtonsState();
@@ -928,8 +956,11 @@ export class CatalogShiftEditionComponent {
       ...(fc.twoDays.dirty || fc.twoDays.touched || newRecord) && { twoDays: fc.twoDays.value },
       ...(fc.isFirstSequence.dirty || fc.isFirstSequence.touched || newRecord) && { isFirstSequence: fc.isFirstSequence.value },
       ...(fc.isLastSequence.dirty || fc.isLastSequence.touched || newRecord) && { isLastSequence: fc.isLastSequence.value },
-      ...(fc.fromTime.dirty || fc.fromTime.touched || newRecord) && { fromTime: new Date(fc.fromTime.value) },
-      ...(fc.toTime.dirty || fc.toTime.touched || newRecord) && { toTime: new Date(fc.toTime.value) },
+      
+      ...(fc.fromTime.dirty || fc.fromTime.touched || newRecord) && { fromTime: fc.fromTime.value },
+      
+      ...(fc.toTime.dirty || fc.toTime.touched || newRecord) && { toTime: fc.toTime.value },
+      
 
       ...(fc.calendar.dirty || fc.calendar.touched || newRecord) && { calendarId: fc.calendar.value ? fc.calendar.value.id : null },      
       
@@ -949,6 +980,8 @@ export class CatalogShiftEditionComponent {
   initForm(): void {
     this.shiftForm.reset();
     // Default values
+    this.shiftForm.controls.fromTime.setValue(GeneralValues.NO);
+    this.shiftForm.controls.toTime.setValue(GeneralValues.NO);
 
     this.storedTranslations = [];
     this.translationChanged = false;
@@ -1104,6 +1137,33 @@ export class CatalogShiftEditionComponent {
       catchError(() => EMPTY)
     )
   }
+
+  calculateByDefaultValue(name: string): void {    
+    let date;
+    let time;
+    if (name === 'from') {
+      date = this._sharedService.formatDate(this.shiftForm.controls.fromTimeDate.value ?? new Date(), 'yyyy/MM/dd');
+      time = this.shiftForm.controls.fromTimeTime.value ?? this._sharedService.formatDate(new Date(), 'HH:mm:ss');
+    } else {
+      date = this._sharedService.formatDate(this.shiftForm.controls.toTimeDate.value ?? new Date(), 'yyyy/MM/dd');
+      time = this.shiftForm.controls.toTimeTime.value ?? this._sharedService.formatDate(new Date(), 'HH:mm:ss');
+    }
+    
+    if (time.length === 5) {
+      time = `${time}:00`;
+    }
+    let byDefaulDAT = null;
+    try {
+      byDefaulDAT = new Date(`${date}' '${time}`)
+    } catch (error) {
+      byDefaulDAT = null;
+    }          
+    if(name==='from'){
+      this.shiftForm.controls.fromTime.setValue(byDefaulDAT);
+    }else {
+      this.shiftForm.controls.toTime.setValue(byDefaulDAT);
+    }
+  }  
 
   get SystemTables () {
     return SystemTables;

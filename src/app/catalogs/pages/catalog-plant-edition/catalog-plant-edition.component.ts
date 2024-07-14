@@ -1112,16 +1112,16 @@ export class CatalogPlantEditionComponent {
   }
 
   processTranslations$(plantId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
-      return this.plant.translations.find((t: any) => {        
-        return st.languageId === t.languageId &&
-        st.id === t.id &&
-        (st.name !== t.name || 
-        st.reference !== t.reference || 
-        st.notes !== t.notes);
-      });
-    });
-    if (differences) {
+    // const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
+    //   return this.plant.translations.find((t: any) => {        
+    //     return st.languageId === t.languageId &&
+    //     st.id === t.id &&
+    //     (st.name !== t.name || 
+    //     st.reference !== t.reference || 
+    //     st.notes !== t.notes);
+    //   });
+    // });
+    if (false) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
