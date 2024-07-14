@@ -38,11 +38,10 @@ export class CatalogPlantEditionComponent {
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
   companies$: Observable<any>; 
-
+  duplicateMainImage$: Observable<any>;  
   companies: GeneralCatalogData = emptyGeneralCatalogData; 
 
   valueTypeChanges$: Observable<any>;
-  duplicateMainImage$: Observable<any>; 
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -910,7 +909,7 @@ export class CatalogPlantEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/plants`)
     .set('processId', this.plant.id)
-    .set('process', originProcess.CATALOGS_PLANTS);
+    .set('process', originProcess.CATALOGS_MOLDS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
@@ -1113,16 +1112,20 @@ export class CatalogPlantEditionComponent {
     }
   }
 
+
   processTranslations$(plantId: number): Observable<any> { 
-    // const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
+    // const differences = this.storedTranslations.length !== this.plant.translations.length ||
+    //   this.storedTranslations.some((st: any) => {
     //   return this.plant.translations.find((t: any) => {        
     //     return st.languageId === t.languageId &&
     //     st.id === t.id &&
-    //     (st.name !== t.name || 
-    //     st.reference !== t.reference || 
+    //     (st.reference !== t.reference || 
+    //       st.name !== t.name || 
+        
     //     st.notes !== t.notes);
     //   });
-    // });
+    //   });
+    console.log("there")
     if (false) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
@@ -1132,26 +1135,25 @@ export class CatalogPlantEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-        customerId: 1, // TODO: Get from profile
-        companyId: this.plant.companyId,
+       
+        plantId
       }      
       const translationsToAdd = this.plant.translations.map((t: any) => {
         return {
           id: null,
           plantId,
-          name: t.name,
+         
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-          customerId: 1, // TODO: Get from profile
-          companyId: this.plant.companyId,
+       
           status: RecordStatus.ACTIVE,
         }
       });
       const varToAdd = {
         translations: translationsToAdd,
       }
-  
+  console.log("here")
       return combineLatest([ 
         varToAdd.translations.length > 0 ? this._catalogsService.addPlantTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePlantTranslations$(varToDelete) : of(null) 
