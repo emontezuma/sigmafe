@@ -84,6 +84,9 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
 
   attachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'actions-attachments' ];
   attachmentsTable = new MatTableDataSource<Attachment>([]);
+
+  variableAttachmentsTableColumns: string[] = [ 'index', 'icon', 'name', 'variable-actions-attachments' ];
+  variableAttachmentsTable = new MatTableDataSource<Attachment>([]);  
   
   possibleValuesTableColumns: string[] = [ 'item', 'value', 'byDefault', 'alarmedValue', 'actions' ];
   possibleValuesTable = new MatTableDataSource<VariablePossibleValue>([]);
@@ -320,6 +323,8 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       });
     }
     this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);
+    this.variableAttachmentsTable = new MatTableDataSource<Attachment>(this.line.variableAttachments);
+    
     this.prepareListOfValues();    
         
   } 
@@ -687,6 +692,23 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
         let url = window.URL.createObjectURL(res);
         let link = document.createElement("a"); 
         link.download = this.line.attachments[id].name;
+        link.href = url;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        link.remove();    
+      }      
+    });
+  }
+
+  handleVariableAttachmentDownload(id: number) {
+    const downloadUrl = `${environment.apiDownloadUrl}`;
+    const params = new HttpParams()
+    .set('fileName', this.line.variableAttachments[id].image.replace(`${environment.serverUrl}/files/`, ''))
+    this.downloadFiles = this._http.get(downloadUrl, { params, responseType: 'blob' }).subscribe((res: any) => {
+      if (res) {
+        let url = window.URL.createObjectURL(res);
+        let link = document.createElement("a"); 
+        link.download = this.line.variableAttachments[id].name;
         link.href = url;
         link.click();
         window.URL.revokeObjectURL(url);
