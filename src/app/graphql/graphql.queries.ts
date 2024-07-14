@@ -2830,19 +2830,15 @@ export const DELETE_PLANT_TRANSLATIONS = gql`
   mutation DeletePlantsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
     $customerId: Long!
-    $companyId: Long!
   ) {
     deletePlantsTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-      companyId: $companyId
     ) 
   }
 `;
 
-
 //companies===========================
-
 export const GET_COMPANY = gql`
   query OneCompany (
     $companyId: Long!,

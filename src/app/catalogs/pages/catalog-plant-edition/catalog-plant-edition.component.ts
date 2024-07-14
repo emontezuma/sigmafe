@@ -1114,19 +1114,17 @@ export class CatalogPlantEditionComponent {
 
 
   processTranslations$(plantId: number): Observable<any> { 
-    // const differences = this.storedTranslations.length !== this.plant.translations.length ||
-    //   this.storedTranslations.some((st: any) => {
-    //   return this.plant.translations.find((t: any) => {        
-    //     return st.languageId === t.languageId &&
-    //     st.id === t.id &&
-    //     (st.reference !== t.reference || 
-    //       st.name !== t.name || 
-        
-    //     st.notes !== t.notes);
-    //   });
-    //   });
-    console.log("there")
-    if (false) {
+    const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
+      return this.plant.translations.find((t: any) => {        
+        return st.languageId === t.languageId &&
+          st.id === t.id &&
+          (st.reference !== t.reference || 
+            st.name !== t.name ||           
+            st.notes !== t.notes
+        );
+      });
+    }); 
+    if (differences) {
       const translationsToDelete = this.storedTranslations.map((t: any) => {
         return {
           id: t.id,
@@ -1134,26 +1132,24 @@ export class CatalogPlantEditionComponent {
         }
       });
       const varToDelete = {
-        ids: translationsToDelete,
-       
-        plantId
+        ids: translationsToDelete,        
+        customerId: 1, // TODO        
       }      
       const translationsToAdd = this.plant.translations.map((t: any) => {
         return {
           id: null,
           plantId,
-         
+          name: t.name,
           reference: t.reference,
           notes: t.notes,
-          languageId: t.languageId,
-       
+          customerId: 1, // TODO        
+          languageId: t.languageId,      
           status: RecordStatus.ACTIVE,
         }
       });
       const varToAdd = {
         translations: translationsToAdd,
       }
-  console.log("here")
       return combineLatest([ 
         varToAdd.translations.length > 0 ? this._catalogsService.addPlantTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePlantTranslations$(varToDelete) : of(null) 
@@ -1161,7 +1157,6 @@ export class CatalogPlantEditionComponent {
     } else {
       return of(null);
     }
-    
   }
 
   duplicateMainImage() {    
