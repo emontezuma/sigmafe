@@ -27,7 +27,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Positions ===============
-  positionsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+  positionsTableColumns: string[] = ['id', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   positionsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   positionsData$: Observable<PositionsData>;
@@ -40,7 +40,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   allPositionsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "construction_worker";  
+  catalogIcon: string = "organizational_chart";  
 
   loading: boolean;
   onTopStatus: string;
@@ -204,12 +204,22 @@ export class CatalogPositionsListComponent implements AfterViewInit {
           positionsPaginated: {
             ...data.positionsPaginated,
             items: data.positionsPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
+                  
+                  plant: {
+                    ...item.data.plant,
+                    name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
+                    isTranslated: item.data.plant?.translations?.length > 0 ? true : false,
+                  },
+                  recipient: {
+                    ...item.data.recipient,
+                    name: item.data.recipient?.translations?.length > 0 ? item.data.recipient.translations[0].name : item.data.recipient?.name,
+                    isTranslated: item.data.recipient?.translations?.length > 0 ? true : false,
+                  },
                 }
               }
             })          
@@ -389,7 +399,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.positionsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.positionsTableColumns = ['id', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

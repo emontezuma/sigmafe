@@ -3844,12 +3844,11 @@ export const GET_POSITION = gql`
       reference
       notes
       prefix
-      mainImagePath
-   
+    
       id
       customerId
       recipientId
-
+     
       plantId     
       status
       createdById
@@ -3858,6 +3857,29 @@ export const GET_POSITION = gql`
       updatedAt
       deletedById
       deletedAt
+      plant {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+      recipient {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+      
       createdBy {
         name
       }
@@ -3891,13 +3913,34 @@ export const GET_POSITIONS = gql`
         data {
           name
           reference
-          ImagePath
-       
+         
           id
           customerId
           plantId
+          plant {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
+          recipient {
+            id
+            customerId
+            name
+            status
+            translations {
+              name
+              languageId
+              id
+            }
+          }
           recipientId
-
+        
           status
           updatedAt
           updatedBy {
@@ -3962,6 +4005,7 @@ export const GET_POSITION_TRANSLATIONS = gql`
 }
 `;
 
+
 export const UPSERT_POSITION_TRANSLATIONS = gql`
   mutation CreateOrUpdatePositionTranslationTable (
     $translations: [PositionTranslationTableDtoInput!]!    
@@ -3981,15 +4025,14 @@ export const UPSERT_POSITION = gql`
     $customerId: Long,
     $plantId: Long,
     $recipientId: Long,
-  
+   
     $id: Long,
     $status: String    
     $name: String,
     $prefix: String,
     $reference: String,
     $notes: String,
-  
-    $mainImagePath: String,    
+   
   ) {
   createOrUpdatePosition (
     inputs: [{
@@ -4004,7 +4047,6 @@ export const UPSERT_POSITION = gql`
       reference: $reference,
       notes: $notes,
     
-      ImagePath: $ImagePath,
     }]) {
       id
       createdAt
@@ -4027,7 +4069,7 @@ export const DELETE_POSITION_TRANSLATIONS = gql`
   mutation DeletePositionsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
     $customerId: Long!   
-  $plantId: Long!
+    $plantId: Long!
   ) {
     deletePositionsTranslationsTable (      
       ids: $ids,
