@@ -1,4 +1,4 @@
-import { GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface UomsData {
   uomsPaginated?: Uoms;
@@ -26,10 +26,10 @@ export interface UomDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
+
   id?: number;
   customerId?: number;
   status?: string;
-  translations?: GeneralTranslation[];
   createdById?: any;
   createdAt?: string;
   updatedById?: any;
@@ -39,6 +39,9 @@ export interface UomDetail {
   deletedBy?: any;
   updatedBy?: any;
   createdBy?: any;
+
+  translations?: GeneralTranslation[];  
+  
 }
 
 export interface UomsState {
@@ -47,6 +50,7 @@ export interface UomsState {
 }
 
 export interface UomState {
+  
   loading: boolean;
   moldDetail: UomDetail;
 }
@@ -54,17 +58,13 @@ export interface UomState {
 export interface UomCatalog {
   id: string;
   name: string;
-  mainImagePath: string;
-  serialNumber: string;
+
+
   status: string;
   updatedAt: string;
 }
 
-const emptyInternalCatalog = {  
-  id: null,
-  customerId: null,
-  name: null,      
-};
+
 
 export const emptyUomCatalog = {  
   friendlyStatus: null,
@@ -72,6 +72,7 @@ export const emptyUomCatalog = {
     id: null,
     customerId: null,
     name: null,
+   
     updatedBy: null,
     status: null,
     updatedAt: null,
@@ -81,6 +82,8 @@ export const emptyUomCatalog = {
 export const emptyUomItem: UomDetail = {  
   name: null,
   id: null,
+
+
   customerId: null,
   prefix: null,
   status: null,
@@ -93,12 +96,6 @@ export const emptyUomItem: UomDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
+
   translations: [],
 };
-
-export interface UomPossibleValue {
-  order?: number;
-  value?: string;
-  byDefault?: boolean;
-  alarmedValue?: boolean;  
-}

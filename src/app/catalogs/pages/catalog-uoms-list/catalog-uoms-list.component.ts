@@ -13,8 +13,9 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
-import { environment } from 'src/environments/environment';
+
 import { UomItem, Uoms, UomsData, emptyUomCatalog } from '../../models';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-uoms',
@@ -27,7 +28,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Uoms ===============
-  uomsTableColumns: string[] = ['id', 'name', 'status', 'updatedAt'];
+  uomsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
   uomsCatalogData = new MatTableDataSource<UomItem>([]);      
   
   uomsData$: Observable<UomsData>;
@@ -40,7 +41,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
   allUomsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  //warning
+  catalogIcon: string = "deliverytruck";  
 
   loading: boolean;
   onTopStatus: string;
@@ -75,11 +76,11 @@ export class CatalogUomsListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.UOMS_CATALOG,
+      ApplicationModules.MANUFACTURERS_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.UOMS_CATALOG,
+      ApplicationModules.MANUFACTURERS_CATALOG,
       true,
     );    
     // Observables
@@ -112,7 +113,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.UOMS_CATALOG) {
+        if (searchBox.from === ApplicationModules.MANUFACTURERS_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -128,7 +129,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.UOMS_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.MANUFACTURERS_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -139,7 +140,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.UOMS_CATALOG,
+      from: ApplicationModules.MANUFACTURERS_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -148,7 +149,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.UOMS_CATALOG,
+      ApplicationModules.MANUFACTURERS_CATALOG,
       false,
     );        
   }
@@ -166,11 +167,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
-          } else if (sortData.active === 'uom') {            
-            this.order = JSON.parse(`{ "data": { "uom": { "name": "${sortData.direction.toUpperCase()}" } } }`);
-          } else if (sortData.active === 'sigmaType') {            
-            this.order = JSON.parse(`{ "data": { "sigmaType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
-          } else {
+          }  else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
         }
@@ -198,10 +195,6 @@ export class CatalogUomsListComponent implements AfterViewInit {
       const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
-
-    // const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "data": { "uom": { "name": { "contains": "${this.filterByText}" } } } }, { "data": { "sigmaType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
-      // filter = JSON.parse(cadFilter);                  
-    // }
     this.uomsCatalogData = new MatTableDataSource<UomItem>(this.uomsData.items);
     this.uomsData$ = this._catalogsService.getUomsDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
@@ -212,22 +205,12 @@ export class CatalogUomsListComponent implements AfterViewInit {
           uomsPaginated: {
             ...data.uomsPaginated,
             items: data.uomsPaginated.items.map((item) => {
-              const extension = item.data.mainImageName ? item.data.mainImageName.split('.').pop() : '';          
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',
-                  uom: {
-                    ...item.data.uom,
-                    name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,
-                    isTranslated: item.data.uom?.translations?.length > 0 ? true : false,
-                  },
-                  sigmaType: {
-                    ...item.data.sigmaType,
-                    name: item.data.sigmaType?.translations.length > 0 ? item.data.sigmaType.translations[0].name : item.data.sigmaType?.name,
-                    isTranslated: item.data.sigmaType?.translations.length > 0 ? true : false,
-                  }
+                  
                 }
               }
             })          
@@ -263,7 +246,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.UOMS_CATALOG,
+          from: ApplicationModules.MANUFACTURERS_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -284,7 +267,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.UOMS_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.MANUFACTURERS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -304,6 +287,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allUomsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(uomsToCsv => {
+            
             const fileData$ = this._catalogsService.getAllCsvData$(uomsToCsv?.data?.exportUomsToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, uomsToCsv?.data?.exportUomsToCsv?.downloadFilename);
@@ -407,7 +391,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.uomsTableColumns = ['id', 'mainImagePath', 'name', 'uom', 'sigmaType', 'status', 'updatedAt'];
+    this.uomsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -432,11 +416,11 @@ export class CatalogUomsListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.UOMS_CATALOG,
+      ApplicationModules.MANUFACTURERS_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.UOMS_CATALOG,
+      ApplicationModules.MANUFACTURERS_CATALOG,
       loading,
     );         
   }
