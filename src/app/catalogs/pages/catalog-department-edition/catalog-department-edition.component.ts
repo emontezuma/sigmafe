@@ -65,7 +65,7 @@ export class CatalogDepartmentEditionComponent {
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
-  storedTranslations: [];
+  storedTranslations: [] = [];
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false

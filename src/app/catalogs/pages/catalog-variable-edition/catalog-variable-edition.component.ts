@@ -100,7 +100,7 @@ export class CatalogVariableEditionComponent {
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
-  storedTranslations: [];
+  storedTranslations: [] = [];
   translationChanged: boolean = false
   imageChanged: boolean = false
   submitControlled: boolean = false

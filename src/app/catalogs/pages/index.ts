@@ -49,4 +49,7 @@ export * from './catalog-shift-edition';
 export * from './catalog-workgroups-list';
 export * from './catalog-workgroup-edition';
 
+export * from './catalog-checklist-plans-list';
+// export * from './catalog-checklist-plans-edition'
+
 export * from './catalogs-home';

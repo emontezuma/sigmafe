@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogGenericsListComponent, CatalogGenericEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogGenericsListComponent, CatalogGenericEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent, CatalogChecklistPlansListComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -106,6 +106,11 @@ const routes: Routes = [
         path: 'checklist-templates',
         component: CatalogChecklistTemplatesListComponent,
         data: { animation: 'CatalogChecklistTemplatesListComponent' },
+      },
+      {
+        path: 'checklist-plans',
+        component: CatalogChecklistPlansListComponent,
+        data: { animation: 'CatalogChecklistPlansListComponent' },
       },
       {
         path: 'checklist-templates/create',

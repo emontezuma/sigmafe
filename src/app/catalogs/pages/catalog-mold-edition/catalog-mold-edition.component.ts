@@ -106,7 +106,7 @@ export class CatalogMoldEditionComponent {
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   orderMaintenance: any = JSON.parse(`{ "data": { "id": "${'DESC'}" } }`);
   macrosValuesOrder: any = JSON.parse(`{ "id": "${'ASC'}" }`);
-  storedTranslations: [];
+  storedTranslations: [] = [];
   translationChanged: boolean = false;
   pendingRecord: boolean = false;
   imageChanged: boolean = false;
