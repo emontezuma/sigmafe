@@ -1575,7 +1575,8 @@ export class CatalogMoldEditionComponent {
       filter, 
       order: this.order
     }    
-    const variables = this._sharedService.setGraphqlGen(moldParameters);     
+    const variables = this._sharedService.setGraphqlGen(moldParameters); 
+    console.log(variables)
     this.equipments$ = this._catalogsService.getEquipmentsLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                

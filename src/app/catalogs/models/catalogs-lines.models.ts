@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface LinesData {
   linesPaginated?: Lines;
@@ -30,9 +30,12 @@ export interface LineDetail {
   mainImagePath?: string;
   mainImageName?: string;
   mainImage?: string;
+  plant?: GeneralCatalogInternalData,
+
   id?: number;
   customerId?: number;
   plantId?: number;
+
   status?: string;
   createdById?: any;
   createdAt?: string;
@@ -44,7 +47,6 @@ export interface LineDetail {
   updatedBy?: any;
   createdBy?: any;
   translations?: GeneralTranslation[];  
-  
 }
 
 export interface LinesState {
@@ -70,6 +72,7 @@ export const emptyLineCatalog = {
   data: {
     id: null,
     customerId: null,
+
     plantId:null,
     name: null,
     mainImagePath: null,    
@@ -83,7 +86,9 @@ export const emptyLineItem: LineDetail = {
   name: null,
   id: null,
   customerId: null,
-  plantId:null,
+  plantId: null,
+
+   
   mainImagePath: null,    
   prefix: null,
   status: null,

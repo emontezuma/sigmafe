@@ -12,11 +12,15 @@
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="plants$ | async "></ng-container>  
+
+  <ng-container *ngIf="recipients$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updatePosition$ | async "></ng-container>
   <ng-container *ngIf="updatePositionCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deletePositionTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addPositionTranslations$ | async "></ng-container>   
+ 
 
   <mat-card class="card">
     <form
@@ -130,71 +134,76 @@
                   >Notas referentes a la posicion</span
                 >
               </app-area-field>              
-            </div>                     
-            <div class="field-items">
-              <fieldset class="field__container">
-                <div class="image-and-field">
-                  <div class="field-components">
-                    <span class="label field__label">Imagen a mostrar</span>                
-                    <mat-form-field appearance="fill" class="field__field">
-                      <input
-                        class="field__input"
-                        matInput
-                        [formControl]="positionForm.controls.mainImageName"                        
-                        [readonly]="true"
-                      />
-                      <input type="file" style="display: none" (change)="onFileSelected($event)" accept=".png,.jpg,.jpeg,.svg,.bmp" #fileInput> 
-                      <button
-                        matSuffix
-                        mat-icon-button
-                        (click)="fileInput.click()"
-                        style="margin-right: 5px;"
-                        matTooltip="Abre la ventana de dialogo para buscar un archivo tipo imagen"
-                        matTooltipClass="tooltip-general"
-                        matTooltipShowDelay="100"
-                      >
-                        <mat-icon>search</mat-icon>
-                      </button>
-                      <button
-                        *ngIf="position.mainImage"
-                        matSuffix
-                        mat-icon-button
-                        (click)="removeImage()"
-                        style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen de la posicion"
-                        matTooltipClass="tooltip-general"
-                        matTooltipShowDelay="100"
-                      >
-                        <mat-icon>close</mat-icon>
-                      </button>
-                    </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta posicion</span>
-                  </div>                  
-                  <div *ngIf="!loading" class="card-image">
-                    <div
-                      class="image-container"
-                      *ngIf="this.position.mainImage"
-                    >
-                      <img                
-                        @dissolve
-                        appImageNotFound                
-                        class="mold-image"                        
-                        [src]="this.position.mainImage"
-                        [alt]="this.position.mainImage"            
-                        fill
-                      >      
-                    </div>
-                    <div
-                      *ngIf="!this.position.mainImage"
-                      class="icon-container"
-                    >
-                      <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
-                    </div>    
-                  </div>
-                </div>                
-              </fieldset>              
             </div>
-                   
+         
+         
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    positionForm.controls.plant.touched &&
+                    !positionForm.controls.plant.valid
+                }"
+                [disabled]="positionForm.controls.plant.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Planta de la posicion</span>
+                  <span class="field__label" *ngIf="positionForm.controls.plant?.value?.id">Id: {{ positionForm.controls.plant?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='plant'"
+                  [formField]="positionForm.controls.plant"
+                  [list]="plants.items"
+                  [totalCount]="plants.totalCount"
+                  leftHint="Escriba el nombre de la Planta a buscar"
+                  [catalog]="SystemTables.PLANTS"
+                  [loading]="plants.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la planta</span
+                >
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    positionForm.controls.recipient.touched &&
+                    !positionForm.controls.recipient.valid
+                }"               
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Recipiente asociado a la posicion</span>
+                  <span class="field__label" *ngIf="positionForm.controls.recipient?.value?.id">Id: {{ positionForm.controls.recipient?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='recipient'"
+                  [formField]="positionForm.controls.recipient"
+                  [list]="recipients.items"
+                  [totalCount]="recipients.totalCount"
+                  leftHint="Escriba el Nombre del recipiente a buscar"
+                  [catalog]="SystemTables.RECIPIENTS"
+                  [loading]="recipients.loading"
+                  noItemsError="No hay recipientes con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Recipiente a notificar</span
+                >
+              </fieldset>
+            </div>
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>

@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralCatalogParams } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,11 +13,14 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { PositionDetail, PositionItem,  emptyPositionItem } from '../../models';
+
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
+import { emptyPositionItem, PositionDetail, PositionItem } from '../../models';
 
 @Component({
   selector: 'app-catalog-position-edition',
@@ -32,11 +35,16 @@ export class CatalogPositionEditionComponent {
 
   // Positions ===============
   position: PositionDetail = emptyPositionItem;
-  scroll$: Observable<any>;
+  scroll$: Observable<any>;;
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
 
-  valueTypeChanges$: Observable<any>;
+  plants$: Observable<any>; 
+  plants: GeneralCatalogData = emptyGeneralCatalogData; 
+
+  recipients$: Observable<any>; 
+
+  recipients: GeneralCatalogData = emptyGeneralCatalogData; 
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -52,13 +60,14 @@ export class CatalogPositionEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "construction_worker";  
+  catalogIcon: string = "organizational_chart";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
+  
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   storedTranslations: [] = [];
   translationChanged: boolean = false
-  imageChanged: boolean = false
+
   submitControlled: boolean = false
   loading: boolean;
   elements: ToolbarElement[] = [];  
@@ -77,9 +86,12 @@ export class CatalogPositionEditionComponent {
       Validators.required,      
     ),   
     notes: new FormControl(''),
-    mainImageName: new FormControl(''),    
+  
     reference: new FormControl(''),    
-    prefix: new FormControl(''),       
+    prefix: new FormControl(''), 
+    plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+    recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+   
   });
 
   pageInfo: PageInfo = {
@@ -93,7 +105,6 @@ export class CatalogPositionEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
-
   
   constructor(
     private _store: Store<AppState>,
@@ -251,6 +262,7 @@ export class CatalogPositionEditionComponent {
       } else if (action.action === ButtonActions.COPY) {               
         this.elements.find(e => e.action === action.action).loading = true;
         this.initUniqueField();
+      
         this._location.replaceState('/catalogs/positions/create');
         this.focusThisField = 'name';
         setTimeout(() => {
@@ -321,7 +333,7 @@ export class CatalogPositionEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará la posicion con el Id <strong>${this.position.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará La posicion con el Id <strong>${this.position.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -339,7 +351,7 @@ export class CatalogPositionEditionComponent {
                 id: this.position.id,
                 customerId: this.position.customerId,
                 recipientId: this.position.recipientId,
-
+                     
                 plantId: this.position.plantId,
                 status: RecordStatus.INACTIVE,
               }
@@ -412,7 +424,7 @@ export class CatalogPositionEditionComponent {
                 id: this.position.id,
                 customerId: this.position.customerId,
                 recipientId: this.position.recipientId,
-   
+              
                 plantId: this.position.plantId,
                 status: RecordStatus.ACTIVE,
               }
@@ -447,7 +459,7 @@ export class CatalogPositionEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones de la posicion <strong>${this.position.id}</strong>`,
+              title: $localize`Traducciones de la Posicion <strong>${this.position.id}</strong>`,
               topIcon: 'world',
               translations: this.position.translations,
               buttons: [{
@@ -491,7 +503,7 @@ export class CatalogPositionEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la posicion ${this.position.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará a la Posicion ${this.position.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -516,7 +528,7 @@ export class CatalogPositionEditionComponent {
     this.elements = [{
       type: 'button',
       caption: $localize`Regresar...`,
-      tooltip:  $localize`Regresar a la lista de posiciones`,
+      tooltip:  $localize`Regresar a la lista de departamentos`,
       icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
@@ -741,8 +753,11 @@ export class CatalogPositionEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.position.id || this.position.id === null || this.position.id === 0;
+
     try {
       const dataToSave = this.prepareRecordToSave(newRecord);
+
+      console.log(dataToSave)
       this.updatePositionCatalog$ = this._catalogsService.updatePositionCatalog$(dataToSave)
       .pipe(
         tap((data: any) => {
@@ -753,7 +768,7 @@ export class CatalogPositionEditionComponent {
               setTimeout(() => {              
                 let message = $localize`La posicion ha sido actualizado`;
                 if (newRecord) {                
-                  message = $localize`La posicion ha sido creado satisfactoriamente con el id <strong>${positionId}</strong>`;
+                  message = $localize`La posicion ha sido creado satisfactoriamente con el id <strong>${this.position.id}</strong>`;
                   this._location.replaceState(`/catalogs/positions/edit/${positionId}`);
                 }
                 this._sharedService.showSnackMessage({
@@ -778,8 +793,7 @@ export class CatalogPositionEditionComponent {
       }); 
       this.setViewLoading(false);
       this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
-    }   
-    
+    }
   }
 
   requestPositionData(positionId: number): void { 
@@ -808,7 +822,7 @@ export class CatalogPositionEditionComponent {
         if (!positionData) return;
         this.position =  positionData;
         this.translationChanged = false;
-        this.imageChanged = false;
+
         this.storedTranslations = JSON.parse(JSON.stringify(this.position.translations));
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.position.translations.length > 0 ? $localize`Traducciones (${this.position.translations.length})` : $localize`Traducciones`;
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.position.translations.length > 0 ? 'accent' : '';   
@@ -831,32 +845,7 @@ export class CatalogPositionEditionComponent {
     ); 
   }  
 
-  onFileSelected(event: any) {
-    const fd = new FormData();
-    fd.append('image', event.target.files[0], event.target.files[0].name);
-
-    const uploadUrl = `${environment.apiUploadUrl}`;
-    const params = new HttpParams()
-    .set('destFolder', `${environment.uploadFolders.catalogs}/positions`)
-    .set('processId', this.position.id)
-    .set('process', originProcess.CATALOGS_MOLDS);
-    this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
-      if (res) {
-        this.imageChanged = true;
-        this.positionForm.controls.mainImageName.setValue(res.fileName);
-        this.position.mainImagePath = res.filePath;
-        this.position.mainImageGuid = res.fileGuid;
-        this.position.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la posicion para aplicar el cambio`;
-        this._sharedService.showSnackMessage({
-          message,
-          duration: 5000,
-          snackClass: 'snack-primary',
-          icon: 'check',
-        });
-        this.setEditionButtonsState();      }      
-    });
-  }
+ 
 
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
@@ -911,31 +900,30 @@ export class CatalogPositionEditionComponent {
     this.positionForm.patchValue({
       name: this.position.name,
       reference: this.position.reference,      
-      mainImageName: this.position.mainImageName,
+
       prefix: this.position.prefix,      
       notes: this.position.notes,      
-
+      plant: this.position.plant,
+      recipient: this.position.recipient,
+    
     });
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
     const fc = this.positionForm.controls;
     return  {
-        id: this.position.id,
-      customerId: 1, // TODO: Get from profile
-      recipientId: 1, // TODO: Get from profile
-
-      plantId: 1, // TODO: Get from profile
+      id: this.position.id,
+      customerId: 1, // TODO: Get from profile      
         status: newRecord ? RecordStatus.ACTIVE : this.position.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
+      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value ? fc.plant.value.id : null },      
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id  : null},      
+      
 
-      ...(this.imageChanged) && { 
-        mainImageName: fc.mainImageName.value,
-        mainImagePath: this.position.mainImagePath,
-        mainImageGuid: this.position.mainImageGuid, },
+ 
     }
   }
 
@@ -947,21 +935,7 @@ export class CatalogPositionEditionComponent {
     }
   }
   
-  removeImage() {
-    this.imageChanged = true;
-    this.positionForm.controls.mainImageName.setValue('');
-    this.position.mainImagePath = '';
-    this.position.mainImageGuid = '';
-    this.position.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la posicion<br>Guarde la posicion para aplicar el cambio`;
-    this._sharedService.showSnackMessage({
-      message,
-      duration: 5000,
-      snackClass: 'snack-primary',
-      icon: 'check',
-    });
-    this.setEditionButtonsState();    
-  }
+ 
 
   initForm(): void {
     this.positionForm.reset();
@@ -1006,8 +980,12 @@ export class CatalogPositionEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la posicion`
-    }
+      return $localize`Descripción o nombre de la Posicion`    
+    } else if (fieldControlName === 'plant') {
+      return $localize`Planta asociada a la Posicion`;
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente asociado a la Posicion`;
+    } 
     return '';
   }
 
@@ -1024,8 +1002,19 @@ export class CatalogPositionEditionComponent {
   }
 
   validateTables(): void {
-
-    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+    if (!this.positionForm.controls.plant.value || !this.positionForm.controls.plant.value.id) {
+      this.positionForm.controls.plant.setErrors({ required: true });   
+    } else if (this.positionForm.controls.plant.value.status === RecordStatus.INACTIVE) {
+      this.positionForm.controls.plant.setErrors({ inactive: true });   
+    } else {
+      this.positionForm.controls.plant.setErrors(null);   
+    }
+    if (this.positionForm.controls.recipient.value && this.positionForm.controls.recipient.value && this.positionForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+      this.positionForm.controls.recipient.setErrors({ inactive: true });   
+    } else {
+      this.positionForm.controls.recipient.setErrors(null);   
+    }   
+    
   }
 
   processTranslations$(positionId: number): Observable<any> { 
@@ -1047,10 +1036,8 @@ export class CatalogPositionEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-        customerId: 1, // TODO: Get from profile
-        recipientId: 1, // TODO: Get from profile
-       
-        plantId: 1, // TODO: Get from profile
+        customerId: 1, // TODO: Get from profile        
+        plantId: this.position.plantId, // TODO: Get from profile
       }      
       const translationsToAdd = this.position.translations.map((t: any) => {
         return {
@@ -1060,10 +1047,7 @@ export class CatalogPositionEditionComponent {
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-          customerId: 1, // TODO: Get from profile
-          recipientId: 1, // TODO: Get from profile
-
-          plantId: 1, // TODO: Get from profile
+          plantId: this.position.plantId, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });
@@ -1080,6 +1064,132 @@ export class CatalogPositionEditionComponent {
     }
     
   }
+
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+
+
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+    if (getMoreDataParams.catalogName === SystemTables.PLANTS) {
+      if (getMoreDataParams.initArray) {
+        this.plants.currentPage = 0;
+        this.plants.items = [];
+      } else if (!this.plants.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.plants.currentPage++;
+      }
+      this.requestPlantsData(        
+        this.plants.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    } else if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    }
+  }
+
+  requestPlantsData(currentPage: number, filterStr: string = null) {    
+    this.plants = {
+      ...this.plants,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }      
+    const skipRecords = this.plants.items.length;
+
+    const plantParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(plantParameters);
+    this.plants$ = this._catalogsService.getPlantsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {
+        const mappedItems = data?.data?.plantsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        });
+        this.plants = {
+          ...this.plants,
+          loading: false,
+          pageInfo: data?.data?.plantsPaginated?.pageInfo,
+          items: this.plants.items?.concat(mappedItems),
+          totalCount: data?.data?.plantsPaginated?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+
 
   get SystemTables () {
     return SystemTables;

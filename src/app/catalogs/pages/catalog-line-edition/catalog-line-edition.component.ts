@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralCatalogParams } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,11 +13,13 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import {  LineDetail, LineItem,    emptyLineItem } from '../../models';
+import { LineDetail, LineItem, emptyLineItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-line-edition',
@@ -32,11 +34,17 @@ export class CatalogLineEditionComponent {
 
   // Lines ===============
   line: LineDetail = emptyLineItem;
-  scroll$: Observable<any>;;
+  scroll$: Observable<any>;JSON: any;
+;
   showGoTop$: Observable<GoTopButtonStatus>;
-  settingsData$: Observable<SettingsData>; 
-
+  settingsData$: Observable<SettingsData>;
+  duplicateMainImage$: Observable<any>; 
   valueTypeChanges$: Observable<any>;
+
+  plants$: Observable<any>; 
+  plants: GeneralCatalogData = emptyGeneralCatalogData; 
+ 
+  
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -47,15 +55,15 @@ export class CatalogLineEditionComponent {
   updateLineCatalog$: Observable<any>;
   deleteLineTranslations$: Observable<any>;  
   addLineTranslations$: Observable<any>;  
-  duplicateMainImage$: Observable<any>;  
   
   lineFormChangesSubscription: Subscription;
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "server";  
+  catalogIcon: string = "organizational_chart";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
+
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
   storedTranslations: [] = [];
   translationChanged: boolean = false
@@ -80,7 +88,10 @@ export class CatalogLineEditionComponent {
     notes: new FormControl(''),
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
-    prefix: new FormControl(''),       
+    prefix: new FormControl(''), 
+    plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
+       
+    
   });
 
   pageInfo: PageInfo = {
@@ -94,7 +105,6 @@ export class CatalogLineEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
-
   
   constructor(
     private _store: Store<AppState>,
@@ -340,6 +350,7 @@ export class CatalogLineEditionComponent {
                 settingType: 'status',
                 id: this.line.id,
                 customerId: this.line.customerId,
+                              
                 plantId: this.line.plantId,
                 status: RecordStatus.INACTIVE,
               }
@@ -394,7 +405,7 @@ export class CatalogLineEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará la lines con el Id <strong>${this.line.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará la linea con el Id <strong>${this.line.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -411,6 +422,7 @@ export class CatalogLineEditionComponent {
                 settingType: 'status',
                 id: this.line.id,
                 customerId: this.line.customerId,
+                
                 plantId: this.line.plantId,
                 status: RecordStatus.ACTIVE,
               }
@@ -489,7 +501,7 @@ export class CatalogLineEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la linea ${this.line.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará a la linea ${this.line.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -739,6 +751,7 @@ export class CatalogLineEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.line.id || this.line.id === null || this.line.id === 0;
+
     try {
       const dataToSave = this.prepareRecordToSave(newRecord);
       this.updateLineCatalog$ = this._catalogsService.updateLineCatalog$(dataToSave)
@@ -804,6 +817,7 @@ export class CatalogLineEditionComponent {
       tap((lineData: LineDetail) => {
         if (!lineData) return;
         this.line =  lineData;
+        console.log(lineData)
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.line.translations));
@@ -826,7 +840,13 @@ export class CatalogLineEditionComponent {
         return EMPTY;
       })      
     ); 
+
+    
   }  
+
+  algo(ev) {
+  console.log(JSON.stringify(ev))
+}
 
   onFileSelected(event: any) {
     const fd = new FormData();
@@ -836,15 +856,15 @@ export class CatalogLineEditionComponent {
     const params = new HttpParams()
     .set('destFolder', `${environment.uploadFolders.catalogs}/lines`)
     .set('processId', this.line.id)
-    .set('process', originProcess.CATALOGS_LINES);
+    .set('process', originProcess.CATALOGS_MOLDS);
     this.uploadFiles = this._http.post(uploadUrl, fd, { params }).subscribe((res: any) => {
       if (res) {
         this.imageChanged = true;
         this.lineForm.controls.mainImageName.setValue(res.fileName);
         this.line.mainImagePath = res.filePath;
         this.line.mainImageGuid = res.fileGuid;
-        this.line.mainImage = environment.serverUrl + '/' + res.filePath.replace(res.fileName, `${res.fileGuid}${res.fileExtension}`)                
-        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la linea para aplicar el cambio`;
+        this.line.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde La linea para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
           duration: 5000,
@@ -911,21 +931,24 @@ export class CatalogLineEditionComponent {
       mainImageName: this.line.mainImageName,
       prefix: this.line.prefix,      
       notes: this.line.notes,      
-
+      plant: this.line.plant,
+      
     });
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
     const fc = this.lineForm.controls;
     return  {
-        id: this.line.id,
-      customerId: 1, // TODO: Get from profile
-      plantId: 1, // TODO: Get from profile
+      id: this.line.id,
+      customerId: 1, // TODO: Get from profile      
         status: newRecord ? RecordStatus.ACTIVE : this.line.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
+      ...(fc.plant.dirty || fc.plant.touched || newRecord) && { plantId: fc.plant.value ? fc.plant.value.id : null },      
+      
+      
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
@@ -948,7 +971,7 @@ export class CatalogLineEditionComponent {
     this.line.mainImagePath = '';
     this.line.mainImageGuid = '';
     this.line.mainImage = '';     
-    const message = $localize`Se ha quitado la imagen de la linea<br>Guarde la linea para aplicar el cambio`;
+    const message = $localize`Se ha quitado la imagen de la linea<br>Guarde La linea para aplicar el cambio`;
     this._sharedService.showSnackMessage({
       message,
       duration: 5000,
@@ -1001,8 +1024,10 @@ export class CatalogLineEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la linea`
-    }
+      return $localize`Descripción o nombre de la linea`    
+    } else if (fieldControlName === 'plant') {
+      return $localize`Planta asociada a la linea`;
+    }   
     return '';
   }
 
@@ -1019,8 +1044,14 @@ export class CatalogLineEditionComponent {
   }
 
   validateTables(): void {
-
-    // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
+    if (!this.lineForm.controls.plant.value || !this.lineForm.controls.plant.value.id) {
+      this.lineForm.controls.plant.setErrors({ required: true });   
+    } else if (this.lineForm.controls.plant.value.status === RecordStatus.INACTIVE) {
+      this.lineForm.controls.plant.setErrors({ inactive: true });   
+    } else {
+      this.lineForm.controls.plant.setErrors(null);   
+    }
+   
   }
 
   processTranslations$(lineId: number): Observable<any> { 
@@ -1042,8 +1073,8 @@ export class CatalogLineEditionComponent {
       });
       const varToDelete = {
         ids: translationsToDelete,
-        customerId: 1, // TODO: Get from profile
-        plantId: 1, // TODO: Get from profile
+        customerId: 1, // TODO: Get from profile        
+        plantId: this.line.plantId, // TODO: Get from profile
       }      
       const translationsToAdd = this.line.translations.map((t: any) => {
         return {
@@ -1053,8 +1084,7 @@ export class CatalogLineEditionComponent {
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-          customerId: 1, // TODO: Get from profile
-          plantId: 1, // TODO: Get from profile
+          plantId: this.line.plantId, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });
@@ -1073,7 +1103,7 @@ export class CatalogLineEditionComponent {
   }
 
   duplicateMainImage() {    
-    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_LINES, this.line.mainImageGuid)
+    this.duplicateMainImage$ = this._catalogsService.duplicateMainImage$(originProcess.CATALOGS_VARIABLES, this.line.mainImageGuid)
     .pipe(
       tap((newAttachments) => {
         if (newAttachments.duplicated) {       
@@ -1087,6 +1117,69 @@ export class CatalogLineEditionComponent {
         }        
       })
     );
+  }
+ 
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+    if (getMoreDataParams.catalogName === SystemTables.PLANTS) {
+      if (getMoreDataParams.initArray) {
+        this.plants.currentPage = 0;
+        this.plants.items = [];
+      } else if (!this.plants.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.plants.currentPage++;
+      }
+      this.requestPlantsData(        
+        this.plants.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    } 
+  }
+
+  requestPlantsData(currentPage: number, filterStr: string = null) {    
+    this.plants = {
+      ...this.plants,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);   
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }      
+    const skipRecords = this.plants.items.length;
+
+    const plantParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(plantParameters);
+    this.plants$ = this._catalogsService.getPlantsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {
+        const mappedItems = data?.data?.plantsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        });
+        this.plants = {
+          ...this.plants,
+          loading: false,
+          pageInfo: data?.data?.plantsPaginated?.pageInfo,
+          items: this.plants.items?.concat(mappedItems),
+          totalCount: data?.data?.plantsPaginated?.totalCount,
+        }        
+      }),
+      catchError(() => EMPTY)
+    )    
   }
 
   get SystemTables () {

@@ -6,19 +6,16 @@
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
-  <ng-container *ngIf="manufacturer$ | async"></ng-container>  
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
   <ng-container *ngIf="settingsData$ | async"></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
-  <ng-container *ngIf="updateManufacturer$ | async "></ng-container>    
-  <ng-container *ngIf="deleteManufacturerTranslations$ | async "></ng-container>      
-  <ng-container *ngIf="addManufacturerTranslations$ | async "></ng-container>   
-  <ng-container *ngIf="updateManufacturerCatalog$ | async "></ng-container>   
-  <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>   
-  
+  <ng-container *ngIf="updateManufacturerCatalog$ | async "></ng-container>  
+  <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
+  <ng-container *ngIf="manufacturer$ | async "></ng-container>       
+
   <mat-card class="card">
     <form
         class="layout"
@@ -45,7 +42,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DEL FABRICANTE</label
+                >INFORMACIÓN PRINCIPAL DE LA FABRICA</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -76,11 +73,11 @@
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn_line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado al fabricante"
+                fieldHelp="Especifique el nombre asignado a la fabrica"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre del fabricante</span
+                  >Descripción/Nombre de la fabrica</span
                 >
               </app-input-field>
             </div>
@@ -93,11 +90,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación del fabricante"
+                fieldHelp="Especifique la abreviación de la fabrica"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación del fabricante</span
+                  >Abreviación de la fabrica</span
                 >
               </app-input-field>
             </div>
@@ -109,7 +106,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia del fabricante"
+                fieldHelp="Especifique la referencia de la fabrica"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -125,13 +122,13 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a este fabricante"
+                fieldHelp="Especifique las notas referentes a esta fabrica"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes al fabricante</span
+                  >Notas referentes a la fabrica</span
                 >
               </app-area-field>              
-            </div>                     
+            </div>  
             <div class="field-items">
               <fieldset class="field__container">
                 <div class="image-and-field">
@@ -162,14 +159,14 @@
                         mat-icon-button
                         (click)="removeImage()"
                         style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen del fabricante"
+                        matTooltip="Remueve la imagen de la fabrica"
                         matTooltipClass="tooltip-general"
                         matTooltipShowDelay="100"
                       >
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este fabricante</span>
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta fabrica</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
@@ -194,46 +191,8 @@
                   </div>
                 </div>                
               </fieldset>              
-            </div>
-                      
+            </div>  
           </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DEL FABRICANTE</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
-              >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
-            </div>
-          </mat-expansion-panel-header>
-         
-          
         </mat-expansion-panel>        
       </mat-accordion>
     </form>

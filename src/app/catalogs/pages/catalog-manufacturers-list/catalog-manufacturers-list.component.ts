@@ -28,7 +28,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Manufacturers ===============
-  manufacturersTableColumns: string[] = ['id', 'name', 'status', 'updatedAt'];
+  manufacturersTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   manufacturersCatalogData = new MatTableDataSource<ManufacturerItem>([]);      
   
   manufacturersData$: Observable<ManufacturersData>;
@@ -41,7 +41,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
   allManufacturersToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "deliverytruck";  
 
   loading: boolean;
   onTopStatus: string;
@@ -167,7 +167,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
-          } else {
+          }  else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
         }
@@ -205,12 +205,12 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
           manufacturersPaginated: {
             ...data.manufacturersPaginated,
             items: data.manufacturersPaginated.items.map((item) => {
-                       
+              
               return {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -219,9 +219,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
       }),
       tap( manufacturersData => {        
         this.setPaginator(manufacturersData.manufacturersPaginated.totalCount);
-
         this.manufacturersData = JSON.parse(JSON.stringify(manufacturersData.manufacturersPaginated));
-
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
@@ -289,6 +287,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allManufacturersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(manufacturersToCsv => {
+            
             const fileData$ = this._catalogsService.getAllCsvData$(manufacturersToCsv?.data?.exportManufacturersToCsv?.exportedFilename)
             .subscribe(data => { 
               this.downloadFile(data, manufacturersToCsv?.data?.exportManufacturersToCsv?.downloadFilename);
@@ -392,7 +391,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.manufacturersTableColumns = ['id', 'name',  'status', 'updatedAt'];
+    this.manufacturersTableColumns = ['id',  'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

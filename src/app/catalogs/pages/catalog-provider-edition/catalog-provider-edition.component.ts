@@ -740,6 +740,8 @@ export class CatalogProviderEditionComponent {
     const newRecord = !this.provider.id || this.provider.id === null || this.provider.id === 0;
     try {
       const dataToSave = this.prepareRecordToSave(newRecord);
+      console.log(dataToSave)
+      
       this.updateProviderCatalog$ = this._catalogsService.updateProviderCatalog$(dataToSave)
       .pipe(
         tap((data: any) => {
@@ -918,6 +920,7 @@ requestProviderData(providerId: number): void {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.provider.mainImagePath,

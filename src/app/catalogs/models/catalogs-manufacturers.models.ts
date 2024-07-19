@@ -1,4 +1,4 @@
-import {  GeneralTranslation,  PageInfo} from 'src/app/shared/models';
+import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface ManufacturersData {
   manufacturersPaginated?: Manufacturers;
@@ -31,6 +31,7 @@ export interface ManufacturerDetail {
   mainImageName?: string;
   mainImage?: string;
   id?: number;
+  customerId?: number;
   status?: string;
   createdById?: any;
   createdAt?: string;
@@ -42,7 +43,8 @@ export interface ManufacturerDetail {
   updatedBy?: any;
   createdBy?: any;
 
-  translations?: GeneralTranslation[];
+  translations?: GeneralTranslation[];  
+  
 }
 
 export interface ManufacturersState {
@@ -51,6 +53,7 @@ export interface ManufacturersState {
 }
 
 export interface ManufacturerState {
+  
   loading: boolean;
   moldDetail: ManufacturerDetail;
 }
@@ -58,28 +61,35 @@ export interface ManufacturerState {
 export interface ManufacturerCatalog {
   id: string;
   name: string;
+
+
   status: string;
   updatedAt: string;
 }
 
-export const emptyManufacturerCatalog = {
+
+
+export const emptyManufacturerCatalog = {  
   friendlyStatus: null,
   data: {
     id: null,
+    customerId: null,
     name: null,
+   
     updatedBy: null,
     status: null,
     updatedAt: null,
   },
 };
 
-export const emptyManufacturerItem: ManufacturerDetail = {
+export const emptyManufacturerItem: ManufacturerDetail = {  
   name: null,
   id: null,
-  mainImageGuid: null,
-  mainImagePath: null,
-  mainImage: null,
+  mainImagePath: null,    
+  mainImageGuid: null,  
   mainImageName: null,
+  mainImage: null,
+  customerId: null,
   prefix: null,
   status: null,
   createdById: null,
@@ -91,5 +101,6 @@ export const emptyManufacturerItem: ManufacturerDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
+
   translations: [],
 };

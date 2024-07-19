@@ -12,13 +12,15 @@
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
   <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="plants$ | async "></ng-container>  
+  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateLine$ | async "></ng-container>
   <ng-container *ngIf="updateLineCatalog$ | async "></ng-container>      
   <ng-container *ngIf="deleteLineTranslations$ | async "></ng-container>      
   <ng-container *ngIf="addLineTranslations$ | async "></ng-container>   
   <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
-
+  
   <mat-card class="card">
     <form
         class="layout"
@@ -80,7 +82,7 @@
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre de la linea</span
+                  >Descripción/Nombre de la linea  </span
                 >
               </app-input-field>
             </div>
@@ -131,7 +133,7 @@
                   >Notas referentes a la linea</span
                 >
               </app-area-field>              
-            </div>                     
+            </div>
             <div class="field-items">
               <fieldset class="field__container">
                 <div class="image-and-field">
@@ -195,7 +197,44 @@
                 </div>                
               </fieldset>              
             </div>
-                   
+         
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    lineForm.controls.plant.touched &&
+                    !lineForm.controls.plant.valid
+                }"
+                [disabled]="lineForm.controls.plant.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Planta de la linea</span>
+                  <span class="field__label" *ngIf="lineForm.controls.plant?.value?.id">Id: {{ lineForm.controls.plant?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='plant'"
+                  [formField]="lineForm.controls.plant"
+                  [list]="plants.items"
+                  [totalCount]="plants.totalCount"
+                  leftHint="Escriba el nombre de la Planta a buscar"
+                  [catalog]="SystemTables.PLANTS"
+                  [loading]="plants.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre de la planta</span
+                >
+              </fieldset>
+            </div>
+
+           
+           
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>

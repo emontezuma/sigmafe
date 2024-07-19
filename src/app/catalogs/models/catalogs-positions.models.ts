@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface PositionsData {
   positionsPaginated?: Positions;
@@ -26,10 +26,12 @@ export interface PositionDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
-  mainImageGuid?: string;
-  mainImagePath?: string;
-  mainImageName?: string;
-  mainImage?: string;
+
+  imagePath?: string;
+
+  plant?: GeneralCatalogInternalData,
+  recipient?: GeneralCatalogInternalData,
+
   id?: number;
   customerId?: number;
   plantId?: number;
@@ -46,7 +48,6 @@ export interface PositionDetail {
   updatedBy?: any;
   createdBy?: any;
   translations?: GeneralTranslation[];  
-  
 }
 
 export interface PositionsState {
@@ -62,7 +63,7 @@ export interface PositionState {
 export interface PositionCatalog {
   id: string;
   name: string;
-  mainImagePath: string;
+  imagePath: string;
   status: string;
   updatedAt: string;
 }
@@ -76,7 +77,7 @@ export const emptyPositionCatalog = {
 
     plantId:null,
     name: null,
-    mainImagePath: null,    
+    imagePath: null,    
     updatedBy: null,
     status: null,
     updatedAt: null,
@@ -90,7 +91,9 @@ export const emptyPositionItem: PositionDetail = {
   plantId: null,
   recipientId: null,
 
-  mainImagePath: null,    
+imagePath: null,    
+
+
   prefix: null,
   status: null,
   createdById: null,
