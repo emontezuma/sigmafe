@@ -321,6 +321,10 @@ export class IconsModule {
       'deliverytruck',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/deliverytruck.svg`)
     );
+    iconRegistry.addSvgIcon(
+      'status_report2',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/status_report2.svg`)
+    );
   }
   
 }

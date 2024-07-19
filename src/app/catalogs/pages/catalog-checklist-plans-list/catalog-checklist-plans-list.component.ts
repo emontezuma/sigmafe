@@ -39,7 +39,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   allChecklistTemplatesToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "brochure";  
+  catalogIcon: string = "status_report2";  
 
   loading: boolean;
   onTopStatus: string;
