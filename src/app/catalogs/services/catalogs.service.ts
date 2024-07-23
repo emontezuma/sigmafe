@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { BehaviorSubject, Observable, combineLatest, map, of, tap } from 'rxjs';
-import { GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPSERT_MOLD, DELETE_MOLD_TRANSLATIONS, UPSERT_MOLD_TRANSLATIONS, UPSERT_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, UPSERT_VARIABLE_TRANSLATIONS, UPSERT_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, UPSERT_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, UPSERT_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPSERT_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, UPSERT_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPSERT_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPSERT_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, UPSERT_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, UPSERT_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPSERT_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, UPSERT_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPSERT_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPSERT_CHECKLIST_TEMPLATE, UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, UPSERT_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPSERT_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, UPSERT_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPSERT_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, UPSERT_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPSERT_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, UPSERT_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPSERT_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_CHECKLIST_TEMPLATE_DETAILS, GET_DEPARTMENTS, UPSERT_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, DELETE_DEPARTMENT_TRANSLATIONS, UPSERT_DEPARTMENT, INACTIVATE_DEPARTMENT, GET_GENERICS, UPSERT_GENERIC_TRANSLATIONS, GET_GENERIC, GET_GENERIC_TRANSLATIONS, UPSERT_GENERIC, DELETE_GENERIC_TRANSLATIONS, GET_SHIFTS, UPSERT_SHIFT_TRANSLATIONS, GET_SHIFT, GET_SHIFT_TRANSLATIONS, UPSERT_SHIFT, DELETE_SHIFT_TRANSLATIONS, INACTIVATE_SHIFT, UPSERT_CHECKLIST_TEMPLATE_DETAILS, DELETE_CHECKLIST_TEMPLATE_DETAILS, UPSERT_WORKGROUP } from 'src/app/graphql/graphql.queries';
-import { ChecklistTemplateDetail, ChecklistTemplateLine, ShiftDetail, } from '../models';
+import { GET_CATALOG_DETAILS_ACTION_PLANS_TO_GENERATE_LAZY_LOADING, INACTIVATE_VARIABLE, GET_PROVIDERS_LAZY_LOADING, GET_MANUFACTURERS_LAZY_LOADING, GET_GENERICS_LAZY_LOADING, GET_PART_NUMBERS_LAZY_LOADING, GET_LINES_LAZY_LOADING, GET_EQUIPMENTS_LAZY_LOADING, GET_MAINTENANCE_HISTORICAL_LAZY_LOADING, GET_ALL_MOLDS_TO_CSV, GET_MOLDS, GET_MOLD, GET_MOLD_TRANSLATIONS, INACTIVATE_MOLD, UPSERT_MOLD, DELETE_MOLD_TRANSLATIONS, UPSERT_MOLD_TRANSLATIONS, UPSERT_MAINTENANCE_HISTORY, DELETE_MAINTENANCE_HISTORY, GET_VARIABLES, UPSERT_VARIABLE_TRANSLATIONS, UPSERT_VARIABLE, DELETE_VARIABLE_TRANSLATIONS, GET_UOMS_LAZY_LOADING, GET_SIGMA_TYPES_LAZY_LOADING, GET_VARIABLE, GET_VARIABLE_TRANSLATIONS, GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING, DELETE_CATALOG_DETAILS, UPSERT_CATALOG_DETAILS, GET_SENSORS_LAZY_LOADING, GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING, GET_CUSTOMERS, GET_CUSTOMER, GET_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER_TRANSLATIONS, UPSERT_CUSTOMER, DELETE_CUSTOMER_TRANSLATIONS, GET_MANUFACTURERS, UPSERT_MANUFACTURER_TRANSLATIONS, GET_MANUFACTURER, GET_MANUFACTURER_TRANSLATIONS, UPSERT_MANUFACTURER, DELETE_MANUFACTURER_TRANSLATIONS, GET_PLANTS, UPSERT_PLANT_TRANSLATIONS, GET_PLANT, GET_PLANT_TRANSLATIONS, UPSERT_PLANT, DELETE_PLANT_TRANSLATIONS, DELETE_COMPANY_TRANSLATIONS, UPSERT_COMPANY, GET_COMPANY_TRANSLATIONS, GET_COMPANY, UPSERT_COMPANY_TRANSLATIONS, GET_COMPANIES, GET_PROVIDERS, UPSERT_PROVIDER_TRANSLATIONS, GET_PROVIDER, GET_PROVIDER_TRANSLATIONS, UPSERT_PROVIDER, DELETE_PROVIDER_TRANSLATIONS, INACTIVATE_CUSTOMER, INACTIVATE_COMPANY, GET_EQUIPMENTS, UPSERT_EQUIPMENT_TRANSLATIONS, GET_EQUIPMENT, GET_EQUIPMENT_TRANSLATIONS, UPSERT_EQUIPMENT, DELETE_EQUIPMENT_TRANSLATIONS, INACTIVATE_EQUIPMENT, GET_CHECKLIST_TEMPLATES, INACTIVATE_PLANT, GET_COMPANIES_LAZY_LOADING, GET_ALL_ATTACHMENTS, SAVE_ATTACHMENTS, DUPLICATE_ATTACHMENTS, INACTIVATE_CHECKLIST_TMEPLATE, UPSERT_CHECKLIST_TEMPLATE, UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS, DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_CHECKLIST_TEMPLATE, GET_CHECKLIST_TEMPLATE_TRANSLATIONS, GET_RECIPIENTS_LAZY_LOADING, GET_UOMS, UPSERT_UOM_TRANSLATIONS, GET_UOM, GET_UOM_TRANSLATIONS, UPSERT_UOM, DELETE_UOM_TRANSLATIONS, INACTIVATE_UOM, GET_POSITIONS, UPSERT_POSITION_TRANSLATIONS, GET_POSITION, GET_POSITION_TRANSLATIONS, UPSERT_POSITION, DELETE_POSITION_TRANSLATIONS, INACTIVATE_POSITION, GET_PART_NUMBERS, UPSERT_PART_NUMBER_TRANSLATIONS, GET_PART_NUMBER, GET_PART_NUMBER_TRANSLATIONS, UPSERT_PART_NUMBER, DELETE_PART_NUMBER_TRANSLATIONS, GET_LINES, UPSERT_LINE_TRANSLATIONS, GET_LINE, GET_LINE_TRANSLATIONS, UPSERT_LINE, DELETE_LINE_TRANSLATIONS, INACTIVATE_LINE, GET_PLANTS_LAZY_LOADING, GET_APPROVERS_LAZY_LOADING, GET_VARIABLES_LAZY_LOADING, GET_CHECKLIST_TEMPLATE_DETAILS, GET_DEPARTMENTS, UPSERT_DEPARTMENT_TRANSLATIONS, GET_DEPARTMENT, GET_DEPARTMENT_TRANSLATIONS, DELETE_DEPARTMENT_TRANSLATIONS, UPSERT_DEPARTMENT, INACTIVATE_DEPARTMENT, GET_GENERICS, UPSERT_GENERIC_TRANSLATIONS, GET_GENERIC, GET_GENERIC_TRANSLATIONS, UPSERT_GENERIC, DELETE_GENERIC_TRANSLATIONS, GET_SHIFTS, UPSERT_SHIFT_TRANSLATIONS, GET_SHIFT, GET_SHIFT_TRANSLATIONS, UPSERT_SHIFT, DELETE_SHIFT_TRANSLATIONS, INACTIVATE_SHIFT, UPSERT_CHECKLIST_TEMPLATE_DETAILS, DELETE_CHECKLIST_TEMPLATE_DETAILS, UPSERT_WORKGROUP, GET_CHECKLIST_PLANS, INACTIVATE_CHECKLIST_PLAN, DELETE_CHECKLIST_PLAN_TRANSLATIONS, UPSERT_CHECKLIST_PLAN, GET_CHECKLIST_PLAN_TRANSLATIONS, GET_CHECKLIST_PLAN, UPSERT_CHECKLIST_PLAN_TRANSLATIONS, GET_CATALOG_DETAILS_DEPARTMENTS_LAZY_LOADING, GET_CATALOG_DETAILS_WORKGROUPS_LAZY_LOADING, GET_CATALOG_DETAILS_USERS_LAZY_LOADING, GET_CATALOG_DETAILS_POSITIONS_LAZY_LOADING } from 'src/app/graphql/graphql.queries';
+import { ChecklistPlanDetail, ChecklistTemplateDetail, ChecklistTemplateLine, ShiftDetail, } from '../models';
 import { Attachment, originProcess, GeneralCatalogMappedItem, GeneralTranslation, MoldDetail } from 'src/app/shared/models';
 import { environment } from 'src/environments/environment';
 import { CompanyDetail, CustomerDetail, DepartmentDetail, EquipmentDetail, LineDetail, PlantDetail, PositionDetail, UomDetail, VariableDetail } from '../models';
@@ -95,14 +95,51 @@ export class CatalogsService {
     });
   }
 
-  getActionPlansToGenerateLazyLoadingDataGql$(variables: any): Observable<any> {
+  getDepartmentsLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.query({
-      query: GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING,
+      query: GET_CATALOG_DETAILS_DEPARTMENTS_LAZY_LOADING,
       variables,
     });
   }
 
+  getPositionsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({
+      query: GET_CATALOG_DETAILS_POSITIONS_LAZY_LOADING,
+      variables,
+    });
+  }
+
+  getWorkgroupsLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({
+      query: GET_CATALOG_DETAILS_WORKGROUPS_LAZY_LOADING,
+      variables,
+    });
+  }
+
+  getUsersLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({
+      query: GET_CATALOG_DETAILS_USERS_LAZY_LOADING,
+      variables,
+    });
+  }
+  
+
+  getActionPlansToGenerateLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({
+      query: GET_CATALOG_DETAILS_ACTION_PLANS_TO_GENERATE_LAZY_LOADING,
+      variables,
+    });
+  }
+  
+
   getChecklistTemplatesRedLazyLoadingDataGql$(variables: any): Observable<any> {
+    return this._apollo.query({
+      query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING,
+      variables,
+    });
+  }
+
+  getChecklistTemplatesLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.query({
       query: GET_CATALOG_DETAILS_CHECKLIST_TEMPLATES_LAZY_LOADING,
       variables,
@@ -264,6 +301,31 @@ export class CatalogsService {
     ]);
   }
 
+  getChecklistPlanDataGql$(parameters: any): Observable<any> {
+
+    const checklistPlanId = { checklistPlanId: parameters.checklistPlanId };
+
+    const variables = {
+      ...(parameters.skipRecords !== 0) && { recordsToSkip: parameters.skipRecords },
+      ...(parameters.takeRecords !== 0) && { recordsToTake: parameters.takeRecords },
+      ...(parameters.order) && { orderBy: parameters.order },
+      ...(parameters.filter) && { filterBy: parameters.filter },
+    }
+
+    return combineLatest([
+      this._apollo.query({
+        query: GET_CHECKLIST_PLAN,
+        variables: checklistPlanId,
+      }),
+
+      this._apollo.query({
+        query: GET_CHECKLIST_PLAN_TRANSLATIONS,
+        variables,
+      }),
+      
+    ]);
+  }
+
   getAttachmentsDataGql$(parameters: any): Observable<any> {
     const variablesForAttachments = {
       processId: parameters.processId,
@@ -298,6 +360,12 @@ export class CatalogsService {
     });
   }
 
+  updateChecklistPlanStatus$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: INACTIVATE_CHECKLIST_PLAN,
+      variables,
+    });
+  }
 
   updateCustomerStatus$(variables: any): Observable<any> {
     return this._apollo.mutate({
@@ -327,6 +395,13 @@ export class CatalogsService {
     })
   }
 
+  updateChecklistPlanCatalog$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPSERT_CHECKLIST_PLAN,
+      variables,
+    })
+  }
+
   deleteMoldTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: DELETE_MOLD_TRANSLATIONS,
@@ -344,6 +419,13 @@ export class CatalogsService {
   deleteChecklistTemplateTranslations$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS,
+      variables,
+    });
+  }
+
+  deleteChecklistPlanTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: DELETE_CHECKLIST_PLAN_TRANSLATIONS,
       variables,
     });
   }
@@ -397,7 +479,14 @@ export class CatalogsService {
     });
   }
 
-  updateChecklistTemplatLines$(variables: any): Observable<any> {
+  updateChecklistPlanTranslations$(variables: any): Observable<any> {
+    return this._apollo.mutate({
+      mutation: UPSERT_CHECKLIST_PLAN_TRANSLATIONS,
+      variables,
+    });
+  }
+
+  updateChecklistTemplateLines$(variables: any): Observable<any> {
     return this._apollo.mutate({
       mutation: UPSERT_CHECKLIST_TEMPLATE_DETAILS,
       variables,
@@ -439,7 +528,6 @@ export class CatalogsService {
 
     const translations = paramsData?.variableGqlTranslationsData?.data;
     const attachments = paramsData?.variableGqlAttachments?.data?.uploadedFiles;
-    // const extension = data.mainImageName ? data.mainImageName.split('.').pop() : '';
     const mainImage = `${environment.uploadFolders.completePathToFiles}/${data.mainImagePath}`;
     return {
       ...data,
@@ -476,6 +564,21 @@ export class CatalogsService {
       translations: this.mapTranslations(translations),
       attachments: this.mapAttachments(attachments?.items),
       lines: this.mapChecklistTemplatesDetails(lines),
+    }
+  }
+
+  mapOneChecklistPlan(paramsData: any): ChecklistPlanDetail {
+    const { oneChecklistPlan } = paramsData?.checklistPlanGqlData?.data;
+    const { data } = oneChecklistPlan;
+    const translations = paramsData?.checklistPlanGqlTranslationsData?.data;    
+
+    return {
+      ...data,
+      friendlyStatus: oneChecklistPlan.friendlyStatus,
+      friendlyFrequency: oneChecklistPlan.friendlyFrequency,
+      friendlyGenerationMode: oneChecklistPlan.friendlyGenerationMode, 
+      checklistPlanType: this.mapDetailTranslationsData(data.checklistPlanType),
+      translations: this.mapTranslations(translations),      
     }
   }
 
@@ -662,6 +765,20 @@ export class CatalogsService {
 
     return this._apollo.watchQuery({
       query: GET_CHECKLIST_TEMPLATES,
+      variables
+    }).valueChanges
+  }
+
+  getChecklistPlansDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
+    const variables = {
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+
+    return this._apollo.watchQuery({
+      query: GET_CHECKLIST_PLANS,
       variables
     }).valueChanges
   }

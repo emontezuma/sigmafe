@@ -211,6 +211,7 @@ export class CatalogProviderEditionComponent {
         this._sharedService.setToolbar({
           from: ApplicationModules.VARIABLES_CATALOG_EDITION,
           show: true,
+          buttonsToRight: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',

@@ -624,6 +624,7 @@ export class CatalogVariableEditionComponent {
         this._sharedService.setToolbar({
           from: ApplicationModules.VARIABLES_CATALOG_EDITION,
           show: true,
+          buttonsToRight: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
@@ -1206,6 +1207,7 @@ export class CatalogVariableEditionComponent {
   }
 
   saveCatalogDetails$(processId: number): Observable<any> {
+    const newRecord = !this.variable.id || this.variable.id === null || this.variable.id === 0;
     if (this.moldsCurrentSelection.length > 0 || this.actionPlansToGenerateCurrentSelection.length > 0) {
       const moldsToDelete = this.moldsCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
@@ -1254,8 +1256,8 @@ export class CatalogVariableEditionComponent {
       }
 
       return combineLatest([ 
-        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
-        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
+        ctToAdd.catalogDetails.length > 0 ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
+        ctToDelete.ids.length > 0 && !newRecord ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
       ]);
     } else {
       return of(null);

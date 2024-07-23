@@ -21,6 +21,7 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
   @Input() list: GeneralCatalogMappedItem[];  
   @Input() currentSelections: GeneralMultipleSelcetionItems[];  
   @Input() defaultValue?: string;
+  @Input() defaultSearchText?: string;
   @Input() placeHolder: string;
   @Input() totalCount: number;
   @Input() catalog: string;
@@ -40,12 +41,13 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
   private textToSearch: string;
   selectedOption: boolean = false;
   multiSelectionForm = new FormGroup({
-    searchInput: new FormControl(''),
+    searchInput: new FormControl(this.defaultSearchText),
   });
   multipleSelectionHeight: number;
   
 // Hooks ====================
-  ngOnInit(): void {    
+  ngOnInit(): void {
+
     this.textToSearch$ = this.multiSelectionForm.controls.searchInput.valueChanges.pipe(
       startWith(''),
       debounceTime(400),

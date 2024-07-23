@@ -53,6 +53,7 @@ export enum ButtonActions {
   MACROS = 'macros',
   INITIALIZE = 'initialize',
   OK = 'ok',
+  EXECUTE = 'execute',
 }
 export interface ToolbarElement {
   id?: string;
@@ -137,6 +138,7 @@ export interface ToolbarControl {
   showSpinner?: boolean;
   toolbarClass?: string;
   dividerClass?: string;
+  buttonsToRight?: number;
   elements: ToolbarElement[];
   alignment?: string;
 }
@@ -161,6 +163,8 @@ export enum ApplicationModules {
   PROVIDERS_CATALOG_EDITION='providers-catalog-edition',
   CHECKLIST_TEMPLATES_CATALOG = 'checklist-templates-catalog',
   CHECKLIST_TEMPLATES_CATALOG_EDITION = 'checklist-templates-edition',
+  CHECKLIST_PLANS_CATALOG = 'checklist-plans-catalog',
+  CHECKLIST_PLANS_CATALOG_EDITION = 'checklist-plans-edition',
   EQUIPMENTS_CATALOG = 'equipments-catalog',
   EQUIPMENTS_CATALOG_EDITION = 'equipments-catalog-edition',
   DEPARTMENTS_CATALOG = 'departments-catalog',

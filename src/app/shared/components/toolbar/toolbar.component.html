@@ -43,7 +43,7 @@
       <div
         name="toolbar-element"
         class="toolbar-button-container"
-        [ngStyle]="{ 'margin-left': button.alignment === 'right' ? 'auto' : 'unset', 'margin-right': button.alignment === 'left' ? 'auto' : 'unset' }"
+        [ngStyle]="{ 'margin-left': button.alignment === 'right' ? 'auto' : 'unset', 'margin-right': (toolbar.buttonsToRight === i + 1 &&  button.alignment === 'left') ? 'auto' : 'unset' }"
         *ngFor="
           let button of toolbar.elements;
           let i = index;          

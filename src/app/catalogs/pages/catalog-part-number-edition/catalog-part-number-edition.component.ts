@@ -205,6 +205,7 @@ export class CatalogPartNumberEditionComponent {
         this._sharedService.setToolbar({
           from: ApplicationModules.PART_NUMBERS_CATALOG_EDITION,
           show: true,
+          buttonsToRight: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',

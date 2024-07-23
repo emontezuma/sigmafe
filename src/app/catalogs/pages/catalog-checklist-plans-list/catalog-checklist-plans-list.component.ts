@@ -13,8 +13,7 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
-import { environment } from 'src/environments/environment';
-import { ChecklistTemplateItem, ChecklistTemplates, ChecklistTemplatesData, emptyChecklistTemplateCatalog } from '../../models';
+import { ChecklistPlanItem, ChecklistTemplates, ChecklistTemplatesData, emptyChecklistTemplateCatalog } from '../../models';
 
 @Component({
   selector: 'app-catalog-checklist-plans',
@@ -26,10 +25,10 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-  checklistTemplatesTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'templateType', 'lastGeneratedDate', 'generationCount', 'status', 'updatedAt'];
-  checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>([]);      
+  checklistPlansTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'friendlyGenerationMode', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
+  checklistPlansCatalogData = new MatTableDataSource<ChecklistPlanItem>([]);      
   
-  checklistTemplatesData$: Observable<ChecklistTemplatesData>;
+  checklistPlansData$: Observable<ChecklistTemplatesData>;
   sort$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>;
   settingsData$: Observable<SettingsData>;
@@ -47,7 +46,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   profileData: ProfileData;
   filterByText: string;
   allChecklistTemplatesToCsv: any;
-  checklistTemplatesData: ChecklistTemplates = {
+  checklistPlansData: ChecklistTemplates = {
     items: new Array(5).fill(null),
   }
   pageInfo: PageInfo = {
@@ -74,11 +73,11 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   // Hooks ====================
   ngOnInit() {
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_PLANS_CATALOG,
       true,
     );
     this._sharedService.setSearchBox(
-      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_PLANS_CATALOG,
       true,
     );    
     // Observables
@@ -111,7 +110,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
-        if (searchBox.from === ApplicationModules.CHECKLIST_TEMPLATES_CATALOG) {
+        if (searchBox.from === ApplicationModules.CHECKLIST_PLANS_CATALOG) {
           console.log(searchBox.textToSearch);
           this.filterByText = searchBox.textToSearch;    
           this.requestData(0, this.pageInfo.pageSize);      
@@ -127,7 +126,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     );
     this.toolbarClick$ = this._sharedService.toolbarAction.pipe(
       tap((buttonClicked: ToolbarButtonClicked) => {
-        if (buttonClicked.from !== ApplicationModules.CHECKLIST_TEMPLATES_CATALOG) {
+        if (buttonClicked.from !== ApplicationModules.CHECKLIST_PLANS_CATALOG) {
             return
         }
         this.toolbarAction(buttonClicked);      
@@ -138,7 +137,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
 
   ngOnDestroy() : void {
     this._sharedService.setToolbar({
-      from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      from: ApplicationModules.CHECKLIST_PLANS_CATALOG,
       show: false,
       showSpinner: false,
       toolbarClass: '',
@@ -147,7 +146,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       alignment: 'right',
     });
     this._sharedService.setGeneralScrollBar(
-      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_PLANS_CATALOG,
       false,
     );        
   }
@@ -156,8 +155,8 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     if (this.paginator) {
       this.paginator._intl.itemsPerPageLabel = $localize`Registros por página`;      
     }
-    this.checklistTemplatesCatalogData.paginator = this.paginator;
-    this.checklistTemplatesCatalogData.sort = this.sort;
+    this.checklistPlansCatalogData.paginator = this.paginator;
+    this.checklistPlansCatalogData.sort = this.sort;
     this.sort$ = this.sort.sortChange.pipe(
       tap((sortData: any) => {              
         this.order = null;
@@ -165,13 +164,17 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
-          } else if (sortData.active === 'templateType') {            
-            this.order = JSON.parse(`{ "data": { "templateType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
+          } else if (sortData.active === 'frequency') {            
+            this.order = JSON.parse(`{ "friendlyFrequency": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'generationMode') {            
+            this.order = JSON.parse(`{ "friendlyGenerationMode": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'checklistPlanType') {            
+            this.order = JSON.parse(`{ "data": { "checklistPlanType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
         }
-        this.requestData(0, this.pageInfo.pageSize);      
+        this.requestData(0, this.pageInfo.pageSize);              
       })
     );
   }
@@ -187,7 +190,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
 
   requestData(skipRecords: number, takeRecords: number) {
     this.setViewLoading(true);
-    this.checklistTemplatesData = {
+    this.checklistPlansData = {
       items: new Array(5).fill(emptyChecklistTemplateCatalog),
     }
     let filter = null;
@@ -199,26 +202,25 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     //   const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { // "data": { "templateType": { "name": { "contains": "${this.filterByText}" } } } } ] }`;
     //   filter = JSON.parse(cadFilter);                  
     // }
-    this.checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>(this.checklistTemplatesData.items);
-    this.checklistTemplatesData$ = this._catalogsService.getChecklistTemplatesDataGql$(skipRecords, takeRecords, this.order, filter)
+    this.checklistPlansCatalogData = new MatTableDataSource<ChecklistPlanItem>(this.checklistPlansData.items);
+    this.checklistPlansData$ = this._catalogsService.getChecklistPlansDataGql$(skipRecords, takeRecords, this.order, filter)
     .pipe(
-      map((checklistTemplates: any) => {
-        const { data } = checklistTemplates;
+      map((checklistPlans: any) => {
+        const { data } = checklistPlans;
         return { 
           ...data,
-          checklistTemplatesPaginated: {
-            ...data.checklistTemplatesPaginated,
-            items: data.checklistTemplatesPaginated.items.map((item) => {
+          checklistPlansPaginated: {
+            ...data.checklistPlansPaginated,
+            items: data.checklistPlansPaginated.items.map((item) => {
               
               return {
                 ...item,
                 data: {
-                  ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
-                  templateType: {
-                    ...item.data.templateType,
-                    name: item.data.templateType?.translations?.length > 0 ? item.data.templateType.translations[0].name : item.data.templateType?.name,
-                    isTranslated: item.data.templateType?.translations?.length > 0 ? true : false,
+                  ...item.data,
+                  checklistPlanType: {
+                    ...item.data.checklistPlanType,
+                    name: item.data.checklistPlanType?.translations?.length > 0 ? item.data.checklistPlanType.translations[0].name : item.data.checklistPlanType?.name,
+                    isTranslated: item.data.checklistPlanType?.translations?.length > 0 ? true : false,
                   },                  
                 }
               }
@@ -226,21 +228,21 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
           }
         }
       }),
-      tap( checklistTemplatesData => {        
-        this.setPaginator(checklistTemplatesData.checklistTemplatesPaginated.totalCount);
-        this.checklistTemplatesData = JSON.parse(JSON.stringify(checklistTemplatesData.checklistTemplatesPaginated));
+      tap( checklistPlansData => {        
+        this.setPaginator(checklistPlansData.checklistPlansPaginated.totalCount);
+        this.checklistPlansData = JSON.parse(JSON.stringify(checklistPlansData.checklistPlansPaginated));
         if (this.paginator) {
           this.paginator.pageIndex = this.pageInfo.currentPage; 
           this.paginator.length = this.pageInfo.totalRecords;
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
-            this.checklistTemplatesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.checklistTemplatesData.items);
+            this.checklistPlansData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.checklistPlansData.items);
           }      
         }        
-        this.checklistTemplatesData.items.length = this.checklistTemplatesData.totalCount;
-        this.checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>(this.checklistTemplatesData.items);
-        this.checklistTemplatesCatalogData.paginator = this.paginator;
-        // this.checklistTemplatesCatalogData.sort = this.sort;
-        this.checklistTemplatesCatalogData.sortData = () => this.checklistTemplatesData.items;        
+        this.checklistPlansData.items.length = this.checklistPlansData.totalCount;
+        this.checklistPlansCatalogData = new MatTableDataSource<ChecklistPlanItem>(this.checklistPlansData.items);
+        this.checklistPlansCatalogData.paginator = this.paginator;
+        // this.checklistPlansCatalogData.sort = this.sort;
+        this.checklistPlansCatalogData.sortData = () => this.checklistPlansData.items;        
         if (this.elements.find(e => e.action === ButtonActions.RELOAD).loading) {
           setTimeout(() => {
             this.elements.find(e => e.action === ButtonActions.RELOAD).loading = false;                                      
@@ -255,7 +257,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
-          from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+          from: ApplicationModules.CHECKLIST_PLANS_CATALOG,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -276,7 +278,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
-    if (action.from === ApplicationModules.CHECKLIST_TEMPLATES_CATALOG  && this.elements.length > 0) {
+    if (action.from === ApplicationModules.CHECKLIST_PLANS_CATALOG  && this.elements.length > 0) {
       if (action.action === ButtonActions.RELOAD) {
         this.elements.find(e => e.action === action.action).loading = true;        
         this.pageInfo = {
@@ -288,17 +290,17 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
         this.requestData(this.pageInfo.currentPage, this.pageInfo.pageSize);
       } else if (action.action === ButtonActions.NEW) {
         this.elements.find(e => e.action === action.action).loading = true;                
-        this._router.navigateByUrl("/catalogs/checklist-templates/create");
+        this._router.navigateByUrl("/catalogs/checklist-plans/create");
         setTimeout(() => {
           this.elements.find(e => e.action === action.action).loading = false;                          
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
-          tap(checklistTemplatesToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
+          tap(checklistPlansToCsv => {
+            const fileData$ = this._catalogsService.getAllCsvData$(checklistPlansToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
+              this.downloadFile(data, checklistPlansToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -399,7 +401,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.checklistTemplatesTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'templateType', 'lastGeneratedDate', 'generationCount', 'status', 'updatedAt'];
+    this.checklistPlansTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'friendlyGenerationMode', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 
@@ -424,11 +426,11 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   setViewLoading(loading: boolean): void {
     this.loading = loading;
     this._sharedService.setGeneralLoading(
-      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_PLANS_CATALOG,
       loading,
     );
     this._sharedService.setGeneralProgressBar(
-      ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
+      ApplicationModules.CHECKLIST_PLANS_CATALOG,
       loading,
     );         
   }

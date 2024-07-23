@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue, Attachment } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, Attachment } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -531,6 +531,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG_EDITION,
+          buttonsToRight: 1,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
@@ -1434,12 +1435,13 @@ export class CatalogChecklistTemplatesEditionComponent {
       i++;
     }
     return combineLatest([ 
-      linesToAdd.length > 0 ? this._catalogsService.updateChecklistTemplatLines$({ checklistTemplateDetail: linesToAdd }) : of(null),
+      linesToAdd.length > 0 ? this._catalogsService.updateChecklistTemplateLines$({ checklistTemplateDetail: linesToAdd }) : of(null),
       varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateDetails$(varToDelete) : of(null) 
     ]);  
   }
 
   saveCatalogDetails$(processId: number): Observable<any> {
+    const newRecord = !this.checklistTemplate.id || this.checklistTemplate.id === null || this.checklistTemplate.id === 0;
     if (this.moldsCurrentSelection.length > 0) {
       const moldsToDelete = this.moldsCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
@@ -1469,8 +1471,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       }
 
       return combineLatest([ 
-        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
-        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
+        ctToAdd.catalogDetails.length > 0 ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
+        ctToDelete.ids.length > 0 && !newRecord ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
       ]);
     } else {
       return of(null);

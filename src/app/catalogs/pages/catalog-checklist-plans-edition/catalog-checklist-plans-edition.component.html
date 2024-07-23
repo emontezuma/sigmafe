@@ -1,0 +1,470 @@
+
+<div
+  class="container"
+  #catalogEdition
+  @routingAnimation
+  (@routingAnimation.done)="pageAnimationFinished($event)"
+>
+
+  <ng-container *ngIf="scroll$ | async"></ng-container>
+  <ng-container *ngIf="showGoTop$ | async"></ng-container>
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+  <ng-container *ngIf="genYesNoValues$ | async"></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+  <ng-container *ngIf="templates$ | async "></ng-container>       
+  <ng-container *ngIf="entities$ | async "></ng-container>       
+  <ng-container *ngIf="updateChecklistPlanCatalog$ | async "></ng-container>       
+  <ng-container *ngIf="deleteChecklistPlanTranslations$ | async "></ng-container>
+  <ng-container *ngIf="updateChecklistPlan$ | async "></ng-container>      
+  <ng-container *ngIf="checklistPlan$ | async "></ng-container>      
+  <ng-container *ngIf="frequencies$ | async "></ng-container>      
+  <ng-container *ngIf="generationModes$ | async "></ng-container>   
+  <ng-container *ngIf="checklistPlanTypes$ | async "></ng-container>   
+
+  <mat-card class="card">
+    <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="checklistPlanForm"
+        #f="ngForm"
+      >
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DEL PLAN DE CHECKLIST</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='name'"
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="300"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignadoa la variable"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Descripción/Nombre del plan de checklist</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='prefix'"
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.prefix"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="50"
+                [showRightHint]="true"                
+                [showCloseButton]="true"
+                fieldHelp="Especifique la abreviación de el plan de checklist"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Abreviación de el plan de checklist</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.reference"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="100"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                fieldHelp="Especifique la referencia de el plan de checklist"
+              >
+                <span fieldTitle class="label field__label"
+                  >Referencia</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items field-items--bordered">
+              <app-area-field
+                [bordered]="false"
+                [formField]="checklistPlanForm.controls.notes"
+                [fieldMaxLength]="500"
+                [showRightHint]="true"
+                [showCloseButton]="true"
+                [minRows]="1"
+                [maxRows]="5"
+                fieldHelp="Especifique las notas referentes a esta plan de checklist"
+              >
+                <span fieldTitle class="label field__label"
+                  >Notas referentes al plan de checklist</span
+                >
+              </app-area-field>     
+            </div> 
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    checklistPlanForm.controls.checklistPlanType.touched &&
+                    !checklistPlanForm.controls.checklistPlanType.valid
+                }"
+                [disabled]="checklistPlanForm.controls.checklistPlanType.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Tipo de plan de checklist</span>
+                  <span class="field__label" *ngIf="checklistPlanForm.controls.checklistPlanType?.value?.id">id: {{ checklistPlanForm.controls.checklistPlanType?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='checklistPlanType'"
+                  [formField]="checklistPlanForm.controls.checklistPlanType"
+                  [list]="checklistPlanTypes.items"
+                  [totalCount]="checklistPlanTypes.totalCount"
+                  leftHint="Escriba el tipo de plan de checklist"
+                  [catalog]="SystemTables.CHECKLIST_TEMPLATE_TYPES"
+                  [loading]="checklistPlanTypes.loading"
+                  noItemsError="No hay Tipos de plan con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help">Especifique el Tipo de plan de checklist</span>
+              </fieldset>
+            </div>  
+            <div class="field-items">
+              <app-multiple-selection-list
+                [bordered]="true"
+                [showSelect]="true"                  
+                [selectOptions]="moldsOptions"
+                [currentSelections]="templatesCurrentSelection"        
+                [formField]="checklistPlanForm.controls.templates"
+                [list]="templates.items"
+                [totalCount]="templates.totalCount"
+                [loading]="templates.loading"                
+                [catalog]="SystemTables.CHECKLIST_TEMPLATES"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              <span fieldTitle class="label field__label">Templates que se ejecutarán con este plan</span>
+              </app-multiple-selection-list>      
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistPlanForm.controls.generationMode"
+                [list]="generationModes.items"                
+                fieldHelp="Especifique el modo de generación del plan"                
+                (selectSelectionChange)="handleSelectionChange($event)"
+
+              >
+                <span fieldTitle class="label field__label"
+                  >Modo de generación del plan</span
+                >
+              </app-select-field>      
+            </div>
+            <div class="field-items">
+              <app-multiple-selection-list
+                [bordered]="true"
+                [showSelect]="true"                  
+                [selectOptions]="entitiesOptions"
+                [currentSelections]="entitiesCurrentSelection"        
+                [formField]="checklistPlanForm.controls.entities"
+                [list]="entities.items"
+                [totalCount]="entities.totalCount"
+                [loading]="entities.loading"                
+                [catalog]="entityTable"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchEntityDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              <span fieldTitle class="label field__label">Entidades a las que se le enviará el checklist</span>
+              </app-multiple-selection-list>      
+            </div>    
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistPlanForm.controls.frequency"
+                [list]="frequencies.items"                
+                fieldHelp="Especifique la frecuencia de ejecución del plan"
+              >
+                <span fieldTitle class="label field__label"
+                  >Frecuencia de ejecución de este plan</span
+                >
+              </app-select-field>      
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    checklistPlanForm.controls.specificDate.touched &&
+                    !checklistPlanForm.controls.specificDate.valid
+                }"
+                [disabled]="checklistPlanForm.controls.frequency.value !== GeneralValues.SPECIFIC"
+              >
+                <span class="label field__label">Fecha y hora específica</span>
+                <div class="flex-columns">
+                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+                    <input
+                      class="field__input"
+                      matInput
+                      formControlName="byDefaultDate"
+                      #byDefault
+                      name="byDefaultDate"
+                      [matDatepicker]="byDefaultPicker"
+                    />
+                    <mat-hint>DD/MM/AAAA</mat-hint>
+                    <mat-datepicker-toggle
+                      matIconSuffix
+                      [for]="byDefaultPicker"
+                    ></mat-datepicker-toggle>
+                    <mat-datepicker #byDefaultPicker></mat-datepicker>
+                    <mat-error class="field__error field__required">
+                      <mat-icon
+                        class="field__required-icon"
+                        svgIcon="warn_line"
+                      ></mat-icon>
+                      <span class="field__required-label"
+                        ><strong>Error en el formato de la fecha</strong></span
+                      >
+                    </mat-error>
+                  </mat-form-field>
+                  <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
+                    <input
+                      class="field__input"
+                      matInput
+                      formControlName="byDefaultTime"
+                      #byDefault
+                      name="byDefaultTime"
+                      type="time"
+                      style="min-height: 22px"
+                    />
+                    <mat-hint>HH:MM AM/PM</mat-hint>                  
+                  </mat-form-field>
+                </div>
+                <span class="field__help"
+                  >Especifique la fecha y hora especifica</span
+                >
+              </fieldset>
+            </div>
+            <div
+              class="field-items"
+            >
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    checklistPlanForm.controls.hour.touched &&
+                    !checklistPlanForm.controls.hour.valid
+                }"
+                [disabled]="checklistPlanForm.controls.frequency.value === GeneralValues.SPECIFIC"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Horarios de ejecución</span>
+                  <span class="field__label label-error" *ngIf="hours.length > 9">Límite de horarios alcanzado</span>
+                </div>
+                <div class="flex-columns">
+                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
+                    <mat-chip-grid #chipGrid aria-label="Enter keywords" [formControl]="checklistPlanForm.controls.hours">
+                      <div
+                        class="hours-list"
+                        *ngFor="let hour of hours; let i = index;"
+                      >
+                        <mat-chip-row (removed)="removeHour(hour)">
+                          {{ hour }}
+                          <button matChipRemove aria-label="'remove ' + keyword">
+                            <mat-icon>cancel</mat-icon>
+                          </button>
+                        </mat-chip-row>
+                      </div>
+                    </mat-chip-grid>
+                    <input
+                      class="field__input"
+                      matInput
+                      formControlName="hour"
+                      #hour
+                      name="hour"
+                      type="time"
+                      style="min-height: 22px"
+                      [matChipInputFor]="chipGrid"
+                      (matChipInputTokenEnd)="addHour($event)"
+                      [disabled]="hours.length > 9"
+                    />
+                    <mat-hint>HH:MM AM/PM</mat-hint>
+                    <mat-hint align="end">{{ hours.length }} de 10 horarios</mat-hint>
+                    <button
+                      [disabled]="hours.length > 9"
+                      matSuffix
+                      mat-icon-button
+                      (click)="addHour($event)"
+                      style="margin-right: 5px;"
+                      matTooltip="Agrega la hora a la lista"
+                      matTooltipClass="tooltip-general"
+                      matTooltipShowDelay="100"
+                    >
+                      <mat-icon>add</mat-icon>
+                    </button>                  
+                  </mat-form-field>
+                </div>      
+                <span class="field__help">Especifique la hora de ejecución</span>
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.timeZone"
+                rightHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                leftHint="Expresado en segundos"
+                fieldHelp="Timezone del Plan de checklist"
+                [rightSuffix]="_sharedService.getHours(checklistPlanForm.controls.timeZone.value)"
+              >
+                <span fieldTitle class="label field__label"
+                  >Tiempo del huso horario del plan</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.limit"
+                rightHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                leftHint="0 = Sin límites"
+                fieldHelp="Límite de checklist a generar "              
+              >
+                <span fieldTitle class="label field__label"
+                  >Límite de checklist a generar con este plan</span
+                >
+              </app-input-field>
+            </div>
+          </div>
+        </mat-expansion-panel>     
+      </mat-accordion>
+    </form>
+    <div
+      *ngIf="checklistPlan.id"
+      class="catalog-footer"
+    >
+      <div class="grid-dates">
+        <div class="flex">
+          <div class="readonly-value item-id">{{ checklistPlan.id }}</div>
+          <div class="label-with-no-index">ID del registro</div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistPlan.createdAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de creación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ checklistPlan.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Creado por</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistPlan.updatedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de modificación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ checklistPlan.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+
+
+        <div class="flex">
+          <div class="readonly-value">{{ checklistPlan.lastGeneration ? (_sharedService.convertUtcTolocal(checklistPlan.lastGeneration) | date :"medium") : "Indeterminado..." }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+              <div class="label-with-no-index">Fecha de últ. generación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value item-id">{{ (checklistPlan.checklistCount ? checklistPlan.checklistCount : 0) | number : "1." }}</div>
+            <div class="flex-row">
+              <mat-icon class="small-icon" svgIcon="update"></mat-icon>
+              <div class="label-with-no-index">Checklist generados</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="grid-inactive" *ngIf="checklistPlan.status === RecordStatus.INACTIVE">
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(checklistPlan.deletedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de inactivación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ checklistPlan.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Inactivado por</div>
+          </div>
+        </div>
+        <div class="flex-inactive">
+          <div class="label-inactive">
+            <strong>El registro está INACTIVO</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

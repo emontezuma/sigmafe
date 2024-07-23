@@ -213,6 +213,7 @@ export class CatalogPlantEditionComponent {
         this._sharedService.setToolbar({
           from: ApplicationModules.PLANTS_CATALOG_EDITION,
           show: true,
+          buttonsToRight: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',

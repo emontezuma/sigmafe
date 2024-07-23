@@ -1115,6 +1115,20 @@ export const UPSERT_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
   }
 `;
 
+export const UPSERT_CHECKLIST_PLAN_TRANSLATIONS = gql`
+  mutation CreateOrUpdateChecklistPlanTranslationTable (
+    $translations: [ChecklistPlanTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateChecklistPlanTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      checklistPlanId,
+      languageId      
+    }
+  }
+`;
+
 export const UPSERT_CHECKLIST_TEMPLATE = gql`
   mutation CreateOrUpdateChecklistTemplate (
     $alarmNotificationChannels: String,
@@ -1254,6 +1268,61 @@ export const UPSERT_CHECKLIST_TEMPLATE = gql`
   }
 `;
 
+export const UPSERT_CHECKLIST_PLAN = gql`
+  mutation CreateOrUpdateChecklistPlan (
+    $customerId: Long,
+    $id: Long,
+    $name: String,
+    $reference: String,
+    $notes: String,
+    $prefix: String,
+    $templates: String,
+    $entities: String,
+    $limit: Int,
+    $hours: String,
+    $checklistPlanTypeId: Long,
+    $frequency: String,
+    $specificDate: DateTime,
+    $timeZone: Long,    
+    $generationMode: String,
+    $status: String
+  ) {
+  createOrUpdateChecklistPlan (
+    inputs: [{      
+      customerId: $customerId,
+      id: $id,
+      name: $name,
+      reference: $reference,
+      notes: $notes,
+      prefix: $prefix,
+      templates: $templates,
+      entities: $entities,
+      limit: $limit,
+      hours: $hours,
+      checklistPlanTypeId: $checklistPlanTypeId,
+      frequency: $frequency,
+      specificDate: $specificDate,
+      timeZone: $timeZone,
+      generationMode: $generationMode,
+      status: $status,    
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
 export const UPSERT_VARIABLE = gql`
   mutation CreateOrUpdateVariable (
     $customerId: Long,
@@ -1355,6 +1424,18 @@ export const DELETE_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
     $customerId: Long!
   ) {
     deleteChecklistTemplatesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId
+    ) 
+  }
+`;
+
+export const DELETE_CHECKLIST_PLAN_TRANSLATIONS = gql`
+  mutation DeleteChecklistPlansTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  ) {
+    deleteChecklistPlansTranslationsTable (      
       ids: $ids,
       customerId: $customerId
     ) 
@@ -2094,6 +2175,117 @@ export const GET_CHECKLIST_TEMPLATE_TRANSLATIONS = gql`
 }
 `;
 
+export const GET_CHECKLIST_PLAN = gql`
+  query OneChecklistPlan ($checklistPlanId: Long!) {
+    oneChecklistPlan (id: $checklistPlanId) {      
+      isTranslated
+      translatedName
+      translatedReference
+      translatedNotes
+      translatedPrefix
+      friendlyStatus
+      friendlyFrequency
+      friendlyGenerationMode
+      data {
+          name
+          reference
+          notes
+          prefix
+          templates
+          equipments
+          checklistPlanTypeId
+          frequency          
+          executionTimes
+          hours
+          timeZone
+          lastGeneration
+          checklistCount
+          specificDate
+          limit
+          anticipationTime
+          generationMode
+          entities
+          id
+          customerId
+          status
+          createdById
+          createdAt
+          updatedById
+          updatedAt
+          deletedById
+          deletedAt
+          checklistPlanType {
+            id
+            status
+            name
+            reference
+            translations {
+              name
+              reference
+              languageId
+            }               
+          }         
+          translations {
+            checklistPlanId
+            name
+            reference
+            notes
+            prefix              
+            languageId
+            id                
+          }
+      }    
+  }
+}
+`;
+
+export const GET_CHECKLIST_PLAN_TRANSLATIONS = gql`
+  query ChecklistPlansTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [ChecklistPlanTranslationTableSortInput!],
+    $filterBy: ChecklistPlanTranslationTableFilterInput,
+  ) {
+    checklistPlansTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        checklistPlanId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
 export const INACTIVATE_CHECKLIST_TMEPLATE = gql`
   mutation CreateOrUpdateChecklistTemplate (
     $id: Long,
@@ -2101,6 +2293,24 @@ export const INACTIVATE_CHECKLIST_TMEPLATE = gql`
     $status: String
   ) {
   createOrUpdateChecklistTemplate (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+export const INACTIVATE_CHECKLIST_PLAN = gql`
+  mutation CreateOrUpdateChecklistPlan (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateChecklistPlan (
     inputs: {
       id: $id
       customerId: $customerId
@@ -2212,7 +2422,7 @@ export const GET_CATALOG_DETAILS_MOLDS_LAZY_LOADING = gql`
   }
 `;
 
-export const GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING = gql`
+export const GET_CATALOG_DETAILS_ACTION_PLANS_TO_GENERATE_LAZY_LOADING = gql`
   query CatalogDetailTemplateActionPlan (    
     $recordsToSkip: Int,
     $recordsToTake: Int,
@@ -2244,7 +2454,133 @@ export const GET_ACTION_PLANS_TO_GENERATE_LAZY_LOADING = gql`
   }
 `;
 
-//customers================================================
+export const GET_CATALOG_DETAILS_DEPARTMENTS_LAZY_LOADING = gql`
+  query CatalogDetailDepartment (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailDepartment (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_POSITIONS_LAZY_LOADING = gql`
+  query CatalogDetailPosition (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailPosition (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_WORKGROUPS_LAZY_LOADING = gql`
+  query CatalogDetailWorkgroup (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailWorkgroup (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_USERS_LAZY_LOADING = gql`
+  query CatalogDetailUser (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+    catalogDetailUser (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
 
 export const GET_CUSTOMERS = gql`
   query CustomersPaginated (
@@ -5180,12 +5516,12 @@ export const UPSERT_SHIFT = gql`
 
     $calendarId: Long,
 
-    $twoDays:String!,
-    $isFirstSequence:String!,
-    $isLastSequence:String!,
+    $twoDays: String!,
+    $isFirstSequence: String!,
+    $isLastSequence: String!,
     
-    $fromTime:DateTime,
-    $toTime:DateTime,
+    $fromTime: DateTime,
+    $toTime: DateTime,
 
     
    
@@ -5563,6 +5899,57 @@ export const INACTIVATE_DEPARTMENT = gql`
       id
       status
     } 
+  }
+`;
+
+export const GET_CHECKLIST_PLANS = gql`
+  query ChecklistPlansPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedChecklistPlanDtoSortInput!],
+    $filterBy: TranslatedChecklistPlanDtoFilterInput,
+  ) {
+  checklistPlansPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        friendlyFrequency
+        friendlyGenerationMode
+        data {
+          id
+          name
+          reference
+          notes
+          prefix
+          customerId
+          lastGeneration
+          checklistCount
+          status
+          frequency
+          generationMode 
+          checklistPlanType {
+            id
+            status
+            name
+            reference
+            translations {
+              name
+              reference
+              languageId
+            }
+          }   
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
   }
 `;
 

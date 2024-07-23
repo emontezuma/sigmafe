@@ -82,17 +82,23 @@ export enum SystemTables {
     LINES = 'lines',
     MOLD_MAINTENANCE_STATES = 'mold-maintenance-states',
     EQUIPMENTS = 'equipments',
+    DEPARTMENTS = 'departments',
+    WORKGROUPS = 'workgroups',
+    POSITIONS = 'positions',
     PARTNUMBERS = 'partNumbers',
     MOLD_TYPES = 'mold-types',
     MOLD_CLASSES = 'mold-classes',
-    MOLDS = 'molds',
+    MOLDS = 'molds',    
     CHECKLIST_TEMPLATE_MOLDS = 'checklist-template-molds',
+    CHECKLIST_PLANS_TEMPLATES = 'checklist-plans-template',
     VARIABLE_TEMPLATE_ACTION_PLANS = 'variable-template-action-plans',
     TEMPLATE_ACTION_PLANS = 'template-action-plans',
     UOMS = 'uoms',
     SENSORS = 'sensors',
     SIGMA_TYPES = 'sigmaTypes',
     GEN_VALUES_YES_NO = 'gen-values-yes-no',
+    CHECKLIST_PLANS_FREQUENCIES = 'checklist-plans-frequencies',
+    CHECKLIST_PLANS_GENERATION_MODES = 'checklist-plans-generation-modes',
     VARIABLE_BY_DEFAULT_DATE = 'variable-by-default-date',
     RESET_VALUE_MODES = 'variable-reset-value-modes',
     VARIABLE_VALUE_TYPES = 'variable-value-types',
@@ -108,6 +114,7 @@ export enum SystemTables {
     CHECKLIST_TEMPLATE_NOTIFYING = 'checklist-template-notifying',    
     CHANNELS = 'channels',        
     RECIPIENTS = 'recipients',        
+    CHECKLIST_PLAN_TYPES = 'checklist-plan-types',    
 }
 
 export enum GeneralValues {
@@ -146,4 +153,12 @@ export interface OptionData {
     DATE = 'date',
     DATE_AND_TIME = 'date-and-time',
     TIME = 'time',
+    BY_DEPARTMENT = 'by-department',
+}
+
+export enum HarcodedChecklistPlanGenerationMode {
+    BY_DEPARTMENT = 'by-department',
+    BY_POSITIONS = 'by-position',
+    BY_WORKGROUP = 'by-workgroup',
+    BY_USER = 'by-user',
 }

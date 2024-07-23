@@ -677,6 +677,7 @@ export class CatalogMoldEditionComponent {
         this._sharedService.setToolbar({
           from: ApplicationModules.MOLDS_CATALOG_EDITION,
           show: true,
+          buttonsToRight: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
@@ -2442,6 +2443,7 @@ export class CatalogMoldEditionComponent {
   }
 
   saveCatalogDetails$(processId: number): Observable<any> {
+    const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
     if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistRedTemplatesCurrentSelection.length > 0) {
       const checklistTemplatesYellowToDelete = this.checklistYellowTemplatesCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
@@ -2490,8 +2492,8 @@ export class CatalogMoldEditionComponent {
       }
 
       return combineLatest([ 
-        ctToAdd.catalogDetails.length > 0  ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
-        ctToDelete.ids.length > 0 ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
+        ctToAdd.catalogDetails.length > 0 ? this._catalogsService.addOrUpdateCatalogDetails$(ctToAdd) : of(null), 
+        ctToDelete.ids.length > 0 && !newRecord ? this._catalogsService.deleteCatalogDetails$(ctToDelete) :  of(null) 
       ]);
     } else {
       return of(null);
