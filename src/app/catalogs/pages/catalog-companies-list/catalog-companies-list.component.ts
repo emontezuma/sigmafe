@@ -63,7 +63,8 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.COMPANIES_CATALOG,
       true,
@@ -241,8 +243,9 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.COMPANIES_CATALOG,
@@ -252,9 +255,9 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -286,9 +289,9 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allCompaniesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(companiesToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(companiesToCsv?.data?.exportCompaniesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(companiesToCsv?.data?.exportCompanieToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, companiesToCsv?.data?.exportCompaniesToCsv?.downloadFilename);
+              this.downloadFile(data, companiesToCsv?.data?.exportCompanieToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

@@ -12,7 +12,9 @@
   <ng-container *ngIf="profileData$ | async "></ng-container>   
   <ng-container *ngIf="showGoTop$ | async "></ng-container>   
   <ng-container *ngIf="checklistFillingLoading$ | async "></ng-container>     
-  <ng-container *ngIf="everySecond$ | async "></ng-container>       
+  <ng-container *ngIf="everySecond$ | async "></ng-container>   
+  <ng-container *ngIf="parameters$ | async "></ng-container>    
+  <ng-container *ngIf="checklistTemplate$ | async"></ng-container>  
    
   <mat-tab-group    
     mat-stretch-tabs="false"
@@ -85,7 +87,7 @@
                 <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="checklist.number"
+                      [label]="checklist.id"
                       [loading]="loading"
                     >
                     </app-readonly-field>
@@ -93,7 +95,7 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.stateDescription"
+                      [label]="checklist.friendlyState"
                       [loading]="loading"
                     >
                     </app-readonly-field>
@@ -101,8 +103,8 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.priority?.description"
-                      [reference]="checklist.priority?.code"
+                      label="NORMAL"
+                      reference="N01"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="priority"
@@ -118,7 +120,7 @@
                     >
                       <app-label-ellipsis
                         class="label-description"
-                        [label]="checklist.description"
+                        [labelInnerHTML]="checklist.name"
                         [lines]="3"
                       >
                       </app-label-ellipsis>
@@ -200,20 +202,23 @@
                 <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="checklist.equipment?.description"
-                      [reference]="checklist.equipment?.number"
+                      [label]="checklist.mold?.description"
+                      [reference]="checklist.mold?.reference"
+                      [recordId]="checklist.moldId"
+                      [recordUrl]="checklist.recordUrl"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
-                      icon="gear"
+                      icon="treasure_chest"
                       [showGoToRecord]="true"
-                      [recordId]="checklist.equipment?.id"
                     >
                     </app-readonly-field>
-                    <mat-card-subtitle class="label">Equipo/Máquina</mat-card-subtitle>
+                    <mat-card-subtitle class="label">Molde</mat-card-subtitle>
                   </div>
+                </div>
+                <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="convertedDates.equipment.lastChecklistDate"
+                      [label]="_sharedService.capitalization(_sharedService.formatDate(_sharedService.convertUtcTolocal(checklist.mold?.lastChecklist?.completedDate), 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE)"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -223,73 +228,79 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.equipment?.lastChecklistAuditor"
+                      [label]="checklist.mold?.lastChecklist?.assignedTo?.name"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="man"
                     >
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Efectuado por</mat-card-subtitle>
-                  </div>
-
-                  <div class="grid-multiple equipment">
-                    <div                       
-                      class="notes-content"
+                  </div>                  
+                </div>
+                <div class="grid-multiple equipment">
+                  <div                       
+                    class="notes-content"
+                  >
+                    <div
+                      class="long-text"
+                      @dissolve
+                      *ngIf="!loading"
                     >
-                      <div
-                        class="long-text"
-                        @dissolve
-                        *ngIf="!loading"
-                      >
-                        {{ checklist.equipment?.extendedInfo || 'No hay notas para éste equipo/máquina...' }}
-                      </div>
-                      <ngx-skeleton-loader
-                        *ngIf="loading"
-                        class="text"
-                        [theme]="{
-                        height: '16px',
-                        marginBottom: '0px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.075)',
-                        }"
-                        count="3"
-                      >
-                      </ngx-skeleton-loader>
+                      {{ checklist.mold?.notes || 'No hay notas para éste molde...' }}
                     </div>
-                    <mat-card-subtitle class="label">
-                      Notas del equipo/máquina
-                    </mat-card-subtitle>
+                    <ngx-skeleton-loader
+                      *ngIf="loading"
+                      class="text"
+                      [theme]="{
+                      height: '16px',
+                      marginBottom: '0px',
+                      backgroundColor: 'rgba(0, 0, 0, 0.075)',
+                      }"
+                      count="3"
+                    >
+                    </ngx-skeleton-loader>
                   </div>
+                  <mat-card-subtitle
+                    class="label"
+                    style="margin-left: 5px;margin-top: -5px;"
+                  >
+                    Notas del molde
+                  </mat-card-subtitle>
                 </div>
               </div>
               <div class="grid-dates">
                 <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="checklist.type?.description"
-                      [reference]="checklist.type?.code"
+                      [label]="checklistTemplate.templateType?.translatedName"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="white_list"
-                      [showGoToRecord]="true"
-                      [recordId]="checklist.type?.id"
                     >
                     </app-readonly-field>
-                    <mat-card-subtitle class="label">Tipo de checklist</mat-card-subtitle>
+                    <mat-card-subtitle class="label">Tipo de plantilla de checklist asociada</mat-card-subtitle>
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="checklist.class?.description"
-                      [reference]="checklist.class?.code"
+                      [label]="checklist.friendlyFrequency"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="white_list"
-                      [showGoToRecord]="true"
-                      [recordId]="checklist.class?.id"
                     >
                     </app-readonly-field>
-                    <mat-card-subtitle class="label">Clase de checklist</mat-card-subtitle>
+                    <mat-card-subtitle class="label">Frecuencia de generacion</mat-card-subtitle>
                   </div>
                   <div>
+                    <app-readonly-field
+                      [label]="checklist.friendlyGenerationMode"
+                      labelClass="label-description-with-reference"
+                      [loading]="loading"
+                      icon="white_list"
+                    >
+                    </app-readonly-field>
+                    <mat-card-subtitle class="label">Modo de generacion</mat-card-subtitle>
+                  </div>
+                  <!--<div>
                     <app-readonly-field
                       [label]="checklist.project?.description"
                       [reference]="checklist.project?.code"
@@ -301,14 +312,14 @@
                     >
                     </app-readonly-field>   
                     <mat-card-subtitle class="label">Proyecto</mat-card-subtitle>
-                  </div>
+                  </div>-->
                 </div>
               </div>
               <div class="grid-dates">
                 <div class="grid-multiple">
                   <div>
                     <app-readonly-field
-                      [label]="convertedDates.dueDateToStart"
+                      [label]="_sharedService.capitalization(_sharedService.formatDate(_sharedService.convertUtcTolocal(checklist.startDate), 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE)"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -318,17 +329,7 @@
                   </div>
                   <div>
                     <app-readonly-field
-                      [label]="convertedDates.startDate"
-                      labelClass="label-description-with-reference"
-                      [loading]="loading"
-                      icon="event"
-                    >
-                    </app-readonly-field>
-                    <mat-card-subtitle class="label">Fecha de inicio</mat-card-subtitle>
-                  </div>
-                  <div>
-                    <app-readonly-field
-                      [label]="convertedDates.dueDateToFinish"
+                    [label]="_sharedService.capitalization(_sharedService.formatDate(_sharedService.convertUtcTolocal(limitTime), 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE)"
                       labelClass="label-description-with-reference"
                       [loading]="loading"
                       icon="event"
@@ -336,10 +337,21 @@
                     </app-readonly-field>
                     <mat-card-subtitle class="label">Fecha límite para terminar</mat-card-subtitle>
                   </div>
+                  <div>
+                    <app-readonly-field
+                      [label]="lapse"
+                      labelClass="label-description-with-reference"
+                      [loading]="loading"
+                      icon="event"
+                    >
+                    </app-readonly-field>
+                    <mat-card-subtitle class="label">Tiempo de llenado</mat-card-subtitle>
+                  </div>
+                  
                 </div>
               </div>
               <mat-accordion multi>
-                <mat-expansion-panel
+                <!--<mat-expansion-panel
                   (opened)="panelOpenState[0] = true"
                   (closed)="panelOpenState[0] = false"
                   hideToggle="true"
@@ -401,7 +413,7 @@
                     </div>
                     <div>
                       <app-readonly-field
-                        [label]="convertedDates.assignement.date"
+                        [label]=""
                         [loading]="loading"
                         icon="event"
                       >
@@ -518,7 +530,7 @@
                     </div>
                     <div>
                       <app-readonly-field
-                        [label]="convertedDates.planning.date"
+                        [label]=""
                         [loading]="loading"
                         icon="event"
                       >
@@ -528,7 +540,7 @@
                       </mat-card-subtitle>
                     </div>
                   </div>
-                </mat-expansion-panel>
+                </mat-expansion-panel>-->
                 <mat-expansion-panel
                   (opened)="panelOpenState[2] = true"
                   (closed)="panelOpenState[2] = false"
@@ -572,7 +584,7 @@
                         @dissolve
                         *ngIf="!loading"
                       >
-                        {{ checklist.extendedInfo }}
+                        {{ checklist.notes }}
                       </div>
                       <ngx-skeleton-loader
                         *ngIf="loading"
@@ -642,7 +654,7 @@
           <mat-menu #menuLayouts="matMenu" class="menu">
             <div
               class="menu-container"
-              *ngFor="let button of layouts; let i = index"
+              *ngFor="let button of layout.options; let i = index"
             >
               <button
                 mat-menu-item
@@ -693,7 +705,7 @@
           <mat-menu #menuView="matMenu" class="menu">
             <div
               class="menu-container"
-              *ngFor="let button of views; let i = index"
+              *ngFor="let button of view.options; let i = index"
             >
               <button
                 mat-menu-item
@@ -729,7 +741,7 @@
               : ''
           "   
         > 
-          <ng-container *ngFor="let item of checklist.items; let i = index">
+          <ng-container *ngFor="let item of checklist.lines; let i = index">
             <ng-container              
               *ngIf="selectedView.value === 'all' || 
               (selectedView.value === 'answered' && item.status === ChecklistQuestionStatus.COMPLETED) ||

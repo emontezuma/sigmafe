@@ -63,7 +63,8 @@ export class CatalogPlantsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogPlantsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.PLANTS_CATALOG,
       true,
@@ -166,6 +168,8 @@ export class CatalogPlantsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'company') {            
+            this.order = JSON.parse(`{ "data": { "company": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -246,8 +250,9 @@ export class CatalogPlantsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {  
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.PLANTS_CATALOG,
@@ -258,8 +263,8 @@ export class CatalogPlantsListComponent implements AfterViewInit {
           elements: this.elements,
           alignment: 'right',
         });        
-      }, 500);
-    }
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -291,9 +296,9 @@ export class CatalogPlantsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allPlantsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(plantsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(plantsToCsv?.data?.exportPlantsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(plantsToCsv?.data?.exportPlantToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, plantsToCsv?.data?.exportPlantsToCsv?.downloadFilename);
+              this.downloadFile(data, plantsToCsv?.data?.exportPlantToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

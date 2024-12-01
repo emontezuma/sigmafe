@@ -27,7 +27,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Equipments ===============
-  equipmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+  equipmentsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'status', 'updatedAt'];
   equipmentsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   equipmentsData$: Observable<EquipmentsData>;
@@ -40,7 +40,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
   allEquipmentsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "server";  
+  catalogIcon: string = "electric_blanket_2";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +63,8 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.EQUIPMENTS_CATALOG,
       true,
@@ -166,6 +168,8 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'plant') {            
+            this.order = JSON.parse(`{ "data": { "plant": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -209,7 +213,12 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  plant: {
+                    ...item.data.plant,
+                    name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
+                    isTranslated: item.data.plant?.translations?.length > 0 ? true : false,
+                  },                 
                 }
               }
             })          
@@ -241,8 +250,9 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.EQUIPMENTS_CATALOG,
@@ -252,9 +262,9 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -286,9 +296,9 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allEquipmentsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(equipmentsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(equipmentsToCsv?.data?.exportEquipmentsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(equipmentsToCsv?.data?.exportEquipmentToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, equipmentsToCsv?.data?.exportEquipmentsToCsv?.downloadFilename);
+              this.downloadFile(data, equipmentsToCsv?.data?.exportEquipmentToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -389,7 +399,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.equipmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
+    this.equipmentsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

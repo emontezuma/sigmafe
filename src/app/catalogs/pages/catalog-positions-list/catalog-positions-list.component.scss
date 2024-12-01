@@ -88,9 +88,9 @@ table {
 .mat-column-name {
   word-wrap: break-word !important;
   white-space: unset !important;
-  width: 26%;
-  max-width: 26% !important;
-  min-width: 26%;
+  width: 15%;
+  max-width: 15% !important;
+  min-width: 15%;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;
@@ -120,9 +120,33 @@ table {
 .mat-column-reference {
   word-wrap: break-word !important;
   white-space: unset !important;
-  width: 26%;
-  max-width: 26% !important;
-  min-width: 26%;
+  width: 10%;
+  max-width: 10% !important;
+  min-width: 10%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
+.mat-column-plant {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 15%;
+  max-width: 15% !important;
+  min-width: 15%;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+}
+
+.mat-column-recipient {
+  word-wrap: break-word !important;
+  white-space: unset !important;
+  width: 15%;
+  max-width: 15% !important;
+  min-width: 15%;
   overflow-wrap: break-word;
   word-wrap: break-word;
   word-break: break-word;

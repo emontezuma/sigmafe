@@ -62,7 +62,8 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -73,6 +74,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
       true,
@@ -251,8 +253,9 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG,
@@ -262,9 +265,9 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -296,9 +299,9 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(checklistTemplatesToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(checklistTemplatesToCsv?.data?.exportChecklistTemplateToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, checklistTemplatesToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
+              this.downloadFile(data, checklistTemplatesToCsv?.data?.exportChecklistTemplateToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

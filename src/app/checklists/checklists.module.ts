@@ -10,6 +10,7 @@ import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, MultipleSelect
 import { IconsModule } from '../shared/icons';
 import { ImageNotFoundModule } from '../shared/directives';
 import { ChecklistFillingItemsComponent, QuestionToolbarComponent } from './components';
+import { ButtonMenuModule } from '../shared/components/button-menu/button-menu.module';
 
 @NgModule({
   declarations: [  
@@ -32,7 +33,8 @@ import { ChecklistFillingItemsComponent, QuestionToolbarComponent } from './comp
     IconsModule,
     LabelEllipsisModule,
     ImageNotFoundModule,
-    ReadonlyFieldModule,    
+    ReadonlyFieldModule,
+    ButtonMenuModule,
   ],
   providers: [
     {

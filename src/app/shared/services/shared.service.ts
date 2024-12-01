@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, interval } from 'rxjs';
 import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
-import { CapitalizationMethod, DatesDifference, RecordStatus } from '../models/helpers.models';
+import { Attachment, CapitalizationMethod, DatesDifference, RecordStatus } from '../models/helpers.models';
 import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_MOLDS, GET_PLANTS_LAZY_LOADING } from '../../graphql/graphql.queries';
 import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
@@ -415,7 +415,7 @@ export class SharedService {
   }
 
   convertUtcTolocal(dateUtc: string): Date | string {
-    if (!dateUtc || dateUtc?.trim() === '') {
+    if (!dateUtc || (!!dateUtc && dateUtc.trim() === '')) {
       return null;
     }
     
@@ -518,6 +518,33 @@ export class SharedService {
     }
     return timeStr;
   }
+
+  mapAttachments(data: any): Attachment[] {
+    if (!data) return [];
+    let line = 0;
+    return data?.map(t => {
+      return {
+        index: line++,
+        name: t.fileName,
+        image: `${environment.serverUrl}/files/${t.path}`,
+        id: t.fileId,
+        icon: this.setIconName(t.fileType),
+      }
+    });
+  }
+
+  setIconName(fileType: string): string {
+    if (fileType.toLowerCase().indexOf('image') > -1) {
+      return 'field_image'
+    } else if (fileType.toLowerCase().indexOf('pdf') > -1) {
+      return 'file_format_pdf'
+    } else if (fileType.toLowerCase().indexOf('video') > -1) {
+      return 'youtube2'
+    }
+    return 'faq';
+  }
+
+  
   
 // End ======================
 }

@@ -50,14 +50,14 @@
       </mat-form-field>
     </div>
     <fieldset
-      [disabled]="formField.value === 'y' || formField.value === ''"
+      [disabled]="formField.value === GeneralValues.YES || formField.value === ''"
       class="multiple-selection-list__list_options-no-border"
     >
       <div
         class="multiple-selection-list__list-options-container"
         [ngStyle]="{
           'border-color':
-            formField.value === 'y' || formField.value === ''
+            formField.value === GeneralValues.YES || formField.value === ''
               ? 'var(--z-colors-page-button-disabled-border)'
               : 'var(--theme-primary-300)'
         }"
@@ -84,7 +84,7 @@
           *ngIf="list.length > 0 || loading"
           class="multiple-selection-list__list-options-box"
           [disabled]="
-            formField.value === 'y' || formField.value === '' || loading || formField.disabled
+            formField.value === GeneralValues.YES || formField.value === '' || loading || formField.disabled
           "
           #multipleSelection
           name="multipleSelection"

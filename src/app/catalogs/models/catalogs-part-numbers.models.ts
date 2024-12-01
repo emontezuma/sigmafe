@@ -31,6 +31,7 @@ export interface PartNumberDetail {
   mainImageName?: string;
   mainImage?: string;
   id?: number;
+  dieId?: number;
   customerId?: number;
 
 
@@ -84,9 +85,7 @@ export const emptyPartNumberItem: PartNumberDetail = {
   name: null,
   id: null,
   customerId: null,
-
-
-
+  dieId: null,
   mainImagePath: null,    
   prefix: null,
   status: null,

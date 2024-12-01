@@ -66,10 +66,12 @@ export interface PageInfo {
     CATALOGS_VARIABLES_ATTACHMENTS = 'catalogs-variables-attachments',
     CATALOGS_CHECKLIST_TEMPLATES = 'catalogs-checklist-templates',
     CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS = 'catalogs-checklist-template-header-attachments',
-    CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS = 'catalogs-checklist-template-lines-attachments',
+    CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS = 'catalogs-checklist-template-lines-attachments',    
+    CATALOGS_CHECKLIST_LINES_ATTACHMENTS = 'catalogs-checklist-lines-attachments',
     CATALOGS_CUSTOMERS = 'catalogs-custmomers',
     CATALOGS_WORKGROUPS = 'catalogs-workgroups',
     CATALOGS_PROVIDERS = 'catalogs-providers',
+    CHECKLIST_ATTACHMENTS = 'checklist-header-attachments',
 }
   
 export enum SystemTables {
@@ -97,6 +99,7 @@ export enum SystemTables {
     SENSORS = 'sensors',
     SIGMA_TYPES = 'sigmaTypes',
     GEN_VALUES_YES_NO = 'gen-values-yes-no',
+    TABLE_NAMES = 'table-names',
     CHECKLIST_PLANS_FREQUENCIES = 'checklist-plans-frequencies',
     CHECKLIST_PLANS_GENERATION_MODES = 'checklist-plans-generation-modes',
     VARIABLE_BY_DEFAULT_DATE = 'variable-by-default-date',
@@ -109,7 +112,8 @@ export enum SystemTables {
     CHECKLIST_TEMPLATES_RED = 'mold-checklist-templates-red',
     CHECKLIST_TEMPLATES = 'checklist-templates',
     CHECKLIST_TEMPLATE_TYPES = 'checklist-template-types',
-    CHECKLIST_TEMPLATE_MACROS = 'checklist-templates-macros',    
+    CHECKLIST_TEMPLATE_MACROS = 'checklist-templates-macros',
+    CHECKLIST_TEMPLATE_INITIAL_STATES = 'checklist-templates-initial-states',    
     MOLDS_CATALOGS_MACROS = 'molds-catalog-macros',    
     CHECKLIST_TEMPLATE_NOTIFYING = 'checklist-template-notifying',    
     CHANNELS = 'channels',        
@@ -120,10 +124,12 @@ export enum SystemTables {
 export enum GeneralValues {
     N_A = 'n/a',
     YES = 'y',
+    YESNO = 'yesNo',
     NO = 'n',
     FREE_TEXT = 'free-text',
     SPECIFIC = 'specific',
     DASH = '-',
+    PLANNED = 'planned',
 }
 
 export enum TemplatesHardcodedlValues {

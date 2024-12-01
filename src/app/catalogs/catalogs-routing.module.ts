@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogGenericsListComponent, CatalogGenericEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent, CatalogChecklistPlansListComponent, CatalogChecklistPlansEditionComponent } from './pages';
+import { CatalogChecklistTemplatesListComponent, CatalogMoldsListComponent, CatalogMoldEditionComponent, CatalogVariablesListComponent, CatalogVariableEditionComponent, CatalogsHomeComponent, CatalogCustomersListComponent, CatalogCustomerEditionComponent, CatalogManufacturersListComponent, CatalogManufacturerEditionComponent, CatalogPlantEditionComponent, CatalogPlantsListComponent, CatalogCompaniesListComponent, CatalogCompanyEditionComponent, CatalogEquipmentsListComponent, CatalogEquipmentEditionComponent, CatalogDepartmentsListComponent, CatalogDepartmentEditionComponent, CatalogChecklistTemplatesEditionComponent, CatalogUomsListComponent, CatalogUomEditionComponent, CatalogPositionsListComponent, CatalogPositionEditionComponent, CatalogPartNumbersListComponent, CatalogPartNumberEditionComponent, CatalogLinesListComponent, CatalogLineEditionComponent, CatalogGenericsListComponent, CatalogGenericEditionComponent, CatalogShiftsListComponent, CatalogShiftEditionComponent, CatalogProvidersListComponent, CatalogProviderEditionComponent, CatalogChecklistPlansListComponent, CatalogChecklistPlansEditionComponent, CatalogWorkgroupEditionComponent, CatalogWorkgroupsListComponent, CatalogRecipientEditionComponent, CatalogRecipientsListComponent, CatalogSigmaTypeEditionComponent, CatalogSigmaTypesListComponent, CatalogMoldControlEditionComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
 import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
@@ -15,7 +15,12 @@ const routes: Routes = [
       {
         path: 'molds',
         component: CatalogMoldsListComponent,
-        data: { animation: 'CatalogMoldsComponent' },
+        data: { animation: 'CatalogMoldsComponent', showAddButton: true },
+      },
+      {
+        path: 'molds-control',
+        component: CatalogMoldsListComponent,
+        data: { animation: 'CatalogMoldsComponent', showAddButton: false },
       },
       {
         path: 'molds/create',
@@ -26,6 +31,11 @@ const routes: Routes = [
         path: 'molds/edit/:id',
         component: CatalogMoldEditionComponent,
         data: { animation: 'CatalogMoldEditionComponent' },
+      },
+      {
+        path: 'molds-control/edit/:id',
+        component: CatalogMoldControlEditionComponent,
+        data: { animation: 'CatalogMoldControlEditionComponent' },
       },
       {
         path: 'variables',
@@ -266,6 +276,51 @@ const routes: Routes = [
         path: 'providers/edit/:id',
         component: CatalogProviderEditionComponent,
         data: { animation: 'CatalogProviderEditionComponent' },
+      },
+      {
+        path: 'workgroups',
+        component: CatalogWorkgroupsListComponent,
+        data: { animation: 'CatalogprovidersComponent' },
+      },
+      {
+        path: 'workgroups/create',
+        component: CatalogWorkgroupEditionComponent,
+        data: { animation: 'CatalogWorkgroupEditionComponent' },
+      },
+      {
+        path: 'workgroups/edit/:id',
+        component: CatalogWorkgroupEditionComponent,
+        data: { animation: 'CatalogWorkgroupEditionComponent' },
+      },
+      {
+        path: 'recipients',
+        component: CatalogRecipientsListComponent,
+        data: { animation: 'CatalogRecipientsComponent' },
+      },
+      {
+        path: 'recipients/create',
+        component: CatalogRecipientEditionComponent,
+        data: { animation: 'CatalogRecipientEditionComponent' },
+      },
+      {
+        path: 'recipients/edit/:id',
+        component: CatalogRecipientEditionComponent,
+        data: { animation: 'CatalogRecipientEditionComponent' },
+      },
+      {
+        path: 'sigma-types',
+        component: CatalogSigmaTypesListComponent,
+        data: { animation: 'CatalogSigmaTypesListComponent' },
+      },
+      {
+        path: 'sigma-types/create',
+        component: CatalogSigmaTypeEditionComponent,
+        data: { animation: 'CatalogSigmaTypeEditionComponent' },
+      },
+      {
+        path: 'sigma-types/edit/:id',
+        component: CatalogSigmaTypeEditionComponent,
+        data: { animation: 'CatalogSigmaTypeEditionComponent' },
       },
       {
         path: '**',

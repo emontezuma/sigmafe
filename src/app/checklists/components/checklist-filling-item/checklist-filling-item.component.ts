@@ -9,6 +9,7 @@ import { dissolve } from '../../../shared/animations/shared.animations';
 import { EChartsOption } from 'echarts';
 import { Observable, tap } from 'rxjs';
 import { ButtonActions, SharedState } from 'src/app/shared/models/screen.models';
+import { ChecklistLine, GeneralValues } from 'src/app/shared/models';
 
 @Component({
   selector: 'app-checklist-filling-item',
@@ -18,7 +19,7 @@ import { ButtonActions, SharedState } from 'src/app/shared/models/screen.models'
 })
 export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('questionCard') questionCard: ElementRef;
-  @Input() item: ChecklistFillingItem;
+  @Input() item: ChecklistLine;
   @Input() view: string;
   @Input() inactive: boolean;
 
@@ -102,7 +103,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
   screen$: Observable<SharedState>;
   observer;
 
-  showChart: boolean = false;
+  showChart: string = 'N';
   miniChartWidth: number = 90;
   miniChartHeight: number = 50;
 
@@ -117,6 +118,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
     this.observer = new ResizeObserver(entries => {
       this._zone.run(() => {
         this.adjustCardWidth(entries[0].contentRect.width);
+        console.log(this.item);
       });
     });
     this.observer.observe(this._host.nativeElement);
@@ -148,7 +150,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
 // Functions ================
 
   setAnswer(e: any) {    
-    if (this.item.answerType === ChecklistAnswerType.YES_NO) {
+    if (this.item.valueType === ChecklistAnswerType.YES_NO) {
       let answer = undefined;
       let status = ChecklistQuestionStatus.COMPLETED;
       let actionRequired = false;
@@ -161,8 +163,8 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
       } else {                
         status = ChecklistQuestionStatus.READY;
       }
-      if (
-        answer !== this.item.answer ||
+      /* if (
+        answer !== this.item.value ||
         status !== this.item.status ||
         actionRequired !== this.item.actionRequired
       ) {
@@ -173,7 +175,7 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
           actionRequired,
         };
         this._store.dispatch(updateChecklistQuestion({ item: newItem }));        
-      }        
+      } */        
     }      
   }
 
@@ -205,6 +207,10 @@ export class ChecklistFillingItemsComponent implements AfterViewInit, OnDestroy 
     : this.item.status === ChecklistQuestionStatus.CANCELLED
     ? 'La pregunta fue cancelada y no se requiere una respuesta'
     : 'Se requiere una acción';
+  }
+
+  get GeneralValues() {
+    return GeneralValues; 
   }
 
 // End ======================

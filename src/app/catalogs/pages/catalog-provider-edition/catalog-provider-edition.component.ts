@@ -114,7 +114,7 @@ export class CatalogProviderEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-   
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.VARIABLES_CATALOG_EDITION,
       true,
@@ -205,21 +205,22 @@ export class CatalogProviderEditionComponent {
 
 
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.VARIABLES_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -352,7 +353,8 @@ export class CatalogProviderEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateProvider.length > 0 && data?.data?.createOrUpdateProvider[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.provider.status = RecordStatus.INACTIVE;
                       const message = $localize`El proveedor ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -423,6 +425,7 @@ export class CatalogProviderEditionComponent {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
                       const message = $localize`El Proveedor ha sido reactivado`;
+                      this.provider.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -498,7 +501,7 @@ export class CatalogProviderEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.provider.translations = [...response.translations];
+              this.provider.translations = [...response.translations];              
               //}));
               this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.provider.translations.length > 0 ? $localize`Traducciones (${this.provider.translations.length})` : $localize`Traducciones`;
               this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.provider.translations.length > 0 ? 'accent' : '';   
@@ -913,6 +916,7 @@ requestProviderData(providerId: number): void {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.providerForm.markAllAsTouched();
     const fc = this.providerForm.controls;
     return  {
         id: this.provider.id,
@@ -1119,6 +1123,10 @@ requestProviderData(providerId: number): void {
 
   get GeneralValues() {
     return GeneralValues; 
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
 // End ======================

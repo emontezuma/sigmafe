@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -13,6 +13,7 @@
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateManufacturerCatalog$ | async "></ng-container>  
+  <ng-container *ngIf="updateManufacturer$ | async "></ng-container>  
   <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
   <ng-container *ngIf="manufacturer$ | async "></ng-container>       
 
@@ -42,7 +43,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DE LA FABRICA</label
+                >INFORMACIÓN PRINCIPAL DEL FABRICANTE</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -77,7 +78,7 @@
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre de la fabrica</span
+                  >Descripción/Nombre del fabricante</span
                 >
               </app-input-field>
             </div>
@@ -90,11 +91,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación de la fabrica"
+                fieldHelp="Especifique la abreviación del fabricante"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación de la fabrica</span
+                  >Abreviación del fabricante</span
                 >
               </app-input-field>
             </div>
@@ -106,7 +107,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia de la fabrica"
+                fieldHelp="Especifique la referencia del fabricante"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -122,7 +123,7 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a esta fabrica"
+                fieldHelp="Especifique las notas referentes a este fabricante"
               >
                 <span fieldTitle class="label field__label"
                   >Notas referentes a la fabrica</span
@@ -159,14 +160,14 @@
                         mat-icon-button
                         (click)="removeImage()"
                         style="margin-right: 5px;"
-                        matTooltip="Remueve la imagen de la fabrica"
+                        matTooltip="Remueve la imagen del fabricante"
                         matTooltipClass="tooltip-general"
                         matTooltipShowDelay="100"
                       >
                         <mat-icon>close</mat-icon>
                       </button>
                     </mat-form-field>          
-                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta fabrica</span>
+                    <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de este fabricante</span>
                   </div>                  
                   <div *ngIf="!loading" class="card-image">
                     <div
@@ -235,7 +236,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="manufacturer.deletedById > 0">
+      <div class="grid-inactive" *ngIf="manufacturer.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(manufacturer.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">

@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="equipmentsData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -80,6 +81,16 @@
         </td>
       </ng-container>
 
+      <ng-container matColumnDef="plant">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Planta</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.data.plant.name }}</strong>
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Estatus</th>
         <td mat-cell *matCellDef="let row">
@@ -106,22 +117,22 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: equipmentsTableColumns"
-        [routerLink]="['/catalogs/equipments/edit/', row.data.id]"
+        [routerLink]="['/catalogs/equipments/edit/', row?.data?.id]"
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="equipments-table-mat-row" *matNoDataRow>
           <td class="equipments-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="equipments-table__paginator">
+    <div *ngIf="showTableFooter"class="equipments-table__paginator">
       <div class="equipments-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total equipamiento(s) <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

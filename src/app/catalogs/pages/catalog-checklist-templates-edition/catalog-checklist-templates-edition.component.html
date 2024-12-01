@@ -1,9 +1,9 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 
 <div
   class="container"
   #catalogEdition
-  @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  @routingAnimation  
 >
 
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -32,7 +32,8 @@
   <ng-container *ngIf="states$ | async "></ng-container>   
   <ng-container *ngIf="updateChecklistTemplateLine$ | async "></ng-container>     
   <ng-container *ngIf="checklistDetailAttachments$ | async "></ng-container>  
-  <ng-container *ngIf="copyChecklistTemplate$ | async "></ng-container>           
+  <ng-container *ngIf="copyChecklistTemplate$ | async "></ng-container>
+  <ng-container *ngIf="initialStates$ | async "></ng-container>           
 
   <div @dissolve class="sticky" *ngIf="showMacros">
     <mat-card>
@@ -174,7 +175,7 @@
               <fieldset class="field__container">
                 <div class="image-and-field">
                   <div class="field-components">
-                    <span class="label field__label">Imagen a mostrar</span>                
+                    <span class="label field__label">Imagen a mostrar</span>
                     <mat-form-field appearance="fill" class="field__field">
                       <input
                         class="field__input"
@@ -208,7 +209,7 @@
                       </button>
                     </mat-form-field>          
                     <span class="field__help">Busque en su disco la imagen que se mostrará en las vistas de esta plantilla de checklist</span>
-                  </div>                  
+                  </div>  
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
@@ -230,7 +231,7 @@
                       <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
                     </div>    
                   </div>
-                </div>                
+                </div>
               </fieldset>              
             </div>
             <div class="field-items">
@@ -283,41 +284,6 @@
                 >
               </app-input-field>
             </div>            
-            <div class="field-items">
-              <fieldset
-                class="field__container"
-                style="min-width: 350px; height: calc(100% - 22px);"
-                [ngClass]="{
-                  'field__container--error':
-                    checklistTemplateForm.controls.approver.touched &&
-                    !checklistTemplateForm.controls.approver.valid
-                }"
-                [disabled]="checklistTemplateForm.controls.approver.disabled"
-              >
-                <div class="title-with-id">
-                  <span class="label field__label">Aprobador fijo de esta plantilla</span>
-                  <span class="field__label" *ngIf="checklistTemplateForm.controls.approver?.value?.id">Id: {{ checklistTemplateForm.controls.approver?.value?.id }}</span>
-                </div>
-                <app-auto-complete-field
-                  [focused]="focusThisField==='approver'"
-                  [formField]="checklistTemplateForm.controls.approver"
-                  [list]="approvers.items"
-                  [totalCount]="approvers.totalCount"
-                  leftHint="Escriba el nombre del aprobador a buscar"
-                  [catalog]="SystemTables.USERS"
-                  [loading]="approvers.loading"
-                  noItemsError="No hay plantas con este nombre"
-                  [showDataState]="true"
-                  (optionSelected)="handleOptionSelected($event)"
-                  (getMoreData)="getMoreData($event)"
-                >
-                </app-auto-complete-field>
-                <span class="field__help"
-                  >Especifique el Nombre del aprobador asignado para estas plantilla de checklist. este aprobador no se podrá modificar salvo suplencias</span
-                >
-              </fieldset>
-            </div>
-
           </div>          
         </mat-expansion-panel>
         <mat-expansion-panel
@@ -354,94 +320,51 @@
               </button>
             </div>
           </mat-expansion-panel-header>
-          <div class="grid-multiple margin-top">            
+          <div class="grid-multiple margin-top">
             <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowDiscard"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite descartar el llenado"
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    checklistTemplateForm.controls.approver.touched &&
+                    !checklistTemplateForm.controls.approver.valid
+                }"
+                [disabled]="checklistTemplateForm.controls.approver.disabled"
               >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist permite descartar el llenado?</span
+                <div class="title-with-id">
+                  <span class="label field__label">Aprobador fijo de esta plantilla</span>
+                  <span class="field__label" *ngIf="checklistTemplateForm.controls.approver?.value?.id">Id: {{ checklistTemplateForm.controls.approver?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='approver'"
+                  [formField]="checklistTemplateForm.controls.approver"
+                  [list]="approvers.items"
+                  [totalCount]="approvers.totalCount"
+                  leftHint="Escriba el nombre del aprobador a buscar"
+                  [catalog]="SystemTables.USERS"
+                  [loading]="approvers.loading"
+                  noItemsError="No hay plantas con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
                 >
-              </app-select-field>                
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre del aprobador asignado para estas plantilla de checklist. este aprobador no se podrá modificar salvo suplencias</span
+                >
+              </fieldset>
             </div>
             <div class="field-items">
               <app-select-field
-                [formField]="checklistTemplateForm.controls.allowRejection"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite ser rechazado"
+                [formField]="checklistTemplateForm.controls.initialState"
+                [list]="initialStates.items"                
+                fieldHelp="Especifique el estado inicial de la plantilla de checklist"
               >
                 <span fieldTitle class="label field__label"
-                  >¿El checklist permite ser rechazado?</span
+                  >Estado inicial de la Plantilla de checklist</span
                 >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowManualMode"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite modo manual"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist permite modo manual?</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowPartialSaving"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite el guardado parcial"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist permite guardado parcial?</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowApprovalByGroup"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite ser aprobado por el grupo"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist permite ser aprobado por el grupo?</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowExpiring"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite expiración"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist expira?</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.requiresApproval"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist requiere aprobación"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist requiere aprobación?</span
-                >
-              </app-select-field>                
-            </div>            
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistTemplateForm.controls.allowReassignment"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si el checklist permite ser reasignado"
-              >
-                <span fieldTitle class="label field__label"
-                  >¿El checklist permite ser reasignado a otro usuario?</span
-                >
-              </app-select-field>                
+              </app-select-field>      
             </div>
             <div class="field-items">
               <app-select-field
@@ -452,8 +375,85 @@
                 <span fieldTitle class="label field__label"
                   >¿El checklist requiere activación?</span
                 >
-              </app-select-field>                
+              </app-select-field>
             </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowExpiring"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite expiración"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist expira?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.requiresApproval"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist requiere aprobación"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist requiere aprobación?</span
+                >
+              </app-select-field>
+            </div>        
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowApprovalByGroup"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite ser aprobado por el grupo"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite ser aprobado por el grupo?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowPartialSaving"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite el guardado parcial"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite guardado parcial?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowDiscard"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite descartar el llenado"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite descartar el llenado?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowManualMode"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite modo manual"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite modo manual?</span
+                >
+              </app-select-field>
+            </div>           
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowReassignment"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite ser reasignado"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite ser reasignado a otro usuario?</span
+                >
+              </app-select-field>
+            </div>            
             <div class="field-items">
               <app-select-field
                 [formField]="checklistTemplateForm.controls.allowRestarting"
@@ -463,7 +463,18 @@
                 <span fieldTitle class="label field__label"
                   >¿El checklist permite ser reseteado?</span
                 >
-              </app-select-field>                
+              </app-select-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="checklistTemplateForm.controls.allowRejection"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si el checklist permite ser rechazado"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿El checklist permite ser rechazado?</span
+                >
+              </app-select-field>
             </div>
             <div class="field-items">
               <app-select-field
@@ -474,7 +485,7 @@
                 <span fieldTitle class="label field__label"
                   >Al generar este checklist cancelarían los demás no iniciados?</span
                 >
-              </app-select-field>                
+              </app-select-field>
             </div>
           </div>
         </mat-expansion-panel>
@@ -530,7 +541,7 @@
                 (getMoreData)="getMoreData($event)"
               >
               <span fieldTitle class="label field__label">Moldes donde se puede aplicar este checklist</span>
-              </app-multiple-selection-list>                
+              </app-multiple-selection-list>
             </div>
             <div
               class="field-items"
@@ -540,7 +551,7 @@
                 class="multiple-selection-list__field-container"
                 style="height: calc(100% - 22px);"           
               >
-                <span class="label field__label">Estado del molde para apicar este chesklist</span>
+                <span class="label field__label">Estado del molde para aplicar este chesklist</span>
                 <div
                   class="multiple-selection-list__list-options-container" 
                   style="max-height: 260px;"                 
@@ -703,19 +714,19 @@
                   <span fieldTitle class="label field__label"
                     >¿El checklist se notifica anticipadamente?</span
                   >
-                </app-select-field>                
+                </app-select-field>
               </div>
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Modo de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                      checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -742,7 +753,7 @@
                       *ngIf="anticipationNotificationMode?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                        checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -801,14 +812,14 @@
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Canal de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                      checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -835,7 +846,7 @@
                       *ngIf="anticipationChannels?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyAnticipation.value !== 'y'
+                        checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -900,7 +911,7 @@
                       checklistTemplateForm.controls.anticipationRecipient.touched &&
                       !checklistTemplateForm.controls.anticipationRecipient.valid
                   }"
-                  [disabled]="checklistTemplateForm.controls.anticipationRecipient.disabled ||checklistTemplateForm.controls.notifyAnticipation.value !== 'y'"
+                  [disabled]="checklistTemplateForm.controls.anticipationRecipient.disabled ||checklistTemplateForm.controls.notifyAnticipation.value !== GeneralValues.YES"
                 >
                   <div class="title-with-id">
                     <span class="label field__label">Recipiente asociado</span>
@@ -984,25 +995,7 @@
                     >Título del mensaje a enviar (sólo para envío de correos)</span
                   >
                 </app-area-field>               
-              </div>  
-              <div class="field-items">
-                <app-input-field
-                  [bordered]="true"
-                  [formField]="checklistTemplateForm.controls.anticipationSeconds"
-                  rightHint="Campo opcional"
-                  fieldInputType="number"
-                  currentErrorIcon="warn_line"
-                  [showCloseButton]="true"
-                  [showRightHint]="true"
-                  leftHint="Expresado en segundos"
-                  fieldHelp="Indique el tiempo de anticipación"
-                  [rightSuffix]="_sharedService.getHours(checklistTemplateForm.controls.anticipationSeconds.value)"
-                >
-                  <span fieldTitle class="label field__label"
-                    >Tiempo de anticipación</span
-                  >
-                </app-input-field>
-              </div>                   
+              </div>
             </div>
           </mat-expansion-panel>
           <mat-expansion-panel            
@@ -1050,19 +1043,19 @@
                   <span fieldTitle class="label field__label"
                     >¿El checklist se notifica al generarse?</span
                   >
-                </app-select-field>                
+                </app-select-field>
               </div>
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Modo de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                      checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1089,7 +1082,7 @@
                       *ngIf="generationNotificationMode?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                        checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1148,14 +1141,14 @@
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Canal de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                      checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1182,7 +1175,7 @@
                       *ngIf="generationChannels?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyGeneration.value !== 'y'
+                        checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1247,7 +1240,7 @@
                       checklistTemplateForm.controls.generationRecipient.touched &&
                       !checklistTemplateForm.controls.generationRecipient.valid
                   }"
-                  [disabled]="checklistTemplateForm.controls.generationRecipient.disabled ||checklistTemplateForm.controls.notifyGeneration.value !== 'y'"
+                  [disabled]="checklistTemplateForm.controls.generationRecipient.disabled ||checklistTemplateForm.controls.notifyGeneration.value !== GeneralValues.YES"
                 >
                   <div class="title-with-id">
                     <span class="label field__label">Recipiente asociado</span>
@@ -1379,19 +1372,19 @@
                   <span fieldTitle class="label field__label"
                     >¿El checklist notifica la aprobación?</span
                   >
-                </app-select-field>                
+                </app-select-field>
               </div>
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Modo de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                      checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1418,7 +1411,7 @@
                       *ngIf="approvalNotificationMode?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                        checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1477,14 +1470,14 @@
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Canal de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                      checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1511,7 +1504,7 @@
                       *ngIf="approvalRequestChannels?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyApproval.value !== 'y'
+                        checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1576,7 +1569,7 @@
                       checklistTemplateForm.controls.approvalRecipient.touched &&
                       !checklistTemplateForm.controls.approvalRecipient.valid
                   }"
-                  [disabled]="checklistTemplateForm.controls.approvalRecipient.disabled ||checklistTemplateForm.controls.notifyApproval.value !== 'y'"
+                  [disabled]="checklistTemplateForm.controls.approvalRecipient.disabled ||checklistTemplateForm.controls.notifyApproval.value !== GeneralValues.YES"
                 >
                   <div class="title-with-id">
                     <span class="label field__label">Recipiente asociado</span>
@@ -1708,19 +1701,19 @@
                   <span fieldTitle class="label field__label"
                     >¿El checklist notifica la expiración?</span
                   >
-                </app-select-field>                
+                </app-select-field>
               </div>
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Modo de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                      checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1747,7 +1740,7 @@
                       *ngIf="expiringNotificationMode.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                        checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1806,14 +1799,14 @@
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Canal de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                      checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -1840,7 +1833,7 @@
                       *ngIf="expiringChannels?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyExpiring.value !== 'y'
+                        checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -1905,7 +1898,7 @@
                       checklistTemplateForm.controls.expiringRecipient.touched &&
                       !checklistTemplateForm.controls.expiringRecipient.valid
                   }"
-                  [disabled]="checklistTemplateForm.controls.expiringRecipient.disabled ||checklistTemplateForm.controls.notifyExpiring.value !== 'y'"
+                  [disabled]="checklistTemplateForm.controls.expiringRecipient.disabled ||checklistTemplateForm.controls.notifyExpiring.value !== GeneralValues.YES"
                 >
                   <div class="title-with-id">
                     <span class="label field__label">Recipiente asociado</span>
@@ -2037,19 +2030,19 @@
                   <span fieldTitle class="label field__label"
                     >¿El checklist notificará cuiando se alarme?</span
                   >
-                </app-select-field>                
+                </app-select-field>
               </div>
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Modo de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                      checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -2076,7 +2069,7 @@
                       *ngIf="alarmNotificationMode?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                        checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -2135,14 +2128,14 @@
               <div class="field-items">
                 <fieldset
                   class="multiple-selection-list__field-container"
-                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== 'y'"                
+                  [disabled]="checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES"                
                 >
                   <span class="label field__label">Canal de notificación</span>
                   <div
                     class="multiple-selection-list__list-options-container"
                     [ngStyle]="{
                       'border-color':
-                      checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                      checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES
                           ? 'var(--z-colors-page-button-disabled-border)'
                           : 'var(--theme-primary-300)'
                     }"
@@ -2169,7 +2162,7 @@
                       *ngIf="alarmNotificationChannels?.items.length > 0 || loading"
                       class="multiple-selection-list__list-options-box"
                       [disabled]="
-                        checklistTemplateForm.controls.notifyAlarm.value !== 'y'
+                        checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES
                       "
                       name="multipleSelection"
                       (click)="handleChangeSelection($event)"
@@ -2234,7 +2227,7 @@
                       checklistTemplateForm.controls.alarmRecipient.touched &&
                       !checklistTemplateForm.controls.alarmRecipient.valid
                   }"
-                  [disabled]="checklistTemplateForm.controls.alarmRecipient.disabled ||checklistTemplateForm.controls.notifyAlarm.value !== 'y'"
+                  [disabled]="checklistTemplateForm.controls.alarmRecipient.disabled ||checklistTemplateForm.controls.notifyAlarm.value !== GeneralValues.YES"
                 >
                   <div class="title-with-id">
                     <span class="label field__label">Recipiente asociado</span>
@@ -2340,8 +2333,8 @@
               <mat-icon class="accordion-icon" svgIcon="attachment"> </mat-icon>              
               <div class="flex-accordion">
                 <label class="accordion-label">ADJUNTOS DE LA PLANTILLA DE CHECKLIST / CABECERA</label>
-                <label class="accordion-label-no-counter">({{ checklistTemplate.attachments.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
-              </div>                
+                <label class="accordion-label-no-counter">({{ checklistTemplate.attachments.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>
+              </div>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -2367,7 +2360,7 @@
                 <table mat-table [dataSource]="attachmentsTable">
 
                   <ng-container matColumnDef="index">
-                    <th mat-header-cell *matHeaderCellDef>#</th>                  
+                    <th mat-header-cell *matHeaderCellDef>#</th>  
                     <td mat-cell *matCellDef="let row; let i = index">
                       <ng-container>{{ i + 1 }}</ng-container>    
                     </td>
@@ -2405,7 +2398,7 @@
                   </ng-container>
 
                   <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef>Nombre</th>                  
+                    <th mat-header-cell *matHeaderCellDef>Nombre</th>  
                     <td mat-cell *matCellDef="let row">
                       <ng-container>{{ row.name }}</ng-container>    
                     </td>
@@ -2484,7 +2477,7 @@
                     <td class="values-table__no-data" colspan="9">
                       No hay adjuntos a mostrar...
                     </td>
-                  </tr>                  
+                  </tr>  
                 </table>
               </div>        
               <mat-divider style="margin: 10px 0px 0px 0px;"></mat-divider>
@@ -2563,8 +2556,8 @@
               <mat-icon class="accordion-icon" svgIcon="view_mode_details"> </mat-icon>
               <div class="flex-accordion">
                 <label class="accordion-label">LÍNEAS DEL CHECKLIST / VARIABLES</label>
-                <label class="accordion-label-no-counter">({{ checklistTemplateLines.length }} de un máximo de {{ settingsData?.checklistTemplate?.variablesLimit ?? 20 }})</label>                
-              </div>                
+                <label class="accordion-label-no-counter">({{ checklistTemplateLines.length }} de un máximo de {{ settingsData?.checklistTemplate?.variablesLimit ?? 20 }})</label>
+              </div>
             </mat-panel-title>
             <div class="icon-button-container">
               <button
@@ -2686,7 +2679,7 @@
                       [disabled]="line.order === checklistTemplateLines.length - 1"
                     >
                       <mat-icon class="icon-rotated-90">last_page</mat-icon>
-                    </button>                    
+                    </button>    
                   </div>
                   
                   <div class="icon-button-container">
@@ -2703,8 +2696,8 @@
                         }}
                       </mat-icon>
                     </button>
-                  </div>                  
-                </mat-expansion-panel-header>                                
+                  </div>  
+                </mat-expansion-panel-header>                
                 <div class="grid-multiple margin-top">
                   <button
                     [disabled]="line.loading"
@@ -2822,7 +2815,7 @@
                   >
                   </app-checklist-template-edition-line>
                 </div>  
-              </mat-expansion-panel>                  
+              </mat-expansion-panel>  
             </div>
           </ng-container>          
         </mat-expansion-panel>           

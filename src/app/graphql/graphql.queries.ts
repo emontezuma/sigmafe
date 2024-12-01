@@ -206,6 +206,38 @@ export const GET_MANUFACTURERS_LAZY_LOADING = gql`
   }
 `;
 
+export const GET_SIGMATYPES_LAZY_LOADING = gql`
+  query SigmaTypesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedManufacturerDtoSortInput!],
+    $filterBy: TranslatedManufacturerDtoFilterInput
+  ) {
+  sigmaTypesPaginated (
+    where: $filterBy, 
+    order: $orderBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake
+  ) {
+      totalCount
+      items {
+        translatedName
+        translatedReference
+        isTranslated        
+        data {
+            name
+            id  
+            status
+        }      
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 export const GET_LINES_LAZY_LOADING = gql`
   query LinesPaginated (
     $recordsToSkip: Int,
@@ -294,7 +326,6 @@ export const GET_GENERICS_LAZY_LOADING = gql`
           status
           id
         }        
-        translatedTableName
         translatedName
         translatedReference
         friendlyStatus
@@ -366,6 +397,61 @@ export const GET_ALL_MOLDS_TO_CSV = gql`
   }
 `;
 
+export const GET_ALL_WORKGROUPS_TO_CSV = gql`
+  query ExportWorkGroupToCSV {
+    exportWorkGroupToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+
+export const GET_ALL_DEPARTMENTS_TO_CSV = gql`
+  query ExportDepartmentToCSV {
+    exportDepartmentToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+export const GET_ALL_LINES_TO_CSV = gql`
+  query ExportLineToCSV {
+    exportLineToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+export const GET_ALL_GENERICS_TO_CSV = gql`
+  query ExportGenericToCSV {
+    exportGenericToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+export const GET_ALL_SIGMATYPES_TO_CSV = gql`
+  query ExportSigmaTypeToCSV {
+    exportSigmaTypeToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
+export const GET_ALL_MANUFACTURES_TO_CSV = gql`
+  query ExportManufacturerToCSV {
+    exportManufacturerToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
+
 export const GET_MOLD = gql`
   query OneMold (
     $moldId: Long!,
@@ -420,6 +506,8 @@ export const GET_MOLD = gql`
         notifyYellowBody
         notifyRedSubject
         notifyRedBody
+        entities
+        generationMode
         id
         customerId
         status
@@ -622,7 +710,6 @@ export const GET_MOLD = gql`
       }
       translatedMoldType {
         isTranslated
-        translatedTableName
         translatedName
         translatedReference
         translatedNotes
@@ -630,7 +717,6 @@ export const GET_MOLD = gql`
       }
       translatedMoldClass {
         isTranslated
-        translatedTableName
         translatedName
         translatedReference
         translatedNotes
@@ -812,6 +898,9 @@ export const UPSERT_MOLD = gql`
     $notifyRedRecipientId: Long
     $notifyRedSubject: String
     $notifyRedBody: String
+    $generationMode: String,
+    $entities: String,
+    
   ) {
   createOrUpdateMold (
     inputs: [{
@@ -855,6 +944,9 @@ export const UPSERT_MOLD = gql`
       notifyRedRecipientId: $notifyRedRecipientId
       notifyRedSubject: $notifyRedSubject
       notifyRedBody: $notifyRedBody
+      generationMode: $generationMode
+      entities: $entities
+    
     }]) {
       id
       createdAt
@@ -1145,12 +1237,12 @@ export const UPSERT_CHECKLIST_TEMPLATE = gql`
     $allowReassignment: String,
     $allowRejection: String,
     $allowRestarting: String,
+    $initialState: String,
     $anticipationChannels: String,
     $anticipationMessageBody: String,
     $anticipationMessageSubject: String,
     $anticipationNotificationMode: String,
     $anticipationRecipientId: Long,
-    $anticipationSeconds: Long,
     $approvalNotificationMode: String,
     $approvalRecipientId: Long,
     $approvalRequestChannels: String,
@@ -1206,12 +1298,12 @@ export const UPSERT_CHECKLIST_TEMPLATE = gql`
       allowReassignment: $allowReassignment
       allowRejection: $allowRejection
       allowRestarting: $allowRestarting
+      initialState: $initialState
       anticipationChannels: $anticipationChannels
       anticipationMessageBody: $anticipationMessageBody
       anticipationMessageSubject: $anticipationMessageSubject
       anticipationNotificationMode: $anticipationNotificationMode
       anticipationRecipientId: $anticipationRecipientId
-      anticipationSeconds: $anticipationSeconds
       approvalNotificationMode: $approvalNotificationMode
       approvalRecipientId: $approvalRecipientId
       approvalRequestChannels: $approvalRequestChannels
@@ -1276,15 +1368,14 @@ export const UPSERT_CHECKLIST_PLAN = gql`
     $reference: String,
     $notes: String,
     $prefix: String,
-    $templates: String,
-    $entities: String,
+    $templates: String,    
     $limit: Int,
+    $anticipationTime: Long,
     $hours: String,
     $checklistPlanTypeId: Long,
     $frequency: String,
     $specificDate: DateTime,
     $timeZone: Long,    
-    $generationMode: String,
     $status: String
   ) {
   createOrUpdateChecklistPlan (
@@ -1296,14 +1387,13 @@ export const UPSERT_CHECKLIST_PLAN = gql`
       notes: $notes,
       prefix: $prefix,
       templates: $templates,
-      entities: $entities,
       limit: $limit,
+      anticipationTime: $anticipationTime,
       hours: $hours,
       checklistPlanTypeId: $checklistPlanTypeId,
       frequency: $frequency,
       specificDate: $specificDate,
-      timeZone: $timeZone,
-      generationMode: $generationMode,
+      timeZone: $timeZone,      
       status: $status,    
     }]) {
       id
@@ -1354,7 +1444,7 @@ export const UPSERT_VARIABLE = gql`
     $sigmaTypeId: Long,
     $mainImageGuid: String,
     $mainImageName: String,
-    $mainImagePath: String,    
+    $mainImagePath: String,        
   ) {
   createOrUpdateVariable (
     inputs: [{
@@ -1387,7 +1477,7 @@ export const UPSERT_VARIABLE = gql`
       sigmaTypeId: $sigmaTypeId,
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
-      mainImagePath: $mainImagePath,
+      mainImagePath: $mainImagePath,      
     }]) {
       id
       createdAt
@@ -1876,7 +1966,6 @@ export const GET_CHECKLIST_TEMPLATE = gql`
           anticipationMessageSubject
           anticipationMessageBody
           anticipationNotificationMode
-          anticipationSeconds
           notifyGeneration
           generationChannels
           generationMessageSubject
@@ -1892,6 +1981,7 @@ export const GET_CHECKLIST_TEMPLATE = gql`
           allowReassignment
           requiresActivation
           allowRestarting
+          initialState
           generationCount
           lastGeneratedDate
           anticipationRecipientId
@@ -2033,87 +2123,181 @@ export const GET_CHECKLIST_TEMPLATE = gql`
 }
 `;
 
+export const GET_CHECKLIST = gql`
+  query oneChecklist ($checklistId: Long!) {
+    oneChecklist (id: $checklistId) {      
+      isTranslated
+      translatedName
+      translatedReference
+      translatedNotes
+      translatedPrefix
+      friendlyStatus
+      friendlyState
+      friendlyFrequency
+      friendlyGenerationMode      
+      data {
+        id
+        name
+        reference
+        notes
+        prefix
+        imagePath
+        startDate
+        timeToFill
+        moldId
+        checklistTemplateId
+        mold {
+          description
+          reference
+          notes
+          lastChecklist {
+            name
+            reference
+            completedDate
+            assignedTo {
+                name
+                email
+            }
+            assignedToId
+          }
+        }
+      }    
+    }
+  }
+`;
+
 export const GET_CHECKLIST_TEMPLATE_DETAILS = gql`
 query ChecklistTemplateDetailsUnlimited (
-  $orderBy: [ChecklistTemplateDetailSortInput!],
-  $filterBy: ChecklistTemplateDetailFilterInput,
+  $orderBy: [TranslatedChecklistTemplateDetailDtoSortInput!],
+  $filterBy: TranslatedChecklistTemplateDetailDtoFilterInput,
 ) {
-    checklistTemplateDetailsUnlimited(
+    checklistTemplateDetailsUnlimited (
       order: $orderBy,
       where: $filterBy
     ) {
-        checklistTemplateId
-        variableId
-        minimum
-        maximum
-        required
-        byDefault
-        allowNoCapture
-        allowComments
-        showChart
-        allowAlarm
-        notifyAlarm
-        recipientId
-        line
-        possibleValues        
-        useVariableSettings
-        notes
-        showNotes
-        showLastValue
-        showParameters
-        useVariableAttachments
-        id
-        customerId
-        recipientId
-        variableId
-        customerId        
-        status
-        recipient {
-          name
-          reference
+        friendlyVariableValueType
+        checklistTemplateDetail {
+          checklistTemplateId
+          variableId
+          minimum
+          maximum
+          required
+          byDefault
+          allowNoCapture
+          allowComments
+          showChart
+          allowAlarm
+          notifyAlarm
+          recipientId
+          line
+          possibleValues        
           notes
-          prefix
-          languageId
+          showNotes
+          showLastValue
+          showParameters
+          useVariableSettings
+          useVariableAttachments
           id
-          translations {
-              recipientId
-              name
-              languageId
-              id
-              customerId
-          }
-        }
-        variable {
-          name          
-          reference
-          valueType
-          notes
-          prefix
-          id
-          status          
-          translations {
-              variableId
-              name
-              prefix
-              languageId
-              status
-          }
-          uom {
+          customerId
+          recipientId
+          variableId
+          customerId        
+          status
+          recipient {
             name
             reference
             notes
             prefix
+            languageId
+            id
+            translations {
+                recipientId
+                name
+                languageId
+                id
+                customerId
+            }
+          }
+          variable {
+            name          
+            reference
+            valueType
+            notes
+            prefix
             id
             status          
-            translations {                
+            translations {
+                variableId
                 name
                 prefix
                 languageId
                 status
             }
-          }
-          customerId
-        }        
+            uom {
+              name
+              reference
+              notes
+              prefix
+              id
+              status          
+              translations {                
+                  name
+                  prefix
+                  languageId
+                  status
+              }
+            }
+            customerId
+          }        
+        }
+        
+      }
+  }
+`;
+
+export const GET_CHECKLIST_DETAILS = gql`
+query ChecklistLinesUnlimited (
+  $orderBy: [TranslatedChecklistLineDtoSortInput!],
+  $filterBy: TranslatedChecklistLineDtoFilterInput,
+) {
+    checklistLinesUnlimited (
+      order: $orderBy,
+      where: $filterBy
+    ) {
+        friendlyStatus
+        friendlyState
+        data {
+            checklistId
+            checklistTemplateDetailId
+            line
+            variableId
+            equipmentId
+            state
+            value
+            planned
+            plannedDate
+            alarmed
+            alarmedDate
+            answeredDate
+            isAutonomous
+            sensorId
+            lastAnswer
+            answersCount
+            alarmsCount
+            actionPlan
+            actionPlanExists
+            resetedById
+            resetedDate
+            id
+            customerId
+            status
+            createdById
+            createdAt
+            updatedById
+            updatedAt
+            deletedById
+            deletedAt            
+        }
       }
   }
 `;
@@ -2184,8 +2368,7 @@ export const GET_CHECKLIST_PLAN = gql`
       translatedNotes
       translatedPrefix
       friendlyStatus
-      friendlyFrequency
-      friendlyGenerationMode
+      friendlyFrequency      
       data {
           name
           reference
@@ -2202,9 +2385,7 @@ export const GET_CHECKLIST_PLAN = gql`
           checklistCount
           specificDate
           limit
-          anticipationTime
-          generationMode
-          entities
+          anticipationTime                    
           id
           customerId
           status
@@ -2955,6 +3136,23 @@ export const DELETE_MANUFACTURER_TRANSLATIONS = gql`
   }
 `;
 
+export const INACTIVATE_MANUFACTURER = gql`
+  mutation CreateOrUpdateManufacturer (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateManufacturer (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
 
 //plants===========================
 
@@ -3611,6 +3809,24 @@ export const DELETE_PROVIDER_TRANSLATIONS = gql`
   }
 `;
 
+export const INACTIVATE_PROVIDER = gql`
+  mutation CreateOrUpdateProvider (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateProvider (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 //equipments===========================
 
 export const GET_EQUIPMENTS_LAZY_LOADING = gql`
@@ -4081,6 +4297,52 @@ export const GET_UOM_TRANSLATIONS = gql`
 }
 `;
 
+export const GET_RECIPIENT_TRANSLATIONS = gql`
+  query RecipientsTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [RecipientTranslationTableSortInput!],
+    $filterBy: RecipientTranslationTableFilterInput,
+  ) {
+    recipientsTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        recipientId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
 
 export const UPSERT_UOM_TRANSLATIONS = gql`
   mutation CreateOrUpdateUomTranslationTable (
@@ -4165,8 +4427,195 @@ export const INACTIVATE_UOM = gql`
   }
 `;
 
+export const GET_RECIPIENT = gql`
+  query OneRecipient (
+    $recipientId: Long!,
+  ) {
+  oneRecipient (
+    id: $recipientId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      emails
+      phones
+      mmcalls
+      smartWatchService1
+      smartWatchService2
+      smartWatchService3
+      smartWatchService4
+      smartWatchService5
+      phoneServices
+      languageId
+      language {
+        name
+        reference
+        id
+        iso
+      }
+      id
+      customerId
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus    
+  }
+}
+`;
 
-//positions===========================
+export const GET_RECIPIENTS = gql`
+  query RecipientsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedRecipientDtoSortInput!],
+    $filterBy: TranslatedRecipientDtoFilterInput,
+  ) {
+  recipientsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+          id
+          customerId
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const UPSERT_RECIPIENT_TRANSLATIONS = gql`
+  mutation CreateOrUpdateRecipientTranslationTable (
+    $translations: [RecipientTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateRecipientTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      recipientId,
+      languageId      
+    }
+  }
+`;
+
+export const UPSERT_RECIPIENT = gql`
+  mutation CreateOrUpdateRecipient (
+    $customerId: Long,
+    $id: Long,
+    $status: String    
+    $name: String,
+    $prefix: String,
+    $reference: String,
+    $notes: String,
+    $emails: String,
+    $phones: String,
+    $mmcalls: String,
+    $smartWatchService1: String,
+    $smartWatchService2: String,
+    $smartWatchService3: String,
+    $smartWatchService4: String,
+    $smartWatchService5: String,
+    $phoneServices: String,
+    $languageId: Long
+  ) {
+  createOrUpdateRecipient (
+    inputs: [{
+      customerId: $customerId
+      id: $id      
+      status: $status
+      name: $name
+      prefix: $prefix
+      reference: $reference
+      notes: $notes
+      emails: $emails
+      phones: $phones
+      mmcalls: $mmcalls
+      smartWatchService1: $smartWatchService1
+      smartWatchService2: $smartWatchService2
+      smartWatchService3: $smartWatchService3
+      smartWatchService4: $smartWatchService4
+      smartWatchService5: $smartWatchService5
+      phoneServices: $phoneServices
+      languageId: $languageId
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_RECIPIENT_TRANSLATIONS = gql`
+  mutation DeleteRecipientsTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+ 
+  ) {
+    deleteRecipientsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    ) 
+  }
+`;
+
+export const INACTIVATE_RECIPIENT = gql`
+  mutation CreateOrUpdateRecipient (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateRecipient (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
 
 export const GET_POSITION = gql`
   query OnePosition (
@@ -4341,7 +4790,6 @@ export const GET_POSITION_TRANSLATIONS = gql`
 }
 `;
 
-
 export const UPSERT_POSITION_TRANSLATIONS = gql`
   mutation CreateOrUpdatePositionTranslationTable (
     $translations: [PositionTranslationTableDtoInput!]!    
@@ -4450,7 +4898,7 @@ export const GET_PART_NUMBER = gql`
       reference
       notes
       prefix
-     
+      dieId
       id
       customerId
      
@@ -4584,17 +5032,18 @@ export const UPSERT_PART_NUMBER = gql`
     $name: String,
     $reference: String,
     $notes: String,
+    $dieId: Long,
    
   ) {
   createOrUpdatePartNumber (
     inputs: [{
       customerId: $customerId
-     
       id: $id      
       status: $status
-      name: $name,
-      reference: $reference,
-      notes: $notes,
+      name: $name
+      reference: $reference
+      notes: $notes
+      dieId: $dieId
    
     }]) {
       id
@@ -4628,6 +5077,23 @@ export const DELETE_PART_NUMBER_TRANSLATIONS = gql`
   }
 `;
 
+export const INACTIVATE_PART_NUMBER = gql`
+  mutation CreateOrUpdatePartNumber (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdatePartNumber (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
 
 //lines===========================
 
@@ -4899,6 +5365,7 @@ export const GET_GENERIC = gql`
       notes
       prefix
       id
+      tableName
       customerId
       status
       createdById
@@ -4917,7 +5384,8 @@ export const GET_GENERIC = gql`
         name
       }      
     }
-    friendlyStatus    
+    friendlyStatus
+    friendlyTableName  
   }
 }
 `;
@@ -4936,8 +5404,9 @@ export const GET_GENERICS = gql`
     where: $filterBy
   ) {
       items {
-        friendlyStatus
-        data {
+        friendlyStatus  
+        friendlyTableName      
+        data {          
           name
           reference
           id
@@ -5029,7 +5498,7 @@ export const UPSERT_GENERIC = gql`
     $prefix: String,
     $reference: String,
     $notes: String,
-        
+    $tableName: String,
   ) {
   createOrUpdateGeneric (
     inputs: [{
@@ -5040,6 +5509,7 @@ export const UPSERT_GENERIC = gql`
       prefix: $prefix,
       reference: $reference,
       notes: $notes,
+      tableName: $tableName,
     }]) {
       id
       createdAt
@@ -5089,9 +5559,6 @@ export const INACTIVATE_GENERIC = gql`
   }
 `;
 
-
-//workgroups===========================
-
 export const GET_WORKGROUP = gql`
   query OneWorkgroup (
     $workgroupId: Long!,
@@ -5109,7 +5576,23 @@ export const GET_WORKGROUP = gql`
       mainImagePath     
       id
       customerId
-     
+      recipient {
+        id
+        customerId
+        name
+        status
+        translations {
+          name
+          languageId
+          id
+        }
+      }
+      approver {
+        id
+        customerId
+        name
+        status        
+      }
       status
       createdById
       createdAt
@@ -5241,6 +5724,8 @@ export const UPSERT_WORKGROUP = gql`
     $name: String,
     $reference: String,
     $notes: String,
+    $approverId: Long,
+    $recipientId: Long,
     $mainImageGuid: String,
     $mainImageName: String,
     $mainImagePath: String,   
@@ -5258,7 +5743,8 @@ export const UPSERT_WORKGROUP = gql`
       mainImageGuid: $mainImageGuid,
       mainImageName: $mainImageName,
       mainImagePath: $mainImagePath,
-   
+      approverId: $approverId,
+      recipientId: $recipientId,
     }]) {
       id
       createdAt
@@ -5277,6 +5763,7 @@ export const UPSERT_WORKGROUP = gql`
   }
 `;
 
+
 export const DELETE_WORKGROUP_TRANSLATIONS = gql`
   mutation DeleteWorkgroupsTranslationsTable (
     $ids: [IdToDeleteInput!]!,
@@ -5285,11 +5772,29 @@ export const DELETE_WORKGROUP_TRANSLATIONS = gql`
   ) {
     deleteWorkgroupsTranslationsTable (      
       ids: $ids,
-      customerId: $customerId,
-    
+      customerId: $customerId,    
     ) 
   }
 `;
+
+export const INACTIVATE_WORKGROUP = gql`
+  mutation CreateOrUpdateWorkgroup (
+    $id: Long,
+    $customerId: Long,    
+    $status: String
+  ) {
+  createOrUpdateWorkgroup (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
 
 export const GET_PLANTS_LAZY_LOADING = gql`
   query PlantsPaginated (
@@ -5484,7 +5989,6 @@ export const GET_SHIFT_TRANSLATIONS = gql`
 }
 `;
 
-
 export const UPSERT_SHIFT_TRANSLATIONS = gql`
   mutation CreateOrUpdateShiftTranslationTable (
     $translations: [ShiftTranslationTableDtoInput!]!    
@@ -5499,17 +6003,7 @@ export const UPSERT_SHIFT_TRANSLATIONS = gql`
   }
 `;
 
-/*
 
-   
-    $sequence:Int!,
-    $moveToDate:Int!,  
-==
-
-     moveToDate: $moveToDate
-    sequence: $sequence
-          
-*/
 export const UPSERT_SHIFT = gql`
   mutation CreateOrUpdateShift (
     $customerId: Long,
@@ -5522,9 +6016,9 @@ export const UPSERT_SHIFT = gql`
     
     $fromTime: DateTime,
     $toTime: DateTime,
+    $moveToDate: Int,
+    $sequence: Int,
 
-    
-   
     $id: Long,
     $status: String    
     $name: String,
@@ -5536,18 +6030,14 @@ export const UPSERT_SHIFT = gql`
   createOrUpdateShift (
     inputs: [{
       customerId: $customerId
-
       calendarId: $calendarId
-
       twoDays: $twoDays
       isFirstSequence: $isFirstSequence
       isLastSequence: $isLastSequence  
       fromTime: $fromTime
       toTime: $toTime
-
-      
-
-     
+      moveToDate: $moveToDate
+      sequence: $sequence
       id: $id      
       status: $status
       name: $name,
@@ -5917,8 +6407,7 @@ export const GET_CHECKLIST_PLANS = gql`
   ) {
       items {
         friendlyStatus
-        friendlyFrequency
-        friendlyGenerationMode
+        friendlyFrequency        
         data {
           id
           name
@@ -5929,8 +6418,7 @@ export const GET_CHECKLIST_PLANS = gql`
           lastGeneration
           checklistCount
           status
-          frequency
-          generationMode 
+          frequency          
           checklistPlanType {
             id
             status
@@ -5950,6 +6438,212 @@ export const GET_CHECKLIST_PLANS = gql`
       }    
       totalCount    
     }
+  }
+`;
+
+// Sigma Types
+
+export const GET_SIGMATYPE = gql`
+  query OneSigmaType (
+    $sigmaTypeId: Long!,
+  ) {
+  oneSigmaType (
+    id: $sigmaTypeId        
+  ) {
+    data {
+      name
+      reference
+      notes
+      prefix
+      id
+      customerId     
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+  }
+}
+`;
+
+export const GET_SIGMATYPES = gql`
+  query SigmaTypesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedSigmaTypeDtoSortInput!],
+    $filterBy: TranslatedSigmaTypeDtoFilterInput,
+  ) {
+  sigmaTypesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          id
+          customerId
+          reference
+          status
+          updatedAt
+          updatedBy {
+            name
+          }          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_SIGMATYPE_TRANSLATIONS = gql`
+  query SigmaTypesTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [SigmaTypeTranslationTableSortInput!],
+    $filterBy: SigmaTypeTranslationTableFilterInput,
+  ) {
+    sigmaTypesTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        sigmaTypeId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
+
+export const UPSERT_SIGMATYPE_TRANSLATIONS = gql`
+  mutation CreateOrUpdateSigmaTypeTranslationTable (
+    $translations: [SigmaTypeTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateSigmaTypeTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      sigmaTypeId,
+      languageId      
+    }
+  }
+`;
+
+export const UPSERT_SIGMATYPE = gql`
+  mutation CreateOrUpdateSigmaType (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+     $prefix: String,
+    $reference: String,
+    $notes: String,    
+  ) {
+  createOrUpdateSigmaType (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      prefix: $prefix,
+      reference: $reference,
+      notes: $notes,
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+export const DELETE_SIGMATYPE_TRANSLATIONS = gql`
+  mutation DeleteSigmaTypesTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteSigmaTypesTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,
+    
+    ) 
+  }
+`;
+
+export const INACTIVATE_SIGMATYPE = gql`
+  mutation CreateOrUpdateSigmaType (
+    $id: Long,
+    $customerId: Long,
+    $status: String
+  ) {
+  createOrUpdateSigmaType (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
   }
 `;
 

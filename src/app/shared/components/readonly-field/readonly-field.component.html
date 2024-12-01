@@ -1,16 +1,18 @@
 <div>
   <mat-card-title>
-    <div *ngIf="!loading">
+    <div *ngIf="!loading">      
       <div *ngIf="icon || reference" @dissolve class="flex-col">
-        <mat-icon *ngIf="icon" class="accordion-icon" [svgIcon]="icon">
+        <mat-icon
+          *ngIf="icon" class="accordion-icon"
+          [svgIcon]="icon">
         </mat-icon>
         <app-label-ellipsis
           *ngIf="reference"
           [class]="referenceClass"
-          [label]="reference"
+          [labelInnerHTML]="reference"
         >
         </app-label-ellipsis>
-        <app-label-ellipsis [class]="labelClass" [label]="label">
+        <app-label-ellipsis [class]="labelClass" [labelInnerHTML]="label">
         </app-label-ellipsis>
         <button
           *ngIf="showGoToRecord"
@@ -26,13 +28,13 @@
           </mat-icon>
         </button>
       </div>
-      <app-label-ellipsis
-        @dissolve
-        *ngIf="!reference && !icon"
-        [class]="labelClass"
-        [label]="label"
-      >
-      </app-label-ellipsis>
+      <div *ngIf="!reference && !icon" @dissolve class="flex-col">
+        <app-label-ellipsis          
+          [class]="labelClass"
+          [labelInnerHTML]="label"
+        >          
+        </app-label-ellipsis>
+      </div>
     </div>
     <ngx-skeleton-loader
       *ngIf="loading"

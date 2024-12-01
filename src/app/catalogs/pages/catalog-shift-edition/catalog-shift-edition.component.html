@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -45,7 +45,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL SHIFT</label
+                >INFORMACIÓN PRINCIPAL DEL TURNO</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -76,11 +76,11 @@
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn_line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado al item"
+                fieldHelp="Especifique el nombre asignado al turno"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre del item</span
+                  >Descripción/Nombre del turno</span
                 >
               </app-input-field>
             </div>
@@ -93,11 +93,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación del item"
+                fieldHelp="Especifique la abreviación del turno"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación del item</span
+                  >Abreviación del turno</span
                 >
               </app-input-field>
             </div>
@@ -109,7 +109,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia del item"
+                fieldHelp="Especifique la referencia del turno"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -125,22 +125,16 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a este item"
+                fieldHelp="Especifique las notas referentes a este turno"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes al item</span
+                  >Notas referentes al turno</span
                 >
               </app-area-field>              
-            </div>                     
-        
-                   
+            </div>
           </div>          
         </mat-expansion-panel>
-
-
-
-        <!--                   2                           -->
-       <mat-expansion-panel
+        <mat-expansion-panel
           (opened)="panelOpenState[1] = true"
           (closed)="panelOpenState[1] = false"
           hideToggle="true"
@@ -184,70 +178,87 @@
                 fieldHelp="Especifique si shift es dos dias"
               >
                 <span fieldTitle class="label field__label"
-                  >dos dias?</span
+                  >¿Turno que cubre dos dias?</span
                 >
               </app-select-field>                
+            </div>
+
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="shiftForm.controls.moveToDate"
+                rightHint="Campo requerido"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                fieldHelp="Especifique el número de día a sumar/restar/mantener"
+                currentErrorMessage="Indique cero o deje en blanco si no desea alterar el día"
+                currentErrorIcon="warn_line"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Indique el número de día a alterar en los reportes</span
+                >
+              </app-input-field>
+            </div>
+
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="shiftForm.controls.sequence"
+                rightHint="Campo requerido"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                fieldHelp="Especifique la secuencia de este turno en el día"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn_line"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Secuencia del turno en el día</span
+                >
+              </app-input-field>
             </div>
 
             <div class="field-items">
               <app-select-field
                 [formField]="shiftForm.controls.isFirstSequence"
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si es primera secuencia"
+                fieldHelp="Especifique si es primera secuencia del día"
               >
                 <span fieldTitle class="label field__label"
-                  >Primera secuencia</span
+                  >¿Es la primera secuencia del dia?</span
                 >
               </app-select-field>                
             </div>
 
             <div class="field-items">
               <app-select-field
-                [formField]="shiftForm.controls.isLastSequence"
+                [formField]="shiftForm.controls.isLastSequence"                
                 [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si es ultima secuencia"
+                fieldHelp="Especifique si es ultima secuencia del día"
               >
                 <span fieldTitle class="label field__label"
-                  >Ultima secuencia</span
+                  >¿Es la última secuencia del dia?</span
                 >
               </app-select-field>                
             </div>
 
             <!--from time-->
-           
+            <div class="field-items">
               <fieldset
                 class="field__container"
                 style="min-width: 250px"
-
+                [ngClass]="{
+                  'field__container--error':
+                  shiftForm.controls.fromTimeTime.touched && 
+                  !shiftForm.controls.fromTimeTime.valid
+                }"
               >
-                <span class="label field__label">Fecha y hora por defecto FROM</span>
+                <span class="label field__label">Hora desde</span>
                 <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="fromTimeDate"
-                      #fromTime
-                      name="fromTimeDate"
-                      [matDatepicker]="fromTimePicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="fromTimePicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #fromTimePicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn_line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
+                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
                     <input
                       class="field__input"
                       matInput
@@ -257,49 +268,31 @@
                       style="min-height: 22px"
                       type="time"
                     />
-                    <mat-hint>HH:MM AM/PM</mat-hint>                  
+                    <mat-hint>HH:MM AM/PM</mat-hint>
+                    <mat-error
+                      class="field__error field__required"                      
+                    >
+                      <span class="field__required-label"
+                        ><strong>El rango de horas es incorrecto</strong></span
+                      >
+                    </mat-error>
                   </mat-form-field>
                 </div>
                 <span class="field__help"
-                  >Especifique la fecha y hora por defecto</span
+                  >Especifique hora de incio del turno</span
                 >
               </fieldset>
-          
+          </div>
 
             <!--to time-->
-           
+            <div class="field-items">
               <fieldset
                 class="field__container"
                 style="min-width: 250px"
               >
-                <span class="label field__label">Fecha y hora por defecto TO</span>
+                <span class="label field__label">Hora hasta</span>
                 <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="toTimeDate"
-                      #toTime
-                      name="toTimeDate"
-                      [matDatepicker]="toTimePicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="toTimePicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #toTimePicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn_line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
+                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
                     <input
                       class="field__input"
                       matInput
@@ -313,12 +306,10 @@
                   </mat-form-field>
                 </div>
                 <span class="field__help"
-                  >Especifique la fecha y hora por defecto</span
+                  >Especifique la hora que termina el turno</span
                 >
               </fieldset>
-         
-
-
+            </div>
           </div>
 
         </mat-expansion-panel> 

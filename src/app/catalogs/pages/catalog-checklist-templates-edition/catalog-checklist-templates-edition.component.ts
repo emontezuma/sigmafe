@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, Attachment } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, Attachment, VariableDetail } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,7 +13,7 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { ChecklistTemplateDetail, ChecklistTemplateItem, ChecklistTemplateLine, VariableDetail, emptyChecklistTemplateItem } from '../../models';
+import { ChecklistTemplateDetail, ChecklistTemplateItem, ChecklistTemplateLine, emptyChecklistTemplateItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
@@ -21,7 +21,6 @@ import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/sha
 import { MatTableDataSource } from '@angular/material/table';
 import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
 import { VariableSelectionDialogComponent } from '../../components';
-import { Actions } from '@ngrx/effects';
 
 @Component({
   selector: 'app-catalog-checklist-templates-edition',
@@ -53,6 +52,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   variable$: Observable<any>;
   approvers$: Observable<any>; 
   states$: Observable<any>;
+  initialStates$: Observable<any>;
 
   moldsCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
   molds: GeneralCatalogData = emptyGeneralCatalogData; 
@@ -90,6 +90,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   alarmNotificationMode: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   alarmNotificationChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;   
   states: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  initialStates: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;   
 
   approvers: GeneralCatalogData = emptyGeneralCatalogData; 
 
@@ -172,6 +173,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     allowReassignment: new FormControl(emptyGeneralHardcodedValuesItem),
     requiresActivation: new FormControl(emptyGeneralHardcodedValuesItem),
     allowRestarting: new FormControl(emptyGeneralHardcodedValuesItem),
+    initialState: new FormControl(emptyGeneralHardcodedValuesItem),
     moldStates: new FormControl(''),
     
     expiringMessageSubject:  new FormControl(''),    
@@ -196,8 +198,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     anticipationNotificationMode:  new FormControl(''),
     anticipationChannels:  new FormControl(''),
     anticipationMessageBody:  new FormControl(''),
-    notifyAnticipation: new FormControl(emptyGeneralHardcodedValuesItem),
-    anticipationSeconds: new FormControl(0),    
+    notifyAnticipation: new FormControl(emptyGeneralHardcodedValuesItem),    
     
     notifyGeneration: new FormControl(emptyGeneralHardcodedValuesItem),
     generationNotificationMode:  new FormControl(''),
@@ -257,6 +258,7 @@ export class CatalogChecklistTemplatesEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     // this.checklistTemplateForm.get('name').disable();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.CHECKLIST_TEMPLATES_CATALOG_EDITION,
@@ -293,8 +295,9 @@ export class CatalogChecklistTemplatesEditionComponent {
         // this.requestPartNumbersData(currentPage);
         // this.requestLinesData(currentPage);
         // this.requestEquipmentsData(currentPage);
-        this.requesttemplateTypessData(currentPage);
+        this.requestTemplateTypessData(currentPage);
         this.requestMacrosData(currentPage);
+        this.requestInitialStatesData(currentPage);
         this.requestGenYesNoValuesData(currentPage);        
         this.requestNotifyModesData(currentPage);        
         this.requestNotifyChannelsData(currentPage);        
@@ -306,7 +309,12 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.checklistTemplateFormChangesSubscription = this.checklistTemplateForm.valueChanges
     .subscribe(() => {
       if (!this.loaded) return;
-      this.setEditionButtonsState();      
+      this.setEditionButtonsState();
+      if (this.checklistTemplateForm.get('requiresApproval').value === GeneralValues.YES) {
+        if (this.checklistTemplateForm.get('allowApprovalByGroup').disabled) this.checklistTemplateForm.get('allowApprovalByGroup').enable({ emitEvent: false });
+      } else {
+        if (this.checklistTemplateForm.get('allowApprovalByGroup').enabled) this.checklistTemplateForm.get('allowApprovalByGroup').disable({ emitEvent: false });
+      }
     });
     
     this.toolbarAnimationFinished$ = this._sharedService.toolbarAnimationFinished.pipe(
@@ -366,13 +374,11 @@ export class CatalogChecklistTemplatesEditionComponent {
       if (!this.loaded) return;
       if (!value || value === GeneralValues.NO) {
         if (this.checklistTemplateForm.get('anticipationMessageBody').enabled) this.checklistTemplateForm.get('anticipationMessageBody').disable({ emitEvent: false });
-        if (this.checklistTemplateForm.get('anticipationMessageSubject').enabled) this.checklistTemplateForm.get('anticipationMessageSubject').disable({ emitEvent: false });
-        if (this.checklistTemplateForm.get('anticipationSeconds').enabled) this.checklistTemplateForm.get('anticipationSeconds').disable({ emitEvent: false });
+        if (this.checklistTemplateForm.get('anticipationMessageSubject').enabled) this.checklistTemplateForm.get('anticipationMessageSubject').disable({ emitEvent: false });        
         
       } else if (value === GeneralValues.YES) { 
         if (this.checklistTemplateForm.get('anticipationMessageBody').disabled) this.checklistTemplateForm.get('anticipationMessageBody').enable({ emitEvent: false });
-        if (this.checklistTemplateForm.get('anticipationMessageSubject').disabled) this.checklistTemplateForm.get('anticipationMessageSubject').enable({ emitEvent: false });
-        if (this.checklistTemplateForm.get('anticipationSeconds').disabled) this.checklistTemplateForm.get('anticipationSeconds').enable({ emitEvent: false });        
+        if (this.checklistTemplateForm.get('anticipationMessageSubject').disabled) this.checklistTemplateForm.get('anticipationMessageSubject').enable({ emitEvent: false });        
       }      
     });
 
@@ -477,7 +483,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     )    
   }
 
-  requesttemplateTypessData(currentPage: number, filterStr: string = null) {
+  requestTemplateTypessData(currentPage: number, filterStr: string = null) {
     this.templateTypes = {
       ...this.templateTypes,
       currentPage,
@@ -526,21 +532,22 @@ export class CatalogChecklistTemplatesEditionComponent {
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG_EDITION,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           show: true,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -1419,6 +1426,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         allowAlarm: line.allowAlarm,
         showChart: line.showChart,
         showParameters: line.showParameters ? line.showParameters : GeneralValues.NO,
+        useVariableSettings: line.useVariableSettings ? line.useVariableSettings : GeneralValues.NO,
         showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO,
         notifyAlarm: line.notifyAlarm,
 
@@ -1500,6 +1508,28 @@ export class CatalogChecklistTemplatesEditionComponent {
       catchError(() => EMPTY)
     )
   }
+
+  requestInitialStatesData(currentPage: number) {
+    this.initialStates = {
+      ...this.initialStates,
+      currentPage,
+      loading: true,
+    }        
+    this.initialStates$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.CHECKLIST_TEMPLATE_INITIAL_STATES)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.initialStates.items?.concat(data?.data?.hardcodedValues?.items);        
+        this.initialStates = {
+          ...this.initialStates,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
   
   requestChecklistTemplateData(checklistTemplateId: number): void { 
     let variables = undefined;
@@ -1507,6 +1537,7 @@ export class CatalogChecklistTemplatesEditionComponent {
 
     const skipRecords = 0;
     const filter = JSON.parse(`{ "checklistTemplateId": { "eq": ${checklistTemplateId} } }`);
+    const filterForLines = JSON.parse(`{ "checklistTemplateDetail": { "checklistTemplateId": { "eq": ${checklistTemplateId} } } }`);
     const order: any = JSON.parse(`{ "language": { "name": "${'ASC'}" } }`);
     const process = originProcess.CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS;
     // let getData: boolean = false;
@@ -1517,6 +1548,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       takeRecords: this.takeRecords, 
       order, 
       filter, 
+      filterForLines,
       process,
       customerId: 1, // TODO
       orderForDetails: this.linesOrder,
@@ -1560,7 +1592,7 @@ export class CatalogChecklistTemplatesEditionComponent {
               name: a.fileName, 
               id: a.fileId, 
               image: `${environment.serverUrl}/files/${a.path}`, 
-              icon: this._catalogsService.setIconName(a.fileType), 
+              icon: this._sharedService.setIconName(a.fileType), 
             }            
           });
           if (attachments.length > 1) {
@@ -1570,7 +1602,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                 name: a.fileName, 
                 id: a.fileId, 
                 image: `${environment.serverUrl}/files/${a.path}`, 
-                icon: this._catalogsService.setIconName(a.fileType), 
+                icon: this._sharedService.setIconName(a.fileType), 
               }            
             });
           }          
@@ -1634,7 +1666,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       } else {
         this.templateTypes.currentPage++;
       }
-      this.requesttemplateTypessData(        
+      this.requestTemplateTypessData(        
         this.templateTypes.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
@@ -1780,6 +1812,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       requiresApproval: this.checklistTemplate.requiresApproval,
       cancelOpenChecklists: this.checklistTemplate.cancelOpenChecklists,
       allowReassignment: this.checklistTemplate.allowReassignment,
+      initialState: this.checklistTemplate.initialState,
       requiresActivation: this.checklistTemplate.requiresActivation,
       allowRestarting: this.checklistTemplate.allowRestarting,
       
@@ -1806,7 +1839,6 @@ export class CatalogChecklistTemplatesEditionComponent {
       anticipationChannels: this.checklistTemplate.anticipationChannels,
       anticipationMessageBody: this.checklistTemplate.anticipationMessageBody,
       notifyAnticipation: this.checklistTemplate.notifyAnticipation,
-      anticipationSeconds: this.checklistTemplate.anticipationSeconds,
       
       notifyGeneration: this.checklistTemplate.notifyGeneration,
       generationNotificationMode: this.checklistTemplate.generationNotificationMode,
@@ -1825,6 +1857,7 @@ export class CatalogChecklistTemplatesEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    // this.checklistTemplateForm.markAllAsTouched();
     const fc = this.checklistTemplateForm.controls;
 
     const expiringNotificationMode = this.expiringNotificationMode.items.filter((n) => n.selected).map((n) => n.value).join();
@@ -1864,10 +1897,11 @@ export class CatalogChecklistTemplatesEditionComponent {
       ...(fc.notifyExpiring.dirty || fc.notifyExpiring.touched || newRecord) && { notifyExpiring: fc.notifyExpiring.value },
       ...(fc.notifyAlarm.dirty || fc.notifyAlarm.touched || newRecord) && { notifyAlarm: fc.notifyAlarm.value },
       ...(fc.notifyAnticipation.dirty || fc.notifyAnticipation.touched || newRecord) && { notifyAnticipation: fc.notifyAnticipation.value },
-      ...(fc.anticipationSeconds.dirty || fc.anticipationSeconds.touched || newRecord) && { anticipationSeconds: fc.anticipationSeconds.value ? +fc.anticipationSeconds.value : null },
       ...(fc.notifyApproval.dirty || fc.notifyApproval.touched || newRecord) && { notifyApproval: fc.notifyApproval.value },
       ...(fc.notifyGeneration.dirty || fc.notifyGeneration.touched || newRecord) && { notifyGeneration: fc.notifyGeneration.value },
       ...(fc.allowReassignment.dirty || fc.allowReassignment.touched || newRecord) && { allowReassignment: fc.allowReassignment.value },
+      ...(fc.initialState.dirty || fc.initialState.touched || newRecord) && { initialState: fc.initialState.value },
+      
       ...(fc.requiresActivation.dirty || fc.requiresActivation.touched || newRecord) && { requiresActivation: fc.requiresActivation.value },
       ...(fc.allowRestarting.dirty || fc.allowRestarting.touched || newRecord) && { allowRestarting: fc.allowRestarting.value },
       
@@ -1950,8 +1984,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.checklistTemplateLineForms = [];
 
     // Default values
-    this.checklistTemplateForm.controls.timeToFill.setValue(null);
-    this.checklistTemplateForm.controls.anticipationSeconds.setValue(null);    
+    this.checklistTemplateForm.controls.timeToFill.setValue(null);    
     this.checklistTemplateForm.controls.allowAlarm.setValue(GeneralValues.NO);
     this.checklistTemplateForm.controls.allowDiscard.setValue(GeneralValues.NO);        
     this.checklistTemplateForm.controls.allowRejection.setValue(GeneralValues.NO);
@@ -1971,6 +2004,7 @@ export class CatalogChecklistTemplatesEditionComponent {
     this.checklistTemplateForm.controls.requiresActivation.setValue(GeneralValues.NO);
     this.checklistTemplateForm.controls.allowReassignment.setValue(GeneralValues.NO);
     this.checklistTemplateForm.controls.allowRestarting.setValue(GeneralValues.NO);
+    this.checklistTemplateForm.controls.initialState.setValue(GeneralValues.PLANNED);
         
     this.focusThisField = 'name';
     this.molds.items = [];
@@ -2426,7 +2460,7 @@ export class CatalogChecklistTemplatesEditionComponent {
           name: res.fileName, 
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
-          icon: this._catalogsService.setIconName(res.fileType), 
+          icon: this._sharedService.setIconName(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
         this.setEditionButtonsState();
@@ -2512,7 +2546,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             name: na.fileName, 
             image: `${environment.serverUrl}/files/${na.path}`, 
             id: na.fileId, 
-            icon: this._catalogsService.setIconName(na.fileType), 
+            icon: this._sharedService.setIconName(na.fileType), 
           }
         });
       })
@@ -2792,10 +2826,11 @@ export class CatalogChecklistTemplatesEditionComponent {
             possibleValue: '',
             possibleValues: variableData.possibleValues,
             byDefaultDateType: variableData.byDefaultDateType,    
-            friendlyValueType: variableData.friendlyValueType,
+            friendlyVariableValueType: variableData.friendlyValueType,
             status: RecordStatus.ACTIVE,
             showLastValue: GeneralValues.NO,
             showParameters: GeneralValues.NO,
+            useVariableSettings: GeneralValues.NO,
             loading: false,
           };
           this.checklistTemplateLines.push(newLine);
@@ -3149,6 +3184,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       updatedLine.useVariableAttachments = fc.useVariableAttachments?.value ? GeneralValues.YES : GeneralValues.NO,
       updatedLine.showLastValue = fc.showLastValue?.value;
       updatedLine.showParameters = fc.showParameters?.value;
+      updatedLine.useVariableSettings = fc.showParameters?.useVariableSettings;
       updatedLine.notifyAlarm = fc.notifyAlarm?.value;      
       updatedLine.byDefault = fc.byDefault?.value;    
       updatedLine.showNotes = fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO,
@@ -3173,6 +3209,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         useVariableAttachments: fc.useVariableAttachments.value ? GeneralValues.YES : GeneralValues.NO,
         showLastValue: fc.showLastValue?.value,
         showParameters: fc.showParameters?.value,
+        useVariableSettings: fc.useVariableSettings?.value,
         notifyAlarm: fc.notifyAlarm?.value,        
         byDefault: fc.byDefault?.value,    
         showNotes: fc.showNotes.value ? GeneralValues.YES : GeneralValues.NO,
@@ -3238,7 +3275,7 @@ export class CatalogChecklistTemplatesEditionComponent {
               name: na.fileName, 
               image: `${environment.serverUrl}/files/${na.path}`, 
               id: na.fileId, 
-              icon: this._catalogsService.setIconName(na.fileType), 
+              icon: this._sharedService.setIconName(na.fileType), 
             }
           });
           this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);
@@ -3256,7 +3293,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                   name: na.fileName, 
                   id: na.fileId, 
                   image: `${environment.serverUrl}/files/${na.path}`, 
-                  icon: this._catalogsService.setIconName(na.fileType), 
+                  icon: this._sharedService.setIconName(na.fileType), 
                 }            
               });                        
             }            

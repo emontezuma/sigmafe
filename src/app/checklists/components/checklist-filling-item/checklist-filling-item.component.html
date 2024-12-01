@@ -57,11 +57,11 @@
     </div>    
     <ng-container *ngIf="view === 'flexbox'; else isChecklist">
       <mat-card-header>
-        <ng-container *ngIf="item.answerType === 'yesNo'">      
+        <ng-container *ngIf="item.variable.valueType === GeneralValues.YESNO">      
           <div class="question-container">
             <div class="item-index-container">
               <div class="item-index">
-                {{ item.index }}
+                {{ item.order + 10 }}
               </div>
             </div>
             <div
@@ -78,10 +78,10 @@
                 (change)="setAnswer($event)"
                 [disabled]="item.status === ChecklistQuestionStatus.CANCELLED || inactive"
               >
-                <mat-chip-option value="y" [selected]="item.answer === 'y'">
+                <mat-chip-option value="y" [selected]="item.value === GeneralValues.YES">
                   Si
                 </mat-chip-option>
-                <mat-chip-option value="n" [selected]="item.answer === 'n'">
+                <mat-chip-option value="n" [selected]="item.value === GeneralValues.NO">
                   No
                 </mat-chip-option>
               </mat-chip-listbox>
@@ -121,17 +121,20 @@
 </div>
 <!-- Templates -->
 <ng-template #isChecklist>
-  <mat-card-header class="checklist-flex" >    
+  <div class="checklist-flex" >    
     <div class="question-index">
       <div class="item-index-container">
         <div class="item-index">
-          {{ item.index }}
+          {{ item.order + 1 }}          
         </div>
       </div>
-    </div>    
-    <div class="question-image">
+    </div>
+    <div
+      *ngIf="!!item.icon"
+      class="question-image"
+    >
       <img
-        *ngIf="item.icon"
+        
         alt="image"
         appImageNotFound
         class="item-image"
@@ -141,10 +144,16 @@
     </div>    
     <div class="question-text">
       <div class="item-text">
-        <p>{{ item.text }}</p>
+        <p>{{ item.name }}</p>
+      </div>  
+      <div class="item-text">
+        <p>{{ item.variable?.translatedNotes }}</p>
       </div>  
     </div>
-    <div *ngIf="item.status !== ChecklistQuestionStatus.CANCELLED && !inactive">
+    <div 
+      [ngStyle]="{ 'margin-right': item.required ? '20px' : '2px' }"
+      *ngIf="item.status !== ChecklistQuestionStatus.CANCELLED && !inactive"
+    >
       <app-question-toolbar 
         (buttonAction)="handleButton($event)"
         [elements]="item.buttons"
@@ -160,6 +169,6 @@
         !
       </span>
     </div>
-  </mat-card-header>    
+  </div>    
   
 </ng-template>

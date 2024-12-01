@@ -7,17 +7,27 @@
   <ng-container *ngIf="formStatus$ | async "></ng-container>          
 
   <form class="layout" [formGroup]="variableForm" #f="ngForm">
-    <div>{{variableForm.controls.valueType.value}}</div>
     <div class="grid-multiple">
-      <div class="flex-accordion subtitle">
-        <label class="accordion-label">Variable: {{ line.name }} (id: {{ line.variableId }})</label>
-        <label class="accordion-label">Unidad de medida: {{ line.uomName }} {{ line.uomPrefix ? ("(" + line.uomPrefix + ")") : "" }}</label>
-        <label class="accordion-label-no-counter">Tipo de valor: {{ line.friendlyValueType }}</label>                
+      <div class="flex-accordion">
+        <label class="accordion-label subtitle">Variable: {{ line.name }} (id: {{ line.variableId }})</label>
+        <label class="accordion-label subtitle">Unidad de medida: {{ line.uomName }} {{ line.uomPrefix ? ("(" + line.uomPrefix + ")") : "" }}</label>
+        <label class="accordion-label-no-counter subtitle">Tipo de valor: {{ line.friendlyVariableValueType }}</label>                
       </div>  
     </div>
     <div class="grid-multiple">
       <div class="field-items">
         <app-select-field
+          [formField]="variableForm.controls.useVariableSettings"
+          [list]="genYesNoValues.items"                
+          fieldHelp="Especifique si la variable se basará en los valores directos del catálogo"
+        >
+          <span fieldTitle class="label field__label"
+            >¿Tomar los datos del catálogo de variables?</span
+          >
+        </app-select-field>                
+      </div>
+      <div class="field-items">
+        <app-select-field          
           [formField]="variableForm.controls.required"
           [list]="genYesNoValues.items"                
           fieldHelp="Especifique si la variable es requerida"
@@ -34,7 +44,7 @@
           fieldHelp="Especifique si la variable permite la NO captura"
         >
           <span fieldTitle class="label field__label"
-            >¿El variable permite la NO captura?</span
+            >¿La variable permite la NO captura?</span
           >
         </app-select-field>                
       </div>
@@ -571,7 +581,7 @@
               variableForm.controls.recipient.touched &&
               !variableForm.controls.recipient.valid
           }"
-          [disabled]="variableForm.controls.notifyAlarm.value !== 'y'"
+          [disabled]="variableForm.controls.notifyAlarm.value !== GeneralValues.YES"
         >
           <div class="title-with-id">
             <span class="label field__label">Recipiente asociado</span>
@@ -697,7 +707,7 @@
 
     <div class="grid-multiple">
       <div class="flex-accordion subtitle">
-        <label class="accordion-label">ADJUNTOS DE LA LINEA</label>
+        <label class="accordion-label">ADJUNTOS DE LA LINEA DE CHECKLIST</label>
         <label class="accordion-label-no-counter">({{ line.attachments?.length }} de un máximo de {{ settingsData?.attachments?.checklistTemplateHeader ?? 10 }})</label>                
       </div>  
     </div> 

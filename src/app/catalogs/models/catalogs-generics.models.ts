@@ -26,7 +26,8 @@ export interface GenericDetail {
   reference?: string;
   notes?: string;
   prefix?: string;
-
+  friendlyTableName?: string;
+  tableName?: string;
   id?: number;
   customerId?: number;
   status?: string;

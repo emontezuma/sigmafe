@@ -27,7 +27,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Shifts ===============
-  shiftsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  shiftsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   shiftsCatalogData = new MatTableDataSource<Object>([]);     // PlantItem
   
   shiftsData$: Observable<ShiftsData>;
@@ -40,7 +40,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
   allShiftsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "server";  
+  catalogIcon: string = "time";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +63,8 @@ export class CatalogShiftsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.SHIFTS_CATALOG,
       true,
@@ -245,8 +247,9 @@ export class CatalogShiftsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.SHIFTS_CATALOG,
@@ -256,9 +259,9 @@ export class CatalogShiftsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -290,9 +293,9 @@ export class CatalogShiftsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allShiftsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(shiftsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(shiftsToCsv?.data?.exportShiftsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(shiftsToCsv?.data?.exportShiftToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, shiftsToCsv?.data?.exportShifthhsToCsv?.downloadFilename);
+              this.downloadFile(data, shiftsToCsv?.data?.exportShifthhToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -393,7 +396,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.shiftsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt','calendar'];
+    this.shiftsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt','calendar'];
   }
   
   setTabIndex(tab: any) { 

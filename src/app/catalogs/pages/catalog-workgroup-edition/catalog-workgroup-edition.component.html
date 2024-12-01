@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -11,7 +11,9 @@
   <ng-container *ngIf="settingsData$ | async"></ng-container>
   <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
   <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
-  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>
+  <ng-container *ngIf="approvers$ | async "></ng-container>  
+  <ng-container *ngIf="recipients$ | async "></ng-container>      
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updateWorkgroup$ | async "></ng-container>
   <ng-container *ngIf="updateWorkgroupCatalog$ | async "></ng-container>      
@@ -174,19 +176,19 @@
                   <div *ngIf="!loading" class="card-image">
                     <div
                       class="image-container"
-                      *ngIf="this.workgroup.mainImage"
+                      *ngIf="workgroup.mainImage"
                     >
                       <img                
                         @dissolve
                         appImageNotFound                
                         class="mold-image"                        
-                        [src]="this.workgroup.mainImage"
-                        [alt]="this.workgroup.mainImage"            
+                        [src]="workgroup.mainImage"
+                        [alt]="workgroup.mainImage"            
                         fill
                       >      
                     </div>
                     <div
-                      *ngIf="!this.workgroup.mainImage"
+                      *ngIf="!workgroup.mainImage"
                       class="icon-container"
                     >
                       <mat-icon class="default-icon" [svgIcon]="catalogIcon"></mat-icon>
@@ -195,7 +197,73 @@
                 </div>                
               </fieldset>              
             </div>
-                   
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    workgroupForm.controls.approver.touched &&
+                    !workgroupForm.controls.approver.valid
+                }"
+                [disabled]="workgroupForm.controls.approver.disabled"
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Aprobador del Grupo de trabajo</span>
+                  <span class="field__label" *ngIf="workgroupForm.controls.approver?.value?.id">Id: {{ workgroupForm.controls.approver?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='approver'"
+                  [formField]="workgroupForm.controls.approver"
+                  [list]="approvers.items"
+                  [totalCount]="approvers.totalCount"
+                  leftHint="Escriba el nombre del aprobador a buscar"
+                  [catalog]="SystemTables.USERS"
+                  [loading]="approvers.loading"
+                  noItemsError="No hay aprobador con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Nombre del aprobador</span
+                >
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    workgroupForm.controls.recipient.touched &&
+                    !workgroupForm.controls.recipient.valid
+                }"               
+              >
+                <div class="title-with-id">
+                  <span class="label field__label">Recipiente asociado al departamento</span>
+                  <span class="field__label" *ngIf="workgroupForm.controls.recipient?.value?.id">Id: {{ workgroupForm.controls.recipient?.value?.id }}</span>
+                </div>
+                <app-auto-complete-field
+                  [focused]="focusThisField==='recipient'"
+                  [formField]="workgroupForm.controls.recipient"
+                  [list]="recipients.items"
+                  [totalCount]="recipients.totalCount"
+                  leftHint="Escriba el Nombre del recipiente a buscar"
+                  [catalog]="SystemTables.RECIPIENTS"
+                  [loading]="recipients.loading"
+                  noItemsError="No hay recipientes con este nombre"
+                  [showDataState]="true"
+                  (optionSelected)="handleOptionSelected($event)"
+                  (getMoreData)="getMoreData($event)"
+                >
+                </app-auto-complete-field>
+                <span class="field__help"
+                  >Especifique el Recipiente a notificar</span
+                >
+              </fieldset>
+            </div>
           </div>          
         </mat-expansion-panel>        
       </mat-accordion>

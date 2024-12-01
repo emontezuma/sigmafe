@@ -10,7 +10,7 @@ import {
 
 export const routingAnimation = trigger('routingAnimation', [
   transition('void => *', [
-    style({ opacity: 0.3, transform: 'translateY(50px)' }),
+    style({ opacity: 0.3, transform: 'translateY(30px)' }),
     animate(
       '0.3s ease-in',
       style({ opacity: 1, transform: 'translateY(0px)' })
@@ -19,7 +19,7 @@ export const routingAnimation = trigger('routingAnimation', [
   transition('* => void', [
     animate(
       '0.3s ease-out',
-      style({ opacity: 0.3, transform: 'translateY(50px)' })
+      style({ opacity: 0.3, transform: 'translateY(30px)' })
     ),
   ]),
 ]);

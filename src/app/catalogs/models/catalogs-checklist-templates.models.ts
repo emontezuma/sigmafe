@@ -1,4 +1,4 @@
-import { Attachment, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import { Attachment, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
 
 export interface ChecklistTemplatesData {
   checklistTemplatesPaginated?: ChecklistTemplates;
@@ -29,7 +29,7 @@ export interface ChecklistTemplateDetail {
   mainImageGuid?: string;
   mainImagePath?: string;
   mainImageName?: string;
-  mainImage?: string;
+  mainImage?: string;  
   id?: number;
   customerId?: number;
   templateType?: GeneralCatalogInternalData,
@@ -65,6 +65,7 @@ export interface ChecklistTemplateDetail {
   requiresApproval?: string;
   cancelOpenChecklists?: string;
   allowReassignment?: string;
+  initialState?: string;
   requiresActivation?: string;
   allowRestarting?: string;
   
@@ -185,12 +186,13 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   allowRejection: '',
   allowManualMode: '',
   allowPartialSaving: '',
-  allowApprovalByGroup: '',
+  allowApprovalByGroup: '',  
   allowExpiring: '',
   requiresApproval: '',
   moldStates: '',
   cancelOpenChecklists: '',
   allowReassignment: '',
+  initialState: '',
   requiresActivation: '',
   allowRestarting: '',
   
@@ -237,13 +239,6 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
   lines: [],  
 };
 
-export interface ChecklistTemplatePossibleValue {
-  order?: number;
-  value?: string;
-  byDefault?: boolean;
-  alarmedValue?: boolean;  
-}
-
 export interface ChecklistTemplateLine {
   checklistTemplateId?: number;
   id?: number;
@@ -256,6 +251,7 @@ export interface ChecklistTemplateLine {
   validate?: boolean;
   variableId?: number;
   recipientId?: number;
+  useVariableSettings?: string;
   name?: string;
   notes?: string;
   minimum?: string;
@@ -285,6 +281,6 @@ export interface ChecklistTemplateLine {
   attachments?: Attachment[];
   attachmentsList?: string;
   valuesList?: ChecklistTemplatePossibleValue[];
-  friendlyValueType?: string;
+  friendlyVariableValueType?: string;
   variableAttachments?: Attachment[];
 }

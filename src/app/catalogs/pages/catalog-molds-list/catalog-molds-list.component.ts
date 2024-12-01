@@ -1,10 +1,10 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
-import { Router } from '@angular/router'; 
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'; 
 import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { Observable, map, skip, tap } from 'rxjs';
+import { Observable, filter, map, skip, switchMap, tap } from 'rxjs';
 import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus, MoldItem, emptyMoldCatalog, MoldsData, Molds } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 import { loadMoldsData } from 'src/app/state/actions/molds.actions';
@@ -28,7 +28,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
   // Variables ===============
-  moldsTableColumns: string[] = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'updatedAt'];
+  moldsTableColumns: string[] = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'state', 'hits', 'status', 'updatedAt'];
   moldsCatalogData = new MatTableDataSource<MoldItem>([]);      
   
   moldsData$: Observable<MoldsData>;
@@ -44,6 +44,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
 
   catalogIcon: string = "treasure_chest";
 
+  showAddButton: boolean;
   loading: boolean;
   onTopStatus: string;
   settingsData: SettingsData;
@@ -65,17 +66,25 @@ export class CatalogMoldsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
     private _sharedService: SharedService,
     private _router: Router,
     private _catalogsService: CatalogsService,
+    private activatedRoute: ActivatedRoute,
   ) { }
 
   // Hooks ====================
   ngOnInit() {
+    this.activatedRoute.data.subscribe(data => {
+      this.showAddButton = data ? data['showAddButton'] : true;
+      console.log(this.showAddButton);
+      this.calcElements();
+    } )
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.MOLDS_CATALOG,
       true,
@@ -165,7 +174,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
           if (this.pageInfo.currentPage * this.pageInfo.pageSize > 0) {
             this.moldsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.moldsData.items);
           }      
-        }        
+        }
         this.moldsData.items.length = this.moldsData.totalCount;
         this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
         this.moldsCatalogData.paginator = this.paginator;
@@ -197,7 +206,6 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         }
       })
     );
-    this.calcElements();
   }
 
   ngOnDestroy() : void {
@@ -273,8 +281,9 @@ export class CatalogMoldsListComponent implements AfterViewInit {
     }));
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.MOLDS_CATALOG,
@@ -284,9 +293,9 @@ export class CatalogMoldsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -316,7 +325,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allMoldsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+        this.allMoldsToCsv$ = this._catalogsService.getAllMoldsToCsv$().pipe(
           tap(moldToCsv => {
             const fileData$ = this._catalogsService.getAllCsvData$(moldToCsv?.data?.exportMoldToCSV?.exportedFilename)
             .subscribe(data => { 
@@ -326,41 +335,13 @@ export class CatalogMoldsListComponent implements AfterViewInit {
               }, 200);
             })
           })
-        );
+    );
       }
     }    
   }
 
   calcElements() {
     this.elements = [{
-      type: 'button',
-      caption: $localize`Nuevo...`,
-      tooltip:  $localize`Crea un nuevo registro`,
-      icon: 'document',
-      class: 'primary',
-      iconSize: '24px',
-      showIcon: true,
-      showTooltip: true,
-      locked: false,
-      showCaption: true,
-      loading: false,
-      disabled: false,
-      action: ButtonActions.NEW,
-    },{
-      type: 'divider',
-      caption: '',
-      tooltip: '',
-      icon: "",
-      class: '',
-      iconSize: "",
-      showIcon: true,
-      showTooltip: true,
-      locked: false,
-      showCaption: true,
-      loading: false,
-      disabled: true,
-      action: undefined,
-    },{
       type: 'button',
       caption: $localize`Actualizar la vista`,
       tooltip:  $localize`Actualiza la vista`,
@@ -418,11 +399,43 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       action: undefined,
     },];
 
+    if (this.showAddButton) {
+      this.elements.unshift(
+      {
+        type: 'button',
+        caption: $localize`Nuevo...`,
+        tooltip:  $localize`Crea un nuevo registro`,
+        icon: 'document',
+        class: 'primary',
+        iconSize: '24px',
+        showIcon: true,
+        showTooltip: true,
+        locked: false,
+        showCaption: true,
+        loading: false,
+        disabled: false,
+        action: ButtonActions.NEW,
+      },{
+        type: 'divider',
+        caption: '',
+        tooltip: '',
+        icon: "",
+        class: '',
+        iconSize: "",
+        showIcon: true,
+        showTooltip: true,
+        locked: false,
+        showCaption: true,
+        loading: false,
+        disabled: true,
+        action: undefined,
+      },);
+    }
   }
 
   mapColumns() {
     if (this.size !== 'small') {
-      this.moldsTableColumns = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'label', 'state', 'hits', 'status', 'updatedAt'];  
+      this.moldsTableColumns = ['id', 'mainImagePath', 'description', 'serialNumber', 'position', 'state', 'hits', 'status', 'updatedAt'];  
     } else {
       this.moldsTableColumns = ['id', 'mainImagePath', 'mainInfo', 'generalInfo'];
     }

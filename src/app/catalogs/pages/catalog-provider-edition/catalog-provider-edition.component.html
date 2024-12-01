@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -235,7 +235,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="provider.deletedById > 0">
+      <div class="grid-inactive" *ngIf="provider.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(provider.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">

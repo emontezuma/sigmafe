@@ -549,3 +549,8 @@ mat-divider {
 .mat-sort-header-content {
   text-align: left !important;
 }
+
+
+.mdc-checkbox__background > svg {  
+  color: var(--theme-primary-contrast-500) !important;
+}

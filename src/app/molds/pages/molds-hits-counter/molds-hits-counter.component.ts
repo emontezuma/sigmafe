@@ -75,6 +75,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     // Dispatches
     console.log('inciado');
     this._store.dispatch(loadMoldsHitsQueryData());  
@@ -235,8 +236,9 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
   }
 
 // Functions ================
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this.calcElements();
         this._sharedService.setToolbar({
@@ -247,9 +249,9 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-      });
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   listAnimationFinished(e: any) {    
@@ -300,12 +302,12 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       },
       {
         caption: $localize`En almacén`,        
-        icon: 'solution',
+        icon: 'industry',
         value: MoldStates.IN_WAREHOUSE,
       },
       {
         caption: $localize`En reparación`,        
-        icon: 'solution',
+        icon: 'equipment',
         value: MoldStates.IN_REPAIRING,
       },
       {
@@ -316,7 +318,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
     },{
       type: 'button-menu',
       field: 'mold-status',
-      caption: $localize`Status del molde`,
+      caption: $localize`Estatus del molde`,
       tooltip:  $localize`FIltrar el Status del molde`,
       disabled: false,
       options: [{
@@ -335,7 +337,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
         icon: 'flash',
         value: ButtonActions.WARNED,
       },]      
-    },{
+    /* },{
       type: 'button-menu',
       field: 'mold-color',
       caption: $localize`Etiqueta del molde`,
@@ -371,7 +373,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
         caption: $localize`VERDE`,
         icon: 'palette',
         value: ButtonActions.GREEN,        
-      },]      
+      },]     */  
     },{
       type: 'divider',
       caption: '',

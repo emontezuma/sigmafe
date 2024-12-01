@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="customersData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -105,22 +106,22 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: customersTableColumns"
-        [routerLink]="['/catalogs/customers/edit/', row.data.id]"
+        [routerLink]="['/catalogs/customers/edit/', row?.data?.id]"
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="customers-table-mat-row" *matNoDataRow>
           <td class="customers-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="customers-table__paginator">
+    <div *ngIf="showTableFooter"class="customers-table__paginator">
       <div class="customers-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total clientes <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

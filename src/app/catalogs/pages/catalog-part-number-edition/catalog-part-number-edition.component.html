@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -14,6 +14,7 @@
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="updatePartNumberCatalog$ | async "></ng-container>
   <ng-container *ngIf="duplicateMainImage$ | async "></ng-container>     
+  <ng-container *ngIf="partNumber$ | async "></ng-container>       
 
   <mat-card class="card">
     <form
@@ -127,7 +128,25 @@
                   >Notas</span
                 >
               </app-area-field>              
-            </div>                     
+            </div> 
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="partNumberForm.controls.dieId"
+                rightHint="Campo requerido"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                fieldHelp="Especifique el número de Die Id"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn_line"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Die Id</span
+                >
+              </app-input-field>
+            </div>               
             <div class="field-items">
               <fieldset class="field__container">
                 <div class="image-and-field">
@@ -193,43 +212,7 @@
             </div>
                       
           </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DEL NÚMERO DE PARTE</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
-              >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
-            </div>
-          </mat-expansion-panel-header>
-        
-        </mat-expansion-panel>        
+        </mat-expansion-panel>               
       </mat-accordion>
     </form>
     <div
@@ -271,7 +254,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="partNumber.deletedById > 0">
+      <div class="grid-inactive" *ngIf="partNumber.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(partNumber.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">

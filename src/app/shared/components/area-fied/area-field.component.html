@@ -15,6 +15,7 @@
         [formControl]="formField"
         #selection
         name="selection"
+        [readonly]="fieldReadonly"
         [maxlength]="fieldMaxLength"
         (input)="handleInput($event)"
         [type]="fieldInputType"

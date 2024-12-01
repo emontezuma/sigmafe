@@ -48,7 +48,8 @@ mat-sidenav {
   margin: 3px;
   border: 1px solid var(--z-colors-page-border);
   border-radius: 4px;
-  width: max(300px, 15%);
+  width: max(350px, 15%);
+  padding: 4px;
 }
 
 mat-toolbar {
@@ -156,6 +157,10 @@ mat-panel-title {
   z-index: 999;
 }
 
+.gotop-icon {
+  color: var(--theme-primary-contrast-500) !important;
+}
+
 .with-overflow {
   overflow-y: auto;
 }
@@ -247,4 +252,11 @@ mat-panel-title {
 .panel-icon {
   width: 32px;
   height: 32px;  
+}
+
+.menu-button {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+
 }

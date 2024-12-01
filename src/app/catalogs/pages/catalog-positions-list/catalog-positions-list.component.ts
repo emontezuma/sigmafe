@@ -27,7 +27,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Positions ===============
-  positionsTableColumns: string[] = ['id', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
+  positionsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   positionsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   positionsData$: Observable<PositionsData>;
@@ -40,7 +40,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   allPositionsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "organizational_chart";  
+  catalogIcon: string = "group";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +63,8 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.POSITIONS_CATALOG,
       true,
@@ -166,6 +168,10 @@ export class CatalogPositionsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'plant') {            
+            this.order = JSON.parse(`{ "data": { "plant": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
+          } else if (sortData.active === 'recipient') {            
+            this.order = JSON.parse(`{ "data": { "recipient": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -208,8 +214,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
               return {
                 ...item,
                 data: {
-                  ...item.data,                  
-                  
+                  ...item.data,                                    
                   plant: {
                     ...item.data.plant,
                     name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
@@ -251,8 +256,9 @@ export class CatalogPositionsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.POSITIONS_CATALOG,
@@ -262,9 +268,9 @@ export class CatalogPositionsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -296,9 +302,9 @@ export class CatalogPositionsListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allPositionsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(positionsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(positionsToCsv?.data?.exportPositionsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(positionsToCsv?.data?.exportPositionToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, positionsToCsv?.data?.exportPositionsToCsv?.downloadFilename);
+              this.downloadFile(data, positionsToCsv?.data?.exportPositionToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -399,7 +405,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.positionsTableColumns = ['id', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
+    this.positionsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'plant', 'recipient', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

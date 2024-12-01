@@ -18,7 +18,7 @@ import { ManufacturerItem, Manufacturers, ManufacturersData, emptyManufacturerCa
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-catalog-manufacturers',
+  selector: 'app-catalog-manufacturers-list',
   templateUrl: './catalog-manufacturers-list.component.html',
   animations: [ routingAnimation, dissolve, ],
   styleUrls: ['./catalog-manufacturers-list.component.scss']
@@ -64,7 +64,8 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -75,6 +76,7 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.MANUFACTURERS_CATALOG,
       true,
@@ -242,8 +244,9 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.MANUFACTURERS_CATALOG,
@@ -253,9 +256,9 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -285,12 +288,12 @@ export class CatalogManufacturersListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allManufacturersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+        this.allManufacturersToCsv$ = this._catalogsService.getAllManufacturersToCsv$().pipe(
           tap(manufacturersToCsv => {
             
-            const fileData$ = this._catalogsService.getAllCsvData$(manufacturersToCsv?.data?.exportManufacturersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(manufacturersToCsv?.data?.exportManufacturerToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, manufacturersToCsv?.data?.exportManufacturersToCsv?.downloadFilename);
+              this.downloadFile(data, manufacturersToCsv?.data?.exportManufacturerToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

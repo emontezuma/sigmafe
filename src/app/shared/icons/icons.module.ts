@@ -321,6 +321,51 @@ export class IconsModule {
       'status_report2',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/status_report2.svg`)
     );
+    iconRegistry.addSvgIcon(
+      'toogle_on',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/toogle_on.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'admin',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/admin.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'group',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/group.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'electric_blanket_2',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/electric_blanket_2.svg`)
+    );    
+    iconRegistry.addSvgIcon(
+      'network',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/network.svg`)
+    );    
+    iconRegistry.addSvgIcon(
+      'thermometer',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/thermometer.svg`)
+    );    
+    iconRegistry.addSvgIcon(
+      'best_product',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/best_product.svg`)
+    ); 
+    iconRegistry.addSvgIcon(
+      'address',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/address.svg`)
+    ); 
+    iconRegistry.addSvgIcon(
+      'energy',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/energy.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'equipment',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/equipment.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'project_stage_initiation',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/project_stage_initiation.svg`)
+    );
+    
   }
   
 }

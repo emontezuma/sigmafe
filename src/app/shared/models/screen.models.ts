@@ -138,7 +138,7 @@ export interface ToolbarControl {
   showSpinner?: boolean;
   toolbarClass?: string;
   dividerClass?: string;
-  buttonsToRight?: number;
+  buttonsToLeft?: number;
   elements: ToolbarElement[];
   alignment?: string;
 }
@@ -155,6 +155,8 @@ export enum ApplicationModules {
   CUSTOMERS_CATALOG_EDITION = 'customers-catalog-edition',
   MANUFACTURERS_CATALOG = 'manufacturers-catalog',
   MANUFACTURERS_CATALOG_EDITION = 'manufacturers-catalog-edition',
+  SIGMATYPES_CATALOG = 'sigma-types-catalog',
+  SIGMATYPES_CATALOG_EDITION = 'sigma-types-catalog-edition',
   PLANTS_CATALOG = 'plants-catalog',
   PLANTS_CATALOG_EDITION = 'plants-catalog-edition',
   COMPANIES_CATALOG = 'companies-catalog',
@@ -171,6 +173,8 @@ export enum ApplicationModules {
   DEPARTMENTS_CATALOG_EDITION = 'departments-catalog-edition',
   UOMS_CATALOG = 'uoms-catalog',
   UOMS_CATALOG_EDITION = 'uoms-catalog-edition',
+  RECIPIENTS_CATALOG = 'recipients-catalog',
+  RECIPIENTS_CATALOG_EDITION = 'recipients-catalog-edition',
   POSITIONS_CATALOG = 'positions-catalog',
   POSITIONS_CATALOG_EDITION = 'positions-catalog-edition',
   PART_NUMBERS_CATALOG = 'part-numbers-catalog',
@@ -210,4 +214,10 @@ export interface SimpleMenuOption {
 export interface ButtonState {
   action?: ButtonActions;
   enabled: boolean;
+}
+
+export interface ButtonMenuModel {
+  caption: string;
+  tooltip: string;
+  options: SimpleMenuOption[];
 }

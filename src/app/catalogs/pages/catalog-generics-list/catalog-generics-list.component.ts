@@ -4,8 +4,8 @@ import { MatSort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { Observable, map, skip, tap } from 'rxjs';
-import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus } from 'src/app/shared/models';
+import { EMPTY, Observable, catchError, map, skip, tap } from 'rxjs';
+import { ApplicationModules, ButtonActions, PageInfo, ProfileData, SearchBox, SettingsData, Screen, ToolbarButtonClicked, ToolbarElement, AnimationStatus, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, SystemTables } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 import { AppState } from 'src/app/state/app.state';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
@@ -27,7 +27,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Generics ===============
-  genericsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  genericsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'friendlyTableName', 'reference', 'status', 'updatedAt'];
   genericsCatalogData = new MatTableDataSource<PlantItem>([]);      
   
   genericsData$: Observable<GenericsData>;
@@ -39,8 +39,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
   screenData$: Observable<Screen>;
   allGenericsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
-
-  catalogIcon: string = "server";  
+  catalogIcon: string = "project_stage_initiation";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +62,8 @@ export class CatalogGenericsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +74,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.GENERICS_CATALOG,
       true,
@@ -101,14 +102,14 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       })
     );
     this.settingsData$ = this._store.select(selectSettingsData).pipe(
-      tap(settingsData => {
+      tap(settingsData => {        
         this.settingsData = settingsData;
         this.pageInfo = {
           ...this.pageInfo,
           pageSize: this.settingsData.catalog?.pageSize || 50,
         }
-        this.requestData(0, this.pageInfo.pageSize);      
-      })
+        this.requestData(0, this.pageInfo.pageSize);              
+      })      
     );
     this.searchBox$ = this._sharedService.search.pipe(
       tap((searchBox: SearchBox) => {
@@ -166,6 +167,8 @@ export class CatalogGenericsListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'friendlyTableName') {            
+            this.order = JSON.parse(`{ "friendlyTableName": "${sortData.direction.toUpperCase()}" }`);
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -191,7 +194,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
     }
     let filter = null;
     if (this.filterByText) {      
-      const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } } ] }`;
+      const cadFilter = ` { "or": [ { "data": { "name": { "contains": "${this.filterByText}" } } }, { "data": { "reference": { "contains": "${this.filterByText}" } } }, { "friendlyTableName": { "contains": "${this.filterByText}" } } ] }`;
       filter = JSON.parse(cadFilter);                  
     }
     this.genericsCatalogData = new MatTableDataSource<PlantItem>(this.genericsData.items);
@@ -241,8 +244,9 @@ export class CatalogGenericsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.GENERICS_CATALOG,
@@ -252,9 +256,9 @@ export class CatalogGenericsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -284,11 +288,11 @@ export class CatalogGenericsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allGenericsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+        this.allGenericsToCsv$ = this._catalogsService.getAllGenericsToCsv$().pipe(
           tap(genericsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(genericsToCsv?.data?.exportGenericsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(genericsToCsv?.data?.exportGenericToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, genericsToCsv?.data?.exportGenericsToCsv?.downloadFilename);
+              this.downloadFile(data, genericsToCsv?.data?.exportGenericToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -299,6 +303,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
     }    
   }
 
+  
   calcElements() {
     this.elements = [{
       type: 'button',
@@ -389,7 +394,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.genericsTableColumns = ['id',  'name', 'reference', 'status', 'updatedAt'];
+    this.genericsTableColumns = ['id', 'mainImagePath', 'name', 'friendlyTableName', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="moldsData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -109,7 +110,7 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="label">
+      <!--<ng-container matColumnDef="label">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Etiqueta</th>
         <td mat-cell *matCellDef="let row">
           <div
@@ -127,7 +128,7 @@
           >
           </ngx-skeleton-loader>
         </td>
-      </ng-container>
+      </ng-container>-->
 
       <ng-container matColumnDef="state">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Estado actual</th>
@@ -176,22 +177,23 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: moldsTableColumns"
-        [routerLink]="['/catalogs/molds/edit/', row.data.id]"
+        [routerLink]="showAddButton ? ['/catalogs/molds/edit/', row?.data?.id] : ['/catalogs/molds-control/edit/', row?.data?.id]"
+        
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="molds-table-mat-row" *matNoDataRow>
           <td class="molds-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="molds-table__paginator">
+    <div *ngIf="showTableFooter"class="molds-table__paginator">
       <div class="molds-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total molde(s) <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="checklistPlansData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -89,14 +90,6 @@
         </td>
       </ng-container>
 
-      <ng-container matColumnDef="friendlyGenerationMode">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Modo de Generación</th>
-        <td mat-cell *matCellDef="let row">
-          <ng-container *ngIf="!loading">{{ row.friendlyGenerationMode }}</ng-container>        
-          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
-        </td>
-      </ng-container>
-
       <ng-container matColumnDef="checklistPlanType">
         <th mat-header-cell *matHeaderCellDef mat-sort-header>Tipo de Plan</th>
         <td mat-cell *matCellDef="let row">
@@ -139,22 +132,22 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: checklistPlansTableColumns"
-        [routerLink]="['/catalogs/checklist-plans/edit/', row.data.id]"
+        [routerLink]="['/catalogs/checklist-plans/edit/', row?.data?.id]"
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="checklist-plans-table-mat-row" *matNoDataRow>
           <td class="checklist-plans-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="checklist-plans-table__paginator">
+    <div *ngIf="showTableFooter"class="checklist-plans-table__paginator">
       <div class="checklist-plans-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total planes de checklist <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

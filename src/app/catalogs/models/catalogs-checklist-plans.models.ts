@@ -32,10 +32,8 @@ export interface ChecklistPlanDetail {
   friendlyGenerationMode?: string;
   checklistPlanType?: GeneralCatalogInternalData,
   friendlyGenerationMdode?: string;
-  generationMode?: string;
   frequency?: string;
   specificDate?: string;
-  entities?: string;
   hours?: string;
   notes?: string;
   prefix?: string;
@@ -43,6 +41,7 @@ export interface ChecklistPlanDetail {
   entitites?: string;
   id?: number;
   limit?: number;
+  anticipationTime?: number;
   customerId?: number;
   status?: string;
   translations?: GeneralTranslation[];  
@@ -107,11 +106,10 @@ export const emptyChecklistPlanItem: ChecklistPlanDetail = {
   prefix: '',
   id: null,
   customerId: null,
-  checklistPlanType: null,
-  generationMode: null,
+  checklistPlanType: null,  
   frequency: null,
-  entities: null,
   limit: 0,
+  anticipationTime: 0,
   hours: null,
   specificDate: null,
   status: '',

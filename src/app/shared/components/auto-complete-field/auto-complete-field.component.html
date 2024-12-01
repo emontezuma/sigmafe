@@ -9,8 +9,9 @@
       #selection
       matInput
       [matAutocomplete]="auto"
-      [formControl]="formField"
-      (keydown)="handleKeyDown($event)"
+      [formControl]="formField"      
+      (keydown)="handleKeyDown($event)" 
+      [readonly]="fieldReadonly"     
     />
     <mat-hint
       *ngIf="leftHint"
@@ -56,7 +57,8 @@
       [displayWith]="displayFn"      
       (optionSelected)="handleOptionSelected($event)"
       autoActiveFirstOption
-      #auto="matAutocomplete"
+      [disabled]="fieldReadonly"
+      #auto="matAutocomplete"      
     >
       <mat-option
         *ngFor="let element of list"

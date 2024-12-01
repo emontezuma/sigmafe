@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="genericsData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -12,7 +13,7 @@
   <ng-container *ngIf="screenData$ | async "></ng-container>
   <ng-container *ngIf="animationData$ | async "></ng-container>
   <ng-container *ngIf="allGenericsToCsv$ | async "></ng-container>  
-
+  
   <div
     class="generics-table"    
   >
@@ -26,10 +27,52 @@
         </td>
       </ng-container>      
 
+      <ng-container matColumnDef="mainImagePath">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Imagen</th>
+        <td mat-cell *matCellDef="let row">
+          <div *ngIf="!loading" class="card-image">
+            <div
+              class="image-container"
+              *ngIf="row.data.mainImage"
+            >
+              <img                
+                @dissolve
+                appImageNotFound                
+                class="generic-image"                        
+                [src]="row.data.mainImage"
+                [alt]="row.data.mainImage"         
+                fill
+              >      
+            </div>
+            <div
+              *ngIf="!row.data.mainImage"
+              class="icon-container"
+            >
+              <mat-icon [svgIcon]="catalogIcon"></mat-icon>
+            </div>    
+          </div>
+          <ngx-skeleton-loader
+            *ngIf="loading"
+            class="skeleton"
+            [theme]="{ height: '48px', marginTop: '5px', marginBottom: '5px', backgroundColor: 'rgba(0, 0, 0, 0.075)', }"
+            count="1"
+          >
+          </ngx-skeleton-loader>
+        </td>      
+      </ng-container>
 
+      <ng-container matColumnDef="friendlyTableName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Tabla asociada</th>
+        <td mat-cell *matCellDef="let row">
+          <ng-container *ngIf="!loading">            
+            <strong>{{ row.friendlyTableName }}</strong>
+          </ng-container>        
+          <ng-container [ngTemplateOutlet]="skeleton"></ng-container> 
+        </td>
+      </ng-container>
       
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Nombre del ...</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Descripción</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.name }}</strong>
@@ -74,22 +117,22 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: genericsTableColumns"
-        [routerLink]="['/catalogs/generics/edit/', row.data.id]"
+        [routerLink]="['/catalogs/generics/edit/', row?.data?.id]"
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="generics-table-mat-row" *matNoDataRow>
           <td class="generics-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="generics-table__paginator">
+    <div *ngIf="showTableFooter"class="generics-table__paginator">
       <div class="generics-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total genérico(s) <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

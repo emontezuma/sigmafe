@@ -120,6 +120,7 @@ export class CatalogDepartmentEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
       true,
@@ -208,21 +209,22 @@ export class CatalogDepartmentEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -351,9 +353,6 @@ export class CatalogDepartmentEditionComponent {
                 settingType: 'status',
                 id: this.department.id,
                 customerId: this.department.customerId,
-                recipientId: this.department.recipientId,
-                approverId: this.department.approverId,                
-                plantId: this.department.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const departments = this._sharedService.setGraphqlGen(departmentParameters);
@@ -424,9 +423,6 @@ export class CatalogDepartmentEditionComponent {
                 settingType: 'status',
                 id: this.department.id,
                 customerId: this.department.customerId,
-                recipientId: this.department.recipientId,
-                approverId: this.department.approverId,
-                plantId: this.department.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const departments = this._sharedService.setGraphqlGen(departmentParameters);
@@ -935,6 +931,7 @@ export class CatalogDepartmentEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.departmentForm.markAllAsTouched();
     const fc = this.departmentForm.controls;
     return  {
       id: this.department.id,

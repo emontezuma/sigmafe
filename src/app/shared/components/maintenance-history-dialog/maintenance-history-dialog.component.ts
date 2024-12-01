@@ -8,7 +8,7 @@ import { selectSettingsData } from 'src/app/state/selectors/settings.selectors';
 import {  FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { dissolve } from '../../animations/shared.animations';
 import {  CatalogsService, CustomValidators, MoldParameters } from 'src/app/catalogs';
-import { ButtonActions, GeneralCatalogParams, GeneralHardcodedValuesData, RecordStatus, SettingsData, SmallFont, SpinnerFonts, SpinnerLimits, SystemTables, emptyGeneralHardcodedValuesData, toolbarMode } from 'src/app/shared/models';
+import { ButtonActions, GeneralCatalogParams, GeneralHardcodedValuesData, GeneralValues, RecordStatus, SettingsData, SmallFont, SpinnerFonts, SpinnerLimits, SystemTables, emptyGeneralHardcodedValuesData, toolbarMode } from 'src/app/shared/models';
 import { SharedService } from 'src/app/shared/services';
 import { GeneralCatalogData, emptyGeneralCatalogData, emptyGeneralCatalogItem } from 'src/app/catalogs/models/catalogs-shared.models';
 
@@ -448,8 +448,8 @@ export class MaintenanceHistoryDialogComponent implements AfterViewInit {
           this.maintenanceHistoryForm.controls.operatorName.setValue(mappedItems[0].operatorName);
           this.maintenanceHistoryForm.controls.startDate.setValue(mappedItems[0].startDate ? mappedItems[0].startDate : null);
           this.maintenanceHistoryForm.controls.finishedDate.setValue(mappedItems[0].finishedDate ? mappedItems[0].finishedDate : null);
-          this.maintenanceHistoryForm.controls.updateHitsCumulative.setValue(mappedItems[0].updateHitsCumulative === 'y');
-          this.maintenanceHistoryForm.controls.updateLastMaintenanceDate.setValue(mappedItems[0].updateLastMaintenanceDate === 'y');
+          this.maintenanceHistoryForm.controls.updateHitsCumulative.setValue(mappedItems[0].updateHitsCumulative === GeneralValues.YES);
+          this.maintenanceHistoryForm.controls.updateLastMaintenanceDate.setValue(mappedItems[0].updateLastMaintenanceDate === GeneralValues.YES);
           this.maintenanceHistoryForm.controls.hitsAfter.setValue(mappedItems[0].hitsAfter);
           this.maintenanceHistoryForm.controls.maintenanceDate.setValue(mappedItems[0].dateBefore);
 

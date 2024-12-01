@@ -28,7 +28,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // Uoms ===============
-  uomsTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  uomsTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   uomsCatalogData = new MatTableDataSource<UomItem>([]);      
   
   uomsData$: Observable<UomsData>;
@@ -41,7 +41,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
   allUomsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "deliverytruck";  
+  catalogIcon: string = "thermometer";  
 
   loading: boolean;
   onTopStatus: string;
@@ -64,7 +64,8 @@ export class CatalogUomsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -75,6 +76,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.MANUFACTURERS_CATALOG,
       true,
@@ -242,8 +244,9 @@ export class CatalogUomsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.MANUFACTURERS_CATALOG,
@@ -253,9 +256,9 @@ export class CatalogUomsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -288,9 +291,9 @@ export class CatalogUomsListComponent implements AfterViewInit {
         this.allUomsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(uomsToCsv => {
             
-            const fileData$ = this._catalogsService.getAllCsvData$(uomsToCsv?.data?.exportUomsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(uomsToCsv?.data?.exportUomToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, uomsToCsv?.data?.exportUomsToCsv?.downloadFilename);
+              this.downloadFile(data, uomsToCsv?.data?.exportUomToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -391,7 +394,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.uomsTableColumns = ['id', 'name', 'reference', 'status', 'updatedAt'];
+    this.uomsTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

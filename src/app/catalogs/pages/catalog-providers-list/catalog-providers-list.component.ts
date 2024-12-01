@@ -64,7 +64,8 @@ export class CatalogProvidersListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -75,6 +76,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.PROVIDERS_CATALOG,
       true,
@@ -167,6 +169,8 @@ export class CatalogProvidersListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'plant') {            
+            this.order = JSON.parse(`{ "data": { "plant": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
           }  else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -242,8 +246,9 @@ export class CatalogProvidersListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.PROVIDERS_CATALOG,
@@ -253,9 +258,9 @@ export class CatalogProvidersListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -288,9 +293,9 @@ export class CatalogProvidersListComponent implements AfterViewInit {
         this.allProvidersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(providersToCsv => {
             
-            const fileData$ = this._catalogsService.getAllCsvData$(providersToCsv?.data?.exportProvidersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(providersToCsv?.data?.exportProviderToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, providersToCsv?.data?.exportProvidersToCsv?.downloadFilename);
+              this.downloadFile(data, providersToCsv?.data?.exportProviderToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

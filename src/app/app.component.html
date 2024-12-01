@@ -16,7 +16,7 @@
         <mat-icon class="icon-toolbar" svgIcon="menu"> </mat-icon>
       </button>
       <h1 class="company-name">
-        APLICACION TOYOTA <strong>{{ toolbarCurrentSize }}</strong>
+        APLICACION TOYOTA <strong>Draft version - Octubre 2024</strong>
       </h1>
       <button
         mat-mini-fab
@@ -137,23 +137,178 @@
               </a>
             </mat-expansion-panel>
 
-            <mat-expansion-panel class="panel-main" hideToggle expanded="true">
+            <mat-expansion-panel class="panel-main" hideToggle expanded="false">
               <mat-expansion-panel-header>
                 <mat-icon class="panel-icon" svgIcon="file"></mat-icon>
-                <mat-panel-title class="accordion">MANTENIMIENTO</mat-panel-title>
-              </mat-expansion-panel-header>
-              <a routerLink="catalogs" mat-list-item (click)="sidenav.close()">
-                <mat-icon class="panel-icon" svgIcon="file"></mat-icon>
-                <span>Catálogos</span>
+                <mat-panel-title class="accordion">CATALOGOS</mat-panel-title>
+              </mat-expansion-panel-header>              
+
+              <a routerLink="catalogs/variables" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="equation"></mat-icon>
+                  <span>Variables</span>
+                </div>
               </a>
-              <mat-divider></mat-divider>
-              <a
-                routerLink="checklists"
-                mat-list-item
-                (click)="sidenav.close()"
-              >
-                <mat-icon>checklist</mat-icon>
-                <span>Checklist específico</span>
+
+              <a routerLink="catalogs/checklist-templates" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="brochure"></mat-icon>
+                  <span>Plantillas de checklist</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/checklist-plans" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="status_report2"></mat-icon>
+                  <span>Planes de checklist</span>
+                </div>
+              </a>
+              
+              <a routerLink="catalogs/molds" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="treasure_chest"></mat-icon>
+                  <span>Activos</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/molds-control" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="gear"></mat-icon>
+                  <span>Control de activos</span>
+                </div>
+              </a>
+
+
+            </mat-expansion-panel>
+
+            <mat-expansion-panel class="panel-main" hideToggle expanded="false">
+              <mat-expansion-panel-header>
+                <mat-icon class="panel-icon" svgIcon="file"></mat-icon>
+                <mat-panel-title class="accordion">TABLAS</mat-panel-title>
+              </mat-expansion-panel-header>              
+              <a routerLink="catalogs/companies" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="company"></mat-icon>
+                  <span>Compañías</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/plants" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="industry"></mat-icon>
+                  <span>Plantas</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/lines" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="server"></mat-icon>
+                  <span>Lineas</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/part-numbers" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="best_product"></mat-icon>
+                  <span>Números de parte</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/equipments" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="electric_blanket_2"></mat-icon>
+                  <span>Refacciones</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/sigma-types" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="allow_list2"></mat-icon>
+                  <span>Tipos de variable</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/shifts" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="time"></mat-icon>
+                  <span>Turnos</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/recipients" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="address"></mat-icon>
+                  <span>Recipientes</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/manufacturers" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="deliverytruck"></mat-icon>
+                  <span>Fabricantes</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/providers" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="briefcase"></mat-icon>
+                  <span>Proveedores</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/departments" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="organizational_chart"></mat-icon>
+                  <span>Departamentos</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/positions" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="group"></mat-icon>
+                  <span>Posiciones</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/workgroups" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="network"></mat-icon>
+                  <span>Grupos de trabajo</span>
+                </div>
+              </a>
+
+              <a routerLink="catalogs/uoms" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="thermometer"></mat-icon>
+                  <span>Unidades de medida</span>
+                </div>
+              </a>
+
+
+              <a routerLink="catalogs/generics" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="project_stage_initiation"></mat-icon>
+                  <span>Tablas genéricas</span>
+                </div>
+              </a>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel class="panel-main" hideToggle expanded="false">
+              <mat-expansion-panel-header>
+                <mat-icon class="panel-icon" svgIcon="gear"></mat-icon>
+                <mat-panel-title class="accordion">CONFIGURACIÓN</mat-panel-title>
+              </mat-expansion-panel-header>
+              <a routerLink="catalogs/settings" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="toogle_on"></mat-icon>
+                  <span>Ajustes</span>
+                </div>
+              </a>
+              <a routerLink="catalogs/admin-users" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="admin"></mat-icon>
+                  <span>Gestión de usuarios</span>
+                </div>
               </a>
             </mat-expansion-panel>
           </cdk-accordion>
@@ -206,7 +361,7 @@
     </mat-sidenav-container>
     <mat-toolbar class="footer" @fromTop>
       <span
-        >APLICACION TOYOTA <strong>{{ allHeight }}</strong></span
+        >APLICACION TOYOTA</span
       >
       <span class="example-spacer"></span>      
     </mat-toolbar>

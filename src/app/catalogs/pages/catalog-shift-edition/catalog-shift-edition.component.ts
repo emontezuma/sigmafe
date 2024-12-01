@@ -14,11 +14,10 @@ import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
 import {  ShiftDetail, ShiftItem,    emptyShiftItem } from '../../models';
-import { environment } from 'src/environments/environment';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient  } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
-import { emptyGeneralCatalogItem, emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
+import { emptyGeneralCatalogItem } from '../../models/catalogs-shared.models';
 import { CustomValidators } from '../../custom-validators';
 
 @Component({
@@ -31,6 +30,7 @@ export class CatalogShiftEditionComponent {
   @ViewChild('catalogEdition') private catalogEdition: ElementRef;
   @ViewChild(MatPaginator) paginator: MatPaginator;  
   @ViewChild('f') private thisForm: NgForm;
+  @ViewChild('fromTime', { static: false }) selection: ElementRef;
 
   // Shifts ===============
   shift: ShiftDetail = emptyShiftItem;
@@ -54,7 +54,7 @@ export class CatalogShiftEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "server";  
+  catalogIcon: string = "time";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -84,19 +84,11 @@ export class CatalogShiftEditionComponent {
     
     twoDays: new FormControl(''), 
 
-    fromTime:  new FormControl(''),    
-    fromTimeDate:  new FormControl(new Date()),    
     fromTimeTime: new FormControl(''),  
- 
-
-
-    toTime:  new FormControl(''),    
-    toTimeDate:  new FormControl(new Date()),    
     toTimeTime: new FormControl(''),  
 
-    
-    sequence: new FormControl(''), 
-    moveToDate: new FormControl(''), 
+    moveToDate: new FormControl(0), 
+    sequence: new FormControl(0), 
 
     isFirstSequence: new FormControl(''), 
     isLastSequence : new FormControl(''),     
@@ -140,6 +132,7 @@ export class CatalogShiftEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.SHIFTS_CATALOG_EDITION,
       true,
@@ -174,23 +167,25 @@ export class CatalogShiftEditionComponent {
       })
     );
 
-    this.shiftFormChangesSubscription = this.shiftForm.controls.fromTimeDate.valueChanges
-    .subscribe((value: any) => {
-      this.calculateByDefaultValue('from');
-    });
     this.shiftFormChangesSubscription = this.shiftForm.controls.fromTimeTime.valueChanges
     .subscribe((value: any) => {
-      this.calculateByDefaultValue('from');
-    });
-    this.shiftFormChangesSubscription = this.shiftForm.controls.toTimeDate.valueChanges
-    .subscribe((value: any) => {
-      this.calculateByDefaultValue('to');
-    });
-    this.shiftFormChangesSubscription = this.shiftForm.controls.toTimeTime.valueChanges
-    .subscribe((value: any) => {
-      this.calculateByDefaultValue('to');
+      if (value >= this.shiftForm.controls.toTimeTime.value && this.shiftForm.controls.twoDays.value !== GeneralValues.YES) {
+        this.shiftForm.controls.fromTimeTime.setErrors({ invalidValue: true });
+      } else {
+        this.shiftForm.controls.fromTimeTime.setErrors(null);
+      }
     });
 
+    this.shiftFormChangesSubscription = this.shiftForm.controls.toTimeTime.valueChanges
+    .subscribe((value: any) => {
+      if (value <= this.shiftForm.controls.fromTimeTime.value && this.shiftForm.controls.twoDays.value !== GeneralValues.YES) {        
+        this.shiftForm.controls.fromTimeTime.markAsTouched();
+        this.shiftForm.controls.fromTimeTime.setErrors({ invalidValue: true });        
+      } else {
+        this.shiftForm.controls.fromTimeTime.setErrors(null);
+      }
+    });
+    
     this.shiftFormChangesSubscription = this.shiftForm.valueChanges.subscribe((shiftFormChanges: any) => {
       if (!this.loaded) return;
       this.setEditionButtonsState();
@@ -250,21 +245,22 @@ export class CatalogShiftEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.SHIFTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -771,10 +767,16 @@ export class CatalogShiftEditionComponent {
             if (typedControl.invalid) {
               if (!fieldFocused) {
                 this.focusThisField = controlName;
-                setTimeout(() => {
-                  this.focusThisField = '';
-                }, 100)
-                break;
+                if (controlName === "fromTimeTime") {
+                  setTimeout(() => {
+                    this.selection.nativeElement.focus();    
+                  }, 100);
+                } else {
+                  setTimeout(() => {
+                    this.focusThisField = '';
+                  }, 100);
+                }
+                break;                
               }
               fieldsMissingCounter++;
               fieldsMissing += `<strong>${fieldsMissingCounter}.</strong> ${this.getFieldDescription(controlName)}<br>`;
@@ -792,9 +794,6 @@ export class CatalogShiftEditionComponent {
     this.setViewLoading(true);
     const newRecord = !this.shift.id || this.shift.id === null || this.shift.id === 0;
     const dataToSave = this.prepareRecordToAdd(newRecord);
-
-    console.log("dataToSave")
-    console.log(dataToSave)
 
     this.updateShiftCatalog$ = this._catalogsService.updateShiftCatalog$(dataToSave)
     .pipe(
@@ -933,8 +932,10 @@ export class CatalogShiftEditionComponent {
       isFirstSequence: this.shift.isFirstSequence,
       isLastSequence: this.shift.isLastSequence,
       
-      fromTime: this.shift.fromTime,
-      toTime:this.shift.toTime,
+      fromTimeTime: this.shift.fromTimeTime,
+      toTimeTime: this.shift.toTimeTime,
+      moveToDate: this.shift.moveToDate,
+      sequence: this.shift.sequence,
 
       prefix: this.shift.prefix,      
       notes: this.shift.notes,
@@ -945,6 +946,14 @@ export class CatalogShiftEditionComponent {
 
   prepareRecordToAdd(newRecord: boolean): any {
     const fc = this.shiftForm.controls;
+    let toTime = fc.toTimeTime.value;
+    let fromTime = fc.fromTimeTime.value;
+    if (fc.fromTimeTime.dirty || fc.fromTimeTime.touched || newRecord) {
+      fromTime = this._sharedService.formatDate(new Date(), 'yyyy-MM-dd ' + fc.fromTimeTime.value)
+    }
+    if (fc.toTimeTime.dirty || fc.toTimeTime.touched || newRecord) {
+      toTime = this._sharedService.formatDate(new Date(), 'yyyy-MM-dd ' + fc.toTimeTime.value)
+    }
     return  {
         id: this.shift.id,
       customerId: 1, // TODO: Get from profile
@@ -955,16 +964,13 @@ export class CatalogShiftEditionComponent {
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
       ...(fc.twoDays.dirty || fc.twoDays.touched || newRecord) && { twoDays: fc.twoDays.value },
+      ...(fc.sequence.dirty || fc.sequence.touched || newRecord) && { sequence: fc.sequence.value ? +fc.sequence.value : 0 },
+      ...(fc.moveToDate.dirty || fc.moveToDate.touched || newRecord) && { moveToDate: fc.moveToDate.value ? +fc.moveToDate.value : 0 },
       ...(fc.isFirstSequence.dirty || fc.isFirstSequence.touched || newRecord) && { isFirstSequence: fc.isFirstSequence.value },
       ...(fc.isLastSequence.dirty || fc.isLastSequence.touched || newRecord) && { isLastSequence: fc.isLastSequence.value },
-      
-      ...(fc.fromTime.dirty || fc.fromTime.touched || newRecord) && { fromTime: fc.fromTime.value },
-      
-      ...(fc.toTime.dirty || fc.toTime.touched || newRecord) && { toTime: fc.toTime.value },
-      
-
       ...(fc.calendar.dirty || fc.calendar.touched || newRecord) && { calendarId: fc.calendar.value ? fc.calendar.value.id : null },      
-      
+      fromTime,      
+      toTime,
     }
   }
 
@@ -981,8 +987,8 @@ export class CatalogShiftEditionComponent {
   initForm(): void {
     this.shiftForm.reset();
     // Default values
-    this.shiftForm.controls.fromTime.setValue(GeneralValues.NO);
-    this.shiftForm.controls.toTime.setValue(GeneralValues.NO);
+    this.shiftForm.controls.fromTimeTime.setValue("00:00");
+    this.shiftForm.controls.toTimeTime.setValue("00:00");
 
     this.storedTranslations = [];
     this.translationChanged = false;
@@ -1023,7 +1029,9 @@ export class CatalogShiftEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre del shift`
+      return $localize`Descripción o nombre del Turno`
+    } else if (fieldControlName === 'fromTimeTime') {
+      return $localize`Hora de inicio del turno`
     }
     return '';
   }
@@ -1143,10 +1151,8 @@ export class CatalogShiftEditionComponent {
     let date;
     let time;
     if (name === 'from') {
-      date = this._sharedService.formatDate(this.shiftForm.controls.fromTimeDate.value ?? new Date(), 'yyyy/MM/dd');
       time = this.shiftForm.controls.fromTimeTime.value ?? this._sharedService.formatDate(new Date(), 'HH:mm:ss');
     } else {
-      date = this._sharedService.formatDate(this.shiftForm.controls.toTimeDate.value ?? new Date(), 'yyyy/MM/dd');
       time = this.shiftForm.controls.toTimeTime.value ?? this._sharedService.formatDate(new Date(), 'HH:mm:ss');
     }
     
@@ -1160,9 +1166,9 @@ export class CatalogShiftEditionComponent {
       byDefaulDAT = null;
     }          
     if(name==='from'){
-      this.shiftForm.controls.fromTime.setValue(byDefaulDAT);
+      this.shiftForm.controls.fromTimeTime.setValue(byDefaulDAT);
     }else {
-      this.shiftForm.controls.toTime.setValue(byDefaulDAT);
+      this.shiftForm.controls.toTimeTime.setValue(byDefaulDAT);
     }
   }  
 

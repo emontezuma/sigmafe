@@ -23,6 +23,7 @@ export class AutoCompleteFieldComponent implements OnInit, OnDestroy, OnChanges 
   @Input() noItemsError: string;  
   @Input() leftHint: string;  
   @Input() showDataState: boolean;   
+  @Input() fieldReadonly: boolean;    
   @Input() focused: boolean;   
   
   // @Output() optionSelected = new EventEmitter<{ catalogName: string, selectedData: GeneralCatalogItem}>();

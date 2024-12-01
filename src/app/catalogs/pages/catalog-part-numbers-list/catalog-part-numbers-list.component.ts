@@ -15,6 +15,7 @@ import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
 import { CatalogsService } from '../../services';
 
 import { PartNumberItem, PartNumbers, PartNumbersData, emptyPartNumberCatalog } from '../../models';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog-part-numbers',
@@ -27,7 +28,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
 @ViewChild(MatSort) sort: MatSort;
 
 // PartNumbers ===============
-  partNumbersTableColumns: string[] = ['id', 'name', 'reference', 'status', 'updatedAt'];
+  partNumbersTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   partNumbersCatalogData = new MatTableDataSource<PartNumberItem>([]);      
   
   partNumbersData$: Observable<PartNumbersData>;
@@ -40,7 +41,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
   allPartNumbersToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "best_product";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +64,8 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +76,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.PART_NUMBERS_CATALOG,
       true,
@@ -209,7 +212,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  
+                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -241,8 +244,9 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.PART_NUMBERS_CATALOG,
@@ -252,9 +256,9 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -287,9 +291,9 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
         this.allPartNumbersToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(partNumbersToCsv => {
             
-            const fileData$ = this._catalogsService.getAllCsvData$(partNumbersToCsv?.data?.exportPartNumbersToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(partNumbersToCsv?.data?.exportPartNumberToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, partNumbersToCsv?.data?.exportPartNumbersToCsv?.downloadFilename);
+              this.downloadFile(data, partNumbersToCsv?.data?.exportPartNumberToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -390,7 +394,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.partNumbersTableColumns = ['id',  'name', 'reference', 'status', 'updatedAt'];
+    this.partNumbersTableColumns = ['id',  'mainImagePath', 'name', 'reference', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

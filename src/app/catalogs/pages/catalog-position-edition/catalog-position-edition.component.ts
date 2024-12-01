@@ -60,7 +60,7 @@ export class CatalogPositionEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "organizational_chart";  
+  catalogIcon: string = "group";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   
@@ -120,6 +120,7 @@ export class CatalogPositionEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
       true,
@@ -208,21 +209,22 @@ export class CatalogPositionEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -351,9 +353,6 @@ export class CatalogPositionEditionComponent {
                 settingType: 'status',
                 id: this.position.id,
                 customerId: this.position.customerId,
-                recipientId: this.position.recipientId,
-                     
-                plantId: this.position.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const positions = this._sharedService.setGraphqlGen(positionParameters);
@@ -424,9 +423,6 @@ export class CatalogPositionEditionComponent {
                 settingType: 'status',
                 id: this.position.id,
                 customerId: this.position.customerId,
-                recipientId: this.position.recipientId,
-              
-                plantId: this.position.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const positions = this._sharedService.setGraphqlGen(positionParameters);
@@ -911,6 +907,7 @@ export class CatalogPositionEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.positionForm.markAllAsTouched();
     const fc = this.positionForm.controls;
     return  {
       id: this.position.id,

@@ -187,6 +187,10 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
   get SystemTables () {
     return SystemTables;
   }
+
+  get GeneralValues() {
+    return GeneralValues; 
+  }
   
 // End ======================
 }

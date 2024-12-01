@@ -63,7 +63,8 @@ export class CatalogLinesListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogLinesListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.LINES_CATALOG,
       true,
@@ -166,6 +168,8 @@ export class CatalogLinesListComponent implements AfterViewInit {
         if (sortData.direction) {
           if (sortData.active === 'status') {            
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
+          } else if (sortData.active === 'plant') {            
+            this.order = JSON.parse(`{ "data": { "plant": { "name": "${sortData.direction.toUpperCase()}" } } }`);          
           } else {
             this.order = JSON.parse(`{ "data": { "${sortData.active}": "${sortData.direction.toUpperCase()}" } }`);
           }
@@ -210,6 +214,11 @@ export class CatalogLinesListComponent implements AfterViewInit {
                 data: {
                   ...item.data,                  
                   mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
+                  plant: {
+                    ...item.data.plant,
+                    name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
+                    isTranslated: item.data.plant?.translations?.length > 0 ? true : false,
+                  },                 
                 }
               }
             })          
@@ -241,8 +250,9 @@ export class CatalogLinesListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.LINES_CATALOG,
@@ -252,9 +262,9 @@ export class CatalogLinesListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -284,11 +294,11 @@ export class CatalogLinesListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allLinesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+        this.allLinesToCsv$ = this._catalogsService.getAllLinesToCsv$().pipe(
           tap(linesToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(linesToCsv?.data?.exportLinesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(linesToCsv?.data?.exportLineToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, linesToCsv?.data?.exportLinesToCsv?.downloadFilename);
+              this.downloadFile(data, linesToCsv?.data?.exportLineToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

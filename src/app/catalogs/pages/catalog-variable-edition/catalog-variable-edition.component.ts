@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue, Attachment } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, yesNoNaByDefaultValue, yesNoByDefaultValue, Attachment, VariableDetail } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,7 +13,7 @@ import { EMPTY, Observable, Subscription, catchError, combineLatest, map, of, sk
 import { CdkScrollable, ScrollDispatcher } from '@angular/cdk/scrolling';
 import { FormGroup, FormControl, Validators, NgForm, AbstractControl } from '@angular/forms';
 import { CatalogsService } from '../../services';
-import { VariableDetail, VariableItem, VariablePossibleValue, emptyVariableItem } from '../../models';
+import { VariableItem, VariablePossibleValue, emptyVariableItem } from '../../models';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
@@ -135,7 +135,7 @@ export class CatalogVariableEditionComponent {
     allowNoCapture: new FormControl(emptyGeneralHardcodedValuesItem),
     allowAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     showChart: new FormControl(emptyGeneralHardcodedValuesItem),
-    accumulative: new FormControl(emptyGeneralHardcodedValuesItem),
+    accumulative: new FormControl(emptyGeneralHardcodedValuesItem),    
     automaticActionPlan: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     notes: new FormControl(''),
@@ -203,6 +203,7 @@ export class CatalogVariableEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     // this.variableForm.get('name').disable();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.VARIABLES_CATALOG_EDITION,
@@ -286,6 +287,15 @@ export class CatalogVariableEditionComponent {
         this.variableForm.controls.minimum.setErrors({ invalidValue: true });
       } else {
         this.variableForm.controls.minimum.setErrors(null);
+      }      
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.allowAlarm.valueChanges
+    .subscribe((value: any) => {
+      if (value && value !== GeneralValues.YES) {
+        if (this.variableForm.get('notifyAlarm').enabled) this.variableForm.get('notifyAlarm').disable({ emitEvent: false });
+      } else {
+        if (this.variableForm.get('notifyAlarm').disabled) this.variableForm.get('notifyAlarm').enable({ emitEvent: false });
       }      
     });
 
@@ -618,21 +628,22 @@ export class CatalogVariableEditionComponent {
     )    
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.VARIABLES_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -1652,7 +1663,7 @@ export class CatalogVariableEditionComponent {
       allowComments: this.variable.allowComments,
       showChart: this.variable.showChart,      
       notifyAlarm: this.variable.notifyAlarm,
-      accumulative: this.variable.accumulative,
+      accumulative: this.variable.accumulative,      
       automaticActionPlan: this.variable.automaticActionPlan,    
       byDefault: this.variable.byDefault,          
       byDefaultDateType: this.variable.byDefaultDateType,    
@@ -1673,6 +1684,7 @@ export class CatalogVariableEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.variableForm.markAllAsTouched();
     const fc = this.variableForm.controls;
     if (this.variableForm.controls.valueType.value ===  HarcodedVariableValueType.DATE_AND_TIME && this.variableForm.controls.byDefaultDateType.value === GeneralValues.SPECIFIC && this.variableForm.controls.byDefault.value) {
       const dateAndTime = this._sharedService.formatDate(
@@ -2219,7 +2231,7 @@ export class CatalogVariableEditionComponent {
           name: res.fileName, 
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
-          icon: this._catalogsService.setIconName(res.fileType), 
+          icon: this._sharedService.setIconName(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
         this.setEditionButtonsState();
@@ -2305,7 +2317,7 @@ export class CatalogVariableEditionComponent {
             name: na.fileName, 
             image: `${environment.serverUrl}/files/${na.path}`, 
             id: na.fileId, 
-            icon: this._catalogsService.setIconName(na.fileType), 
+            icon: this._sharedService.setIconName(na.fileType), 
           }
         });
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);

@@ -52,7 +52,7 @@ export class CatalogUomEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "server";  
+  catalogIcon: string = "thermometer";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -109,6 +109,7 @@ export class CatalogUomEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.UOMS_CATALOG_EDITION,
       true,
@@ -197,21 +198,22 @@ export class CatalogUomEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.UOMS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -891,6 +893,7 @@ export class CatalogUomEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.uomForm.markAllAsTouched();
     const fc = this.uomForm.controls;
     return  {
         id: this.uom.id,

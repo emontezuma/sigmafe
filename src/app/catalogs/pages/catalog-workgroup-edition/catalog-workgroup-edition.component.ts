@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralCatalogParams } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,6 +18,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { emptyGeneralCatalogData, emptyGeneralCatalogItem, GeneralCatalogData } from '../../models/catalogs-shared.models';
+import { CustomValidators } from '../../custom-validators';
 
 @Component({
   selector: 'app-catalog-workgroup-edition',
@@ -36,9 +38,15 @@ export class CatalogWorkgroupEditionComponent {
   showGoTop$: Observable<GoTopButtonStatus>;
   settingsData$: Observable<SettingsData>; 
 
-  valueTypeChanges$: Observable<any>;
-  duplicateMainImage$: Observable<any>;
+  approvers$: Observable<any>; 
+  approvers: GeneralCatalogData = emptyGeneralCatalogData; 
+  approversOrder: any = JSON.parse(`{ "data": { "name": "${'ASC'}" } }`);
+  recipients$: Observable<any>; 
+  duplicateMainImage$: Observable<any>; 
+  recipients: GeneralCatalogData = emptyGeneralCatalogData; 
 
+  valueTypeChanges$: Observable<any>;
+  
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
   parameters$: Observable<string | Params>;
@@ -53,7 +61,7 @@ export class CatalogWorkgroupEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "workgroup";  
+  catalogIcon: string = "network";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -81,6 +89,8 @@ export class CatalogWorkgroupEditionComponent {
     mainImageName: new FormControl(''),    
     reference: new FormControl(''),    
     prefix: new FormControl(''),       
+    recipient: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
+    approver: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),      
   });
 
   pageInfo: PageInfo = {
@@ -110,6 +120,7 @@ export class CatalogWorkgroupEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
       true,
@@ -198,21 +209,22 @@ export class CatalogWorkgroupEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -341,9 +353,6 @@ export class CatalogWorkgroupEditionComponent {
                 settingType: 'status',
                 id: this.workgroup.id,
                 customerId: this.workgroup.customerId,
-                recipientId: this.workgroup.recipientId,
-                approverId: this.workgroup.approverId,
-                plantId: this.workgroup.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const workgroups = this._sharedService.setGraphqlGen(workgroupParameters);
@@ -353,7 +362,7 @@ export class CatalogWorkgroupEditionComponent {
                   if (data?.data?.createOrUpdateWorkgroup.length > 0 && data?.data?.createOrUpdateWorkgroup[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
                       this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`el Grupo de trabajo ha sido inhabilitada`;
+                      const message = $localize`El Grupo de trabajo ha sido inhabilitado`;
                       this.workgroup.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -414,9 +423,6 @@ export class CatalogWorkgroupEditionComponent {
                 settingType: 'status',
                 id: this.workgroup.id,
                 customerId: this.workgroup.customerId,
-                recipientId: this.workgroup.recipientId,
-                approverId: this.workgroup.approverId,
-                plantId: this.workgroup.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const workgroups = this._sharedService.setGraphqlGen(workgroupParameters);
@@ -426,7 +432,7 @@ export class CatalogWorkgroupEditionComponent {
                   if (data?.data?.createOrUpdateWorkgroup.length > 0 && data?.data?.createOrUpdateWorkgroup[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`el Grupo de trabajo ha sido reactivada`;
+                      const message = $localize`El Grupo de trabajo ha sido reactivada`;
                       this.workgroup.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
@@ -754,9 +760,9 @@ export class CatalogWorkgroupEditionComponent {
             this.processTranslations$(workgroupId).subscribe(() => {
               this.requestWorkgroupData(workgroupId);
               setTimeout(() => {              
-                let message = $localize`el Grupo de trabajo ha sido actualizado`;
+                let message = $localize`El Grupo de trabajo ha sido actualizado`;
                 if (newRecord) {                
-                  message = $localize`el Grupo de trabajo ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
+                  message = $localize`El Grupo de trabajo ha sido creado satisfactoriamente con el id <strong>${this.workgroup.id}</strong>`;
                   this._location.replaceState(`/catalogs/workgroups/edit/${workgroupId}`);
                 }
                 this._sharedService.showSnackMessage({
@@ -783,6 +789,52 @@ export class CatalogWorkgroupEditionComponent {
       this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
     } 
     
+  }
+
+  requestApproversData(currentPage: number, filterStr: string = null) {    
+    this.approvers = {
+      ...this.approvers,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "data": { "name": { "contains": "${filterStr}" } } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.approvers.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.approversOrder,
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.approvers$ = this._catalogsService.getApproversLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.usersPaginated?.items.map((item) => {
+          return {
+            isTranslated: true,
+            translatedName: item.data.name,
+            translatedReference: item.data.reference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.approvers = {
+          ...this.approvers,
+          loading: false,
+          pageInfo: data?.data?.usersPaginated?.pageInfo,
+          items: this.approvers.items?.concat(mappedItems),
+          totalCount: data?.data?.usersPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
   }
 
   requestWorkgroupData(workgroupId: number): void { 
@@ -860,6 +912,82 @@ export class CatalogWorkgroupEditionComponent {
     });
   }
 
+  requestRecipientsData(currentPage: number, filterStr: string = null) {    
+    this.recipients = {
+      ...this.recipients,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }, { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    } else {
+      filter = JSON.parse(`{ "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } }`);
+    }
+    const skipRecords = this.recipients.items.length;
+
+    const variableParameters = {
+      settingType: 'tables',
+      skipRecords, 
+      takeRecords: this.takeRecords, 
+      filter, 
+      order: this.order
+    }    
+    const variables = this._sharedService.setGraphqlGen(variableParameters); 
+    this.recipients$ = this._catalogsService.getRecipientsLazyLoadingDataGql$(variables)
+    .pipe(
+      tap((data: any) => {                
+        const mappedItems = data?.data?.recipientsPaginated?.items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.data.id,
+            status: item.data.status,
+          }
+        })
+        this.recipients = {
+          ...this.recipients,
+          loading: false,
+          pageInfo: data?.data?.recipientsPaginated?.pageInfo,
+          items: this.recipients.items?.concat(mappedItems),
+          totalCount: data?.data?.recipientsPaginated?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
+  getMoreData(getMoreDataParams: GeneralCatalogParams) {
+    if (getMoreDataParams.catalogName === SystemTables.RECIPIENTS) {
+      if (getMoreDataParams.initArray) {
+        this.recipients.currentPage = 0;
+        this.recipients.items = [];
+      } else if (!this.recipients.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.recipients.currentPage++;
+      }
+      this.requestRecipientsData(        
+        this.recipients.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    } else if (getMoreDataParams.catalogName === SystemTables.USERS) {
+      if (getMoreDataParams.initArray) {
+        this.approvers.currentPage = 0;
+        this.approvers.items = [];
+      } else if (!this.approvers.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.approvers.currentPage++;
+      }
+      this.requestApproversData(        
+        this.approvers.currentPage,
+        getMoreDataParams.textToSearch,  
+      ); 
+    }     
+  }
+
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
   }
@@ -916,23 +1044,24 @@ export class CatalogWorkgroupEditionComponent {
       mainImageName: this.workgroup.mainImageName,
       prefix: this.workgroup.prefix,      
       notes: this.workgroup.notes,      
-
+      recipient: this.workgroup.recipient,
+      approver: this.workgroup.approver,
     });
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.workgroupForm.markAllAsTouched();
     const fc = this.workgroupForm.controls;
     return  {
-        id: this.workgroup.id,
+      id: this.workgroup.id,
       customerId: 1, // TODO: Get from profile
-      recipientId: 1, // TODO: Get from profile
-      approverId: 1, // TODO: Get from profile
-      plantId: 1, // TODO: Get from profile
-        status: newRecord ? RecordStatus.ACTIVE : this.workgroup.status,
+      status: newRecord ? RecordStatus.ACTIVE : this.workgroup.status,
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.prefix.dirty || fc.prefix.touched || newRecord) && { prefix: fc.prefix.value },
+      ...(fc.recipient.dirty || fc.recipient.touched || newRecord) && { recipientId: fc.recipient.value ? fc.recipient.value.id  : null},      
+      ...(fc.approver.dirty || fc.approver.touched || newRecord) && { approverId: fc.approver.value ? fc.approver.value.id : null },      
 
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
@@ -1009,7 +1138,11 @@ export class CatalogWorkgroupEditionComponent {
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
       return $localize`Descripción o nombre del grupo de trabajo`
-    }
+    } else if (fieldControlName === 'recipient') {
+      return $localize`Recipiente asociado al grupo de trabajo`;
+    } else if (fieldControlName === 'approver') {
+      return $localize`Aprobador`;
+    }    
     return '';
   }
 
@@ -1026,7 +1159,16 @@ export class CatalogWorkgroupEditionComponent {
   }
 
   validateTables(): void {
-
+    if (this.workgroupForm.controls.recipient.value && this.workgroupForm.controls.recipient.value && this.workgroupForm.controls.recipient.value.status === RecordStatus.INACTIVE) {
+      this.workgroupForm.controls.recipient.setErrors({ inactive: true });   
+    } else {
+      this.workgroupForm.controls.recipient.setErrors(null);   
+    }   
+    if (this.workgroupForm.controls.approver.value && this.workgroupForm.controls.approver.value && this.workgroupForm.controls.approver.value.status === RecordStatus.INACTIVE) {
+      this.workgroupForm.controls.approver.setErrors({ inactive: true });   
+    } else {
+      this.workgroupForm.controls.approver.setErrors(null);   
+    }
     // It is missing the validation for state and thresholdType because we dont retrieve the complete record but tghe value
   }
 
@@ -1062,10 +1204,6 @@ export class CatalogWorkgroupEditionComponent {
           reference: t.reference,
           notes: t.notes,
           languageId: t.languageId,
-          customerId: 1, // TODO: Get from profile
-          recipientId: 1, // TODO: Get from profile
-          approverId: 1, // TODO: Get from profile
-          plantId: 1, // TODO: Get from profile
           status: RecordStatus.ACTIVE,
         }
       });

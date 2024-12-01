@@ -558,7 +558,7 @@ form {
 .image-container {    
   position: relative;
   display: flex;
-  margin: auto;
+  margin: auto;  
 }
 
 .image-container-table {    
@@ -842,6 +842,7 @@ mat-hint {
   background-color: rgba(0, 0, 0, 0.1);
   padding: 10px;
   border-radius: 4px;
+  flex: 1;  
 }
 
 .icon-rotated-90 {

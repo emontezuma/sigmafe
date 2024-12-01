@@ -1,5 +1,4 @@
-import { Attachment, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
-import { ChecklistTemplatePossibleValue } from './catalogs-checklist-templates.models';
+import { Attachment, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, GeneralTranslation, GeneralValues, PageInfo, VariableDetail } from 'src/app/shared/models';
 
 export interface VariablesData {
   variablesPaginated?: Variables;
@@ -20,59 +19,6 @@ export interface VariableItem {
   friendlyStatus?: string;
   isTranslated?: boolean;
   data: VariableDetail;
-}
-
-export interface VariableDetail {
-  name?: string;
-  reference?: string;
-  notes?: string;
-  prefix?: string;
-  mainImageGuid?: string;
-  mainImagePath?: string;
-  mainImageName?: string;
-  mainImage?: string;
-  id?: number;
-  customerId?: number;
-  uom?: GeneralCatalogInternalData,
-  uomName?: string;
-  uomPrefix?: string;
-  recipient?: GeneralCatalogInternalData,
-  sigmaType?: GeneralCatalogInternalData,
-  valueType?: string,
-  status?: string;
-  showNotes?: string;
-  translations?: GeneralTranslation[];
-  attachments?: Attachment[];
-  required?: string;
-  allowNoCapture?: string;
-  allowComments?: string;
-  showChart?: string;
-  allowAlarm?: string;
-  notifyAlarm?: string;
-  accumulative?: string;
-  automaticActionPlan?: string;  
-  actionPlansToGenerate?: string;  
-  possibleValues?: string;  
-
-  byDefault?: string; 
-  byDefaultDateType?: string; 
-  
-  resetValueMode?: string; 
-  valuesList?: ChecklistTemplatePossibleValue[]; 
-  minimum?: string; 
-  maximum?: string; 
-  createdById?: any;
-  createdAt?: string;
-  updatedById?: any;
-  updatedAt?: string;
-  deletedById?: any;
-  deletedAt?: any;
-  deletedBy?: any;
-  updatedBy?: any;
-  createdBy?: any;  
-  friendlyValueType?: string;
-  uomId?: number;
-  recipientId?: number;
 }
 
 export interface VariablesState {
@@ -138,12 +84,13 @@ export const emptyVariableItem: VariableDetail = {
   allowComments: GeneralValues.NO,
   showChart: GeneralValues.NO,
   allowAlarm: GeneralValues.NO,
-  accumulative: GeneralValues.NO,
+  accumulative: GeneralValues.NO,  
   automaticActionPlan: GeneralValues.NO,
   notifyAlarm: GeneralValues.NO,
   translations: [],
   attachments: [],
   byDefault: '',
+  translatedNotes: '',
   byDefaultDateType: '-',
 };
 

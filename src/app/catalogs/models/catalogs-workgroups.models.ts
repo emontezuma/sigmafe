@@ -1,4 +1,4 @@
-import {  GeneralTranslation, PageInfo } from 'src/app/shared/models';
+import {  GeneralCatalogInternalData, GeneralTranslation, PageInfo } from 'src/app/shared/models';
 
 export interface WorkgroupsData {
   workgroupsPaginated?: Workgroups;
@@ -34,6 +34,8 @@ export interface WorkgroupDetail {
   customerId?: number;
   plantId?: number;
   recipientId?: number;
+  recipient?: GeneralCatalogInternalData,
+  approver?: GeneralCatalogInternalData,
   approverId?: number; 
   status?: string;
   createdById?: any;

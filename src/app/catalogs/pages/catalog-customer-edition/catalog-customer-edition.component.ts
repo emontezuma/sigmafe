@@ -99,6 +99,7 @@ export class CatalogCustomerEditionComponent {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.CUSTOMERS_CATALOG_EDITION,
       true
@@ -188,21 +189,22 @@ export class CatalogCustomerEditionComponent {
 
   // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.CUSTOMERS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -439,7 +441,7 @@ export class CatalogCustomerEditionComponent {
                 status: RecordStatus.ACTIVE,
               };
               const customers =
-                this._sharedService.setGraphqlGen(customerParameters);
+              this._sharedService.setGraphqlGen(customerParameters);
               this.updateCustomer$ = this._catalogsService
                 .updateCustomerStatus$(customers)
                 .pipe(
@@ -1074,9 +1076,8 @@ export class CatalogCustomerEditionComponent {
   }
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.customerForm.markAllAsTouched();
     const fc = this.customerForm.controls;
-    console.log("this.customer")
-    console.log(this.customer)
     return {
       id: this.customer.id,
 

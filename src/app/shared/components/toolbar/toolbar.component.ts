@@ -122,8 +122,6 @@ export class ToolbarComponent implements AfterViewInit {
     setTimeout(() => {
       this.validateScrollbar();
     }, 200)
-      
-    
   }
 
   ngOnChanges(): void {

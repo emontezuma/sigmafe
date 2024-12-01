@@ -20,7 +20,8 @@ export class ReadonlyFieldComponent {
   @Input() skeletonTheme;
   @Input() skeletonCount: string;  
   @Input() openNewTabMessage: string;   
-  @Input() showGoToRecord: boolean;  
+  @Input() showGoToRecord: boolean;
+  @Input() recordUrl: string; 
   
   constructor (    
   ) { }
@@ -39,9 +40,10 @@ export class ReadonlyFieldComponent {
     this.iconClass = this.iconClass ?? "accordion-icon";
     this.openNewTabMessage = this.openNewTabMessage ?? $localize`Abrir este registro en una nueva ficha`;
   }
+
 // Functions ================
   openRecordInNewTab() {
-    alert('El registro es: ' + this.recordId);
+    window.open(this.recordUrl, "_blank");
   }
 
 // End ======================

@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralMultipleSelcetionItems, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,6 +18,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { CustomValidators } from '../../custom-validators';
 import { GenericDialogComponent, TranslationsDialogComponent } from 'src/app/shared/components';
+import { emptyGeneralHardcodedValuesItem } from '../../models/catalogs-shared.models';
 
 @Component({
   selector: 'app-catalog-generic-edition',
@@ -46,14 +47,14 @@ export class CatalogGenericEditionComponent {
   updateGenericCatalog: Subscription;
   deleteGenericTranslations$: Observable<any>;  
   addGenericTranslations$: Observable<any>;  
+  genTablesValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  genTablesValues$: Observable<any>;
+  takeRecords: number;
   
   genericFormChangesSubscription: Subscription;
-  
-
-  
   uploadFiles: Subscription;
   
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "project_stage_initiation";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -69,7 +70,6 @@ export class CatalogGenericEditionComponent {
   profileData: ProfileData;
   genericData: GenericItem;  
   goTopButtonTimer: any;
-  takeRecords: number;
   focusThisField: string = '';
 
   genericForm = new FormGroup({
@@ -81,9 +81,8 @@ export class CatalogGenericEditionComponent {
     notes: new FormControl(''),
    
     reference: new FormControl(''),    
-    prefix: new FormControl(''),    
-
-
+    prefix: new FormControl(''),  
+    tableName: new FormControl(emptyGeneralHardcodedValuesItem), 
   });
 
   pageInfo: PageInfo = {
@@ -97,7 +96,7 @@ export class CatalogGenericEditionComponent {
   // Temporal
   tmpDate: number = 112;
   loaded: boolean = false;
-
+  creating: boolean = false;
  
   actionPlansCurrentSelection: GeneralMultipleSelcetionItems[] = [];
   
@@ -115,7 +114,7 @@ export class CatalogGenericEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-   
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.GENERICS_CATALOG_EDITION,
       true,
@@ -143,10 +142,10 @@ export class CatalogGenericEditionComponent {
       tap(settingsData => {
         this.settingsData = settingsData;
         this.takeRecords = this.settingsData.catalog?.pageSize || 50
-    
+        const currentPage = 0;
+        this.requestGenTablesData(currentPage);
       })
     );
-
 
     this.genericFormChangesSubscription = this.genericForm.valueChanges.subscribe((genericFormChanges: any) => {
       if (!this.loaded) return;
@@ -175,8 +174,10 @@ export class CatalogGenericEditionComponent {
     ));
     this.parameters$ = this._route.params.pipe(
       tap((params: Params) => {
-        if (params['id']) {
+        if (params['id']) { 
           this.requestGenericData(+params['id']);
+        } else {
+          this.creating = true;
         }
       })
     ); 
@@ -211,21 +212,22 @@ export class CatalogGenericEditionComponent {
 
 
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.GENERICS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -332,7 +334,7 @@ export class CatalogGenericEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción inactivará la tabla con el Id <strong>${this.generic.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el registro genérico con el Id <strong>${this.generic.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -357,8 +359,9 @@ export class CatalogGenericEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateGeneric.length > 0 && data?.data?.createOrUpdateGeneric[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
-                      const message = $localize`La tabla ha sido inhabilitado`;
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.generic.status = RecordStatus.INACTIVE;
+                      const message = $localize`El registro genérico ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-warn',
@@ -401,7 +404,7 @@ export class CatalogGenericEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción reactivará la tabla con el Id <strong>${this.generic.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción reactivará el registro genérico con el Id <strong>${this.generic.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -426,8 +429,9 @@ export class CatalogGenericEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateGeneric.length > 0 && data?.data?.createOrUpdateGeneric[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
-                      this.changeInactiveButton(RecordStatus.ACTIVE)
-                      const message = $localize`La tabla ha sido reactivado`;
+                      this.changeInactiveButton(RecordStatus.ACTIVE);
+                      this.generic.status = RecordStatus.ACTIVE;
+                      const message = $localize`El registro genérico ha sido reactivado`;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -450,7 +454,7 @@ export class CatalogGenericEditionComponent {
             data: {
               duration: 0,
               translationsUpdated: false,
-              title: $localize`Traducciones de la tabla <strong>${this.generic.id}</strong>`,
+              title: $localize`Traducciones del registro genérico <strong>${this.generic.id}</strong>`,
               topIcon: 'world',
               translations: this.generic.translations,
               buttons: [{
@@ -494,7 +498,7 @@ export class CatalogGenericEditionComponent {
                 cancel: true,
               }],
               body: {
-                message: $localize`Esta acción inactivará la tabla ${this.generic.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción inactivará el registro genérico ${this.generic.id} y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: false,
             },
@@ -520,7 +524,7 @@ export class CatalogGenericEditionComponent {
       type: 'button',
       caption: $localize`Regresar...`,
       tooltip:  $localize`Regresar a la lista de tablas`,
-      icon: 'arrow-left',
+      icon: 'arrow_left',
       class: 'primary',
       iconSize: '24px',
       showIcon: true,
@@ -747,15 +751,15 @@ export class CatalogGenericEditionComponent {
     const dataToSave = this.prepareRecordToAdd(newRecord);
     this.updateGenericCatalog = this._catalogsService.updateGenericCatalog$(dataToSave)
     .subscribe((data: any) => {
-      const genericId = data?.data?.createOrUpdateMold[0].id;
+      const genericId = data?.data?.CreateOrUpdateGeneric[0].id;
       if (genericId > 0) {        
         this.processTranslations$(genericId)
         .subscribe(() => {
           this.requestGenericData(genericId);
           setTimeout(() => {              
-            let message = $localize`La tabla ha sido actualizada`;
+            let message = $localize`El registro genérico ha sido actualizado`;
             if (newRecord) {                
-              message = $localize`La tabla ha sido creada satisfactoriamente con el id <strong>${this.generic.id}</strong>`;
+              message = $localize`El registro genérico ha sido creada satisfactoriamente con el id <strong>${this.generic.id}</strong>`;
               this._location.replaceState(`/catalogs/generics/edit/${this.generic.id}`);
             }
             this._sharedService.showSnackMessage({
@@ -768,11 +772,6 @@ export class CatalogGenericEditionComponent {
       }
     })
   }
-
-
-
-
-
 
   requestGenericData(genericId: number): void { 
     let generics = undefined;
@@ -841,9 +840,31 @@ export class CatalogGenericEditionComponent {
     return this._catalogsService.getGenericsLazyLoadingDataGql$(generics).pipe();
   }
 
-
-
-
+  requestGenTablesData(currentPage: number) {
+    this.genTablesValues = {
+      ...this.genTablesValues,
+      currentPage,
+      loading: true,
+    }        
+    this.genTablesValues$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrder, SystemTables.TABLE_NAMES)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.genTablesValues.items?.concat(data?.data?.hardcodedValues?.items);
+        this.genTablesValues = {
+          ...this.genTablesValues,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }
+        if (this.creating) {
+          this.initForm();
+          this.creating = false;
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }  
 
   handleOptionSelected(getMoreDataParams: any){
     console.log('[handleOptionSelected]', getMoreDataParams)
@@ -908,7 +929,7 @@ export class CatalogGenericEditionComponent {
       reference: this.generic.reference,      
       prefix: this.generic.prefix,      
       notes: this.generic.notes,      
-    
+      tableName: this.generic.tableName,
     });
   } 
 
@@ -921,14 +942,14 @@ export class CatalogGenericEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.tableName.dirty || fc.tableName.touched || newRecord) && { tableName: fc.tableName.value },
 
     }
   }
   
-
-
   initForm(): void {
     this.genericForm.reset();
+    this.genericForm.controls.tableName.setValue(this.genTablesValues?.items.length > 0 ? this.genTablesValues?.items[0].value : null);
     // Default values
 
     this.storedTranslations = [];
@@ -970,7 +991,7 @@ export class CatalogGenericEditionComponent {
 
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'name') {
-      return $localize`Descripción o nombre de la tabla`
+      return $localize`Descripción o nombre del registro genérico`
     } 
     return '';
   }
@@ -1049,6 +1070,14 @@ export class CatalogGenericEditionComponent {
 
   get GeneralValues() {
     return GeneralValues; 
+  }
+
+  get SystemTables () {
+    return SystemTables;
+  }
+
+  get RecordStatus() {
+    return RecordStatus; 
   }
 
 // End ======================

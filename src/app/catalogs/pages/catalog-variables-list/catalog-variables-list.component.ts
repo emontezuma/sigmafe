@@ -63,7 +63,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.VARIABLES_CATALOG,
       true,
@@ -264,8 +266,9 @@ export class CatalogVariablesListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.VARIABLES_CATALOG,
@@ -275,9 +278,9 @@ export class CatalogVariablesListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -309,9 +312,9 @@ export class CatalogVariablesListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allVariablesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(variablesToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(variablesToCsv?.data?.exportVariablesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(variablesToCsv?.data?.exportVariableToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, variablesToCsv?.data?.exportVariablesToCsv?.downloadFilename);
+              this.downloadFile(data, variablesToCsv?.data?.exportVariableToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

@@ -1,3 +1,5 @@
+import { VariableData } from "src/app/catalogs";
+import { ChecklistLine, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, VariableDetail } from "src/app/shared/models";
 import { Attachment, Priority, RecordStatus, SimpleTable } from "src/app/shared/models/helpers.models";
 
 export enum ChecklistAnswerType {
@@ -126,9 +128,10 @@ export interface ChecklistFillingItem {
     alarms?: ChecklistAlarms[];
     helpers?: Attachment[];
     buttons?: any[]; // TODO define the intreface
-    component?: ChecklistEquipment;
+    component?: ChecklistInnerObject;
     showChart?: boolean;
     previousValues?: previousVariableValue[];
+    variable?: VariableDetail;
 }
 
 export interface ChecklistAlarms {
@@ -159,13 +162,17 @@ export interface ChecklistPlanning {
     type?: string;    
 }
 
-export interface ChecklistEquipment {
+export interface ChecklistInnerObject {
     id?: string;
     number?: string;
     description?: string;
-    extendedInfo?: string;
-    lastChecklistDate?: string;
-    lastChecklistAuditor?: string;
+    reference?: string;
+    date?: string;
+    notes?: string;
+    name?: string;    
+    completedDate?: string;    
+    lastChecklist?: ChecklistInnerObject;
+    assignedTo?: ChecklistInnerObject;
     canAlarm?: boolean;
 }
 
@@ -186,12 +193,16 @@ export interface previousVariableValue {
 export interface ChecklistFillingData {
     id?: string;
     number?: string;
+    recordUrl?: string;
+    name?: string;
+    notes?: string;
     parentId?: string;
     sequence?: number;
     description?: string;
     extendedInfo?: string;
     questions?: number;
     warnedItems?: number;
+    moldId?: string;
     completed?: number;
     cancelled?: number;
     alarmedItems?: number;
@@ -207,6 +218,7 @@ export interface ChecklistFillingData {
     viewType?: ChecklistView;
     icon?: string;
     items?: ChecklistFillingItem[];
+    lines?: ChecklistLine[];
     status?: RecordStatus;
     state?: ChecklistState;
     stateDescription?: string;
@@ -218,13 +230,35 @@ export interface ChecklistFillingData {
     planning?: ChecklistPlanning;
     actionRequired?: boolean;
     attachmentCompleted?: boolean;
-    equipment?: ChecklistEquipment;
+    equipment?: ChecklistInnerObject;
+    mold?: ChecklistInnerObject;
     periods?: ChecklistPeriod[];
     startingMode?: ChecklistStartingMode;
-    secondsToAlert?: number,
+    secondsToAlert?: number;
+    timeToFill?: number;
+    friendlyStatus?: string;
+    friendlyState?: string;
+    friendlyFrequency?: string;
+    friendlyGenerationMode?: string;
+    checklistTemplate?: checklistTemplateData;
 }
+
+export interface checklistTemplateData {
+    reference?: string;
+    name?: string;
+} 
 
 export interface ChecklistFillingState {
     loading: boolean;
     checklistFillingData: ChecklistFillingData;
+}
+
+export const emptyChecklistFillingData = {
+    id: null,
+    number: null,
+    parentId: null,
+    sequence: null,
+    description: null,
+    extendedInfo: null,
+    recordUrl: null,
 }

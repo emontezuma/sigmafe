@@ -1,5 +1,6 @@
 export * from './catalog-molds-list';
 export * from './catalog-mold-edition';
+export * from './catalog-mold-control-edition';
 
 export * from './catalog-variables-list';
 export * from './catalog-variable-edition';
@@ -51,5 +52,11 @@ export * from './catalog-workgroup-edition';
 
 export * from './catalog-checklist-plans-list';
 export * from './catalog-checklist-plans-edition'
+
+export * from './catalog-recipients-list';
+export * from './catalog-recipient-edition'
+
+export * from './catalog-sigma-types-list';
+export * from './catalog-sigma-type-edition'
 
 export * from './catalogs-home';

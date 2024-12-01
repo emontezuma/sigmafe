@@ -40,7 +40,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
   allWorkgroupsToCsv$: Observable<any>;
   animationData$: Observable<AnimationStatus>;
 
-  catalogIcon: string = "workgroup";  
+  catalogIcon: string = "network";  
 
   loading: boolean;
   onTopStatus: string;
@@ -63,7 +63,8 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -74,6 +75,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.WORKGROUPS_CATALOG,
       true,
@@ -241,8 +243,9 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.WORKGROUPS_CATALOG,
@@ -252,9 +255,9 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -284,11 +287,11 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
         }, 200);
       } else if (action.action === ButtonActions.EXPORT_TO_CSV) {        
         this.elements.find(e => e.action === action.action).loading = true;                          
-        this.allWorkgroupsToCsv$ = this._catalogsService.getAllToCsv$().pipe(
+        this.allWorkgroupsToCsv$ = this._catalogsService.getAllWorkgroupsToCsv$().pipe(
           tap(workgroupsToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(workgroupsToCsv?.data?.exportWorkgroupsToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(workgroupsToCsv?.data?.exportWorkgroupToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, workgroupsToCsv?.data?.exportWorkgroupsToCsv?.downloadFilename);
+              this.downloadFile(data, workgroupsToCsv?.data?.exportWorkgroupToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);

@@ -48,7 +48,7 @@ export class CatalogPartNumberEditionComponent {
   addPartNumberTranslations$: Observable<any>;  
   partNumberFormChangesSubscription: Subscription;
   uploadFiles: Subscription;
-  catalogIcon: string = "equation";  
+  catalogIcon: string = "best_product";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
@@ -76,6 +76,7 @@ export class CatalogPartNumberEditionComponent {
     mainImageName: new FormControl(''),
     reference: new FormControl(''),    
     prefix: new FormControl(''),    
+    dieId: new FormControl(0),    
   });
 
   pageInfo: PageInfo = {
@@ -107,7 +108,7 @@ export class CatalogPartNumberEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-   
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.PART_NUMBERS_CATALOG_EDITION,
       true,
@@ -197,23 +198,22 @@ export class CatalogPartNumberEditionComponent {
   
 // Functions ================
 
-
-
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.PART_NUMBERS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -346,7 +346,8 @@ export class CatalogPartNumberEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdatePartNumber.length > 0 && data?.data?.createOrUpdatePartNumber[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.partNumber.status = RecordStatus.INACTIVE;
                       const message = $localize`Ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -415,7 +416,8 @@ export class CatalogPartNumberEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdatePartNumber.length > 0 && data?.data?.createOrUpdatePartNumber[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
-                      this.changeInactiveButton(RecordStatus.ACTIVE)
+                      this.changeInactiveButton(RecordStatus.ACTIVE);
+                      this.partNumber.status = RecordStatus.ACTIVE;
                       const message = $localize`Ha sido reactivado`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -738,8 +740,9 @@ export class CatalogPartNumberEditionComponent {
       this.updatePartNumberCatalog$ = this._catalogsService.updatePartNumberCatalog$(dataToSave)    
       .pipe(
         tap((data: any) => {        
-          if (data?.data?.createOrUpdatPartNumber.length > 0) {
-            const partNumberId = data?.data?.createOrUpdatPartNumber[0].id;        
+          if (data?.data?.createOrUpdatePartNumber.length > 0) {
+            
+            const partNumberId = data?.data?.createOrUpdatePartNumber[0].id;        
             this.processTranslations$(partNumberId)
             .subscribe(() => {
               this.requestPartNumberData(partNumberId);
@@ -773,11 +776,6 @@ export class CatalogPartNumberEditionComponent {
       this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
     }    
   }
-
-
-
-
-
 
   requestPartNumberData(partNumberId: number): void { 
     let partNumbers = undefined;
@@ -909,11 +907,12 @@ export class CatalogPartNumberEditionComponent {
       reference: this.partNumber.reference,      
       prefix: this.partNumber.prefix,      
       notes: this.partNumber.notes,      
-    
+      dieId: this.partNumber.dieId,      
     });
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.partNumberForm.markAllAsTouched();
     const fc = this.partNumberForm.controls;
     return  {
         id: this.partNumber.id,
@@ -922,14 +921,13 @@ export class CatalogPartNumberEditionComponent {
       ...(fc.name.dirty || fc.name.touched || newRecord) && { name: fc.name.value  },
       ...(fc.reference.dirty || fc.reference.touched || newRecord) && { reference: fc.reference.value },
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
+      ...(fc.dieId.dirty || fc.dieId.touched || newRecord) && { dieId: fc.dieId.value ? +fc.dieId.value : 0 },
       ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.partNumber.mainImagePath,
         mainImageGuid: this.partNumber.mainImageGuid, },
     }
   }
-  
-
 
   initForm(): void {
     this.partNumberForm.reset();
@@ -1122,6 +1120,11 @@ export class CatalogPartNumberEditionComponent {
   get GeneralValues() {
     return GeneralValues; 
   }
+
+  get RecordStatus () {
+    return RecordStatus;
+  }
+
 
 // End ======================
 }

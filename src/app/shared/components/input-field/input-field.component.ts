@@ -25,7 +25,8 @@ export class InputFieldComponent implements OnChanges {
   @Input() currentErrorMessage: string;
   @Input() currentErrorIcon: string;  
   @Input() showCloseButton: boolean;  
-  @Input() fieldRequired: boolean;    
+  @Input() fieldRequired: boolean;
+  @Input() fieldReadonly: boolean;      
   @Input() fieldMaxLength: number;    
   @Input() showRightHint: boolean;  
   @Input() initialFocus: boolean;    

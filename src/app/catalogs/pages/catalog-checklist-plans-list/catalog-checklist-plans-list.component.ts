@@ -25,7 +25,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
 @ViewChild(MatPaginator) paginator: MatPaginator;
 @ViewChild(MatSort) sort: MatSort;
 
-  checklistPlansTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'friendlyGenerationMode', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
+  checklistPlansTableColumns: string[] = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
   checklistPlansCatalogData = new MatTableDataSource<ChecklistPlanItem>([]);      
   
   checklistPlansData$: Observable<ChecklistTemplatesData>;
@@ -61,7 +61,8 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   size: 'minimum' | 'medium' | 'high' | string;
 
   elements: ToolbarElement[] = [];
-  currentTabIndex: number = 1;  
+  currentTabIndex: number = 1;
+  showTableFooter: boolean = false;  
 
   constructor(
     private _store: Store<AppState>,
@@ -72,6 +73,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
 
   // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralScrollBar(
       ApplicationModules.CHECKLIST_PLANS_CATALOG,
       true,
@@ -166,8 +168,6 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
             this.order = JSON.parse(`{ "friendlyStatus": "${sortData.direction.toUpperCase()}" }`);
           } else if (sortData.active === 'frequency') {            
             this.order = JSON.parse(`{ "friendlyFrequency": "${sortData.direction.toUpperCase()}" }`);
-          } else if (sortData.active === 'generationMode') {            
-            this.order = JSON.parse(`{ "friendlyGenerationMode": "${sortData.direction.toUpperCase()}" }`);
           } else if (sortData.active === 'checklistPlanType') {            
             this.order = JSON.parse(`{ "data": { "checklistPlanType": { "name": "${sortData.direction.toUpperCase()}" } } }`);
           } else {
@@ -253,8 +253,9 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
     );
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {        
         this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_PLANS_CATALOG,
@@ -264,9 +265,9 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   setPaginator(totalRecords: number) {
@@ -298,9 +299,9 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
         this.elements.find(e => e.action === action.action).loading = true;                          
         this.allChecklistTemplatesToCsv$ = this._catalogsService.getAllToCsv$().pipe(
           tap(checklistPlansToCsv => {
-            const fileData$ = this._catalogsService.getAllCsvData$(checklistPlansToCsv?.data?.exportChecklistTemplatesToCsv?.exportedFilename)
+            const fileData$ = this._catalogsService.getAllCsvData$(checklistPlansToCsv?.data?.exportChecklistTemplateToCSV?.exportedFilename)
             .subscribe(data => { 
-              this.downloadFile(data, checklistPlansToCsv?.data?.exportChecklistTemplatesToCsv?.downloadFilename);
+              this.downloadFile(data, checklistPlansToCsv?.data?.exportChecklistTemplateToCSV?.downloadFilename);
               setTimeout(() => {
                 this.elements.find(e => e.action === action.action).loading = false;
               }, 200);
@@ -401,7 +402,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
   }
 
   mapColumns() {    
-    this.checklistPlansTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'friendlyGenerationMode', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
+    this.checklistPlansTableColumns = ['id', 'mainImagePath', 'name', 'reference', 'friendlyFrequency', 'checklistPlanType', 'lastGeneration', 'status', 'updatedAt'];
   }
   
   setTabIndex(tab: any) { 

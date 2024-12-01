@@ -45,6 +45,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
     showLastValue: new FormControl(emptyGeneralHardcodedValuesItem),
     notifyAlarm: new FormControl(emptyGeneralHardcodedValuesItem),
     valueType: new FormControl(emptyGeneralHardcodedValuesItem),
+    useVariableSettings: new FormControl(emptyGeneralHardcodedValuesItem),
     useVariableAttachments: new FormControl(true),
     notes: new FormControl(''),
     uomName: new FormControl(''),
@@ -145,6 +146,33 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       } else {
         this.variableForm.controls.minimum.setErrors(null);
       }      
+    });
+
+    this.variableFormChangesSubscription = this.variableForm.controls.useVariableSettings.valueChanges
+    .subscribe((value: any) => {
+      if (value === GeneralValues.NO) {
+        if (this.variableForm.get('required').disabled) this.variableForm.get('required').enable({ emitEvent: false });
+        if (this.variableForm.get('allowNoCapture').disabled) this.variableForm.get('allowNoCapture').enable({ emitEvent: false });
+        if (this.variableForm.get('minimum').disabled) this.variableForm.get('minimum').enable({ emitEvent: false });
+        if (this.variableForm.get('maximum').disabled) this.variableForm.get('maximum').enable({ emitEvent: false });
+        if (this.variableForm.get('notes').disabled) this.variableForm.get('notes').enable({ emitEvent: false });
+        if (this.variableForm.get('byDefault').disabled) this.variableForm.get('byDefault').enable({ emitEvent: false });
+        if (this.variableForm.get('allowComments').disabled) this.variableForm.get('allowComments').enable({ emitEvent: false });
+        if (this.variableForm.get('showParameters').disabled) this.variableForm.get('showParameters').enable({ emitEvent: false });
+        if (this.variableForm.get('showChart').disabled) this.variableForm.get('showChart').enable({ emitEvent: false });
+        if (this.variableForm.get('showNotes').disabled) this.variableForm.get('showNotes').enable({ emitEvent: false });        
+      } else if (value === GeneralValues.YES) {
+        if (this.variableForm.get('required').enabled) this.variableForm.get('required').disable({ emitEvent: false });
+        if (this.variableForm.get('allowNoCapture').enabled) this.variableForm.get('allowNoCapture').disable({ emitEvent: false });
+        if (this.variableForm.get('minimum').enabled) this.variableForm.get('minimum').disable({ emitEvent: false });
+        if (this.variableForm.get('maximum').enabled) this.variableForm.get('maximum').disable({ emitEvent: false });
+        if (this.variableForm.get('notes').enabled) this.variableForm.get('notes').disable({ emitEvent: false });
+        if (this.variableForm.get('byDefault').enabled) this.variableForm.get('byDefault').disable({ emitEvent: false });
+        if (this.variableForm.get('allowComments').enabled) this.variableForm.get('allowComments').disable({ emitEvent: false });
+        if (this.variableForm.get('showParameters').enabled) this.variableForm.get('showParameters').disable({ emitEvent: false });
+        if (this.variableForm.get('showChart').enabled) this.variableForm.get('showChart').disable({ emitEvent: false });
+        if (this.variableForm.get('showNotes').enabled) this.variableForm.get('showNotes').disable({ emitEvent: false });        
+      }
     });
 
     this.checkListTemplateLineChanged$ = this._catalogsService.checkListTemplateLineChanged.pipe(
@@ -308,6 +336,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
       showLastValue: this.line.showLastValue,            
       showParameters: this.line.showParameters,            
       notifyAlarm: this.line.notifyAlarm,
+      useVariableSettings: this.line.useVariableAttachments,      
       valueType: this.line.valueType,      
       byDefault: this.line.byDefault,    
       showNotes: this.line.showNotes === GeneralValues.YES,   
@@ -638,7 +667,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
           name: res.fileName, 
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
-          icon: this._catalogsService.setIconName(res.fileType), 
+          icon: this._sharedService.setIconName(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
         this.setEditionButtonsState();

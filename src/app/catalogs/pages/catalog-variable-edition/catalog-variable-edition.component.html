@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
   <ng-container *ngIf="variable$ | async"></ng-container>  
@@ -151,7 +151,10 @@
               </mat-checkbox>
             </div>                     
             <div class="field-items">
-              <fieldset class="field__container">
+              <fieldset
+                class="field__container"
+                style="min-width: 350px; height: calc(100% - 22px);"
+              >
                 <div class="image-and-field">
                   <div class="field-components">
                     <span class="label field__label">Imagen a mostrar</span>                
@@ -564,273 +567,274 @@
               </button>
               </div>
             </fieldset>
+          </div>          
+          <div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.required"
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si la variable es requerida"
+            >
+              <span fieldTitle class="label field__label"
+                >¿La variable es requerida?</span
+              >
+            </app-select-field>                
           </div>
-           
-
-
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.required"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable es requerida"
-              >
-                <span fieldTitle class="label field__label"
-                  >La variable es requerida</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.allowNoCapture"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable permite la NO captura"
-              >
-                <span fieldTitle class="label field__label"
-                  >La variable permite la NO captura</span
-                >
-              </app-select-field>                
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO && 
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO_NA &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.LIST &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE_AND_TIME &&
-                variableForm.controls.valueType.value !== HarcodedVariableValueType.TIME
-              "
-              class="field-items"
-            >            
-              <app-input-field
-                [bordered]="true"
-                [formField]="variableForm.controls.byDefault"
-                leftHint="Campo opcional"                
-                [fieldInputType]="byDefaultValueType"
-                currentErrorIcon="warn_line"
-                [showCloseButton]="true"
-                [showRightHint]="true"
-                rightHint="Deje el valor vacío para no aplicar el valor por defecto"
-                fieldHelp="Especifique el valor por defecto para esta variable"
-              >
-                <span fieldTitle class="label field__label"
-                  >Valor por defecto para la variable</span
-                >
-              </app-input-field>
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO || 
-                variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO_NA
-              "
-              class="field-items"
+          <div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.allowNoCapture"
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si la variable permite la NO captura"
             >
-              <app-select-field
-                [formField]="variableForm.controls.byDefault"
-                [list]="valuesByDefault.items"                
-                fieldHelp="Seleccione de la lista el valor por defecto"
+              <span fieldTitle class="label field__label"
+                >La variable permite la NO captura</span
               >
-                <span fieldTitle class="label field__label"
+            </app-select-field>                
+          </div>
+          <div
+            *ngIf="
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO && 
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.YES_NO_NA &&
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.LIST &&
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE &&
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.DATE_AND_TIME &&
+              variableForm.controls.valueType.value !== HarcodedVariableValueType.TIME
+            "
+            class="field-items"
+          >            
+            <app-input-field
+              [bordered]="true"
+              [formField]="variableForm.controls.byDefault"
+              leftHint="Campo opcional"                
+              [fieldInputType]="byDefaultValueType"
+              currentErrorIcon="warn_line"
+              [showCloseButton]="true"
+              [showRightHint]="true"
+              rightHint="Deje el valor vacío para no aplicar el valor por defecto"
+              fieldHelp="Especifique el valor por defecto para esta variable"
+            >
+              <span fieldTitle class="label field__label"
                 >Valor por defecto para la variable</span
-                >
-              </app-select-field>
-            </div>
-            <div
-              *ngIf="
-                variableForm.controls.valueType.value === HarcodedVariableValueType.DATE ||
-                variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME ||
-                variableForm.controls.valueType.value === HarcodedVariableValueType.TIME
-              "
-              class="field-items"
+              >
+            </app-input-field>
+          </div>
+          <div
+            *ngIf="
+              variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO || 
+              variableForm.controls.valueType.value === HarcodedVariableValueType.YES_NO_NA
+            "
+            class="field-items"
+          >
+            <app-select-field
+              [formField]="variableForm.controls.byDefault"
+              [list]="valuesByDefault.items"                
+              fieldHelp="Seleccione de la lista el valor por defecto"
             >
-              <app-select-field
-                [formField]="variableForm.controls.byDefaultDateType"
-                [list]="variableByDefaultDate.items"                
-                fieldHelp="Especifique el tipo de valor por defecto"
+              <span fieldTitle class="label field__label"
+              >Valor por defecto para la variable</span
               >
-                <span fieldTitle class="label field__label"
-                  >Tipo de fecha/hora por defecto</span
-                >
-              </app-select-field>                
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME"
-              class="field-items"
+            </app-select-field>
+          </div>
+          <div
+            *ngIf="
+              variableForm.controls.valueType.value === HarcodedVariableValueType.DATE ||
+              variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME ||
+              variableForm.controls.valueType.value === HarcodedVariableValueType.TIME
+            "
+            class="field-items"
+          >
+            <app-select-field
+              [formField]="variableForm.controls.byDefaultDateType"
+              [list]="variableByDefaultDate.items"                
+              fieldHelp="Especifique el tipo de valor por defecto"
             >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+              <span fieldTitle class="label field__label"
+                >Tipo de fecha/hora por defecto</span
               >
-                <span class="label field__label">Fecha y hora por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="flex: 1">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefaultDate"
-                      #byDefault
-                      name="byDefaultDate"
-                      [matDatepicker]="byDefaultPicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="byDefaultPicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #byDefaultPicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn_line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>
-                  <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefaultTime"
-                      #byDefault
-                      name="byDefaultTime"
-                      style="min-height: 22px"
-                      type="time"
-                    />
-                    <mat-hint>HH:MM AM/PM</mat-hint>                  
-                  </mat-form-field>
-                </div>
-                <span class="field__help"
-                  >Especifique la fecha y hora por defecto</span
-                >
-              </fieldset>
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE"
-              class="field-items"
+            </app-select-field>                
+          </div>
+          <div
+            *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE_AND_TIME"
+            class="field-items"
+          >
+            <fieldset
+              class="field__container"
+              style="min-width: 250px"
+              [ngClass]="{
+                'field__container--error':
+                  variableForm.controls.byDefault.touched &&
+                  !variableForm.controls.byDefault.valid
+              }"
+              [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
             >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+              <span class="label field__label">Fecha y hora por defecto</span>
+              <div class="flex-columns">
+                <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+                  <input
+                    class="field__input"
+                    matInput
+                    formControlName="byDefaultDate"
+                    #byDefault
+                    name="byDefaultDate"
+                    [matDatepicker]="byDefaultPicker"
+                  />
+                  <mat-hint>DD/MM/AAAA</mat-hint>
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="byDefaultPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #byDefaultPicker></mat-datepicker>
+                  <mat-error class="field__error field__required">
+                    <mat-icon
+                      class="field__required-icon"
+                      svgIcon="warn_line"
+                    ></mat-icon>
+                    <span class="field__required-label"
+                      ><strong>Error en el formato de la fecha</strong></span
+                    >
+                  </mat-error>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="field__field" style="max-width: 110px">
+                  <input
+                    class="field__input"
+                    matInput
+                    formControlName="byDefaultTime"
+                    #byDefault
+                    name="byDefaultTime"
+                    style="min-height: 22px"
+                    type="time"
+                  />
+                  <mat-hint>HH:MM AM/PM</mat-hint>                  
+                </mat-form-field>
+              </div>
+              <span class="field__help"
+                >Especifique la fecha y hora por defecto</span
               >
-                <span class="label field__label">Fecha por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      [matDatepicker]="byDefaultPicker"
-                    />
-                    <mat-hint>DD/MM/AAAA</mat-hint>
-                    <mat-datepicker-toggle
-                      matIconSuffix
-                      [for]="byDefaultPicker"
-                    ></mat-datepicker-toggle>
-                    <mat-datepicker #byDefaultPicker></mat-datepicker>
-                    <mat-error class="field__error field__required">
-                      <mat-icon
-                        class="field__required-icon"
-                        svgIcon="warn_line"
-                      ></mat-icon>
-                      <span class="field__required-label"
-                        ><strong>Error en el formato de la fecha</strong></span
-                      >
-                    </mat-error>
-                  </mat-form-field>                 
-                </div>
-                <span class="field__help"
-                  >Especifique la fecha por defecto</span
-                >
-              </fieldset>
-            </div>
-            <div
-              *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.TIME"
-              class="field-items"
+            </fieldset>
+          </div>
+          <div
+            *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.DATE"
+            class="field-items"
+          >
+            <fieldset
+              class="field__container"
+              style="min-width: 250px"
+              [ngClass]="{
+                'field__container--error':
+                  variableForm.controls.byDefault.touched &&
+                  !variableForm.controls.byDefault.valid
+              }"
+              [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
             >
-              <fieldset
-                class="field__container"
-                style="min-width: 250px"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.byDefault.touched &&
-                    !variableForm.controls.byDefault.valid
-                }"
-                [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+              <span class="label field__label">Fecha por defecto</span>
+              <div class="flex-columns">
+                <mat-form-field appearance="fill" class="field__field" style="width: 100%">
+                  <input
+                    class="field__input"
+                    matInput
+                    formControlName="byDefault"
+                    #byDefault
+                    name="byDefault"
+                    [matDatepicker]="byDefaultPicker"
+                  />
+                  <mat-hint>DD/MM/AAAA</mat-hint>
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="byDefaultPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #byDefaultPicker></mat-datepicker>
+                  <mat-error class="field__error field__required">
+                    <mat-icon
+                      class="field__required-icon"
+                      svgIcon="warn_line"
+                    ></mat-icon>
+                    <span class="field__required-label"
+                      ><strong>Error en el formato de la fecha</strong></span
+                    >
+                  </mat-error>
+                </mat-form-field>                 
+              </div>
+              <span class="field__help"
+                >Especifique la fecha por defecto</span
               >
-                <span class="label field__label">Hora por defecto</span>
-                <div class="flex-columns">
-                  <mat-form-field appearance="fill" class="field__field" style="width: 100%">
-                    <input
-                      class="field__input"
-                      matInput
-                      formControlName="byDefault"
-                      #byDefault
-                      name="byDefault"
-                      type="time"
-                      style="min-height: 22px"
-                    />
-                    <mat-hint>HH:MM AM/PM</mat-hint>                  
-                  </mat-form-field>
-                </div>
-                <span class="field__help"
-                  >Especifique la hora por defecto</span
-                >
-              </fieldset>
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.allowComments"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la variable permite la entrada de comentarios"
+            </fieldset>
+          </div>
+          <div
+            *ngIf="variableForm.controls.valueType.value === HarcodedVariableValueType.TIME"
+            class="field-items"
+          >
+            <fieldset
+              class="field__container"
+              style="min-width: 250px"
+              [ngClass]="{
+                'field__container--error':
+                  variableForm.controls.byDefault.touched &&
+                  !variableForm.controls.byDefault.valid
+              }"
+              [disabled]="variableForm.controls.byDefaultDateType.value !== GeneralValues.SPECIFIC"
+            >
+              <span class="label field__label">Hora por defecto</span>
+              <div class="flex-columns">
+                <mat-form-field appearance="fill" class="field__field" style="width: 100%">
+                  <input
+                    class="field__input"
+                    matInput
+                    formControlName="byDefault"
+                    #byDefault
+                    name="byDefault"
+                    type="time"
+                    style="min-height: 22px"
+                  />
+                  <mat-hint>HH:MM AM/PM</mat-hint>                  
+                </mat-form-field>
+              </div>
+              <span class="field__help"
+                >Especifique la hora por defecto</span
               >
-                <span fieldTitle class="label field__label"
-                  >La variable permite la entrada de comentarios</span
-                >
-              </app-select-field>                
-            </div>
+            </fieldset>
+          </div>
+          <div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.allowComments"
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si la variable permite la entrada de comentarios"
+            >
+              <span fieldTitle class="label field__label"
+                >La variable permite la entrada de comentarios</span
+              >
+            </app-select-field>                
+          </div>
 
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.showChart"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si en la captura de la variable se muestra el gráfico"
+          <div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.showChart"
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si en la captura de la variable se muestra el gráfico"
+            >
+              <span fieldTitle class="label field__label"
+                >Mostrar gráfico</span
               >
-                <span fieldTitle class="label field__label"
-                  >Mostrar gráfico</span
-                >
-              </app-select-field>                
-            </div>
+            </app-select-field>                
+          </div>
 
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.allowAlarm"
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si esta variable generará alarmas"
+          <div class="field-items">
+            <app-select-field              
+              [formField]="variableForm.controls.allowAlarm"
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si esta variable generará alarmas"
+            >
+              <span fieldTitle class="label field__label"
+                >La variable generará alarmas</span
               >
-                <span fieldTitle class="label field__label"
-                  >La variable generará alarmas</span
-                >
-              </app-select-field>                
-            </div>
+            </app-select-field>                
+          </div>
 
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.notifyAlarm"                
+          <div class="field-items">
+            <fieldset
+              style="border: none; padding: 0px"
+              [disabled]="variableForm.controls.allowAlarm.value !== GeneralValues.YES"
+            >
+              <app-select-field                
+                [formField]="variableForm.controls.notifyAlarm"
                 [list]="genYesNoValues.items"                
                 fieldHelp="Especifique si la alarma de esta variable generará notificaciones"
               >
@@ -838,104 +842,105 @@
                   >La alarma de la variable generará notificaciones</span
                 >
               </app-select-field>                
-            </div>
-            <div class="field-items">
-              <fieldset
-                class="field__container"
-                style="min-width: 350px; height: calc(100% - 22px);"
-                [ngClass]="{
-                  'field__container--error':
-                    variableForm.controls.recipient.touched &&
-                    !variableForm.controls.recipient.valid
-                }"
-                [disabled]="variableForm.controls.notifyAlarm.value !== 'y'"
-              >
-                <div class="title-with-id">
-                  <span class="label field__label">Recipiente asociado</span>
-                  <span class="field__label" *ngIf="variableForm.controls.recipient?.value?.id">Id: {{ variableForm.controls.recipient?.value?.id }}</span>
-                </div>
-                <app-auto-complete-field
-                  [focused]="focusThisField==='recipient'"
-                  [formField]="variableForm.controls.recipient"
-                  [list]="recipients.items"
-                  [totalCount]="recipients.totalCount"
-                  leftHint="Escriba el Nombre del recipiente a buscar"
-                  [catalog]="SystemTables.RECIPIENTS"
-                  [loading]="recipients.loading"
-                  noItemsError="No hay recipientes con este nombre"
-                  [showDataState]="true"
-                  (optionSelected)="handleOptionSelected($event)"
-                  (getMoreData)="getMoreData($event)"
-                >
-                </app-auto-complete-field>
-                <span class="field__help"
-                  >Especifique el Recipiente a notificar</span
-                >
-              </fieldset>
-            </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.resetValueMode"
-                [list]="resetValueModes.items"                
-                [fieldRequired]="true"
-                [showRightHint]="true"
-                currentErrorMessage="Este campo no puede estar vacío"
-                currentErrorIcon="warn_line"
-                fieldHelp="Modo de reseteo de la variable"
-              >
-                <span fieldTitle class="label field__label"
-                  >Modo de reseteo de la variable</span
-                >
-              </app-select-field>                
-            </div>
-            <!--div class="field-items">
-              <app-multiple-selection-list
-                [bordered]="true"
-                [showSelect]="true"                  
-                [selectOptions]="moldsOptions"
-                [currentSelections]="moldsCurrentSelection"        
-                [formField]="variableForm.controls.molds"
-                [list]="molds.items"
-                [totalCount]="molds.totalCount"
-                [loading]="molds.loading"                                    
-                [catalog]="SystemTables.MOLDS"                  
-                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
-                (getMoreData)="getMoreData($event)"
-              >
-              <span fieldTitle class="label field__label">Moldes donde se puede usar la variable</span>
-              </app-multiple-selection-list>                
-            </div-->
-            <div class="field-items">
-              <app-select-field
-                [formField]="variableForm.controls.automaticActionPlan"                
-                [list]="genYesNoValues.items"                
-                fieldHelp="Especifique si la alarma de esta variable generará notificaciones"
-              >
-                <span fieldTitle class="label field__label"
-                  >La alarma de la variable generará planes</span
-                >
-              </app-select-field>                
-            </div>
-            <div class="field-items">
-              <app-multiple-selection-list
-                [bordered]="true"
-                [showSelect]="true"                  
-                [selectOptions]="actionPlansToGenerateOptions"
-                [currentSelections]="actionPlansToGenerateCurrentSelection"        
-                [formField]="variableForm.controls.actionPlansToGenerate"
-                [list]="actionPlansToGenerate.items"
-                [totalCount]="actionPlansToGenerate.totalCount"
-                [loading]="actionPlansToGenerate.loading"                                    
-                [catalog]="SystemTables.TEMPLATE_ACTION_PLANS"
-                placeHolder="Filtrar..."
-                [defaultValue]="multipleSearchDefaultValue"
-                (multipleSelectionChanged)="setEditionButtonsState()"
-                (getMoreData)="getMoreData($event)"
-              >
-              <span fieldTitle class="label field__label">Lista de Planes de acción a generar de forma automática en caso de alarmarse</span>
-              </app-multiple-selection-list>                
-            </div>
+            </fieldset>
           </div>
+          <div class="field-items">
+            <fieldset
+              class="field__container"
+              style="min-width: 350px; height: calc(100% - 22px);"
+              [ngClass]="{
+                'field__container--error':
+                  variableForm.controls.recipient.touched &&
+                  !variableForm.controls.recipient.valid
+              }"
+              [disabled]="variableForm.controls.notifyAlarm.value !== GeneralValues.YES || variableForm.controls.allowAlarm.value !== GeneralValues.YES"
+            >
+              <div class="title-with-id">
+                <span class="label field__label">Recipiente asociado</span>
+                <span class="field__label" *ngIf="variableForm.controls.recipient?.value?.id">Id: {{ variableForm.controls.recipient?.value?.id }}</span>
+              </div>
+              <app-auto-complete-field
+                [focused]="focusThisField==='recipient'"
+                [formField]="variableForm.controls.recipient"
+                [list]="recipients.items"
+                [totalCount]="recipients.totalCount"
+                leftHint="Escriba el Nombre del recipiente a buscar"
+                [catalog]="SystemTables.RECIPIENTS"
+                [loading]="recipients.loading"
+                noItemsError="No hay recipientes con este nombre"
+                [showDataState]="true"
+                (optionSelected)="handleOptionSelected($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              </app-auto-complete-field>
+              <span class="field__help"
+                >Especifique el Recipiente a notificar</span
+              >
+            </fieldset>
+          </div>
+          <!--<div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.resetValueMode"
+              [list]="resetValueModes.items"                
+              [fieldRequired]="true"
+              [showRightHint]="true"
+              currentErrorMessage="Este campo no puede estar vacío"
+              currentErrorIcon="warn_line"
+              fieldHelp="Modo de reseteo de la variable"
+            >
+              <span fieldTitle class="label field__label"
+                >Modo de reseteo de la variable</span
+              >
+            </app-select-field>                
+          </div>
+          <div class="field-items">
+            <app-multiple-selection-list
+              [bordered]="true"
+              [showSelect]="true"                  
+              [selectOptions]="moldsOptions"
+              [currentSelections]="moldsCurrentSelection"        
+              [formField]="variableForm.controls.molds"
+              [list]="molds.items"
+              [totalCount]="molds.totalCount"
+              [loading]="molds.loading"                                    
+              [catalog]="SystemTables.MOLDS"                  
+              (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+              (getMoreData)="getMoreData($event)"
+            >
+            <span fieldTitle class="label field__label">Moldes donde se puede usar la variable</span>
+            </app-multiple-selection-list>                
+          </div-->
+          <!--<div class="field-items">
+            <app-select-field
+              [formField]="variableForm.controls.automaticActionPlan"                
+              [list]="genYesNoValues.items"                
+              fieldHelp="Especifique si la alarma de esta variable generará notificaciones"
+            >
+              <span fieldTitle class="label field__label"
+                >La alarma de la variable generará planes</span
+              >
+            </app-select-field>                
+          </div>
+          <div class="field-items">
+            <app-multiple-selection-list
+              [bordered]="true"
+              [showSelect]="true"                  
+              [selectOptions]="actionPlansToGenerateOptions"
+              [currentSelections]="actionPlansToGenerateCurrentSelection"        
+              [formField]="variableForm.controls.actionPlansToGenerate"
+              [list]="actionPlansToGenerate.items"
+              [totalCount]="actionPlansToGenerate.totalCount"
+              [loading]="actionPlansToGenerate.loading"                                    
+              [catalog]="SystemTables.TEMPLATE_ACTION_PLANS"
+              placeHolder="Filtrar..."
+              [defaultValue]="multipleSearchDefaultValue"
+              (multipleSelectionChanged)="setEditionButtonsState()"
+              (getMoreData)="getMoreData($event)"
+            >
+            <span fieldTitle class="label field__label">Lista de Planes de acción a generar de forma automática en caso de alarmarse</span>
+            </app-multiple-selection-list>                
+          </div>-->
+        </div>
 
         </mat-expansion-panel> 
 

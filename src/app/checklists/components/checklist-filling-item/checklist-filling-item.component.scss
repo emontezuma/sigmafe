@@ -86,8 +86,7 @@
     font-size: 1.5rem;
     text-align: start;
     line-height: 2rem;
-    margin: 5px;
-    margin-top: 12px;
+    margin: 5px;    
 }
 
 .item-response {
@@ -135,8 +134,6 @@
 }
 
 mat-card-header {
-    max-height: 300px;
-    overflow-x: hidden;
     flex: 1;
 }
 
@@ -180,16 +177,15 @@ mat-card-footer {
 }
 
 .required {
-    font-size: 2.4rem;
+    font-size: 4rem;
     color: var(--theme-warn-500);
     position: absolute;
     bottom: 0;
     right: 0;
-    margin-bottom: 8px;
-    margin-right: 10px;
+    margin-bottom: 12px;
+    margin-right: 6px;
     cursor: help;
-    height: 28px;
-    width: 28px;
+    height: 28px;    
     font-weight: 900;
     text-align: center;
     transform: scale(1.7, 1);
@@ -210,6 +206,7 @@ mat-card-footer {
 .question-index {
     flex: 1;
     max-width: 50px;
+    margin-left: 5px;
 }
 
 .question-image {
@@ -219,9 +216,11 @@ mat-card-footer {
 
 .question-text {
     flex: auto;
+    max-height: 135px;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-size: 1.5rem;
     text-align: start;
     line-height: 2rem;
-    margin: 5px;
-    margin-top: 12px;
+    margin: 5px;    
 }

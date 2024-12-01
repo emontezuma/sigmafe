@@ -9,6 +9,7 @@ export const environment = {
     serverUrl: 'https://localhost:7209',
     apiUploadUrl: 'https://localhost:7209/api/file/upload',
     apiDownloadUrl: 'https://localhost:7209/api/file/download',
+    catalogsUrl: '#/catalogs',
     uploadFolders: {
         completePathToFiles: 'https://localhost:7209/files',
         catalogs: 'catalogs',

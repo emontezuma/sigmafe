@@ -21,8 +21,8 @@ export interface Color {
 export class ColorsService {
 
 // Variables ===============
-  primaryColor: string = '#c2b280';
-  accentColor = '#00FF00';
+  primaryColor: string = '#1D3649';
+  accentColor = '#1D3649';
   warnColor = '#FF0000';
       
   fakeColorsData: ColorsData = sampleColors;
@@ -110,13 +110,15 @@ export class ColorsService {
     document.documentElement.style.setProperty('--z-colors-page-tab-fore', colorsData?.page?.tabForeColor ?? colorToUse);
     
     //Tables
-    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-700');    
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-300');    
     document.documentElement.style.setProperty('--z-colors-table-header-background-color', colorsData?.page?.tableHeaderBackgroundColor ?? colorToUse);
     document.documentElement.style.setProperty('--z-colors-paginator-background-color', colorsData?.page?.tablePaginatorBackgroundColor ?? colorToUse);
-
-    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-contrast-500');
     document.documentElement.style.setProperty('--z-colors-table-header-fore-color', colorsData?.page?.tableHeaderForeColor ?? colorToUse);
-    document.documentElement.style.setProperty('--z-colors-paginator-fore-color', colorsData?.page?.tablePaginatorBackgroundColor ?? colorToUse);
+    document.documentElement.style.setProperty('--z-colors-paginator-fore-color', colorsData?.page?.tablePaginatorForeColor ?? colorToUse);
+    
+
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');        
     document.documentElement.style.setProperty('--z-colors-table-even-background-color', colorsData?.page?.tableRowEvenBackgroundColor ?? colorToUse);
 
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-50');
@@ -126,7 +128,7 @@ export class ColorsService {
     colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-400');
     document.documentElement.style.setProperty('--z-colors-table-border-color', colorsData?.page?.tableBorderColor ?? colorToUse);
     
-    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-200');
+    colorToUse = document.documentElement.style.getPropertyValue('--theme-primary-100');
     document.documentElement.style.setProperty('--z-colors-table-hover-background-color', colorsData?.page?.tableHoverBackgroundColor ?? colorToUse);
         
     document.documentElement.style.setProperty('--z-colors-required-fore-color', colorsData?.page?.requiredForeColor ?? Colors.orangered);

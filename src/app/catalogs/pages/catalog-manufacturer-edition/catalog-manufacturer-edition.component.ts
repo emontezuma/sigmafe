@@ -109,6 +109,7 @@ export class CatalogManufacturerEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     // this.manufacturerForm.get('name').disable();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
@@ -200,21 +201,22 @@ export class CatalogManufacturerEditionComponent {
   }
   
 // Functions ================
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.MANUFACTURERS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -338,7 +340,7 @@ export class CatalogManufacturerEditionComponent {
               const manufacturerParameters = {
                 settingType: 'status',
                 id: this.manufacturer.id,
-
+                customerId: this.manufacturer.customerId,
                 status: RecordStatus.INACTIVE,
               }
               const manufacturers = this._sharedService.setGraphqlGen(manufacturerParameters);
@@ -347,7 +349,8 @@ export class CatalogManufacturerEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateManufacturer.length > 0 && data?.data?.createOrUpdateManufacturer[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.manufacturer.status = RecordStatus.INACTIVE;
                       const message = $localize`El fabricante ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -407,7 +410,7 @@ export class CatalogManufacturerEditionComponent {
               const manufacturerParameters = {
                 settingType: 'status',
                 id: this.manufacturer.id,
-            
+                customerId: this.manufacturer.customerId,
                 status: RecordStatus.ACTIVE,
               }
               const manufacturers = this._sharedService.setGraphqlGen(manufacturerParameters);
@@ -418,6 +421,7 @@ export class CatalogManufacturerEditionComponent {
                     setTimeout(() => {                      
                       this.changeInactiveButton(RecordStatus.ACTIVE)
                       const message = $localize`El fabricante ha sido reactivado`;
+                      this.manufacturer.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -913,6 +917,7 @@ export class CatalogManufacturerEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.manufacturerForm.markAllAsTouched();
     const fc = this.manufacturerForm.controls;
     return  {
         id: this.manufacturer.id,
@@ -1123,6 +1128,11 @@ export class CatalogManufacturerEditionComponent {
   get GeneralValues() {
     return GeneralValues; 
   }
+
+  get RecordStatus() {
+    return RecordStatus; 
+  }
+
 
 // End ======================
 }

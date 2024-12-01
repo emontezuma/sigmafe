@@ -50,6 +50,7 @@ export class AreaFieldComponent implements OnChanges {
   @Input() currentErrorIcon: string;  
   @Input() showCloseButton: boolean;  
   @Input() fieldRequired: boolean;    
+  @Input() fieldReadonly: boolean;    
   @Input() fieldMaxLength: number;    
   @Input() showRightHint: boolean; 
   @Input() focused: boolean;

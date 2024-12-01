@@ -1,11 +1,10 @@
-
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
-  @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  @routingAnimation  
+  i18n
 >
-
   <ng-container *ngIf="scroll$ | async"></ng-container>
   <ng-container *ngIf="showGoTop$ | async"></ng-container>
   <ng-container *ngIf="settingsData$ | async"></ng-container>
@@ -15,13 +14,11 @@
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container>  
   <ng-container *ngIf="templates$ | async "></ng-container>       
-  <ng-container *ngIf="entities$ | async "></ng-container>       
   <ng-container *ngIf="updateChecklistPlanCatalog$ | async "></ng-container>       
   <ng-container *ngIf="deleteChecklistPlanTranslations$ | async "></ng-container>
   <ng-container *ngIf="updateChecklistPlan$ | async "></ng-container>      
   <ng-container *ngIf="checklistPlan$ | async "></ng-container>      
   <ng-container *ngIf="frequencies$ | async "></ng-container>      
-  <ng-container *ngIf="generationModes$ | async "></ng-container>   
   <ng-container *ngIf="checklistPlanTypes$ | async "></ng-container>   
 
   <mat-card class="card">
@@ -185,41 +182,9 @@
                 (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
                 (getMoreData)="getMoreData($event)"
               >
-              <span fieldTitle class="label field__label">Templates que se ejecutarán con este plan</span>
+              <span fieldTitle class="label field__label">Plantillas de checklist que se ejecutarán con este plan</span>
               </app-multiple-selection-list>      
             </div>
-            <div class="field-items">
-              <app-select-field
-                [formField]="checklistPlanForm.controls.generationMode"
-                [list]="generationModes.items"                
-                fieldHelp="Especifique el modo de generación del plan"                
-                (selectSelectionChange)="handleSelectionChange($event)"
-
-              >
-                <span fieldTitle class="label field__label"
-                  >Modo de generación del plan</span
-                >
-              </app-select-field>      
-            </div>
-            <div class="field-items">
-              <app-multiple-selection-list
-                [bordered]="true"
-                [showSelect]="true"                  
-                [selectOptions]="entitiesOptions"
-                [currentSelections]="entitiesCurrentSelection"        
-                [formField]="checklistPlanForm.controls.entities"
-                [list]="entities.items"
-                [totalCount]="entities.totalCount"
-                [loading]="entities.loading"                
-                [catalog]="entityTable"      
-                placeHolder="Filtrar..."
-                [defaultValue]="multipleSearchEntityDefaultValue"            
-                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
-                (getMoreData)="getMoreData($event)"
-              >
-              <span fieldTitle class="label field__label">Entidades a las que se le enviará el checklist</span>
-              </app-multiple-selection-list>      
-            </div>    
             <div class="field-items">
               <app-select-field
                 [formField]="checklistPlanForm.controls.frequency"
@@ -350,6 +315,25 @@
                 <span class="field__help">Especifique la hora de ejecución</span>
               </fieldset>
             </div>
+            <div class="field-items">
+              <app-input-field
+                [bordered]="true"
+                [formField]="checklistPlanForm.controls.anticipationTime"
+                rightHint="Campo opcional"
+                fieldInputType="number"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                [showRightHint]="true"
+                leftHint="Expresado en segundos"
+                rightHint="0 = No anticipar"
+                fieldHelp="Indique el tiempo de anticipación"
+                [rightSuffix]="_sharedService.getHours(checklistPlanForm.controls.anticipationTime.value)"
+              >
+                <span fieldTitle class="label field__label"
+                  >Tiempo de anticipación</span
+                >
+              </app-input-field>
+            </div>                   
             <div class="field-items">
               <app-input-field
                 [bordered]="true"

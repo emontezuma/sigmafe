@@ -1,4 +1,4 @@
-import { PageInfo } from "./helpers.models";
+import { Attachment, PageInfo } from "./helpers.models";
 
 export interface GeneralTranslation {
     languageId: number;
@@ -56,6 +56,8 @@ export interface MoldDetail {
     prefix?: string;
     notes?: string;
     reference?: string;
+    generationMode?: string;
+    entities?: string;  
     manufacturerId?: number;
     providerId?: number;
     manufacturingDate?: string;
@@ -265,6 +267,8 @@ export interface MoldDetail {
     notifyYellowChannels: '',
     notifyYellowSubject: '',
     notifyYellowBody: '',
+    generationMode: null,
+    entities: null,  
   };
   
   export const emptyMoldCatalog = {
@@ -348,4 +352,120 @@ export interface MoldDetail {
     { friendlyText: $localize`Valor Sí`, disabled: false, value: 'y'},
     { friendlyText: $localize`Valor No`, disabled: false, value: 'n'},    
    ]
+
+   export interface ChecklistTemplatePossibleValue {
+    order?: number;
+    value?: string;
+    byDefault?: boolean;
+    alarmedValue?: boolean;  
+  }
+  
+  export interface VariableDetail {
+    name?: string;
+    reference?: string;
+    notes?: string;
+    prefix?: string;
+    mainImageGuid?: string;
+    mainImagePath?: string;
+    mainImageName?: string;
+    mainImage?: string;
+    id?: number;
+    customerId?: number;
+    uom?: GeneralCatalogInternalData,
+    uomName?: string;
+    uomPrefix?: string;
+    recipient?: GeneralCatalogInternalData,
+    sigmaType?: GeneralCatalogInternalData,
+    valueType?: string,
+    status?: string;
+    showNotes?: string;
+    translations?: GeneralTranslation[];
+    attachments?: Attachment[];
+    required?: string;
+    allowNoCapture?: string;
+    allowComments?: string;
+    showChart?: string;
+    allowAlarm?: string;
+    notifyAlarm?: string;
+    accumulative?: string;  
+    automaticActionPlan?: string;  
+    actionPlansToGenerate?: string;  
+    possibleValues?: string;  
+  
+    byDefault?: string; 
+    byDefaultDateType?: string; 
+    
+    resetValueMode?: string; 
+    valuesList?: ChecklistTemplatePossibleValue[]; 
+    minimum?: string; 
+    maximum?: string; 
+    createdById?: any;
+    createdAt?: string;
+    updatedById?: any;
+    updatedAt?: string;
+    deletedById?: any;
+    deletedAt?: any;
+    deletedBy?: any;
+    updatedBy?: any;
+    createdBy?: any;  
+    friendlyValueType?: string;
+    uomId?: number;
+    recipientId?: number;
+    translatedNotes?: string;
+  }
+
+  export interface ChecklistLine {
+    checklistTemplateId?: number;
+    buttons: []
+    id?: number;
+    customerId?: number;
+    line?: number;
+    order?: number;
+    loading?: boolean;
+    enabled?: boolean;
+    error?: boolean;
+    validate?: boolean;
+    variableId?: number;
+    recipientId?: number;
+    alarmed?: boolean;
+    name?: string;
+    notes?: string;
+    minimum?: string;
+    maximum?: string;
+    required?: string;
+    byDefault?: string;
+    allowNoCapture?: string;
+    allowComments?: string;
+    possibleValues?: string;
+    possibleValue?: string;
+    byDefaultDateType?: string;
+    valueType?: string;
+    sensorId?: number;
+    uomId?: number;
+    uomName?: string;  
+    uomPrefix?: string;
+    showChart?: string;
+    useVariableAttachments?: string;
+    showLastValue?: string;
+    showParameters?: string;
+    useVariableSettings?: string;
+    showNotes?: string;
+    allowAlarm?: string;
+    notifyAlarm?: string;  
+    recipient?: GeneralCatalogInternalData,  
+    status?: string;
+    uom?: GeneralCatalogInternalData,
+    attachments?: Attachment[];
+    attachmentsList?: string;
+    valuesList?: ChecklistTemplatePossibleValue[];
+    friendlyVariableValueType?: string;
+    variableAttachments?: Attachment[];
+    variable?: VariableDetail;
+    value?: String;
+    text?: String;
+    icon?: String;
+    actionRequired?: boolean;
+    attachmentRequired?: boolean;
+    attachmentCompleted?: boolean;
+  }
   

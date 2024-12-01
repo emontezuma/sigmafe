@@ -16,3 +16,5 @@ export * from './catalogs-lines.models';
 export * from './catalogs-generics.models';
 export * from './catalogs-shifts.models';
 export * from './catalogs-workgroups.models';
+export * from './catalogs-recipients.models';
+export * from './catalogs-sigma-types.models';

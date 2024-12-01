@@ -115,7 +115,7 @@ export class CatalogPlantEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
-
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.PLANTS_CATALOG_EDITION,
       true,
@@ -207,21 +207,22 @@ export class CatalogPlantEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.PLANTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
         });
-      }, 500);
-    }
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -350,7 +351,6 @@ export class CatalogPlantEditionComponent {
                 settingType: 'statusPlant',
                 id: this.plant.id,
                 customerId: this.plant.customerId,
-                companyId: this.plant.companyId,
                 status: RecordStatus.INACTIVE,
               }
               const plants = this._sharedService.setGraphqlGen(plantParameters);
@@ -421,7 +421,6 @@ export class CatalogPlantEditionComponent {
                 settingType: 'statusPlant',
                 id: this.plant.id,
                 customerId: this.plant.customerId,
-                companyId: this.plant.companyId,            
                 status: RecordStatus.ACTIVE,
               }
               const plants = this._sharedService.setGraphqlGen(plantParameters);
@@ -999,6 +998,7 @@ export class CatalogPlantEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.plantForm.markAllAsTouched();
     const fc = this.plantForm.controls;
     return  {
       id: this.plant.id,

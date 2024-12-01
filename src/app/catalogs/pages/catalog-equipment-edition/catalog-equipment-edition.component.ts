@@ -60,7 +60,7 @@ export class CatalogEquipmentEditionComponent {
   
   uploadFiles: Subscription;
   
-  catalogIcon: string = "organizational_chart";  
+  catalogIcon: string = "electric_blanket_2";  
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
 
@@ -120,6 +120,7 @@ export class CatalogEquipmentEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
       true,
@@ -208,21 +209,22 @@ export class CatalogEquipmentEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.EQUIPMENTS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -351,8 +353,6 @@ export class CatalogEquipmentEditionComponent {
                 settingType: 'status',
                 id: this.equipment.id,
                 customerId: this.equipment.customerId,
-                              
-                plantId: this.equipment.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
@@ -423,8 +423,6 @@ export class CatalogEquipmentEditionComponent {
                 settingType: 'status',
                 id: this.equipment.id,
                 customerId: this.equipment.customerId,
-                
-                plantId: this.equipment.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const equipments = this._sharedService.setGraphqlGen(equipmentParameters);
@@ -938,6 +936,7 @@ export class CatalogEquipmentEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.equipmentForm.markAllAsTouched();
     const fc = this.equipmentForm.controls;
     return  {
       id: this.equipment.id,

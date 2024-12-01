@@ -43,8 +43,6 @@ export class CatalogLineEditionComponent {
 
   plants$: Observable<any>; 
   plants: GeneralCatalogData = emptyGeneralCatalogData; 
- 
-  
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   toolbarAnimationFinished$: Observable<boolean>;
@@ -90,8 +88,6 @@ export class CatalogLineEditionComponent {
     reference: new FormControl(''),    
     prefix: new FormControl(''), 
     plant: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
-       
-    
   });
 
   pageInfo: PageInfo = {
@@ -120,6 +116,7 @@ export class CatalogLineEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.LINES_CATALOG_EDITION,
       true,
@@ -208,21 +205,22 @@ export class CatalogLineEditionComponent {
   
 // Functions ================
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.LINES_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });
-      }, 500);
-    }
+        });        
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -351,8 +349,6 @@ export class CatalogLineEditionComponent {
                 settingType: 'status',
                 id: this.line.id,
                 customerId: this.line.customerId,
-                              
-                plantId: this.line.plantId,
                 status: RecordStatus.INACTIVE,
               }
               const lines = this._sharedService.setGraphqlGen(lineParameters);
@@ -361,7 +357,8 @@ export class CatalogLineEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateLine.length > 0 && data?.data?.createOrUpdateLine[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.line.status = RecordStatus.INACTIVE;
                       const message = $localize`La linea ha sido inhabilitada`;
                       this.line.status = RecordStatus.INACTIVE;
                       this._sharedService.showSnackMessage({
@@ -423,8 +420,6 @@ export class CatalogLineEditionComponent {
                 settingType: 'status',
                 id: this.line.id,
                 customerId: this.line.customerId,
-                
-                plantId: this.line.plantId,
                 status: RecordStatus.ACTIVE,
               }
               const lines = this._sharedService.setGraphqlGen(lineParameters);
@@ -433,7 +428,8 @@ export class CatalogLineEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateLine.length > 0 && data?.data?.createOrUpdateLine[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
-                      this.changeInactiveButton(RecordStatus.ACTIVE)
+                      this.changeInactiveButton(RecordStatus.ACTIVE);
+                      this.line.status = RecordStatus.ACTIVE;
                       const message = $localize`La linea ha sido reactivada`;
                       this.line.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
@@ -938,6 +934,7 @@ export class CatalogLineEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.lineForm.markAllAsTouched();
     const fc = this.lineForm.controls;
     return  {
       id: this.line.id,

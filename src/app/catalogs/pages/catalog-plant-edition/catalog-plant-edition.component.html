@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
-  @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  @routingAnimation  
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>

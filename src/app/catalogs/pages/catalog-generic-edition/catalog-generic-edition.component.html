@@ -1,8 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
   class="container"
   #catalogEdition
   @routingAnimation
-  (@routingAnimation.done)="pageAnimationFinished($event)"
   i18n
 >
   <ng-container *ngIf="scroll$ | async"></ng-container>
@@ -13,6 +13,8 @@
   <ng-container *ngIf="parameters$ | async "></ng-container>  
   <ng-container *ngIf="translations$ | async "></ng-container> 
   <ng-container *ngIf="updateGeneric$ | async "></ng-container> 
+  <ng-container *ngIf="genTablesValues$ | async "></ng-container>  
+  <ng-container *ngIf="generic$ | async "></ng-container>    
 
   <mat-card class="card">
     <form
@@ -40,7 +42,7 @@
               <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
               </mat-icon>
               <label class="accordion-label"
-                >INFORMACIÓN PRINCIPAL DE LA VARIABLE</label
+                >INFORMACIÓN PRINCIPAL DEL REGISTRO GENÉRICO</label
               >
             </mat-panel-title>
             <div class="icon-button-container">
@@ -61,6 +63,17 @@
           </mat-expansion-panel-header>
           <div class="grid-multiple margin-top">
             <div class="field-items">
+              <app-select-field
+                [formField]="genericForm.controls.tableName"
+                [list]="genTablesValues.items"                
+                fieldHelp="Especifique la Tabla"
+              >
+                <span fieldTitle class="label field__label"
+                  >Nombre de la tabla</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
               <app-input-field
                 [focused]="focusThisField==='name'"
                 [bordered]="true"
@@ -71,11 +84,11 @@
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
                 [showCloseButton]="true"
-                fieldHelp="Especifique el nombre asignado a la tabla"
+                fieldHelp="Especifique el nombre asignado al registro genérico"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Descripción/Nombre de la tabla</span
+                  >Descripción/Nombre del registro genérico</span
                 >
               </app-input-field>
             </div>
@@ -88,11 +101,11 @@
                 [fieldMaxLength]="50"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
-                fieldHelp="Especifique la abreviación de la tabla"
+                fieldHelp="Especifique la abreviación del registro genérico"
                 [initialFocus]="true"                
               >
                 <span fieldTitle class="label field__label"
-                  >Abreviación de la tabla</span
+                  >Abreviación del registro genérico</span
                 >
               </app-input-field>
             </div>
@@ -104,7 +117,7 @@
                 [fieldMaxLength]="100"
                 [showRightHint]="true"
                 [showCloseButton]="true"
-                fieldHelp="Especifique la referencia de la tabla"
+                fieldHelp="Especifique la referencia del registro genérico"
               >
                 <span fieldTitle class="label field__label"
                   >Referencia</span
@@ -120,52 +133,14 @@
                 [showCloseButton]="true"
                 [minRows]="1"
                 [maxRows]="5"
-                fieldHelp="Especifique las notas referentes a esta tabla"
+                fieldHelp="Especifique las notas referentes al registro genérico"
               >
                 <span fieldTitle class="label field__label"
-                  >Notas referentes a la tabla</span
+                  >Notas referentes al registro genérico</span
                 >
               </app-area-field>              
-            </div>                     
-           
-                      
-          </div>          
-        </mat-expansion-panel>
-        <mat-expansion-panel
-          (opened)="panelOpenState[1] = true"
-          (closed)="panelOpenState[1] = false"
-          hideToggle="true"
-          [expanded]="panelOpenState[1]"
-        >
-          <mat-expansion-panel-header
-            [collapsedHeight]="'55px'"
-            [ngStyle]="{
-              'background-color': panelOpenState[1]
-                ? 'var(--z-colors-page-shadow)'
-                : 'var(--z-colors-page-card-background-color)'
-            }"
-          >
-            <mat-panel-title>
-              <mat-icon class="accordion-icon" svgIcon="time"> </mat-icon>
-              <label class="accordion-label">USO GENERAL DE LA VARIABLE</label>
-            </mat-panel-title>
-            <div class="icon-button-container">
-              <button
-                mat-icon-button
-                class="icon-button open"
-                aria-label="icon-button with menu icon"
-              >
-                <mat-icon class="icon-button">
-                  {{
-                    panelOpenState[1]
-                      ? "keyboard_arrow_up"
-                      : "keyboard_arrow_down"
-                  }}
-                </mat-icon>
-              </button>
             </div>
-          </mat-expansion-panel-header>
-        
+          </div>          
         </mat-expansion-panel>        
       </mat-accordion>
     </form>
@@ -208,7 +183,7 @@
         </div>
       </div>
       <mat-divider></mat-divider>
-      <div class="grid-inactive" *ngIf="generic.deletedById > 0">
+      <div class="grid-inactive" *ngIf="generic.status === RecordStatus.INACTIVE">
         <div class="flex">
           <div class="readonly-value">{{ _sharedService.convertUtcTolocal(generic.deletedAt) | date :"medium" }}</div>
           <div class="flex-row">

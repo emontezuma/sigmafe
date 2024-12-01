@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType, Attachment, HarcodedChecklistPlanGenerationMode } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedVariableValueType } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatDialog } from '@angular/material/dialog';
@@ -40,13 +40,10 @@ export class CatalogChecklistPlansEditionComponent {
   checklistPlanTypes$: Observable<any>; 
   genYesNoValues$: Observable<any>;
   frequencies$: Observable<any>;
-  generationModes$: Observable<any>;
   
   templatesCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
-  entitiesCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
   templates: GeneralCatalogData = emptyGeneralCatalogData; 
   templates$: Observable<any>;    
-  entities$: Observable<any>;    
   pendingRecord: number = 0;
 
   toolbarClick$: Observable<ToolbarButtonClicked>; 
@@ -63,9 +60,6 @@ export class CatalogChecklistPlansEditionComponent {
   checklistPlanTypes: GeneralCatalogData = emptyGeneralCatalogData;   
   genYesNoValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
   frequencies: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
-  generationModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
-  entityTable: string;
-  entities: GeneralCatalogData = emptyGeneralCatalogData; 
   hours: string[] = [];
   
   updatingCount: number = 0;
@@ -90,8 +84,7 @@ export class CatalogChecklistPlansEditionComponent {
   takeRecords: number;
   focusThisField: string = '';
   tmpValueType: string = '';
-  multipleSearchDefaultValue: string = '';  
-  multipleSearchEntityDefaultValue: string = '';  
+  multipleSearchDefaultValue: string = '';    
 
   checklistPlanForm = new FormGroup({
     name: new FormControl(
@@ -100,12 +93,10 @@ export class CatalogChecklistPlansEditionComponent {
     ),
     checklistPlanType: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
     templates:  new FormControl('y'),
-    generationMode: new FormControl(emptyGeneralHardcodedValuesItem),
     frequency: new FormControl(emptyGeneralHardcodedValuesItem),
     notes: new FormControl(''),
     reference: new FormControl(''),
     prefix: new FormControl(''),
-    entities: new FormControl('y'),
     hour: new FormControl(''),
     hours: new FormControl(''),
     byDefaultDate:  new FormControl(new Date()),
@@ -113,6 +104,7 @@ export class CatalogChecklistPlansEditionComponent {
     specificDate:  new FormControl(null), 
     timeZone: new FormControl(new Date().getTimezoneOffset() * 60),
     limit: new FormControl(0),
+    anticipationTime: new FormControl(0),
   });
 
   pageInfo: PageInfo = {
@@ -137,14 +129,6 @@ export class CatalogChecklistPlansEditionComponent {
     { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
   ];
 
-  entitiesOptions: SimpleTable[] = [
-    { id: '', description: $localize`No usar entidades para ningún Plan` },  
-    { id: 'y', description: $localize`TODOS las entidades activas` },  
-    { id: 'n', description: $localize`Las entidades de lista` },  
-    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
-    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
-  ];
-
   valuesByDefault: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
 
   constructor(
@@ -161,6 +145,7 @@ export class CatalogChecklistPlansEditionComponent {
 // Hooks ====================
   ngOnInit() {
     // this.checklistPlanForm.get('name').disable();
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.CHECKLIST_TEMPLATES_CATALOG_EDITION,
       true,
@@ -197,18 +182,16 @@ export class CatalogChecklistPlansEditionComponent {
         // this.requestLinesData(currentPage);
         // this.requestEquipmentsData(currentPage);
         this.requestChecklistPlanTypesData(currentPage);
-        this.requestGenYesNoValuesData(currentPage);        
-        this.requestFrequenciesValuesData(currentPage);        
-        this.requestGenerationModesValuesData(currentPage);        
-        this.requestChecklistTemplatesData(currentPage);        
-        this.requestChecklistEntitiesData(currentPage);                
+        this.requestGenYesNoValuesData(currentPage);  
+        this.requestFrequenciesValuesData(currentPage);          
+        this.requestChecklistTemplatesData(currentPage);         
       })
     );
         
     this.checklistPlanFormChangesSubscription = this.checklistPlanForm.valueChanges
     .subscribe(() => {
       if (!this.loaded) return;
-      this.setEditionButtonsState();      
+      this.setEditionButtonsState();
     });
 
     this.checklistPlanFormChangesSubscription = this.checklistPlanForm.controls.byDefaultDate.valueChanges
@@ -255,7 +238,7 @@ export class CatalogChecklistPlansEditionComponent {
         this.loaded = !this.editing || this.loaded;
         this.initForm();
       }      
-    }, 200);         
+    }, 200);   
   }
 
   ngOnDestroy() : void {
@@ -325,21 +308,22 @@ export class CatalogChecklistPlansEditionComponent {
     return this._catalogsService.getGenericsLazyLoadingDataGql$(variables).pipe();
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.CHECKLIST_TEMPLATES_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 2,
+          buttonsToLeft: 2,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
         });
-      }, 500);
-    }
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -347,7 +331,7 @@ export class CatalogChecklistPlansEditionComponent {
       if (action.action === ButtonActions.NEW) {        
         this.elements.find(e => e.action === action.action).loading = true;
         if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) {
-          this.showErrorDialog('save-before', ButtonActions.NEW);          
+          this.showErrorDialog('save-before', ButtonActions.NEW);    
         } else {
           this._location.replaceState('/catalogs/checklist-plans/create');
           this.initForm();
@@ -424,6 +408,152 @@ export class CatalogChecklistPlansEditionComponent {
               }],
               body: {
                 message: $localize`Esta acción inactivará la plantilla checklist con el Id <strong>${this.checklistPlan.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+              },
+              showCloseButton: true,
+            },
+          });
+          dialogResponse.afterClosed().subscribe((response) => {
+            if (response.action === ButtonActions.CANCEL) {
+              setTimeout(() => {
+                this._sharedService.actionCancelledByTheUser();
+                this.elements.find(e => e.action === action.action).loading = false;
+              }, 200); 
+            } else {
+              this.elements.find(e => e.action === action.action).loading = true;
+              const variableParameters = {
+                settingType: 'status',
+                id: this.checklistPlan.id,
+                customerId: this.checklistPlan.customerId,
+                status: RecordStatus.INACTIVE,
+              }
+              const variables = this._sharedService.setGraphqlGen(variableParameters);
+              this.updateChecklistPlan$ = this._catalogsService.updateChecklistPlanStatus$(variables)
+              .pipe(
+                tap((data: any) => {
+                  if (data?.data?.createOrUpdateChecklistPlan.length > 0 && data?.data?.createOrUpdateChecklistPlan[0].status === RecordStatus.INACTIVE) {
+                    setTimeout(() => {
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.checklistPlan.status = RecordStatus.INACTIVE;
+                      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = !(this.checklistPlan.status === RecordStatus.ACTIVE);
+                      const message = $localize`La Plantilla de checklist ha sido inhabilitada`;
+                      this._sharedService.showSnackMessage({
+                        message,
+                        snackClass: 'snack-warn',
+                        progressBarColor: 'warn',
+                        icon: 'delete',
+                      });
+                      this.elements.find(e => e.action === action.action).loading = false;
+                    }, 200);
+                  }
+                })
+              )
+            }  
+          });
+        } else if (this.checklistPlan?.id > 0 && this.checklistPlan.status === RecordStatus.INACTIVE) {
+          const dialogResponse = this._dialog.open(GenericDialogComponent, {
+            width: '450px',
+            disableClose: true,
+            autoFocus : true,
+            data: {
+              title: $localize`REACTIVAR PLAN DE CHECKLIST`,  
+              topIcon: 'check',
+              buttons: [{
+                action: 'reactivate',
+                showIcon: true,
+                icon: 'check',
+                showCaption: true,
+                caption: $localize`Reactivar`,
+                showTooltip: true,
+                class: 'primary',
+                tooltip: $localize`Reactiva el registro`,
+                default: true,
+              }, {
+                action: ButtonActions.CANCEL,
+                showIcon: true,
+                icon: 'cancel',
+                showCaption: true,
+                caption: $localize`Cancelar`,
+                showTooltip: true,        
+                tooltip: $localize`Cancela la acción`,
+                default: false,
+              }],
+              body: {
+                message: $localize`Esta acción reactivará el plan de checklist con el Id <strong>${this.checklistPlan.id}</strong> y volverá a estar disponible en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+              },
+              showCloseButton: true,
+            },
+          });
+          dialogResponse.afterClosed().subscribe((response) => {
+            if (response.action === ButtonActions.CANCEL) {
+              setTimeout(() => {
+                this._sharedService.actionCancelledByTheUser();
+                this.elements.find(e => e.action === action.action).loading = false;
+              }, 200); 
+            } else {
+              this.elements.find(e => e.action === action.action).loading = true;
+              const variableParameters = {
+                settingType: 'status',
+                id: this.checklistPlan.id,
+                customerId: this.checklistPlan.customerId,
+                status: RecordStatus.ACTIVE,
+              }
+              const variables = this._sharedService.setGraphqlGen(variableParameters);
+              this.updateChecklistPlan$ = this._catalogsService.updateChecklistPlanStatus$(variables)
+              .pipe(
+                tap((data: any) => {
+                  if (data?.data?.createOrUpdateChecklistPlan.length > 0 && data?.data?.createOrUpdateChecklistPlan[0].status === RecordStatus.ACTIVE) {
+                    setTimeout(() => {
+                      this.checklistPlan.status = RecordStatus.ACTIVE;
+                      this.changeInactiveButton(RecordStatus.ACTIVE);
+                      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = !(this.checklistPlan.status === RecordStatus.ACTIVE);
+                      const message = $localize`La Plantilla de checklist ha sido reactivado`;
+                      this._sharedService.showSnackMessage({
+                        message,
+                        snackClass: 'snack-primary',
+                        progressBarColor: 'primary',
+                        icon: 'check',
+                      });
+                      this.elements.find(e => e.action === action.action).loading = false;
+                    }, 200);
+                  }
+                })
+              )
+            }  
+          });
+        }
+      } else if (action.action === ButtonActions.EXECUTE) { 
+        this.elements.find(e => e.action === action.action).loading = true;
+        if (this.checklistPlan?.id > 0 && this.checklistPlan.status === RecordStatus.ACTIVE) {
+          const dialogResponse = this._dialog.open(GenericDialogComponent, {
+            width: '450px',
+            disableClose: true,
+            panelClass: 'warn-dialog',
+            autoFocus : true,
+            data: {
+              title: $localize`EJECUTAR EL PLAN DE CHECKLIST`,  
+              topIcon: 'delete',
+              buttons: [{
+                action: 'execute',
+                showIcon: true,
+                icon: 'time_cycles',
+                showCaption: true,
+                caption: $localize`Ejecutar el plan`,
+                showTooltip: true,
+                class: 'warn',
+                tooltip: $localize`Ejecuta el plan de checklist`,
+                default: true,
+              }, {
+                action: ButtonActions.CANCEL,
+                showIcon: true,
+                icon: 'cancel',
+                showCaption: true,
+                caption: $localize`Cancelar`,
+                showTooltip: true,        
+                tooltip: $localize`Cancela la acción`,
+                default: false,
+              }],
+              body: {
+                message: $localize`Esta acción generará la plantilla checklist con el Id <strong>${this.checklistPlan.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -535,6 +665,7 @@ export class CatalogChecklistPlansEditionComponent {
             }  
           });
         }
+      
       } else if (action.action === ButtonActions.TRANSLATIONS) { 
         if (this.checklistPlan?.id > 0) {
           const dialogResponse = this._dialog.open(TranslationsDialogComponent, {
@@ -804,28 +935,6 @@ export class CatalogChecklistPlansEditionComponent {
     )
   }
 
-  requestGenerationModesValuesData(currentPage: number) {
-    this.generationModes = {
-      ...this.generationModes,
-      currentPage,
-      loading: true,
-    }        
-    this.generationModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrderById, SystemTables.CHECKLIST_PLANS_GENERATION_MODES)
-    .pipe(
-      tap((data: any) => {                
-        const accumulatedItems = this.generationModes.items?.concat(data?.data?.hardcodedValues?.items);
-        this.generationModes = {
-          ...this.generationModes,
-          loading: false,
-          pageInfo: data?.data?.hardcodedValues?.pageInfo,
-          items: accumulatedItems,
-          totalCount: data?.data?.hardcodedValues?.totalCount,  
-        }        
-      }),
-      catchError(() => EMPTY)
-    )
-  }
-
   getScrolling(data: CdkScrollable) {       
     const scrollTop = data.getElementRef().nativeElement.scrollTop || 0; 
     let status = 'inactive'
@@ -925,7 +1034,7 @@ export class CatalogChecklistPlansEditionComponent {
       .pipe(
         switchMap((data: any) => {
           if (data?.data?.createOrUpdateChecklistPlan.length > 0) {
-            checklistPlanId = data?.data?.createOrUpdateChecklistPlan[0].id;            
+            checklistPlanId = data?.data?.createOrUpdateChecklistPlan[0].id;      
             return combineLatest([ 
               this.processTranslations$(checklistPlanId), 
               this.saveCatalogDetails$(checklistPlanId),
@@ -961,7 +1070,7 @@ export class CatalogChecklistPlansEditionComponent {
           }); 
           this.setViewLoading(false);
           this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
-          return of(null);        
+          return of(null);  
         })
       )    
     } catch (error) {
@@ -979,7 +1088,7 @@ export class CatalogChecklistPlansEditionComponent {
 
   saveCatalogDetails$(processId: number): Observable<any> {
     const newRecord = !this.checklistPlan.id || this.checklistPlan.id === null || this.checklistPlan.id === 0;
-    if (this.templatesCurrentSelection.length > 0 || this.entitiesCurrentSelection.length > 0) {
+    if (this.templatesCurrentSelection.length > 0) {
       const checklistPlanTemplates = this.templatesCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
       .map(ct => {
@@ -988,16 +1097,8 @@ export class CatalogChecklistPlansEditionComponent {
           deletePhysically: true,
         }
       });
-      const checklistPlanEntities = this.entitiesCurrentSelection
-      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
-      .map(ct => {
-        return {
-          id: ct.catalogDetailId,
-          deletePhysically: true,
-        }
-      });
       const ctToDelete = {
-        ids: [...checklistPlanTemplates, ...checklistPlanEntities],
+        ids: checklistPlanTemplates,
         customerId: 1, // TODO: Get from profile
       }
       const checklistPlanTemplatesdToAdd = this.templatesCurrentSelection
@@ -1011,19 +1112,8 @@ export class CatalogChecklistPlansEditionComponent {
           customerId: 1,  // TODO: Get from profile
         }
       });
-      const checklistPlanEntitiesToAdd = this.entitiesCurrentSelection
-      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
-      .map(ct => {
-        return {
-          process: SystemTables.CHECKLIST_PLANS_TEMPLATES,
-          processId,
-          detailTableName: this.entityTable,
-          value: ct.valueRight,
-          customerId: 1,  // TODO: Get from profile
-        }
-      });
       const ctToAdd = {
-        catalogDetails: [...checklistPlanTemplatesdToAdd, ...checklistPlanEntitiesToAdd],
+        catalogDetails: checklistPlanTemplatesdToAdd,
       }
 
       return combineLatest([ 
@@ -1059,14 +1149,14 @@ export class CatalogChecklistPlansEditionComponent {
         })
       }),
       tap((checklistPlanData: ChecklistPlanDetail) => {
-        // this.mapLines(attachments);        
+        // this.mapLines(attachments);  
         this.checklistPlan = checklistPlanData; 
-        this.templatesCurrentSelection = [];        
-        this.translationChanged = false;        
-        this.storedTranslations = JSON.parse(JSON.stringify(this.checklistPlan.translations));        
+        this.templatesCurrentSelection = [];  
+        this.translationChanged = false;  
+        this.storedTranslations = JSON.parse(JSON.stringify(this.checklistPlan.translations));  
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistPlan.translations.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations.length})` : $localize`Traducciones`;
         this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistPlan.translations.length > 0 ? 'accent' : '';   
-        this.pendingRecord = 0;        
+        this.pendingRecord = 0;  
         this.updateFormFromData();
         this.changeInactiveButton(this.checklistPlan.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
@@ -1080,8 +1170,8 @@ export class CatalogChecklistPlansEditionComponent {
         this.loaded = true;
         setTimeout(() => {
           this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
-        }, 1000);                
-        this.setViewLoading(false);        
+        }, 1000);          
+        this.setViewLoading(false);  
       }),
       catchError(err => {
         this.setViewLoading(false);
@@ -1134,21 +1224,7 @@ export class CatalogChecklistPlansEditionComponent {
       this.requestChecklistTemplatesData(        
         this.templates.currentPage,
         getMoreDataParams.textToSearch,  
-      );            
-    } else if (getMoreDataParams.catalogName === this.entityTable) {
-      if (this.entities.loading) return;
-      if (getMoreDataParams.initArray) {
-        this.entities.currentPage = 0;   
-        this.entities.items = [];
-      } else if (!this.entities.pageInfo.hasNextPage) {
-        return;
-      } else {
-        this.entities.currentPage++;
-      }
-      this.requestChecklistEntitiesData(        
-        this.entities.currentPage,
-        getMoreDataParams.textToSearch,  
-      );            
+      );          
     }          
   }
 
@@ -1177,7 +1253,7 @@ export class CatalogChecklistPlansEditionComponent {
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
-      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;      
+      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;
     } else if (mode === toolbarMode.EDITING_WITH_NO_DATA) {
       // if (!this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = false;
@@ -1185,7 +1261,7 @@ export class CatalogChecklistPlansEditionComponent {
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
-      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;      
+      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;
     } else if (mode === toolbarMode.INITIAL_WITH_DATA) {
       // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
@@ -1193,7 +1269,7 @@ export class CatalogChecklistPlansEditionComponent {
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = false;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = false;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = false;
-      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = false;      
+      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = !(this.checklistPlan.status === RecordStatus.ACTIVE);
     } else if (mode === toolbarMode.INITIAL_WITH_NO_DATA) {
       // if (this.elements.find(e => e.action === ButtonActions.SAVE).disabled) return
       this.elements.find(e => e.action === ButtonActions.SAVE).disabled = true;
@@ -1201,7 +1277,7 @@ export class CatalogChecklistPlansEditionComponent {
       this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).disabled = true;   
       this.elements.find(e => e.action === ButtonActions.INACTIVATE).disabled = true;
       this.elements.find(e => e.action === ButtonActions.COPY).disabled = true;
-      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;      
+      this.elements.find(e => e.action === ButtonActions.EXECUTE).disabled = true;
     }    
   }
 
@@ -1212,18 +1288,16 @@ export class CatalogChecklistPlansEditionComponent {
       prefix: this.checklistPlan.prefix,  
       notes: this.checklistPlan.notes,  
       checklistPlanType: this.checklistPlan.checklistPlanType,
-      templates: this.checklistPlan.templates,
-      entities: this.checklistPlan.entities,
+      templates: this.checklistPlan.templates,      
       limit: this.checklistPlan.limit,
+      anticipationTime: this.checklistPlan.anticipationTime,
       frequency: this.checklistPlan.frequency,
-      specificDate: this.checklistPlan.specificDate ? this._sharedService.convertUtcTolocal(this.checklistPlan.specificDate) : null,
-      generationMode: this.checklistPlan.generationMode,      
+      specificDate: this.checklistPlan.specificDate ? this._sharedService.convertUtcTolocal(this.checklistPlan.specificDate) : null,      
     });
     this.hours = [];
     if (this.checklistPlan.hours) {
-      this.hours = JSON.parse(this.checklistPlan.hours); //.map((h) => this._sharedService.formatDate(`2021/01/01 ${h}`, 'hh:mm a'));      
+      this.hours = JSON.parse(this.checklistPlan.hours); //.map((h) => this._sharedService.formatDate(`2021/01/01 ${h}`, 'hh:mm a'));
     }
-    this.changeEntities(this.checklistPlan.generationMode);
     if (this.checklistPlanForm.controls.specificDate.value) {      
       const dateAndTime = this._sharedService.formatDate(this.checklistPlanForm.controls.specificDate.value, 'yyyy/MM/dd HH:mm').split(' ');
       this.checklistPlanForm.patchValue({        
@@ -1234,6 +1308,7 @@ export class CatalogChecklistPlansEditionComponent {
   } 
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.checklistPlanForm.markAllAsTouched();
     const fc = this.checklistPlanForm.controls;
     let dateToSave = null;
     if (this.checklistPlanForm.controls.specificDate.value) {
@@ -1241,7 +1316,7 @@ export class CatalogChecklistPlansEditionComponent {
         (this.checklistPlanForm.controls.specificDate.value ? this.checklistPlanForm.controls.specificDate.value : new Date()),
         'yyyy/MM/dd HH:mm:ss'
       )
-      .split(' ');      
+      .split(' ');
       dateToSave = `${dateAndTime[0]} ${dateAndTime[1]}`;
     }
 
@@ -1257,20 +1332,20 @@ export class CatalogChecklistPlansEditionComponent {
       ...(fc.notes.dirty || fc.notes.touched || newRecord) && { notes: fc.notes.value },
       ...(fc.checklistPlanType.dirty || fc.checklistPlanType.touched || newRecord) && { checklistPlanTypeId: fc.checklistPlanType.value ? fc.checklistPlanType.value.id : null },  
       ...(fc.templates.dirty || fc.templates.touched || newRecord) && { templates: fc.templates.value },
-      ...(fc.generationMode.dirty || fc.generationMode.touched || newRecord) && { generationMode: fc.generationMode.value },
       ...(fc.frequency.dirty || fc.frequency.touched || newRecord) && { frequency: fc.frequency.value },
-      ...(fc.entities.dirty || fc.entities.touched || newRecord) && { entities: fc.entities.value },      
       ...(fc.timeZone.dirty || fc.timeZone.touched || newRecord) && { timeZone: fc.timeZone.value ? +fc.timeZone.value : 0 },
       ...(fc.limit.dirty || fc.limit.touched || newRecord) && { limit: fc.limit.value ? +fc.limit.value : 0 }, 
+      ...(fc.anticipationTime.dirty || fc.anticipationTime.touched || newRecord) && { anticipationTime: fc.anticipationTime.value ? +fc.anticipationTime.value : 0 }, 
     }
   }
   
   initForm(): void {
     this.checklistPlanForm.reset();    
-    this.checklistPlanForm.controls.templates.setValue('');       
-    this.checklistPlanForm.controls.entities.setValue('');    
-    this.checklistPlanForm.controls.timeZone.setValue(new Date().getTimezoneOffset() * 60);      
-    this.checklistPlanForm.controls.limit.setValue(0);      
+    this.checklistPlanForm.controls.templates.setValue(''); 
+    
+    this.checklistPlanForm.controls.timeZone.setValue(new Date().getTimezoneOffset() * 60);
+    this.checklistPlanForm.controls.limit.setValue(0);
+    this.checklistPlanForm.controls.anticipationTime.setValue(0);
     this.multipleSearchDefaultValue = '';
     this.storedTranslations = [];
     this.hours = [];
@@ -1281,11 +1356,9 @@ export class CatalogChecklistPlansEditionComponent {
     // Default values
     
     this.focusThisField = 'name';
-    this.templates.items = [];
-    this.entities.items = [];
+    this.templates.items = [];    
     this.templatesCurrentSelection = [];  
-    this.entitiesCurrentSelection = [];  
-    this.requestChecklistEntitiesData(0); 
+    
     this.requestChecklistTemplatesData(0);    
     
     setTimeout(() => {
@@ -1350,7 +1423,7 @@ export class CatalogChecklistPlansEditionComponent {
     if (this.checklistPlanForm.controls.checklistPlanType.value && this.checklistPlanForm.controls.checklistPlanType.value.status === RecordStatus.INACTIVE) {
       this.checklistPlanForm.controls.checklistPlanType.setErrors({ inactive: true });   
     } else {
-      this.checklistPlanForm.controls.checklistPlanType.setErrors(null);         
+      this.checklistPlanForm.controls.checklistPlanType.setErrors(null);   
     }    
   }
 
@@ -1459,70 +1532,6 @@ export class CatalogChecklistPlansEditionComponent {
       catchError(() => EMPTY)
     )    
   }
-  
-  requestChecklistEntitiesData(currentPage: number, filterStr: string = null) {    
-    this.entities = {
-      ...this.entities,
-      currentPage,
-      loading: true,
-    }    
-    let filter = null;
-    if (filterStr) {
-      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
-    }
-    const skipRecords = this.entities.items.length;
-
-    const processId = !!this.checklistPlan.id ? this.checklistPlan.id : 0;
-    const checklistPlanParameters = {
-      settingType: 'multiSelection',
-      skipRecords,
-      process: SystemTables.CHECKLIST_PLANS_TEMPLATES,
-      processId, 
-      takeRecords: this.takeRecords, 
-      filter,   
-    }    
-    let entityObservable: Observable<any> = null;
-    const variables = this._sharedService.setGraphqlGen(checklistPlanParameters);
-    if (!this.entityTable) {
-      this.entityTable = SystemTables.DEPARTMENTS;
-      this.checklistPlanForm.controls.entities.setValue(HarcodedChecklistPlanGenerationMode.BY_DEPARTMENT);     
-    }
-    if (this.entityTable === SystemTables.DEPARTMENTS) {
-      entityObservable = this._catalogsService.getDepartmentsLazyLoadingDataGql$(variables)
-    } else if (this.entityTable === SystemTables.WORKGROUPS) {
-      entityObservable = this._catalogsService.getWorkgroupsLazyLoadingDataGql$(variables)
-    } else if (this.entityTable === SystemTables.POSITIONS) {
-      entityObservable = this._catalogsService.getPositionsLazyLoadingDataGql$(variables)
-    } else if (this.entityTable === SystemTables.USERS) {
-      entityObservable = this._catalogsService.getUsersLazyLoadingDataGql$(variables)
-    }
-    this.entities$ = entityObservable
-    .pipe(
-      tap((data: any) => {
-        const customData = data?.data;
-        const graphqlDataObjectName = Object.keys(customData)[0];
-        const { items } = customData[graphqlDataObjectName];
-        const mappedItems = items.map((item) => {
-          return {
-            isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
-            translatedReference: item.translatedReference,
-            id: item.id,
-            valueRight: item.value,
-            catalogDetailId: item.catalogDetailId,
-          }
-        })
-        this.entities = {
-          ...this.entities,
-          loading: false,
-          pageInfo: customData[graphqlDataObjectName]?.pageInfo,
-          items: this.entities.items?.concat(mappedItems),
-          totalCount: customData[graphqlDataObjectName]?.totalCount,
-        }
-      }),
-      catchError(() => EMPTY)
-    )    
-  }
 
   handleKeyDown(event: KeyboardEvent) { }
 
@@ -1575,29 +1584,7 @@ export class CatalogChecklistPlansEditionComponent {
     }, 750);
   }
 
-  handleSelectionChange(event: any) {
-    if (event && event.value) {
-      this.changeEntities(event.value);
-    }
-    
-  }
-
-  changeEntities(selection: string) {    
-    this.entityTable = SystemTables.DEPARTMENTS;
-    if  (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_POSITIONS) > -1) {
-      this.entityTable = SystemTables.POSITIONS;
-    } else if (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_WORKGROUP) > -1) {
-      this.entityTable = SystemTables.WORKGROUPS;
-    } else if (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_USER) > -1) {
-      this.entityTable = SystemTables.USERS;
-    }    
-    this.entities.currentPage = 0;   
-    this.entities.items = [];
-    this.multipleSearchEntityDefaultValue = '';
-    this.requestChecklistEntitiesData(
-      this.templates.currentPage,
-      '',  
-    );        
+  handleSelectionChange(event: any) {    
   }
 
   addHour(event: any) {
@@ -1621,12 +1608,8 @@ export class CatalogChecklistPlansEditionComponent {
   removeHour(hour: string) {
     const index = this.hours.indexOf(hour);
     if (index >= 0) {
-      this.hours.splice(index, 1);      
+      this.hours.splice(index, 1);
     }
-  }
-
-  fillGenerationModeEntities() {
-    this.entities.items = [];    
   }
 
   calculateByDefaultValue() {    

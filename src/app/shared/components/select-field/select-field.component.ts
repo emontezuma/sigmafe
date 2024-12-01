@@ -20,6 +20,7 @@ export class SelectFieldComponent implements OnChanges {
   @Input() currentErrorMessage: string;
   @Input() currentErrorIcon: string;
   @Input() fieldRequired: boolean;      
+  @Input() fieldReadonly: boolean;    
   @Input() showRightHint: boolean;  
   @Input() selectType: string;  
   @Input() focused: boolean;  

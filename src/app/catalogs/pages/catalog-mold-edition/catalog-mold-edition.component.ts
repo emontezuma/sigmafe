@@ -3,7 +3,7 @@ import { ActivatedRoute, Params } from '@angular/router';
 import { Router } from '@angular/router'; 
 import { Location } from '@angular/common'; 
 import { routingAnimation, dissolve } from '../../../shared/animations/shared.animations';
-import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, MoldDetail, MoldItem, emptyMoldItem, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems } from 'src/app/shared/models';
+import { ApplicationModules, ButtonActions, CapitalizationMethod, GoTopButtonStatus, PageInfo, ProfileData, RecordStatus, SettingsData, ToolbarButtonClicked, ToolbarElement, dialogByDefaultButton, originProcess, SystemTables, toolbarMode, ScreenDefaultValues, GeneralValues, MoldDetail, MoldItem, emptyMoldItem, GeneralHardcodedValuesData, emptyGeneralHardcodedValuesData, GeneralCatalogParams, SimpleTable, GeneralMultipleSelcetionItems, HarcodedChecklistPlanGenerationMode } from 'src/app/shared/models';
 import { Store } from '@ngrx/store';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -57,6 +57,8 @@ export class CatalogMoldEditionComponent {
   maintenances$: Observable<any>;
   moldThresholdTypeChanges$: Observable<any>;
   duplicateMainImage$: Observable<any>; 
+  generationModes$: Observable<any>;
+  entities$: Observable<any>;    
   // moldFormChanges$: Observable<any>;
   toolbarClick$: Observable<ToolbarButtonClicked>; 
   notifyRedChannels: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData;    
@@ -95,15 +97,19 @@ export class CatalogMoldEditionComponent {
   checklistTemplatesYellow: GeneralCatalogData = emptyGeneralCatalogData; 
   checklistTemplatesRed: GeneralCatalogData = emptyGeneralCatalogData; 
   macros: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  generationModes: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
+  entities: GeneralCatalogData = emptyGeneralCatalogData; 
 
   notifyRedChannelsSelected: number = 0;
   notifyYellowChannelsSelected: number = 0;
+  
   uploadFiles: Subscription;
   
   catalogIcon: string = 'treasure_chest';
   today = new Date();  
   order: any = JSON.parse(`{ "translatedName": "${'ASC'}" }`);
   harcodedValuesOrder: any = JSON.parse(`{ "friendlyText": "${'ASC'}" }`);
+  harcodedValuesOrderById: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   orderMaintenance: any = JSON.parse(`{ "data": { "id": "${'DESC'}" } }`);
   macrosValuesOrder: any = JSON.parse(`{ "id": "${'ASC'}" }`);
   storedTranslations: [] = [];
@@ -122,7 +128,9 @@ export class CatalogMoldEditionComponent {
   goTopButtonTimer: any;
   takeRecords: number;
   focusThisField: string = '';
+  entityTable: string = '';
   showMacros: boolean = false;
+  multipleSearchEntityDefaultValue: string = '';  
 
   moldForm = new FormGroup({
     description: new FormControl(
@@ -165,6 +173,9 @@ export class CatalogMoldEditionComponent {
     notifyRedBody:  new FormControl(''),
     notifyYellowSubject:  new FormControl(''),    
     notifyYellowBody:  new FormControl(''),
+    generationMode: new FormControl(emptyGeneralHardcodedValuesItem),
+    entities: new FormControl('y'),
+    
   });
 
   maintenanceHistoricalTableColumns: string[] = ['item', 'provider', 'operator', 'friendlyState', 'notes', 'range', 'actions'];
@@ -204,8 +215,18 @@ export class CatalogMoldEditionComponent {
     { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
   ];
 
+  entitiesOptions: SimpleTable[] = [
+    { id: '', description: $localize`No usar entidades para ningún Plan` },  
+    { id: 'y', description: $localize`TODOS las entidades activas` },  
+    { id: 'n', description: $localize`Las entidades de lista` },  
+    { id: 's', description: $localize`Seleccionar TODOS los items de la lista` },  
+    { id: 'u', description: $localize`Deseleccionar TODOS los items de la lista` },  
+  ];
+
+  
   checklistYellowTemplatesCurrentSelection: GeneralMultipleSelcetionItems[] = [];
   checklistRedTemplatesCurrentSelection: GeneralMultipleSelcetionItems[] = [];
+  entitiesCurrentSelection: GeneralMultipleSelcetionItems[] = [];  
   loaded: boolean = false;
 
   constructor(
@@ -222,7 +243,9 @@ export class CatalogMoldEditionComponent {
 
 // Hooks ====================
   ngOnInit() {
+    this.pageAnimationFinished();
     // this.moldForm.get('name').disable();
+    this.pageAnimationFinished();
     this._sharedService.setGeneralProgressBar(
       ApplicationModules.MOLDS_CATALOG_EDITION,
       true,
@@ -264,7 +287,9 @@ export class CatalogMoldEditionComponent {
         this.requestStatesData(currentPage);
         this.requestMacrosData(currentPage);
         this.requestNotifyChannelsData(currentPage);   
-        this.requestGenYesNoValuesData(currentPage);             
+        this.requestGenYesNoValuesData(currentPage);
+        this.requestGenerationModesValuesData(currentPage);   
+        this.requestChecklistEntitiesData(currentPage);                  
       })
     );   
     
@@ -473,6 +498,92 @@ export class CatalogMoldEditionComponent {
     )    
   }
 
+  requestGenerationModesValuesData(currentPage: number) {
+    this.generationModes = {
+      ...this.generationModes,
+      currentPage,
+      loading: true,
+    }        
+    this.generationModes$ = this._sharedService.requestHardcodedValuesData$(0, 0, this.takeRecords, this.harcodedValuesOrderById, SystemTables.CHECKLIST_PLANS_GENERATION_MODES)
+    .pipe(
+      tap((data: any) => {                
+        const accumulatedItems = this.generationModes.items?.concat(data?.data?.hardcodedValues?.items);
+        this.generationModes = {
+          ...this.generationModes,
+          loading: false,
+          pageInfo: data?.data?.hardcodedValues?.pageInfo,
+          items: accumulatedItems,
+          totalCount: data?.data?.hardcodedValues?.totalCount,  
+        }        
+      }),
+      catchError(() => EMPTY)
+    )
+  }
+
+  requestChecklistEntitiesData(currentPage: number, filterStr: string = null) {    
+    this.entities = {
+      ...this.entities,
+      currentPage,
+      loading: true,
+    }    
+    let filter = null;
+    if (filterStr) {
+      filter = JSON.parse(`{ "and": [ { "translatedName": { "contains": "${filterStr}" } } ] }`);
+    }
+    const skipRecords = this.entities.items.length;
+
+    const processId = !!this.mold.id ? this.mold.id : 0;
+    const moldParameters = {
+      settingType: 'multiSelection',
+      skipRecords,
+      process: SystemTables.CHECKLIST_PLANS_TEMPLATES,
+      processId, 
+      takeRecords: this.takeRecords, 
+      filter,   
+    }    
+    let entityObservable: Observable<any> = null;
+    const variables = this._sharedService.setGraphqlGen(moldParameters);
+    if (!this.entityTable) {
+      this.entityTable = SystemTables.DEPARTMENTS;
+      this.moldForm.controls.entities.setValue(HarcodedChecklistPlanGenerationMode.BY_DEPARTMENT);     
+    }
+    if (this.entityTable === SystemTables.DEPARTMENTS) {
+      entityObservable = this._catalogsService.getDepartmentsLazyLoadingDataGql$(variables)
+    } else if (this.entityTable === SystemTables.WORKGROUPS) {
+      entityObservable = this._catalogsService.getWorkgroupsLazyLoadingDataGql$(variables)
+    } else if (this.entityTable === SystemTables.POSITIONS) {
+      entityObservable = this._catalogsService.getPositionsLazyLoadingDataGql$(variables)
+    } else if (this.entityTable === SystemTables.USERS) {
+      entityObservable = this._catalogsService.getUsersLazyLoadingDataGql$(variables)
+    }
+    this.entities$ = entityObservable
+    .pipe(
+      tap((data: any) => {
+        const customData = data?.data;
+        const graphqlDataObjectName = Object.keys(customData)[0];
+        const { items } = customData[graphqlDataObjectName];
+        const mappedItems = items.map((item) => {
+          return {
+            isTranslated: item.isTranslated,
+            translatedName: item.translatedName,
+            translatedReference: item.translatedReference,
+            id: item.id,
+            valueRight: item.value,
+            catalogDetailId: item.catalogDetailId,
+          }
+        })
+        this.entities = {
+          ...this.entities,
+          loading: false,
+          pageInfo: customData[graphqlDataObjectName]?.pageInfo,
+          items: this.entities.items?.concat(mappedItems),
+          totalCount: customData[graphqlDataObjectName]?.totalCount,
+        }
+      }),
+      catchError(() => EMPTY)
+    )    
+  }
+
   requestGenYesNoValuesData(currentPage: number) {
     this.genYesNoValues = {
       ...this.genYesNoValues,
@@ -671,21 +782,22 @@ export class CatalogMoldEditionComponent {
     )
   }
 
-  pageAnimationFinished(e: any) {
-    if (e === null || e.fromState === 'void') {
+  // pageAnimationFinished(e: any) {
+  pageAnimationFinished() {
+    // if (e === null || e.fromState === 'void') {
       setTimeout(() => {
         this._sharedService.setToolbar({
           from: ApplicationModules.MOLDS_CATALOG_EDITION,
           show: true,
-          buttonsToRight: 1,
+          buttonsToLeft: 1,
           showSpinner: false,
           toolbarClass: 'toolbar-grid',
           dividerClass: 'divider',
           elements: this.elements,
           alignment: 'right',
-        });        
-      }, 500);
-    }
+        });
+      }, 10);
+    // }
   }
 
   toolbarAction(action: ToolbarButtonClicked) {
@@ -821,7 +933,8 @@ export class CatalogMoldEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateMold.length > 0 && data?.data?.createOrUpdateMold[0].status === RecordStatus.INACTIVE) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE)
+                      this.changeInactiveButton(RecordStatus.INACTIVE);
+                      this.mold.status = RecordStatus.INACTIVE;              
                       const message = $localize`El Molde ha sido inhabilitado`;
                       this._sharedService.showSnackMessage({
                         message,
@@ -890,8 +1003,10 @@ export class CatalogMoldEditionComponent {
                 tap((data: any) => {
                   if (data?.data?.createOrUpdateMold.length > 0 && data?.data?.createOrUpdateMold[0].status === RecordStatus.ACTIVE) {
                     setTimeout(() => {                      
-                      this.changeInactiveButton(RecordStatus.ACTIVE)
+                      this.changeInactiveButton(RecordStatus.ACTIVE);
+                      this.mold.status = RecordStatus.ACTIVE;              
                       const message = $localize`El Molde ha sido reactivado`;
+                      this.mold.status = RecordStatus.ACTIVE;
                       this._sharedService.showSnackMessage({
                         message,
                         snackClass: 'snack-primary',
@@ -967,7 +1082,7 @@ export class CatalogMoldEditionComponent {
             this.translationChanged = response.translationsUpdated
             if (response.translationsUpdated) {              
               //this._store.dispatch(updateMoldTranslations({ 
-              this.mold.translations = [...response.translations];
+              this.mold.translations = [...response.translations];              
               //}));
               this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
               this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
@@ -1577,7 +1692,6 @@ export class CatalogMoldEditionComponent {
       order: this.order
     }    
     const variables = this._sharedService.setGraphqlGen(moldParameters); 
-    console.log(variables)
     this.equipments$ = this._catalogsService.getEquipmentsLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {                
@@ -1911,7 +2025,22 @@ export class CatalogMoldEditionComponent {
         this.recipients.currentPage,
         getMoreDataParams.textToSearch,  
       ); 
+    } else if (getMoreDataParams.catalogName === this.entityTable) {
+      if (this.entities.loading) return;
+      if (getMoreDataParams.initArray) {
+        this.entities.currentPage = 0;   
+        this.entities.items = [];
+      } else if (!this.entities.pageInfo.hasNextPage) {
+        return;
+      } else {
+        this.entities.currentPage++;
+      }
+      this.requestChecklistEntitiesData(        
+        this.entities.currentPage,
+        getMoreDataParams.textToSearch,  
+      );      
     }    
+    
   }
 
   onFileSelected(event: any) {
@@ -2111,11 +2240,38 @@ export class CatalogMoldEditionComponent {
       notifyRedState: this.mold.notifyRedState,      
       notifyRedRecipient: this.mold.notifyRedRecipient,            
       notifyRedSubject: this.mold.notifyRedSubject,
-      notifyRedBody:  this.mold.notifyRedBody,      
+      notifyRedBody:  this.mold.notifyRedBody,   
+      generationMode: this.mold.generationMode,      
+      entities: this.mold.entities,   
     });
-
+    this.changeEntities(this.mold.generationMode);
     this.updateMultiSelections();
   } 
+
+  handleSelectionChange(event: any) {
+    if (event && event.value) {
+      this.changeEntities(event.value);
+    }
+    
+  }
+
+  changeEntities(selection: string) {    
+    this.entityTable = SystemTables.DEPARTMENTS;
+    if  (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_POSITIONS) > -1) {
+      this.entityTable = SystemTables.POSITIONS;
+    } else if (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_WORKGROUP) > -1) {
+      this.entityTable = SystemTables.WORKGROUPS;
+    } else if (selection.indexOf(HarcodedChecklistPlanGenerationMode.BY_USER) > -1) {
+      this.entityTable = SystemTables.USERS;
+    }    
+    this.entities.currentPage = 0;   
+    this.entities.items = [];
+    this.multipleSearchEntityDefaultValue = '';
+    this.requestChecklistEntitiesData(
+      this.entities.currentPage,
+      '',  
+    );  
+  }
 
   updateMultiSelections() {
     if (this.notifyYellowChannels.items.length === 0) return;
@@ -2135,6 +2291,7 @@ export class CatalogMoldEditionComponent {
   }
 
   prepareRecordToSave(newRecord: boolean): any {
+    this.moldForm.markAllAsTouched();
     const fc = this.moldForm.controls;
     let startingDate = null;
     let manufacturingDate = null;
@@ -2183,24 +2340,7 @@ export class CatalogMoldEditionComponent {
         ...(fc.line.dirty || fc.line.touched || newRecord) && { lineId: fc.line.value ? fc.line.value.id : null},
         ...(fc.equipment.dirty || fc.equipment.touched || newRecord) && { equipmentId: fc.equipment.value ? fc.equipment.value.id : null},
         
-        ...(fc.notifyYellowRecipient.dirty || fc.notifyYellowRecipient.touched || newRecord) && { notifyYellowRecipientId: fc.notifyYellowRecipient.value ? fc.notifyYellowRecipient.value.id : null },
-        ...(fc.notifyRedRecipient.dirty || fc.notifyRedRecipient.touched || newRecord) && { notifyRedRecipientId: fc.notifyRedRecipient.value ? fc.notifyRedRecipient.value.id : null },
-        ...(fc.notifyYellowState.dirty || fc.notifyYellowState.touched || newRecord) && { notifyYellowState: fc.notifyYellowState.value },
-        ...(fc.notifyRedState.dirty || fc.notifyRedState.touched || newRecord) && { notifyRedState: fc.notifyRedState.value },
-        ...(this.mold?.notifyYellowChannels !== selectedYellowChannels || newRecord) && { notifyYellowChannels: selectedYellowChannels },
-        ...(this.mold?.notifyRedChannels !== selectedRedChannels || newRecord) && { notifyRedChannels: selectedRedChannels },
-        ...(fc.notifyRedSubject.dirty || fc.notifyRedSubject.touched || newRecord) && { notifyRedSubject: fc.notifyRedSubject.value },
-        ...(fc.notifyRedBody.dirty || fc.notifyRedBody.touched || newRecord) && { notifyRedBody: fc.notifyRedBody.value },
-        ...(fc.notifyYellowSubject.dirty || fc.notifyYellowSubject.touched || newRecord) && { notifyYellowSubject: fc.notifyYellowSubject.value },
-        ...(fc.notifyYellowBody.dirty || fc.notifyYellowBody.touched || newRecord) && { notifyYellowBody: fc.notifyYellowBody.value },
-
-
-        ...(fc.thresholdType.dirty || fc.thresholdType.touched || newRecord) && { thresholdType: fc.thresholdType.value },
-        ...(fc.thresholdYellow.dirty || fc.thresholdYellow.touched || newRecord) && { thresholdYellow: fc.thresholdYellow.value ? +fc.thresholdYellow.value : null },
-        ...(fc.thresholdRed.dirty || fc.thresholdRed.touched || newRecord) && { thresholdRed: fc.thresholdRed.value ? +fc.thresholdRed.value : null },
-        ...(fc.thresholdDateYellow.dirty || fc.thresholdDateYellow.touched || newRecord) && { thresholdDateYellow: fc.thresholdDateYellow.value ? +fc.thresholdDateYellow.value : null },
-        ...(fc.thresholdDateRed.dirty || fc.thresholdDateRed.touched || newRecord) && { thresholdDateRed: fc.thresholdDateRed.value ? +fc.thresholdDateRed.value : null },
-
+        
         ...(this.imageChanged) && { 
         mainImageName: fc.mainImageName.value,
         mainImagePath: this.mold.mainImagePath,
@@ -2230,8 +2370,11 @@ export class CatalogMoldEditionComponent {
     this.moldForm.controls.thresholdType.setValue(GeneralValues.N_A);
     this.moldForm.controls.state.setValue(GeneralValues.N_A);
     this.moldForm.controls.timeZone.setValue(new Date().getTimezoneOffset() * 60);
+    this.moldForm.controls.entities.setValue('');    
     this.maintenances.items = [];
     this.storedTranslations = [];
+    this.entitiesCurrentSelection = [];  
+    this.entities.items = [];
     this.translationChanged = false;
     this.mold = emptyMoldItem;        
     this.checklistRedTemplatesCurrentSelection = [];
@@ -2242,8 +2385,7 @@ export class CatalogMoldEditionComponent {
     this.checklistTemplatesRed.items = [];
     this.requestChecklistTemplatesYellowData(0);
     this.requestChecklistTemplatesRedData(0);
-
-    
+    this.requestChecklistEntitiesData(0);     
     this.focusThisField = 'description';
     this.updateMultiSelections();
     setTimeout(() => {
@@ -2444,7 +2586,7 @@ export class CatalogMoldEditionComponent {
 
   saveCatalogDetails$(processId: number): Observable<any> {
     const newRecord = !this.mold.id || this.mold.id === null || this.mold.id === 0;
-    if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistRedTemplatesCurrentSelection.length > 0) {
+    if (this.checklistYellowTemplatesCurrentSelection.length > 0 || this.checklistRedTemplatesCurrentSelection.length > 0 || this.entitiesCurrentSelection.length > 0) {
       const checklistTemplatesYellowToDelete = this.checklistYellowTemplatesCurrentSelection
       .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
       .map(ct => {
@@ -2461,8 +2603,17 @@ export class CatalogMoldEditionComponent {
           deletePhysically: true,
         }
       });
+      const checklistPlanEntities = this.entitiesCurrentSelection
+      .filter(ct => !!ct.originalValueRight && ct.valueRight === null)
+      .map(ct => {
+        return {
+          id: ct.catalogDetailId,
+          deletePhysically: true,
+        }
+      });
+      
       const ctToDelete = {
-        ids: [...checklistTemplatesYellowToDelete, ...checklistTemplatesRedToDelete],
+        ids: [...checklistTemplatesYellowToDelete, ...checklistTemplatesRedToDelete, ...checklistPlanEntities],
         customerId: 1, // TODO: Get from profile
       }
       const checklistTemplatesYellowToAdd = this.checklistYellowTemplatesCurrentSelection
@@ -2487,8 +2638,20 @@ export class CatalogMoldEditionComponent {
           customerId: 1,  // TODO: Get from profile
         }
       });
+      const checklistPlanEntitiesToAdd = this.entitiesCurrentSelection
+      .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
+      .map(ct => {
+        return {
+          process: SystemTables.CHECKLIST_PLANS_TEMPLATES,
+          processId,
+          detailTableName: this.entityTable,
+          value: ct.valueRight,
+          customerId: 1,  // TODO: Get from profile
+        }
+      });
+      
       const ctToAdd = {
-        catalogDetails: [...checklistTemplatesYellowToAdd, ...checklistTemplatesRedToAdd],
+        catalogDetails: [...checklistTemplatesYellowToAdd, ...checklistTemplatesRedToAdd, ...checklistPlanEntitiesToAdd],
       }
 
       return combineLatest([ 
@@ -2606,6 +2769,10 @@ export class CatalogMoldEditionComponent {
 
   get RecordStatus() {
     return RecordStatus; 
+  }
+
+  get GeneralValues() {
+    return GeneralValues; 
   }
 
 // End ======================

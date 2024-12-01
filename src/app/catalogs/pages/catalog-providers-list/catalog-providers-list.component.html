@@ -1,7 +1,8 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
 <div
-  class="container-animated"
-  (@routingAnimation.done)="pageAnimationFinished($event)"
+  class="container-animated"  
   @routingAnimation
+  (@routingAnimation.done)="showTableFooter = true"  
 >
   <ng-container *ngIf="providersData$ | async "></ng-container>
   <ng-container *ngIf="sort$ | async "></ng-container>
@@ -71,7 +72,7 @@
       </ng-container>
 
       <ng-container matColumnDef="reference">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header>Refererencia</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Referencia</th>
         <td mat-cell *matCellDef="let row">
           <ng-container *ngIf="!loading">            
             <strong>{{ row.data.reference }}</strong>
@@ -106,22 +107,22 @@
         class="table-row"
         mat-row *matRowDef="let row;
         columns: providersTableColumns"
-        [routerLink]="['/catalogs/providers/edit/', row.data.id]"
+        [routerLink]="['/catalogs/providers/edit/', row?.data?.id]"
       >
       </tr>
       <div *ngIf="!loading">
         <tr class="providers-table-mat-row" *matNoDataRow>
           <td class="providers-table__no-data" colspan="10">
-            No hay registros a mostrar
+           No hay registros a mostrar
           </td>
         </tr>
       </div>
     </table>
 
-    <div class="providers-table__paginator">
+    <div *ngIf="showTableFooter"class="providers-table__paginator">
       <div class="providers-table__paginator--catalog-data">
         <mat-icon class="small-icon" [svgIcon]="catalogIcon"></mat-icon>
-        <div>Total registros {{ pageInfo?.totalRecords}}</div>
+        <div>Total proveedor(es) <strong>{{ loading ? '?' : pageInfo?.totalRecords }}</strong></div>
         <!--<div>Inactivos: {{ pageInfo.inactiveRecords}}</div>-->
         <mat-divider vertical></mat-divider>
       </div>

@@ -40,11 +40,9 @@ export interface ShiftDetail {
   isLastSequence?: string;
   
   fromTime?: string;
-
-
   toTime?: string;
- 
-
+  fromTimeTime?: string;
+  toTimeTime?: string;
   moveToDate?: number;
   sequence?: number;
 
@@ -100,25 +98,17 @@ export const emptyShiftItem: ShiftDetail = {
   name: null,
   id: null,
   customerId: null,
-
-  calendarId: null,
-  
+  calendarId: null,  
   notes:null,
-
   twoDays:null,
-  moveToDate: null,
-  
-  fromTime: '',
-
-  
+  moveToDate: 0,    
+  fromTime: null,  
   toTime: null,
-
-
-  sequence:null,
+  fromTimeTime: null,  
+  toTimeTime: null,
+  sequence: 0,
   isFirstSequence:null,
   isLastSequence:null,
-
- 
   prefix: null,
   status: null,
   createdById: null,
@@ -130,6 +120,5 @@ export const emptyShiftItem: ShiftDetail = {
   deletedBy: null,
   updatedBy: null,
   createdBy: null,
-
   translations: [],
 };
