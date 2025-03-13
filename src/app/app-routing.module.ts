@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/pages/not-found/not-found.component';
-import { AppComponent } from './app.component';
 
 const routes: Routes = [
   {
@@ -12,7 +11,7 @@ const routes: Routes = [
   {
     path: 'catalogs',
     loadChildren: () => import('./catalogs/catalogs.module').then(m => m.CatalogsModule),    
-    data: { animation: 'isTop' },
+    data: { animation: 'isTop', accessType: 'team-member' },        
   },
   {
     path: 'molds',

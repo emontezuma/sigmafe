@@ -229,7 +229,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
             this.uomsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.uomsData.items);
           }      
         }        
-        this.uomsData.items.length = this.uomsData.totalCount;
+        // this.uomsData.items.length = this.uomsData.totalCount;
         this.uomsCatalogData = new MatTableDataSource<UomItem>(this.uomsData.items);
         this.uomsCatalogData.paginator = this.paginator;
         // this.uomsCatalogData.sort = this.sort;
@@ -318,6 +318,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -331,7 +332,8 @@ export class CatalogUomsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -346,6 +348,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -360,6 +363,7 @@ export class CatalogUomsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -373,7 +377,8 @@ export class CatalogUomsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -387,7 +392,8 @@ export class CatalogUomsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

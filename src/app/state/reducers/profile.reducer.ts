@@ -5,11 +5,13 @@ import { ProfileState } from '../../shared/models/profile.models';
 export const initialState: ProfileState = {
   loading: false,
   profileData: {
-    id: '',
+    id: null,
+    customerId: null,
+    languageId: null,
     animate: true,
-    firstName: '',
-    lastName: '',
-    userProfile: '',
+    name: '',
+    roles: '',
+    mainImage: '',
     email: '',
   }  
 };
@@ -17,6 +19,8 @@ export const initialState: ProfileState = {
 export const profileReducer = createReducer(
   initialState,
   on(profileActions.loadProfileData, ( state ) => ({ ...state, loading: true })),
-  on(profileActions.loadedProfileData, (state, { profileData } ) => ({ ...state, loading: false, profileData })),
+  on(profileActions.loadedProfileData, (state, { profileData } ) => (
+    { ...state, loading: false, profileData }
+  )),
 );
   

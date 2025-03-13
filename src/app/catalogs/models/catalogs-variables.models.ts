@@ -68,6 +68,7 @@ export const emptyVariableItem: VariableDetail = {
   prefix: null,
   status: null,
   maximum: null,
+  valueToAlarm: null,
   minimum: null,
   createdById: null,
   createdAt: null,

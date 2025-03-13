@@ -28,6 +28,7 @@ export enum dialogByDefaultButton {
 export enum ButtonActions {
   START = 'start',
   NEW = 'new',
+  COMMENTS = 'comments',
   SAVE = 'save',
   CANCEL = 'cancel',
   CLOSE = 'close',
@@ -54,6 +55,15 @@ export enum ButtonActions {
   INITIALIZE = 'initialize',
   OK = 'ok',
   EXECUTE = 'execute',
+  DISCARD = 'discard',
+  APPROVE = 'approve',
+  DISAPPROVE = 'disapprove',
+  COMPLETE = 'complete',
+  SHOW_ATTACHMENTS = 'showAttachments',
+  SHOW_CHARTS = 'showCharts',
+  ALLOW_COMMENTS = 'allowComments',
+  REASSIGN = 'reassign',
+  UNLOCK = 'unlock',
 }
 export interface ToolbarElement {
   id?: string;
@@ -86,7 +96,7 @@ export interface ToolbarElement {
   badgeText?: string;
   badgeSize?: any;
   badgeStyle?: any;
-
+  visible?: boolean;
 }
 export interface SharedState {
   screen: Screen;
@@ -110,7 +120,7 @@ export interface SnackMessage {
 }
 
 export interface ToolbarButtonClicked {
-  action: ButtonActions | undefined;
+  action: ButtonActions | undefined | string;
   from: string;
   buttonIndex: number;
   field: string;
@@ -146,6 +156,7 @@ export interface ToolbarControl {
 export enum ApplicationModules {
   MOLDS_HITS_VIEW = 'molds-hits-view',
   CHECKLIST_FILLING = 'checklist-filling',
+  CHECKLIST_FILLING_LIST = 'checklist-filling-list',
   GENERAL = 'general',
   MOLDS_CATALOG = 'molds-catalog',
   MOLDS_CATALOG_EDITION = 'molds-catalog-edition',

@@ -231,6 +231,7 @@ mat-panel-title {
 
 .toolbar-content {
   height: 64px;
+  
   // border-bottom: 1px solid var(--z-colors-page-border);
   border-bottom: 1px solid rgba(0, 0, 0, 0.3);
   background-color: var(--z-colors-page-background-color);
@@ -259,4 +260,13 @@ mat-panel-title {
   gap: 5px;
   align-items: center;
 
+}
+
+.user-name {
+  margin-right: 10px;
+}
+
+.right-side {
+  display: flex;
+  flex-direction: row;
 }

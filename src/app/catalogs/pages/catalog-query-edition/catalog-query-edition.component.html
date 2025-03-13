@@ -1,0 +1,317 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
+<div
+  class="container"
+  #catalogEdition
+  @routingAnimation
+  i18n
+>
+  <ng-container *ngIf="scroll$ | async"></ng-container>
+  <ng-container *ngIf="query$ | async"></ng-container>  
+  <ng-container *ngIf="showGoTop$ | async"></ng-container>
+      
+  <ng-container *ngIf="settingsData$ | async"></ng-container>
+  <ng-container *ngIf="toolbarClick$ | async "></ng-container>  
+  <ng-container *ngIf="toolbarAnimationFinished$ | async "></ng-container>  
+  <ng-container *ngIf="parameters$ | async "></ng-container>  
+  <ng-container *ngIf="plants$ | async "></ng-container>  
+
+  <ng-container *ngIf="recipients$ | async "></ng-container>  
+  <ng-container *ngIf="translations$ | async "></ng-container>  
+  <ng-container *ngIf="updateQuery$ | async "></ng-container>
+  <ng-container *ngIf="updateQueryCatalog$ | async "></ng-container>      
+  <ng-container *ngIf="deleteQueryTranslations$ | async "></ng-container>      
+  <ng-container *ngIf="addQueryTranslations$ | async "></ng-container>  
+  
+  <ng-container *ngIf="molds$ | async "></ng-container>       
+  <ng-container *ngIf="variables$ | async "></ng-container>       
+  <ng-container *ngIf="partNumbers$ | async "></ng-container>       
+  <ng-container *ngIf="checklistLinesReport$ | async "></ng-container>      
+ 
+  <mat-card class="card">
+    <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="queryForm"
+        #f="ngForm"
+      >
+      <mat-accordion multi>
+        <mat-expansion-panel
+          (opened)="panelOpenState[0] = true"
+          (closed)="panelOpenState[0] = false"
+          hideToggle="true"
+          [expanded]="panelOpenState[0]"
+        >
+          <mat-expansion-panel-header
+            [collapsedHeight]="'55px'"
+            [ngStyle]="{
+              'background-color': panelOpenState[0]
+                ? 'var(--z-colors-page-shadow)'
+                : 'var(--z-colors-page-card-background-color)'
+            }"
+          >
+            <mat-panel-title>
+              <mat-icon class="accordion-icon" [svgIcon]="catalogIcon">
+              </mat-icon>
+              <label class="accordion-label"
+                >INFORMACIÓN PRINCIPAL DE LA CONSULTA</label
+              >
+            </mat-panel-title>
+            <div class="icon-button-container">
+              <button
+                mat-icon-button
+                class="icon-button open"
+                aria-label="icon-button with menu icon"
+              >
+                <mat-icon class="icon-button">
+                  {{
+                    panelOpenState[0]
+                      ? "keyboard_arrow_up"
+                      : "keyboard_arrow_down"
+                  }}
+                </mat-icon>
+              </button>
+            </div>
+          </mat-expansion-panel-header>
+          <div class="grid-multiple margin-top">
+            <div class="field-items">
+              <app-input-field
+                [focused]="focusThisField==='name'"
+                [bordered]="true"
+                [formField]="queryForm.controls.name"
+                leftHint="Campo requerido"
+                [fieldMaxLength]="100"
+                [showRightHint]="true"
+                currentErrorMessage="Este campo no puede estar vacío"
+                currentErrorIcon="warn_line"
+                [showCloseButton]="true"
+                fieldHelp="Especifique el nombre asignado a la posicion"
+                [initialFocus]="true"                
+              >
+                <span fieldTitle class="label field__label"
+                  >Descripción/Nombre de la consulta</span
+                >
+              </app-input-field>
+            </div>
+            <div class="field-items">
+              <app-select-field
+                [formField]="queryForm.controls.public"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si la consulta estará disponible para todos los usuarios"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿La consulta es pública?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+             <app-select-field
+                [formField]="queryForm.controls.byDefault"
+                [list]="genYesNoValues.items"                
+                fieldHelp="Especifique si la consulta será su consulta por defecto"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿Es su consulta por defecto?</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+             <app-select-field
+                [formField]="queryForm.controls.periodTime"
+                [list]="genPeriodsTimeValues.items"                
+                fieldHelp="Especifique el período de tiempo"
+              >
+                <span fieldTitle class="label field__label"
+                  >Período de tiempo</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">                         
+              <fieldset
+                class="field__container field-with-label"
+                style="min-width: 350px; height: calc(100% - 22px);"
+                [ngClass]="{
+                  'field__container--error':
+                    queryForm.controls.periodTime.touched &&
+                    !queryForm.controls.periodTime.valid
+                }"
+                [disabled]="queryForm.controls.periodTime.value !== GeneralValues.SPECIFIC"
+              >
+                <span class="label field__label">Rango de fecha específica</span>
+                <mat-form-field appearance="fill" class="field__field" style="flex: 1">                    
+                  <mat-date-range-input [rangePicker]="rangePicker">
+                    <input 
+                      class="field__input"
+                      matInput
+                      formControlName="fromDate"
+                      name="fromDate"
+                      matStartDate
+                      placeholder="Desde"
+                    >
+                    <input
+                      class="field__input"
+                      matInput
+                      formControlName="toDate"
+                      name="toDate"
+                      matEndDate
+                      placeholder="Hasta"
+                    >
+                  </mat-date-range-input>                  
+                  <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+                  <mat-date-range-picker #rangePicker>
+                    <mat-date-range-picker-actions>
+                      <button mat-button matDateRangePickerCancel>Cancelar</button>
+                      <button mat-raised-button color="primary" matDateRangePickerApply style="color: white;">Aplicar</button>
+                    </mat-date-range-picker-actions>
+                  </mat-date-range-picker>
+                </mat-form-field>
+                <span class="field__help"
+                  >Especifique el rango de fechas específico</span
+                >
+              </fieldset>
+            </div>
+            <div class="field-items">
+              <app-multiple-selection-list
+                [bordered]="true"
+                [showSelect]="true"                  
+                [selectOptions]="moldsOptions"
+                [currentSelections]="moldsCurrentSelection"        
+                [formField]="queryForm.controls.molds"
+                [list]="molds.items"
+                [totalCount]="molds.totalCount"
+                [loading]="molds.loading"                
+                [catalog]="SystemTables.MOLDS"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              <span fieldTitle class="label field__label">Moldes a filtrar</span>
+              </app-multiple-selection-list>
+            </div>
+            <div class="field-items">
+              <app-multiple-selection-list
+                [bordered]="true"
+                [showSelect]="true"                  
+                [selectOptions]="variablesOptions"
+                [currentSelections]="variablesCurrentSelection"        
+                [formField]="queryForm.controls.variables"
+                [list]="variables.items"
+                [totalCount]="variables.totalCount"
+                [loading]="variables.loading"                
+                [catalog]="SystemTables.VARIABLES"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              <span fieldTitle class="label field__label">Variables a filtrar</span>
+              </app-multiple-selection-list>
+            </div>
+            <div class="field-items">
+              <app-multiple-selection-list
+                [bordered]="true"
+                [showSelect]="true"                  
+                [selectOptions]="partNumbersOptions"
+                [currentSelections]="partNumbersCurrentSelection"        
+                [formField]="queryForm.controls.partNumbers"
+                [list]="partNumbers.items"
+                [totalCount]="partNumbers.totalCount"
+                [loading]="partNumbers.loading"                
+                [catalog]="SystemTables.PARTNUMBERS"      
+                placeHolder="Filtrar..."
+                [defaultValue]="multipleSearchDefaultValue"            
+                (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
+                (getMoreData)="getMoreData($event)"
+              >
+              <span fieldTitle class="label field__label">Números de parte a filtrar</span>
+              </app-multiple-selection-list>
+            </div>
+            <div class="field-items">
+             <app-select-field
+                [formField]="queryForm.controls.checklistState"
+                [list]="genStatesValues.items"                
+                fieldHelp="Especifique el Estado de checklist que desea incluir"
+              >
+                <span fieldTitle class="label field__label"
+                  >Estado del checklist a filtrar</span
+                >
+              </app-select-field>
+            </div>
+            <div class="field-items">
+             <app-select-field
+                [formField]="queryForm.controls.alarmed"
+                [list]="genAlarmedValues.items"                
+                fieldHelp="Especifique si desea filtar los checklist alarmados"
+              >
+                <span fieldTitle class="label field__label"
+                  >¿Alarma en el checklist?</span
+                >
+              </app-select-field>
+            </div>
+          </div>          
+        </mat-expansion-panel>        
+      </mat-accordion>
+    </form>
+    <div
+      *ngIf="query.id"
+      class="catalog-footer"
+    >
+      <div class="grid-dates">
+        <div class="flex">
+          <div class="readonly-value item-id">{{ query.id }}</div>
+          <div class="label-with-no-index">ID del registro</div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(query.createdAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de creación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ query.createdBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Creado por</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(query.updatedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de modificación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ query.updatedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Modificado por</div>
+          </div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="grid-inactive" *ngIf="query.status === RecordStatus.INACTIVE">
+        <div class="flex">
+          <div class="readonly-value">{{ _sharedService.convertUtcTolocal(query.deletedAt) | date :"medium" }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="event"></mat-icon>
+            <div class="label-with-no-index">Fecha de inactivación</div>
+          </div>
+        </div>
+        <div class="flex">
+          <div class="readonly-value">{{ query.deletedBy?.name ?? ScreenDefaultValues.N_A }}</div>
+          <div class="flex-row">
+            <mat-icon class="small-icon" svgIcon="man"></mat-icon>
+            <div class="label-with-no-index">Inactivado por</div>
+          </div>
+        </div>
+        <div class="flex-inactive">
+          <div class="label-inactive">
+            <strong>El registro está INACTIVO</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

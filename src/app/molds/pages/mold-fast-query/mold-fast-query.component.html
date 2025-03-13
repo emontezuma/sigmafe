@@ -1,0 +1,89 @@
+<div
+  class="container"
+  #moldQuery
+  @routingAnimation
+  i18n
+>
+    <ng-container *ngIf="mold$ | async"></ng-container>    
+    
+    <div class="mold">
+      <div class="camera-space" style="flex: 1"><ngx-scanner-qrcode #action="scanner" [config]="config" (event)="onEvent($event, action)"></ngx-scanner-qrcode></div>
+      <button 
+        class="toolbar-button" 
+        style="width: 145px"
+        mat-button
+        (click)="action.isStart ? action.stop() : action.start()"
+        [disabled]="action.isLoading"
+      >    
+        <mat-icon
+          *ngIf="!action.isLoading"
+          class="svgicon icon-medium"
+          svgIcon="qr_code_access"
+        >
+        </mat-icon>          
+        <mat-progress-spinner
+          *ngIf="action.isLoading"
+          class="spinner-regular-button"
+          diameter="32"
+          mode="indeterminate"
+        >
+        </mat-progress-spinner>
+        <label class="button-label" [ngStyle]="{ 'margin-left': action.isLoading ? '30px' : '5px' }">{{ action.isStart ? 'Detener' : 'Escanear' }}</label>
+      </button>
+      <div class="mold-field-without-border">
+        <app-search-box
+          style="margin-top: 15px;"        
+          [textToSearch]="textToSearch"
+          [formField]="referenceField"
+          i18n-placeHolder
+          placeHolder="Referencia"
+          maxLength="50"
+          (searchBy)="sendSearchText($event)"
+        >
+        </app-search-box>
+      </div>
+      <div class="mold-field">
+        <app-readonly-field
+          [label]="mold?.description"                      
+          [labelLines]="2"                      
+          labelClass="label-description-with-reference"
+          [loading]="loading"
+          icon="treasure_chest"
+        >
+        </app-readonly-field>
+        <mat-card-subtitle class="label">Nombre del molde</mat-card-subtitle>
+      </div>
+      
+      <div class="mold-field">
+        <app-readonly-field
+          [label]="'<big>' + mold?.hits + '</big> hits. ' + ' <small>' + this._sharedService.formatDate(_sharedService.convertUtcTolocal(mold?.lastHit), 'EEEE d MMM yyyy hh:mm:ss a') + '</small>'"                      
+          labelClass="label-description-with-reference"
+          [loading]="loading"          
+          icon="event"
+        >
+        </app-readonly-field>
+        <mat-card-subtitle class="label">Total hits (fecha del último golpe)</mat-card-subtitle>
+      </div>
+      <div class="mold-double-field">
+        <div class="mold-field">
+          <app-readonly-field
+            [label]="mold?.partNumberReference + ' / ' + mold?.partNumberName"                      
+            labelClass="label-description-with-reference"
+            [loading]="loading"   
+            icon="best_product"       
+          >
+          </app-readonly-field>
+          <mat-card-subtitle class="label">Número de parte</mat-card-subtitle>
+        </div>
+        <div class="mold-field" style="flex: unset;">
+          <app-readonly-field
+            [label]="mold?.position + ''"                      
+            labelClass="label-description-with-reference"
+            [loading]="loading"          
+          >
+          </app-readonly-field>
+          <mat-card-subtitle class="label">Posición</mat-card-subtitle>
+        </div>            
+      </div>
+    </div>
+</div>

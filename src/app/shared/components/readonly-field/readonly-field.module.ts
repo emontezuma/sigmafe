@@ -4,6 +4,7 @@ import { ReadonlyFieldComponent } from './readonly-field.component';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { LabelEllipsisModule } from '../label-ellipsis';
+import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { LabelEllipsisModule } from '../label-ellipsis';
     MatTooltipModule,
     MatIconModule,
     LabelEllipsisModule,
+    NgxSkeletonLoaderModule
   ],
   schemas: [
     NO_ERRORS_SCHEMA,

@@ -1,4 +1,4 @@
-import { Attachment, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, GeneralCatalogMappedItem, GeneralTranslation, GeneralValues, PageInfo } from 'src/app/shared/models';
+import { Attachment, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, GeneralCatalogMappedItem, GeneralTranslation, GeneralValues, LineButton, PageInfo } from 'src/app/shared/models';
 
 export interface ChecklistTemplatesData {
   checklistTemplatesPaginated?: ChecklistTemplates;
@@ -242,6 +242,8 @@ export const emptyChecklistTemplateItem: ChecklistTemplateDetail = {
 export interface ChecklistTemplateLine {
   checklistTemplateId?: number;
   id?: number;
+  buttons: LineButton[];
+  comments: any[];
   customerId?: number;
   line?: number;
   order?: number;
@@ -282,5 +284,6 @@ export interface ChecklistTemplateLine {
   attachmentsList?: string;
   valuesList?: ChecklistTemplatePossibleValue[];
   friendlyVariableValueType?: string;
-  variableAttachments?: Attachment[];
+  variableAttachments?: Attachment[];  
 }
+

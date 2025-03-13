@@ -511,8 +511,8 @@ export class CatalogWorkgroupEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.workgroup.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.workgroup.translations.length > 0 ? $localize`Traducciones (${this.workgroup.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.workgroup.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.workgroup.translations?.length > 0 ? $localize`Traducciones (${this.workgroup.translations?.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.workgroup.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -535,6 +535,7 @@ export class CatalogWorkgroupEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -548,6 +549,7 @@ export class CatalogWorkgroupEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -560,7 +562,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -573,7 +576,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -587,7 +591,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -600,7 +605,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -613,7 +619,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -628,6 +635,7 @@ export class CatalogWorkgroupEditionComponent {
       loading: false,
       disabled: this.workgroup?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -639,7 +647,8 @@ export class CatalogWorkgroupEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -654,6 +663,7 @@ export class CatalogWorkgroupEditionComponent {
       showCaption: true,
       loading: false,
       disabled: !!!this.workgroup.id,
+      visible: true,
       action: ButtonActions.TRANSLATIONS,      
     },];
   }
@@ -860,20 +870,33 @@ export class CatalogWorkgroupEditionComponent {
         })
       }),
       tap((workgroupData: WorkgroupDetail) => {
-        if (!workgroupData) return;
+        if (!workgroupData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/workgroups/create');
+          return;
+        }
         this.workgroup =  workgroupData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.workgroup.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.workgroup.translations.length > 0 ? $localize`Traducciones (${this.workgroup.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.workgroup.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.workgroup.translations?.length > 0 ? $localize`Traducciones (${this.workgroup.translations?.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.workgroup.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.workgroup.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = workgroupData.translations.length > 0 ? $localize`Traducciones (${workgroupData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = workgroupData.translations?.length > 0 ? $localize`Traducciones (${workgroupData.translations?.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = workgroupData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = workgroupData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -1173,7 +1196,7 @@ export class CatalogWorkgroupEditionComponent {
   }
 
   processTranslations$(workgroupId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.workgroup.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.workgroup.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.workgroup.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1212,7 +1235,7 @@ export class CatalogWorkgroupEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addWorkgroupTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addWorkgroupTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteWorkgroupTranslations$(varToDelete) : of(null) 
       ]);
     } else {

@@ -531,7 +531,7 @@ export class CatalogChecklistPlansEditionComponent {
             autoFocus : true,
             data: {
               title: $localize`EJECUTAR EL PLAN DE CHECKLIST`,  
-              topIcon: 'delete',
+              topIcon: 'execute',
               buttons: [{
                 action: 'execute',
                 showIcon: true,
@@ -553,7 +553,7 @@ export class CatalogChecklistPlansEditionComponent {
                 default: false,
               }],
               body: {
-                message: $localize`Esta acción generará la plantilla checklist con el Id <strong>${this.checklistPlan.id}</strong> y ya no estará activo en el sistema.<br><br><strong>¿Desea continuar?</strong>`,
+                message: $localize`Esta acción solcitará la creación de los checklisst asociados a este plan <strong>${this.checklistPlan.id}</strong> y enviará las notificaciones a los recipientes asociados.<br><br><strong>¿Desea continuar?</strong>`,
               },
               showCloseButton: true,
             },
@@ -567,29 +567,27 @@ export class CatalogChecklistPlansEditionComponent {
             } else {
               this.elements.find(e => e.action === action.action).loading = true;
               const variableParameters = {
-                settingType: 'status',
+                settingType: 'executeNow',
                 id: this.checklistPlan.id,
                 customerId: this.checklistPlan.customerId,
-                status: RecordStatus.INACTIVE,
+                executeNow: GeneralValues.YES,
               }
               const variables = this._sharedService.setGraphqlGen(variableParameters);
-              this.updateChecklistPlan$ = this._catalogsService.updateChecklistPlanStatus$(variables)
+              this.updateChecklistPlan$ = this._catalogsService.updateChecklistExecuteNow$(variables)
               .pipe(
                 tap((data: any) => {
-                  if (data?.data?.createOrUpdateChecklistPlan.length > 0 && data?.data?.createOrUpdateChecklistPlan[0].status === RecordStatus.INACTIVE) {
+                  if (data?.data?.createOrUpdateChecklistPlan.length > 0 && data?.data?.createOrUpdateChecklistPlan[0].executeNow === GeneralValues.YES) {
                     setTimeout(() => {
-                      this.changeInactiveButton(RecordStatus.INACTIVE);
-                      this.checklistPlan.status = RecordStatus.INACTIVE;
-                      const message = $localize`La Plantilla de checklist ha sido inhabilitada`;
+                      const message = $localize`Se solicitó la creación de los respectivos Checklists, espere a las notificaciones`;
                       this._sharedService.showSnackMessage({
                         message,
-                        snackClass: 'snack-warn',
-                        progressBarColor: 'warn',
-                        icon: 'delete',
-                      });
-                      this.elements.find(e => e.action === action.action).loading = false;
+                        snackClass: 'snack-primary',
+                        progressBarColor: 'primary',
+                        icon: 'execute',
+                      });                      
                     }, 200);
-                  }
+                  } 
+                  this.elements.find(e => e.action === action.action).loading = false;
                 })
               )
             }  
@@ -730,8 +728,8 @@ export class CatalogChecklistPlansEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.checklistPlan.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistPlan.translations.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistPlan.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistPlan.translations?.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations?.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistPlan.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -754,6 +752,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -767,7 +766,8 @@ export class CatalogChecklistPlansEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+      visible: true,
       action: ButtonActions.EXECUTE,
     },{
       type: 'button',
@@ -781,6 +781,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -794,6 +795,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -807,6 +809,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -821,6 +824,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -834,6 +838,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -847,6 +852,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -861,6 +867,7 @@ export class CatalogChecklistPlansEditionComponent {
       loading: false,
       disabled: this.checklistPlan?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -873,6 +880,7 @@ export class CatalogChecklistPlansEditionComponent {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     
     },{
@@ -1154,16 +1162,16 @@ export class CatalogChecklistPlansEditionComponent {
         this.templatesCurrentSelection = [];  
         this.translationChanged = false;  
         this.storedTranslations = JSON.parse(JSON.stringify(this.checklistPlan.translations));  
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistPlan.translations.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistPlan.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistPlan.translations?.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations?.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistPlan.translations?.length > 0 ? 'accent' : '';   
         this.pendingRecord = 0;  
         this.updateFormFromData();
         this.changeInactiveButton(this.checklistPlan.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = this.checklistPlan.translations.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = this.checklistPlan.translations?.length > 0 ? $localize`Traducciones (${this.checklistPlan.translations?.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = this.checklistPlan.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = this.checklistPlan.translations?.length > 0 ? 'accent' : '';
         }        
         this.templates.items = [];
         this.requestChecklistTemplatesData(0);
@@ -1428,7 +1436,7 @@ export class CatalogChecklistPlansEditionComponent {
   }
 
   processTranslations$(checklistPlanId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.checklistPlan.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.checklistPlan.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.checklistPlan.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1465,7 +1473,7 @@ export class CatalogChecklistPlansEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.updateChecklistPlanTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.updateChecklistPlanTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistPlanTranslations$(varToDelete) : of(null) 
       ]);
     } else {

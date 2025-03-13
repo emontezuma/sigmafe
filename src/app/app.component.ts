@@ -9,14 +9,14 @@ import { SharedService } from './shared/services/shared.service';
 import { AppState } from './state/app.state'; 
 import * as appActions from './state/actions/screen.actions';
 import { appearing, dissolve, fromTop } from '../app/shared/animations/shared.animations';
-import { loadProfileData } from './state/actions/profile.action';
 import { selectProfileData } from 'src/app/state/selectors/profile.selectors';
 import { ApplicationModules } from 'src/app/shared/models/screen.models';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { ProfileData } from './shared/models/profile.models';
-import { SnackComponent } from "./shared/components";
+import { GenericDialogComponent, SnackComponent } from "./shared/components";
 import { environment } from 'src/environments/environment';
+import { MatDialog } from '@angular/material/dialog';
 // import { CatalogsHomeComponent } from './catalogs';
 
 @Component({
@@ -95,6 +95,8 @@ export class AppComponent implements AfterViewInit {
     private _sharedService: SharedService,
     private _snackBar: MatSnackBar,
     private _changeDetectorRef: ChangeDetectorRef,
+    public _dialog: MatDialog,
+    public _router: Router
     ) {
       this._breakpointObserver
       .observe([
@@ -127,11 +129,9 @@ export class AppComponent implements AfterViewInit {
   ngOnInit(): void {
     // console.log(CatalogsHomeComponent)
     this._sharedService.connectToSocket();
-    this.profileData$ = this._store.select(selectProfileData).pipe(
-        tap( profileData => {
-        this.profileData = profileData;
-      })
-    );
+    this._sharedService.showProfileData.subscribe((profile) => {
+      this.profileData = profile;
+    });
     this._sharedService.showLoader.subscribe((showLoader: ShowElement) => {
       setTimeout(() => {
         this.loading = showLoader.show;        
@@ -158,6 +158,7 @@ export class AppComponent implements AfterViewInit {
       this.onTopStatus = goTop.status;
       this._changeDetectorRef.detectChanges();
     });
+    
     this._sharedService.snackMessage.subscribe((snackBar) => {
       let validDuration = snackBar.duration;
       let showProgressBar = snackBar?.showProgressBar;
@@ -177,8 +178,7 @@ export class AppComponent implements AfterViewInit {
       });
     });
     this._sharedService.setTimer();
-    this.handlerScreenSizeChange(null);
-    this._store.dispatch(loadProfileData()); //TODO: Se colocara una vez que el usuario se autentique
+    this.handlerScreenSizeChange(null);    
   }
 
   ngAfterViewInit(): void {
@@ -266,6 +266,64 @@ export class AppComponent implements AfterViewInit {
   updateHit() {
     this.tmpUpdateHits.reset();
    }  
+
+   exitFromApplication() {
+    
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width: '450px',
+      disableClose: true,
+      panelClass: 'warn-dialog',
+      autoFocus : true,
+      data: {
+        title: $localize`SALIR DE LA APLICACIÓN`,  
+        topIcon: 'admin',
+        buttons: [{
+          action: 'exit',
+          showIcon: true,
+          icon: 'delete',
+          showCaption: true,
+          caption: $localize`Salir`,
+          showTooltip: true,
+          class: 'warn',
+          tooltip: $localize`Salir de la aplicación`,
+          default: true,
+        }, {
+          action: 'cancel',
+          showIcon: true,
+          icon: 'cancel',
+          showCaption: true,
+          caption: $localize`Cancelar`,
+          showTooltip: true,            
+          tooltip: $localize`Cancela la acción`,
+          default: false,
+        }],
+        body: {
+          message: $localize`Esta acción hará que su usuario se desconecte del sistema.<br><br><strong>¿Desea continuar?</strong>`,
+        },
+        showCloseButton: true,
+      },
+    });
+    dialogResponse.afterClosed().subscribe((response) => {
+      if (response.action === 'exit') {
+        this._sharedService.setProfileData({
+          id: null,
+          customerId: null,
+          languageId: null,
+          animate: true,
+          name: '',
+          roles: '',
+          mainImage: '',
+          email: '',
+        })
+        this._router.navigateByUrl('/checklists/login'); 
+      }            
+    });
+   }
+
+   changePassword() {
+    this._sharedService.setChangingPassword(true);
+    this._router.navigateByUrl('/checklists/login'); 
+   }
 
 // End ======================
 }

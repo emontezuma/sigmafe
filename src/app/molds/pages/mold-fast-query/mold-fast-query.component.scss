@@ -1,0 +1,65 @@
+.mold {
+    max-width: 380px;
+    margin: auto;
+    padding: 10px;
+    border: 2px solid whitesmoke;
+    border-radius: 5px;
+}
+
+.mold-field {
+    border: 2px solid skyblue;
+    background-color: whitesmoke;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.mold-field-without-border {
+    margin-top: 10px;    
+    flex: 1;
+}
+
+.mold-double-field {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+
+.camera-space {    
+}
+
+.toolbar-button {
+  margin-right: 5px;
+  display: flex;
+  height: 46px;
+  flex-direction: row;
+  border-radius: 8px 0px;
+  border: 2.5px solid rgba(var(--z-colors-primary-rgb), 0.5);
+}
+
+.icon-medium {
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0px !important;
+}
+
+.spinner-regular-button {
+  color: var(--z-colors-page-button-disabled-fore);
+  position: absolute;
+  left: 0;
+  margin-left: -8px;
+  margin-right: 5px;
+  margin-top: -7px;
+  ::ng-deep circle {
+      stroke: var(--z-colors-page-button-disabled-fore);   
+  }    
+}
+
+.button-label {
+  margin-left: 5px;
+  font-weight: 600;
+  font-size: 1.3rem;
+  cursor: pointer;
+}

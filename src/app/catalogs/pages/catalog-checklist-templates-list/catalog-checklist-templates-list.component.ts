@@ -216,7 +216,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   templateType: {
                     ...item.data.templateType,
                     name: item.data.templateType?.translations?.length > 0 ? item.data.templateType.translations[0].name : item.data.templateType?.name,
@@ -238,7 +238,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
             this.checklistTemplatesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.checklistTemplatesData.items);
           }      
         }        
-        this.checklistTemplatesData.items.length = this.checklistTemplatesData.totalCount;
+        // this.checklistTemplatesData.items.length = this.checklistTemplatesData.totalCount;
         this.checklistTemplatesCatalogData = new MatTableDataSource<ChecklistTemplateItem>(this.checklistTemplatesData.items);
         this.checklistTemplatesCatalogData.paginator = this.paginator;
         // this.checklistTemplatesCatalogData.sort = this.sort;
@@ -326,6 +326,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -339,7 +340,8 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -354,6 +356,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -368,6 +371,7 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -381,7 +385,8 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -395,7 +400,8 @@ export class CatalogChecklistTemplatesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

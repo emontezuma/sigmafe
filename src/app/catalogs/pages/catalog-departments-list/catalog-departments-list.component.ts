@@ -215,7 +215,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                      
                   plant: {
                     ...item.data.plant,
                     name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
@@ -242,7 +242,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
             this.departmentsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.departmentsData.items);
           }      
         }        
-        this.departmentsData.items.length = this.departmentsData.totalCount;
+        // this.departmentsData.items.length = this.departmentsData.totalCount;
         this.departmentsCatalogData = new MatTableDataSource<PlantItem>(this.departmentsData.items);
         this.departmentsCatalogData.paginator = this.paginator;
         // this.departmentsCatalogData.sort = this.sort;
@@ -330,6 +330,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -343,7 +344,8 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -358,6 +360,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -372,6 +375,7 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -385,7 +389,8 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -399,7 +404,8 @@ export class CatalogDepartmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

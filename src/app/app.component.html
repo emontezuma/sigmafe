@@ -16,7 +16,7 @@
         <mat-icon class="icon-toolbar" svgIcon="menu"> </mat-icon>
       </button>
       <h1 class="company-name">
-        APLICACION TOYOTA <strong>Draft version - Octubre 2024</strong>
+        APLICACION TOYOTA <strong>Test version - Enero 2025</strong>
       </h1>
       <button
         mat-mini-fab
@@ -56,50 +56,67 @@
           </mat-divider>
         </div>
       </mat-menu>
-      <button
-        *ngIf="!!profileData.avatar"
-        mat-mini-fab
-        class="button avatar-button"
-        matTooltip="Opciones del usuario"
-        matTooltipClass="tooltip-general"
-        matTooltipShowDelay="100"
-        aria-label="avatar"
-        (click)="sidenav.close()"
-        [matMenuTriggerFor]="menuAvatar"
-        @appearing
-      >
-        <img
-          appImageNotFound
-          [imageByDefault]="'assets/icons/man.svg'"
-          class="item-image"
-          [ngSrc]="profileData.avatar"
-          fill
-        />
-      </button>
-      <mat-menu #menuAvatar="matMenu" class="menu">
+      <div *ngIf="!!profileData" class="right-side">
         <div
-          class="menu-container"
-          *ngFor="let button of toolbarData.elements; let i = index"
+          *ngIf="!!profileData?.name"
+          class="user-name"
         >
-          <button
-            *ngIf="button.type === 'button'"
-            mat-menu-item
-            class="toolbar-button-small"
-            aria-label="icon-button with menu icon"
-            [disabled]="button.disabled"
-          >
-            <mat-icon
-              *ngIf="button.showIcon"
-              [svgIcon]="button.icon"
-              class="menu-button"
-            >
-            </mat-icon>
-            <span>{{ button.showCaption ? button.caption : "" }}</span>
-          </button>
-          <mat-divider *ngIf="button.type === 'divider'" class="divider">
-          </mat-divider>
+          Bienvenido, {{ profileData?.name }} <small>({{ profileData.roles === "admin" ? "Administrador" : profileData.roles ===  "team-member" ? "Team member" : profileData.roles === 'team-leader' ? 'Team Leader' : "No definido" }})</small>
+
         </div>
-      </mat-menu>
+        <button
+          *ngIf="!!profileData?.mainImage"
+          mat-mini-fab
+          class="button image-button"
+          matTooltip="Opciones del usuario"
+          matTooltipClass="tooltip-general"
+          matTooltipShowDelay="100"
+          aria-label="image"
+          (click)="sidenav.close()"
+          [matMenuTriggerFor]="menuAvatar"
+          @appearing
+        >
+          <img
+            appImageNotFound
+            [imageByDefault]="'assets/icons/man.svg'"
+            class="item-image"
+            [ngSrc]="profileData?.mainImage"
+            fill
+          />
+        </button>
+        <mat-menu #menuAvatar="matMenu" class="menu">
+          <div
+            class="menu-container"            
+          >
+            <button              
+              mat-menu-item
+              class="toolbar-button-small"
+              aria-label="icon-button with menu icon"              
+              (click)="changePassword()"
+            >
+              <mat-icon                
+                svgIcon="lock_closed"
+                class="menu-button"
+              >
+              </mat-icon>
+              <span>Cambiar contraseña</span>
+            </button>    
+            <button              
+              mat-menu-item
+              class="toolbar-button-small"
+              aria-label="icon-button with menu icon"              
+              (click)="exitFromApplication()"
+            >
+              <mat-icon                
+                svgIcon="admin"
+                class="menu-button"
+              >
+              </mat-icon>
+              <span>Salir de la aplicación...</span>
+            </button>            
+          </div>
+        </mat-menu>
+      </div>
     </mat-toolbar>
     <mat-progress-bar
       *ngIf="progressBarData?.show"
@@ -128,12 +145,20 @@
               </a>
               <mat-divider></mat-divider>
               <a
-                routerLink="checklists"
+                routerLink="checklists/list"
                 mat-list-item
                 (click)="sidenav.close()"
               >
                 <mat-icon>checklist</mat-icon>
-                <span>Checklist específico</span>
+                <span>Gestión de Checklists</span>
+              </a>
+              <a
+                routerLink="molds/query"
+                mat-list-item
+                (click)="sidenav.close()"
+              >
+                <mat-icon>search</mat-icon>
+                <span>Consulta de molde</span>
               </a>
             </mat-expansion-panel>
 
@@ -304,12 +329,25 @@
                   <span>Ajustes</span>
                 </div>
               </a>
-              <a routerLink="catalogs/admin-users" mat-list-item (click)="sidenav.close()">
+              <a routerLink="catalogs/users" mat-list-item (click)="sidenav.close()">
                 <div class="menu-button">
                   <mat-icon class="panel-icon" svgIcon="admin"></mat-icon>
                   <span>Gestión de usuarios</span>
                 </div>
               </a>
+            </mat-expansion-panel>
+
+            <mat-expansion-panel class="panel-main" hideToggle expanded="false">
+              <mat-expansion-panel-header>
+                <mat-icon class="panel-icon" svgIcon="essay"></mat-icon>
+                <mat-panel-title class="accordion">REPORTES</mat-panel-title>
+              </mat-expansion-panel-header>
+              <a routerLink="catalogs/queries" mat-list-item (click)="sidenav.close()">
+                <div class="menu-button">
+                  <mat-icon class="panel-icon" svgIcon="grouped_tasks"></mat-icon>
+                  <span>Captura de variables</span>
+                </div>
+              </a>              
             </mat-expansion-panel>
           </cdk-accordion>
         </mat-nav-list>

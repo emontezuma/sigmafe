@@ -3,7 +3,10 @@
 .container {
     position: relative;
     padding: 0px 2px;
-    background-color: var(--z-colors-page-shadow);
+    background-color: var(--z-colors-page-shadow);    
+    padding: 10px;
+    padding-top: 4px;
+    height: 64px;
 }
 
 .toolbar {    
@@ -51,6 +54,11 @@
 .divider-adjusted {
     @include mixins.divider(20px, 35px, 0px, 5px, var(--z-colors-page-border), 70px);    
 }
+
+.mdc-button__label {
+    margin-top: -8px;
+}
+
 
 .button-label {
     margin-left: 5px;

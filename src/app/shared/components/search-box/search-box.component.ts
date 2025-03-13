@@ -11,19 +11,19 @@ export class SearchBoxComponent {
   @Input() textToSearch: string;
   @Input() placeHolder: string;
   @Input() maxLength: string;
+  @Input() formField: FormControl;          
   @Output() searchBy = new EventEmitter<string>();
 
-  textBox = new FormControl;
   
 // Hooks ====================
   ngOnInit() {
     if (this.textToSearch) {
-      this.textBox.setValue(this.textToSearch);  
+      this.formField.setValue(this.textToSearch);  
     }
     if (!this.maxLength) {
       this.maxLength = "30";
     }
-    this.textBox.valueChanges.pipe(debounceTime(200))
+    this.formField.valueChanges.pipe(debounceTime(200))
     .subscribe(changedValue => {
       this.searchBy.emit(changedValue);
     });    

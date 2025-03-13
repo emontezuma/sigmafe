@@ -44,7 +44,7 @@ export class CatalogGenericEditionComponent {
   generic$: Observable<GenericDetail>;
   translations$: Observable<any>;
   updateGeneric$: Observable<any>;
-  updateGenericCatalog: Subscription;
+  updateGenericCatalog$: Observable<any>;
   deleteGenericTranslations$: Observable<any>;  
   addGenericTranslations$: Observable<any>;  
   genTablesValues: GeneralHardcodedValuesData = emptyGeneralHardcodedValuesData; 
@@ -509,8 +509,8 @@ export class CatalogGenericEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.generic.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.generic.translations.length > 0 ? $localize`Traducciones (${this.generic.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.generic.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.generic.translations?.length > 0 ? $localize`Traducciones (${this.generic.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.generic.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -533,6 +533,7 @@ export class CatalogGenericEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -546,6 +547,7 @@ export class CatalogGenericEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -558,7 +560,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -571,7 +574,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -585,7 +589,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -598,7 +603,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -611,7 +617,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -626,6 +633,7 @@ export class CatalogGenericEditionComponent {
       loading: false,
       disabled: this.generic?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -637,7 +645,8 @@ export class CatalogGenericEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -748,29 +757,45 @@ export class CatalogGenericEditionComponent {
   saveRecord() {
     this.setViewLoading(true);
     const newRecord = !this.generic.id || this.generic.id === null || this.generic.id === 0;
-    const dataToSave = this.prepareRecordToAdd(newRecord);
-    this.updateGenericCatalog = this._catalogsService.updateGenericCatalog$(dataToSave)
-    .subscribe((data: any) => {
-      const genericId = data?.data?.CreateOrUpdateGeneric[0].id;
-      if (genericId > 0) {        
-        this.processTranslations$(genericId)
-        .subscribe(() => {
-          this.requestGenericData(genericId);
-          setTimeout(() => {              
-            let message = $localize`El registro genérico ha sido actualizado`;
-            if (newRecord) {                
-              message = $localize`El registro genérico ha sido creada satisfactoriamente con el id <strong>${this.generic.id}</strong>`;
-              this._location.replaceState(`/catalogs/generics/edit/${this.generic.id}`);
-            }
-            this._sharedService.showSnackMessage({
-              message,
-              snackClass: 'snack-accent',
-              progressBarColor: 'accent',                
-            });
-          })
+
+    try {
+      const dataToSave = this.prepareRecordToAdd(newRecord);      
+      this.updateGenericCatalog$ = this._catalogsService.updateGenericCatalog$(dataToSave)
+      .pipe(
+        tap((data: any) => {
+          if (data?.data?.createOrUpdateGeneric.length > 0) {
+            const genericId = data?.data?.createOrUpdateGeneric[0].id;            
+            this.processTranslations$(genericId).subscribe(() => {
+              this.requestGenericData(genericId);
+              setTimeout(() => {              
+                let message = $localize`El registro genérico ha sido actualizado`;
+                if (newRecord) {                
+                  message = $localize`El registro genérico ha sido creada satisfactoriamente con el id <strong>${this.generic.id}</strong>`;
+                  this._location.replaceState(`/catalogs/generics/edit/${this.generic.id}`);
+                }
+                this._sharedService.showSnackMessage({
+                  message,
+                  snackClass: 'snack-accent',
+                  progressBarColor: 'accent',                
+                });
+                this.setViewLoading(false);
+                this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;              
+              }, 200)
+            })            
+          }
         })
-      }
-    })
+      )
+    } catch (error) {
+      const message = $localize`Se generó un error al procesar el registro. Error: ${error}`;
+      this._sharedService.showSnackMessage({
+        message,
+        duration: 5000,
+        snackClass: 'snack-warn',
+        icon: 'check',
+      }); 
+      this.setViewLoading(false);
+      this.elements.find(e => e.action === ButtonActions.SAVE).loading = false;    
+    }
   }
 
   requestGenericData(genericId: number): void { 
@@ -796,20 +821,33 @@ export class CatalogGenericEditionComponent {
         })
       }),
       tap((genericData: GenericDetail) => {
-        if (!genericData) return;
+        if (!genericData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/generics/create');
+          return;
+        }
         this.generic =  genericData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.generic.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.generic.translations.length > 0 ? $localize`Traducciones (${this.generic.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.generic.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.generic.translations?.length > 0 ? $localize`Traducciones (${this.generic.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.generic.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.generic.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = genericData.translations.length > 0 ? $localize`Traducciones (${genericData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = genericData.translations?.length > 0 ? $localize`Traducciones (${genericData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = genericData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = genericData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -1014,7 +1052,7 @@ export class CatalogGenericEditionComponent {
   }
 
   processTranslations$(genericId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.generic.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.generic.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.generic.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1051,7 +1089,7 @@ export class CatalogGenericEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addGenericTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addGenericTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteGenericTranslations$(varToDelete) : of(null) 
       ]);
     } else {

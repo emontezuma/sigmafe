@@ -211,7 +211,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',                 
                 }
               }
             })          
@@ -228,7 +228,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
             this.companiesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.companiesData.items);
           }      
         }        
-        this.companiesData.items.length = this.companiesData.totalCount;
+        // this.companiesData.items.length = this.companiesData.totalCount;
         this.companiesCatalogData = new MatTableDataSource<PlantItem>(this.companiesData.items);
         this.companiesCatalogData.paginator = this.paginator;
         // this.companiesCatalogData.sort = this.sort;
@@ -316,6 +316,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -329,7 +330,8 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -344,6 +346,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -358,6 +361,7 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -371,7 +375,8 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -385,7 +390,8 @@ export class CatalogCompaniesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

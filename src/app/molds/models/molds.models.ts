@@ -25,3 +25,25 @@ export interface MoldCatalog {
   status: string;
   updatedAt: string;
 }
+
+export interface MoldFastQuery {
+  reference?: string;
+  description?: string;
+  serialNumber?: string;
+  partNumberName?: string;
+  partNumberReference?: string;
+  position?: number;
+  hits?: number;
+  lastHit?: string;  
+}
+
+export const emptyMoldFastQuery = {
+  reference: '',
+  description: '',
+  serialNumber: '',
+  partNumberName: '',
+  partNumberReference: '',
+  position: 0,
+  hits: 0,
+  lastHit: '' 
+};

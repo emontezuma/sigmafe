@@ -273,7 +273,7 @@ export class TranslationsDialogComponent implements AfterViewInit, OnDestroy {
       ...(filterBy) && { filterBy },
     }
 
-    this.languages$ = this._sharedService.getlanguagesLazyLoadingDataGql$(variables)
+    this.languages$ = this._sharedService.getLanguagesLazyLoadingDataGql$(variables)
     .pipe(
       tap((data: any) => {
         if (data?.data?.languages?.items.length === 0) {

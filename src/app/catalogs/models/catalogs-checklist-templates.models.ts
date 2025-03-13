@@ -253,6 +253,7 @@ export interface ChecklistTemplateLine {
   recipientId?: number;
   useVariableSettings?: string;
   name?: string;
+  valueToAlarm?: string;
   notes?: string;
   minimum?: string;
   maximum?: string;

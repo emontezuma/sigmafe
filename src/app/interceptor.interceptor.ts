@@ -6,7 +6,7 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
-import { Observable, catchError, retry, tap, throwError } from 'rxjs';
+import { Observable, catchError, of, retry, tap, throwError } from 'rxjs';
 import { SharedService } from './shared/services';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class InterceptorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     
     let handled: boolean = false;
-    const authToken = 'SAMPLE';
+    const authToken = 'SAMPLE'; // localStorage.getItem('autorization');
     const authReq = request.clone({
       headers: request.headers
       .set('x-customer-id', '1')
@@ -39,7 +39,7 @@ export class InterceptorInterceptor implements HttpInterceptor {
         this._sharedService.showSnackMessage({
           message,                
           snackClass: 'snack-warn',
-          icon: 'disconnect',          
+          // icon: 'check',          
         });      
         return throwError(error);
       }),

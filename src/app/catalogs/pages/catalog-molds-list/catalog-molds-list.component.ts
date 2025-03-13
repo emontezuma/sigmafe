@@ -158,7 +158,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -175,7 +175,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
             this.moldsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.moldsData.items);
           }      
         }
-        this.moldsData.items.length = this.moldsData.totalCount;
+        // this.moldsData.items.length = this.moldsData.totalCount;
         this.moldsCatalogData = new MatTableDataSource<MoldItem>(this.moldsData.items);
         this.moldsCatalogData.paginator = this.paginator;
         // this.moldsCatalogData.sort = this.sort;
@@ -354,6 +354,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -368,6 +369,7 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -381,7 +383,8 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -395,7 +398,8 @@ export class CatalogMoldsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

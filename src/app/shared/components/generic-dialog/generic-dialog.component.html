@@ -2,6 +2,7 @@
   <div mat-dialog-title class="simple-flex title" #genericDialog>
     <ng-container *ngIf="settingsData$ | async"></ng-container>
     <ng-container *ngIf="everySecond$ | async"></ng-container>
+    <ng-container *ngIf="users$ | async"></ng-container>
 
     <mat-icon class="icon-button" [svgIcon]="data.topIcon"></mat-icon>
     <div class="title-text" [innerHTML]="data.title"></div>
@@ -9,19 +10,76 @@
       *ngIf="data.showCloseButton"
       mat-icon-button
       class="close-button open"
-      aria-label="icon-button with menu icon"
       (click)="handleCloseButtonClick()"
     >
       <mat-icon class="icon-button">close</mat-icon>
     </button>
   </div>
   <mat-divider class="divider-title"></mat-divider>
+
+
+  <div 
+    class="simple-flex"
+    style="min-height: 50px; padding: 20px"
+    *ngIf="!data.application"
+  >
+    <div
+      class="dialog-content"
+      mat-dialog-content
+      [innerHTML]="data.body.message"
+    >  
+    </div>
+  </div>
+
+  
+  <div *ngIf="showChecklistReassigningUser">
+    <div
+      class="dialog-content"
+      mat-dialog-content      
+    >  
+    </div>
+    <div class="field-items">
+      <fieldset
+        class="field__container"
+        style="min-width: 350px; height: calc(100% - 22px);"
+        [ngClass]="{
+          'field__container--error':
+            user.touched &&
+            !user.valid
+        }"
+        [disabled]="user.disabled"
+      >
+        <div class="title-with-id">
+          <span class="label field__label">Usuario que llenará el checklist</span>
+          <span class="field__label" *ngIf="user?.value?.id">id: {{ user?.value?.id }}</span>
+        </div>
+        <app-auto-complete-field
+          [focused]="false"
+          [formField]="user"
+          [list]="users.items"
+          [totalCount]="users.totalCount"
+          leftHint="Escriba el tipo de plan de checklist"
+          [catalog]="SystemTables.USERS"
+          [loading]="users.loading"
+          noItemsError="No hay Tipos de plan con este nombre"
+          [showDataState]="true"
+          (optionSelected)="handleOptionSelected($event)"
+          (getMoreData)="getMoreData($event)"
+        >
+        </app-auto-complete-field>
+        <span class="field__help">Especifique el usuario al que se le reasignará el checklist</span>
+      </fieldset>
+    </div>  
+  </div>  
+
   <div
-    class="dialog-content"
-    mat-dialog-content
-    [innerHTML]="data.body.message"
+    *ngIf="data.body.bottomMessage"
+    class="dialog-bottom-message"    
+    [innerHTML]="data.body.bottomMessage"
   ></div>
   <mat-divider class="divider"></mat-divider>
+
+
   <div class="simple-flex dialog-actions" mat-dialog-actions>
     <div
       *ngIf="timeOutforDefaultButton > 0 && !closed"
@@ -49,7 +107,6 @@
       <button
         mat-button
         class="toolbar-button"
-        aria-label="icon-button with menu icon"
         [ngClass]="button.class"
         [matTooltipDisabled]="!button.showTooltip"
         [matTooltip]="button.tooltip"

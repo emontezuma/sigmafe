@@ -2,6 +2,7 @@
 
 .question-buttons {
     @include mixins.flexbox(row, wrap, 9px, unset);
+    margin-left: 10px;
 }
 
 .with-background {    

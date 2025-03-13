@@ -11,6 +11,7 @@
     font-weight: 600;
     cursor: pointer;
     color: var(--z-colors-page-fore);
+    color: var(--z-colors-page-tab-fore);
 }
 
 .tab-icon {
@@ -106,7 +107,7 @@ mat-card-subtitle {
 .grid-multiple > div {
     flex: 1;
     min-width: 300px;
-    flex-basis: 30%;
+    flex-basis: 23%;
 }
 
 .by-row {
@@ -463,6 +464,13 @@ mat-panel-title {
     border-radius: 4px;
 }
 
+.progress-text {
+    font-size: 1.5rem;
+    font-weight: 200;
+    margin-left: 15px;
+    color: var(--theme-primar-700) !important;        
+}
+  
 .toolbar-menu {
   color: var(--z-colors-page-card-fore) !important;
   background-color: var(--z-colors-page-card-background-color);
@@ -587,4 +595,183 @@ app-label-ellipsis {
     margin: 0px;
     padding: 5px 0px;
     line-height: 27px;
+    font-size: 16px;
+    font-weight: 600;
 }
+
+.values-table {  
+    flex: 1;
+    min-height: 0;
+    &__container {
+      overflow: auto;      
+      max-height: 400px;
+      padding-right: 5px;
+    }
+    &__no-data {
+      font-size: 1.3rem;  
+      text-align: center !important;
+      padding: 10px;
+    }
+  }
+  
+  table {
+    border: 1px solid var(--z-colors-table-border-color);
+    border-radius: 8px 8px 0px 0px;    
+  }
+  
+  ::ng-deep .mat-mdc-paginator-icon {
+    fill: var(--z-colors-paginator-fore-color) !important;    
+  }
+  
+  .mat-mdc-row:hover {
+    background-color: var(--z-colors-table-hover-background-color) !important;
+  }
+  
+  .mat-column-actions {
+    text-align: center;
+    max-width: 264px !important;
+    min-width: 264px !important;
+    width: 264px !important;
+  }
+  
+  .mat-column-actions-attachments {
+    text-align: center;
+    max-width: 310px !important;
+    min-width: 310px !important;
+    width: 310px !important;
+    font-size: 1.5rem;
+  }
+  
+  .mat-column-index {
+    width: 50px;
+    max-width: 50px !important;
+    min-width: 50px;
+    padding: 2px 5px;
+    margin: auto;
+    font-size: 1.5rem;
+    text-align: right;
+    ::ng-deep .mat-sort-header-container {
+      justify-content: end;
+    }
+  }
+  
+  .mat-column-icon {
+    width: 80px;
+    max-width: 80px !important;
+    min-width: 80px;
+    padding: 2px 5px;
+    font-size: 1.5rem;
+    margin: auto;
+    text-align: center;
+    height: 50px;
+    ::ng-deep .mat-sort-header-container {
+      justify-content: center;
+    }
+  }
+
+  .card-image {
+    display: flex;
+    max-width: 180px;
+    min-width: 180px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }
+  
+  .image-container {    
+    width: 100%;
+    height: auto;
+    position: relative;
+    display: flex;
+    margin: auto;
+  }
+  
+  .variable-image {
+    width: inherit;
+    max-width: calc(100% - 4px);
+    max-height: calc(100% - 4px);
+    margin: auto;
+    padding: 2px;
+  }
+  
+  .icon-container-image {      
+    position: relative;
+    display: flex;
+    margin: 2px;  
+  }
+   
+  .card-image-icon {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .icon-container {    
+    max-height: 58px;
+    max-width: 58px;
+    min-height: 58px;
+    min-width: 58px;   
+    position: relative;
+    display: flex;
+    margin: 2px;  
+  }
+  
+  .mat-column-name {
+    text-align: left;
+    font-size: 1.5rem;
+  }
+  
+  .mat-mdc-header-row {
+    font-weight: 700;
+    background-color: var(--z-colors-table-header-background-color) !important;
+    color: var(--z-colors-table-header-fore-color) !important;
+    max-height: 32px !important;
+    height: 32px !important;
+  }
+  
+  ::ng-deep .mat-sort-header-arrow {
+    color: var(--z-colors-table-header-fore-color);
+  }
+  
+  .mat-mdc-row {
+    cursor: pointer;
+    color: var(--z-colors-table-row-fore-color);
+    max-height: 26px !important;
+    height: 26px !important;
+  }
+  
+  tr:nth-child(2n) {
+    background-color: var(--z-colors-table-odd-background-color);  
+  }
+  
+  tr:nth-child(2n+1) {
+    background-color: var(--z-colors-table-even-background-color);
+  }
+
+  .maintenance-buttons {
+    padding: 10px 10px 0px 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    align-items: center;
+  }
+  
+  .file-type-icon {
+    width: 48px;
+    height: 48px;
+    margin: auto;
+  }
+  
+  .icon-rotated-90 {
+    transform: rotate(90deg);
+  }
+  
+  .image-container-table {    
+    max-height: 56px;    
+    max-width: 56px;    
+    min-height: 56px;    
+    min-width: 56px;    
+    position: relative;
+    display: flex;
+    margin: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+  }

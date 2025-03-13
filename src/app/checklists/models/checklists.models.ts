@@ -1,14 +1,5 @@
-import { VariableData } from "src/app/catalogs";
-import { ChecklistLine, ChecklistTemplatePossibleValue, GeneralCatalogInternalData, VariableDetail } from "src/app/shared/models";
-import { Attachment, Priority, RecordStatus, SimpleTable } from "src/app/shared/models/helpers.models";
-
-export enum ChecklistAnswerType {
-    YES_NO = 'yesNo',
-    YES_NO_NA = 'yesNoNa',
-    SELECT = 'select',
-    MULTI_SELECT = 'multiSelect',
-    FREE_FORM = 'freeForm',
-}
+import { HarcodedVariableValueType, ChecklistLine, VariableDetail } from "src/app/shared/models";
+import { Attachment, PageInfo, Priority, RecordStatus, SimpleTable } from "src/app/shared/models/helpers.models";
 
 export enum SelectionType {
     LAZY_LOADING = 'lazyLoading',
@@ -56,12 +47,14 @@ export enum ChecklistVisualHelperSupported {
 
 export enum ChecklistState {
     PLANNED = 'planned',
-    CALCELLED = 'cancelled',
+    CREATED = 'created',
+    CANCELLED = 'cancelled',
     READY = 'ready',
-    IN_PROGRESS = 'inProgress',
-    PAUSED_BY_USER = 'pausedByUser',
-    PAUSED_BY_ADMIN = 'pausedByAdmin',
+    IN_PROGRESS = 'in-progress',
+    PAUSED_BY_USER = 'paused-by-user',
+    PAUSED_BY_ADMIN = 'paused-by-admin',
     COMPLETED = 'completed',
+    CLOSED = 'closed',
 }
 
 export enum ChecklistQuestionStatus {
@@ -70,6 +63,7 @@ export enum ChecklistQuestionStatus {
     CANCELLED = 'cancelled',
     ATTACHMENT_MISSING = 'attachmentMissing',
     COMPLETED = 'completed',
+    ACTIVE = 'active',
 }
 
 export enum variableValueStatus {
@@ -104,7 +98,7 @@ export interface ChecklistFillingItem {
     order?: number;
     text?: string;
     extendedInfo?: string;
-    answerType?: ChecklistAnswerType;
+    answerType?: HarcodedVariableValueType;
     answerByDefault?: string;
     answer?: string;
     status?: ChecklistQuestionStatus;
@@ -163,7 +157,7 @@ export interface ChecklistPlanning {
 }
 
 export interface ChecklistInnerObject {
-    id?: string;
+    id?: number;
     number?: string;
     description?: string;
     reference?: string;
@@ -193,7 +187,19 @@ export interface previousVariableValue {
 export interface ChecklistFillingData {
     id?: string;
     number?: string;
+    attachments?: Attachment[];  
     recordUrl?: string;
+    allowRestarting?: boolean;
+    assignedTo?: ChecklistInnerObject;
+    workgroup?: ChecklistInnerObject;
+    department?: ChecklistInnerObject;
+    reassignedTo?: ChecklistInnerObject;
+    partial?: boolean;
+    allowPartialSaving?: boolean;
+    requiresApproval?: boolean;
+    allowReassignment?: boolean;
+    allowDiscard?: boolean;
+    requiresActivation?: boolean;
     name?: string;
     notes?: string;
     parentId?: string;
@@ -203,7 +209,8 @@ export interface ChecklistFillingData {
     questions?: number;
     warnedItems?: number;
     moldId?: string;
-    completed?: number;
+    completed?: string;
+    questionsCompleted?: number;
     cancelled?: number;
     alarmedItems?: number;
     valueToPrint?: number;
@@ -218,10 +225,11 @@ export interface ChecklistFillingData {
     viewType?: ChecklistView;
     icon?: string;
     items?: ChecklistFillingItem[];
-    lines?: ChecklistLine[];
     status?: RecordStatus;
+    lines?: ChecklistLine[];
     state?: ChecklistState;
     stateDescription?: string;
+    allowExpiring?: boolean;
     priority?: Priority;
     type?: SimpleTable;
     class?: SimpleTable;
@@ -241,6 +249,14 @@ export interface ChecklistFillingData {
     friendlyFrequency?: string;
     friendlyGenerationMode?: string;
     checklistTemplate?: checklistTemplateData;
+    checklistTemplateDetailId?: string;
+    lastAnswer?: string;
+    answeredDate?: string;
+    lastValue?: string;
+    lastValueDate?: string;
+    lastValueUser?: string;
+    lastValueAlarmed?: string;
+    lastChecklistId?: string;    
 }
 
 export interface checklistTemplateData {
@@ -261,4 +277,28 @@ export const emptyChecklistFillingData = {
     description: null,
     extendedInfo: null,
     recordUrl: null,
+    allowExpiring: false,
+}
+
+ 
+export interface ChecklistsFillingData {
+  ChecklistsFillingPaginated?: ChecklistsFilling;
+}
+
+export interface ChecklistTemplateData {
+  oneChecklistTemplate?: ChecklistFillingItem;
+  translations?: any;
+}
+
+export interface ChecklistsFilling {
+  items?: ChecklistFillingItem[];
+  pageInfo?: PageInfo;
+  totalCount?: number;
+}
+
+export interface ChecklistFillingItem {
+  friendlyStatus?: string;
+  friendlyState?: string;
+  isTranslated?: boolean;
+  data?: ChecklistFillingData;
 }

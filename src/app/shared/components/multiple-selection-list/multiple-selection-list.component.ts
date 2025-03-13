@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, OnChanges, ViewChild, AfterViewInit, ElementRef, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { debounceTime, startWith, tap, throttleTime } from 'rxjs/operators';
 import { Observable } from 'rxjs';
@@ -73,30 +73,65 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
     if (this.getMoreData) this.getMoreData.unsubscribe();
   }
 
-  ngOnChanges() {    
-    if (this.focused) {
+  ngOnChanges(changes: SimpleChanges) {    
+    /* if (this.focused) {
       setTimeout(() => {
         this.selection.nativeElement.focus();
       }, 50)
-    }    
-    if (this.currentSelections.length > 0) {
-      for (const item of this.list) {        
-        const itemHasChanged = this.currentSelections.find(cs => cs.id === item.id && cs.valueRight !== item.valueRight)
-        if (itemHasChanged) {
-          item.valueRight = itemHasChanged.valueRight;
+    }   */  
+
+    //if (JSON.stringify(changes['list'].currentValue) != JSON.stringify(changes['list'].previousValue)) {
+      if (this.currentSelections.length > 0) {
+        for (const item of this.list) {        
+          const itemHasChanged = this.currentSelections.find(cs => cs.id === item.id && cs.valueRight !== item.valueRight)
+          if (itemHasChanged) {
+            item.valueRight = itemHasChanged.valueRight;
+          }
+          item.sortedField = item.valueRight ? `-${item.translatedName}`: item.translatedName;
+        } 
+        if (this.list.length > 0) {
+          for (const item of this.currentSelections) {        
+            const itemShadow = this.list.find(cs => cs.id === item.id);
+            if (!itemShadow) {
+              this.list.push({
+                ...item,
+                sortedField: item.valueRight ? `-${item.translatedName}`: item.translatedName,            
+              });            
+            }          
+          } 
         }
-        item.sortedField = item.valueRight ? `-${item.translatedName}`: item.translatedName;
-      }
-      this.list.sort((a, b) => {        
-        return a.sortedField < b.sortedField ? -1 : 1;        
-      })
-    } 
+
+        this.list.sort((a, b) => {        
+          return a.sortedField < b.sortedField ? -1 : 1;        
+        })
+  
+       /*  this.currentSelections.forEach((item) => {
+          let itemHasChanged = this.list.find(cs => cs.id === item.id && cs.valueRight !== item.valueRight);
+          console.log('1', itemHasChanged);
+          if (itemHasChanged) {
+            itemHasChanged.valueRight = item.valueRight;
+          } else {
+            this.list.push(item);
+            itemHasChanged = item;
+            itemHasChanged.valueRight = item.id;            
+          }
+          itemHasChanged.sortedField = itemHasChanged.valueRight ? `-${itemHasChanged.translatedName}`: itemHasChanged.translatedName;
+          console.log('2', itemHasChanged);
+        })
+          
+        this.list.sort((a, b) => {        
+          return a.sortedField < b.sortedField ? -1 : 1;        
+        }) */
+      } 
+    //}
+    
   }
 
   ngAfterViewInit() {
     if (this.multipleSelection) {
       this.multipleSelectionHeight = this.multipleSelection.nativeElement.offsetHeight;
     }
+    if (!this.cdkScrollable) return;
     this.scroll$ = this.cdkScrollable.elementScrolled()
     .pipe(
       throttleTime(300),
@@ -172,7 +207,11 @@ export class MultipleSelectionListComponent implements OnInit, OnChanges, OnDest
     if (itemIndexChanged !== -1) {
       this.currentSelections[itemIndexChanged].valueRight = item.valueRight;
     } else {
-      this.currentSelections.push( { id: item.id, valueRight: item.valueRight, originalValueRight, catalogDetailId: item.catalogDetailId });
+      this.currentSelections.push( 
+        { ...item,
+        originalValueRight, 
+        catalogDetailId: item.catalogDetailId,  
+      });
     }
   }
 

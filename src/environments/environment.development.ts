@@ -11,7 +11,7 @@ export const environment = {
     apiDownloadUrl: 'https://localhost:7209/api/file/download',
     catalogsUrl: '#/catalogs',
     uploadFolders: {
-        completePathToFiles: 'https://localhost:7209/files',
+        completePathToFiles: 'files',
         catalogs: 'catalogs',
     },
     snackByDefaultDuration: 2000,

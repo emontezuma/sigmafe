@@ -33,6 +33,7 @@
   <ng-container *ngIf="updateChecklistTemplateLine$ | async "></ng-container>     
   <ng-container *ngIf="checklistDetailAttachments$ | async "></ng-container>  
   <ng-container *ngIf="copyChecklistTemplate$ | async "></ng-container>
+  
   <ng-container *ngIf="initialStates$ | async "></ng-container>           
 
   <div @dissolve class="sticky" *ngIf="showMacros">
@@ -110,7 +111,7 @@
                 [bordered]="true"
                 [formField]="checklistTemplateForm.controls.name"
                 leftHint="Campo requerido"
-                [fieldMaxLength]="300"
+                [fieldMaxLength]="100"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn_line"
@@ -128,8 +129,8 @@
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
                 [formField]="checklistTemplateForm.controls.prefix"
-                leftHint="Campo requerido"
-                [fieldMaxLength]="50"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="30"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
                 fieldHelp="Especifique la abreviación de la plantilla de checklist"
@@ -145,7 +146,7 @@
                 [bordered]="true"
                 [formField]="checklistTemplateForm.controls.reference"
                 leftHint="Campo opcional"
-                [fieldMaxLength]="100"
+                [fieldMaxLength]="50"
                 [showRightHint]="true"
                 [showCloseButton]="true"
                 fieldHelp="Especifique la referencia de la plantilla de checklist"
@@ -551,7 +552,7 @@
                 class="multiple-selection-list__field-container"
                 style="height: calc(100% - 22px);"           
               >
-                <span class="label field__label">Estado del molde para aplicar este chesklist</span>
+                <span class="label field__label">Estado del molde para aplicar este checklist</span>
                 <div
                   class="multiple-selection-list__list-options-container" 
                   style="max-height: 260px;"                 

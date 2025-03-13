@@ -3,28 +3,32 @@
   #questionCard
 >
 <ng-container *ngIf="screen$ | async "></ng-container>
+<ng-container *ngIf="showProfileData$ | async "></ng-container>
+<ng-container *ngIf="updateChecklistComment$ | async "></ng-container>
+<ng-container *ngIf="chartData$ | async "></ng-container>
+
   <mat-card
     class="question-card"
     [ngClass]="{
           'question-alarmed': item.alarmed,
           'lagacy-alarm': item.alarmed,
-          'question-cancelled': item.status === ChecklistQuestionStatus.CANCELLED || inactive,
+          'question-cancelled': item.state === ChecklistQuestionStatus.CANCELLED || inactive,
       }"
   >
     <div
       @dissolve
       *ngIf="
-        item.status === ChecklistQuestionStatus.CANCELLED ||
-        item.status === ChecklistQuestionStatus.COMPLETED ||
-        item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING ||
+        item.state === ChecklistQuestionStatus.CANCELLED ||
+        item.state === ChecklistQuestionStatus.COMPLETED ||
+        item.state === ChecklistQuestionStatus.ATTACHMENT_MISSING ||
         item.actionRequired
       "
       class="corner"
       [ngStyle]="{
         backgroundColor:
-          item.status === ChecklistQuestionStatus.COMPLETED && !item.alarmed
+          item.state === ChecklistQuestionStatus.COMPLETED && !item.alarmed
             ? 'var(--theme-accent-500)'
-            : item.status === ChecklistQuestionStatus.CANCELLED
+            : item.state === ChecklistQuestionStatus.CANCELLED
             ? 'var(--z-colors-page-card-disabled-background-color)'
             : 'var(--theme-warn-500)'
       }"
@@ -33,22 +37,22 @@
         class="over-icon"
         [ngStyle]="{
           color:
-            item.status === ChecklistQuestionStatus.COMPLETED && !item.alarmed
+            item.state === ChecklistQuestionStatus.COMPLETED && !item.alarmed
               ? 'var(--theme-accent-contrast-500)'
-              : item.status === ChecklistQuestionStatus.CANCELLED
+              : item.state === ChecklistQuestionStatus.CANCELLED
               ? 'var(--z-colors-page-fore)'
               : 'var(--theme-warn-contrast-500)'
         }"
         [svgIcon]="
-          item.status === ChecklistQuestionStatus.COMPLETED
+          item.state === ChecklistQuestionStatus.COMPLETED
             ? 'check'
-            : item.status === ChecklistQuestionStatus.ATTACHMENT_MISSING
+            : item.state === ChecklistQuestionStatus.ATTACHMENT_MISSING
             ? 'attachment_file'
-            : item.status === ChecklistQuestionStatus.CANCELLED
+            : item.state === ChecklistQuestionStatus.CANCELLED
             ? 'block'
             : 'warn_fill'
         "
-        [matTooltipDisabled]="item.status === ChecklistQuestionStatus.COMPLETED"
+        [matTooltipDisabled]="item.state === ChecklistQuestionStatus.COMPLETED"
         [matTooltip]="cornerTooltip"       
         matTooltipClass="tooltip-general"
         matTooltipShowDelay="100"
@@ -64,7 +68,7 @@
                 {{ item.order + 10 }}
               </div>
             </div>
-            <div
+            <!--<div
               *ngIf="showChart" 
               class="mini-chart"
               echarts
@@ -72,11 +76,11 @@
               [style.width.px]="miniChartWidth"
               [style.height.px]="miniChartHeight"
             >
-            </div>
+            </div>-->
             <div class="item-response">              
               <mat-chip-listbox
                 (change)="setAnswer($event)"
-                [disabled]="item.status === ChecklistQuestionStatus.CANCELLED || inactive"
+                [disabled]="item.state === ChecklistQuestionStatus.CANCELLED || inactive"
               >
                 <mat-chip-option value="y" [selected]="item.value === GeneralValues.YES">
                   Si
@@ -100,14 +104,14 @@
           </div>
         </ng-container>      
       </mat-card-header>    
-      <mat-card-footer *ngIf="item.status !== ChecklistQuestionStatus.CANCELLED && !inactive">
+      <mat-card-footer *ngIf="item.state !== ChecklistQuestionStatus.CANCELLED && !inactive">
         <app-question-toolbar 
           (buttonAction)="handleButton($event)"
           [elements]="item.buttons"
         >
         </app-question-toolbar>      
         <span
-          *ngIf="item.required && !inactive && item.status !== ChecklistQuestionStatus.COMPLETED"
+          *ngIf="item.required && !inactive && item.state !== ChecklistQuestionStatus.COMPLETED"
           class="required"
           matTooltip="Respuesta requerida"
           matTooltipClass="tooltip-general"
@@ -116,7 +120,7 @@
           !
         </span>
       </mat-card-footer>
-    </ng-container>
+    </ng-container>    
   </mat-card>
 </div>
 <!-- Templates -->
@@ -134,7 +138,6 @@
       class="question-image"
     >
       <img
-        
         alt="image"
         appImageNotFound
         class="item-image"
@@ -144,31 +147,380 @@
     </div>    
     <div class="question-text">
       <div class="item-text">
-        <p>{{ item.name }}</p>
-      </div>  
-      <div class="item-text">
+        <fieldset 
+          class="field-container"
+          [disabled]="readonly"
+        >
+          <div
+            class="field-container-disabled"
+            *ngIf="readonly"
+          >
+          </div>
+          <div class="item-text-textbox item-text-field">
+            <p class="text-value">{{ item.showNotes === GeneralValues.YES ? item.notes : item.name }} </p>
+            <div class="field-text" *ngIf="item.valueType === HarcodedVariableValueType.NUMERIC_RANGE">
+              <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+                <input
+                  class="field__input"
+                  matInput
+                  [formControl]="inputField"
+                  #byDefault
+                  name="inputField"
+                  [type]="fieldType"
+                />
+                <mat-hint        
+                  *ngIf="errorMessage"
+                  class="field__error field__required"
+                >
+                  <span class="field__required-label">
+                    <strong>{{ errorMessage }}</strong>
+                  </span>
+                </mat-hint>
+                <button
+                  [ngStyle]="{ 'background-color': item.state === ChecklistQuestionStatus.COMPLETED ? 'rgba(0, 0, 0, 0.3)' : 'transparent' }"
+                    style="margin-right: 5px;"
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="completeAnswer()"
+                  >
+                  <mat-icon>check</mat-icon>
+                </button>
+              </mat-form-field>
+                
+            </div> 
+            <div class="field-text" *ngIf="item.valueType === HarcodedVariableValueType.NUMBER || item.valueType === HarcodedVariableValueType.FREE_TEXT">
+              <mat-form-field appearance="fill" class="field__field" style="flex: 1">
+                <input
+                  class="field__input"
+                  matInput
+                  [formControl]="inputField"
+                  #byDefault
+                  name="inputField"
+                  [type]="fieldType"
+                />              
+                <mat-hint        
+                  *ngIf="errorMessage"
+                  class="field__error field__required"
+                >
+                  <span class="field__required-label">
+                    <strong>{{ errorMessage }}</strong>
+                  </span>
+                </mat-hint>
+                <button
+                  [ngStyle]="{ 'background-color': item.state === ChecklistQuestionStatus.COMPLETED ? 'rgba(0, 0, 0, 0.3)' : 'transparent' }"
+                    style="margin-right: 5px;"
+                    matSuffix
+                    mat-icon-button
+                    aria-label="Clear"
+                    (click)="completeAnswer()"
+                  >
+                  <mat-icon>check</mat-icon>
+                </button>
+              </mat-form-field>
+                
+            </div>  
+            <div class="field-text" *ngIf="item.valueType === HarcodedVariableValueType.DATE_AND_TIME || 
+                                          item.valueType === HarcodedVariableValueType.DATE ||
+                                          item.valueType === HarcodedVariableValueType.TIME">
+              <div class="flex-columns">
+                <mat-form-field appearance="fill" class="field__field" style="flex: 1" *ngIf="item.valueType === HarcodedVariableValueType.DATE_AND_TIME || item.valueType === HarcodedVariableValueType.DATE">
+                  <input
+                    class="field__input"
+                    matInput
+                    [formControl]="inputField"
+                    #byDefault
+                    name="byDefaultDate"
+                    [matDatepicker]="byDefaultPicker"
+                  />
+                  <mat-hint
+                    *ngIf="!errorMessage || inputField.value"
+                  >
+                    DD/MM/AAAA
+                  </mat-hint>
+                  <mat-datepicker-toggle
+                    matIconSuffix
+                    [for]="byDefaultPicker"
+                  ></mat-datepicker-toggle>
+                  <mat-datepicker #byDefaultPicker></mat-datepicker>
+                  <mat-error class="field__error field__required">
+                    <mat-icon
+                      class="field__required-icon"
+                      svgIcon="warn_line"
+                    ></mat-icon>
+                    <span class="field__required-label"
+                      ><strong>Error en el formato de la fecha</strong></span
+                    >
+                  </mat-error>
+                  <mat-hint        
+                    *ngIf="errorMessage && !inputField.value"
+                    class="field__error field__required"
+                  >
+                    <span class="field__required-label">
+                      <strong>{{ errorMessage }}</strong>
+                    </span>
+                  </mat-hint>
+                </mat-form-field>
+                <mat-form-field appearance="fill" class="field__field" style="max-width: 110px" *ngIf="item.valueType === HarcodedVariableValueType.DATE_AND_TIME || item.valueType === HarcodedVariableValueType.TIME">
+                  <input
+                    class="field__input"
+                    matInput
+                    [formControl]="inputTimeField"
+                    #byDefault
+                    name="byDefaultTime"
+                    type="time"
+                    style="min-height: 22px"
+                  />
+                  <mat-hint
+                    *ngIf="!errorMessage || inputTimeField.value"
+                  >
+                    HH:MM AM/PM
+                  </mat-hint>             
+                  <mat-hint        
+                    *ngIf="errorMessage && !inputTimeField.value"
+                    class="field__error field__required"
+                  >
+                    <span class="field__required-label">
+                      <strong>Requerido</strong>
+                    </span>
+                  </mat-hint>
+                </mat-form-field>              
+                <button
+                  [ngStyle]="{ 'background-color': item.state === ChecklistQuestionStatus.COMPLETED ? 'rgba(0, 0, 0, 0.3)' : 'transparent' }"
+                  style="margin-right: 5px;"
+                  matSuffix
+                  mat-icon-button
+                  aria-label="Clear"
+                  (click)="completeAnswer()"
+                >
+                  <mat-icon>check</mat-icon>
+                </button>
+              </div>                
+            </div>
+            <div class="field-text" *ngIf="item.valueType === HarcodedVariableValueType.YES_NO || item.valueType === HarcodedVariableValueType.YES_NO_NA">
+              <div class="question-container">              
+                <div class="item-response">              
+                  <mat-chip-listbox
+                    (change)="setAnswer($event)"
+                    [disabled]="item.state === ChecklistQuestionStatus.CANCELLED || inactive"
+                  >
+                    <mat-chip-option value="y" [selected]="item.value === GeneralValues.YES">
+                      Si
+                    </mat-chip-option>
+                    <mat-chip-option value="n" [selected]="item.value === GeneralValues.NO">
+                      No
+                    </mat-chip-option>
+                    <mat-chip-option value="a" [selected]="item.value === GeneralValues.N_A">
+                      No aplica
+                    </mat-chip-option>
+                  </mat-chip-listbox>
+                </div>               
+              </div>              
+            </div>   
+            <div class="field-text" *ngIf="item.valueType === HarcodedVariableValueType.LIST">
+              <div class="question-container">              
+                <div class="item-response">              
+                  <mat-chip-listbox
+                    (change)="setAnswer($event)"
+                    [disabled]="item.state === ChecklistQuestionStatus.CANCELLED || inactive"
+                  >
+                    <mat-chip-option *ngFor="let value of possibleValues" [value]="value.value" [selected]="item.value === value.value">
+                      {{ value.value }}
+                    </mat-chip-option>                  
+                  </mat-chip-listbox>
+                </div>               
+              </div>              
+            </div>              
+          </div>
+        </fieldset>
+        <div class="item-text-textbox value-type" *ngIf="item.showParameters === GeneralValues.YES">
+          <p class="text-value" style="font-weight: 600;">{{ item.friendlyVariableValueType }}</p>        
+          <p class="text-small">Tipo de variable</p>
+          <p class="text-small">Unidad de medida: <strong>{{ item.uomName}} ({{ item.uomPrefix }})</strong></p>
+          <ng-container  *ngIf="item.valueType === HarcodedVariableValueType.NUMERIC_RANGE">          
+            <mat-divider style="margin: 5px 0px;"></mat-divider>
+            <div *ngIf="item.minimum">
+              <span class="text-value">Valor mínimo: <strong>{{ item.minimum }}</strong></span>
+            </div>
+            <div *ngIf="item.maximum">
+              <span class="text-value">Valor máximo: <strong>{{ item.maximum }}</strong></span>
+            </div>
+          </ng-container>          
+        </div>        
+      </div>            
+      <div class="item-micro-text">
         <p>{{ item.variable?.translatedNotes }}</p>
       </div>  
+      <div class="item-text-textbox value-type" style="margin: 5px" *ngIf="item.showLastValue === GeneralValues.YES && !!item.lastValue">          
+        <span class="text-value">Último valor: <strong>{{ item.lastValue }}</strong></span> - <span class="text-value">Fecha de captura: <strong>{{ item.lastValueDate ? _sharedService.capitalization(_sharedService.formatDate(_sharedService.convertUtcTolocal(item.lastValueDate), 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE) : "N/A" }}</strong></span> - <span class="text-value">N° de Checklist: <strong>{{ item.lastChecklistId }}</strong></span> - <span class="text-value">Capturado por: <strong>{{ item.lastValueUser }}</strong></span>
+      </div>
     </div>
-    <div 
-      [ngStyle]="{ 'margin-right': item.required ? '20px' : '2px' }"
-      *ngIf="item.status !== ChecklistQuestionStatus.CANCELLED && !inactive"
+  </div>
+  <div class="checklist-flex" *ngIf="showAttachments" @dissolve>
+    <div style="width: 100%;">
+      <div class="simple-flex select-range" style="flex-direction: column; width: 100%; gap: 0px;">
+        <div class="carrusel-item-title" style="align-self: flex-start;">Adjunto(s): ({{ item.attachments.length }} )</div>
+        <mat-divider style="margin: 5px 0px;width: 100%"></mat-divider>
+        <div class="question-carrusel" cdkScrollable *ngIf="item.attachments?.length > 0" @dissolve>      
+          <div 
+            *ngFor="let attachment of item.attachments; let i = index"
+            class="carrusel-items-container"         
+          >
+              <div class="carrusel-item-title">{{ attachment.index }} de {{ item.attachments?.length }}: {{ attachment.name }}</div>
+              <div class="carrusel-item-file">
+                <img
+                  *ngIf="attachment.containerType === 'image'"
+                  class="carrusel-item-image"
+                  [alt]="attachment.name"
+                  [src]="attachment.image">
+                <iframe
+                  *ngIf="attachment.containerType === 'pdf'"
+                  class="carrusel-item-pdf"  
+                  [src]="attachment.pdfUrl">
+                </iframe>        
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="checklist-flex" *ngIf="showComments" @dissolve>
+    <div style="width: 100%;">
+      <div class="simple-flex">
+        <div class="carrusel-item-title">Comentarios ({{ item.comments.length }} )</div>
+        <button              
+          style="margin-right: 5px;"
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="addingComment = !addingComment"          
+        >
+          <mat-icon>{{ !addingComment ? 'add' : 'delete' }}</mat-icon>
+        </button>
+      </div> 
+      <div *ngIf="addingComment">
+        <mat-form-field appearance="fill" class="field__field">
+          <textarea
+            class="field__input"
+            matInput
+            [formControl]="formField"
+            #selection
+            name="selection"
+            [maxlength]="300"
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="4"
+          ></textarea>
+          <mat-hint class="field__hint" align="end">{{
+              selection?.value.length + " / " + 300 }}
+          </mat-hint>          
+          <button
+            *ngIf="
+              selection?.value.length > 0
+            "
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="formField.setValue('')"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+          <button
+            [disabled]="selection?.value.length === 0"
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="saveComment()"
+          >
+            <mat-icon>save</mat-icon>
+          </button>
+        </mat-form-field>
+
+      </div>
+      <mat-divider style="margin: 5px 0px;width: 100%"></mat-divider>
+      <div class="comments" cdkScrollable>              
+        <div 
+          *ngFor="let comment of item.comments; let i = index"
+          class="carrusel-items-comments"         
+        >
+          <div class="simple-flex" style="margin: 0px 10px">
+            <div class="carrusel-item-title">{{ i + 1 }} de {{ item.comments?.length }}: Comentario por <strong>{{ comment.commentedBy }}</strong></div>
+              <button              
+                style="margin-right: 5px;"
+                matSuffix
+                mat-icon-button
+                aria-label="Clear"
+                (click)="handleRemoveComment(comment.id)"
+                [disabled]="comment.commentedById !== userProfile.id"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>            
+            <div class="carrusel-item-text">
+              {{ comment.comment}}
+            </div>
+            <div class="carrusel-item-bottom">Fecha del comentario {{ comment.commentDate ? _sharedService.capitalization(_sharedService.formatDate(_sharedService.convertUtcTolocal(comment.commentDate), 'EEEE d MMM yyyy hh:mm:ss a'), CapitalizationMethod.FIRST_LETTER_PHRASE) : "N/A" }}
+            </div>          
+        </div>
+      </div>      
+    </div>
+  </div>
+  <div 
+    *ngIf="showChart" 
+    class="checklist-flex"
+  >   
+    <div style="width: 100%;">
+      <div class="simple-flex select-range" style="flex-direction: column; width: 100%; gap: 0px;">
+        <div class="carrusel-item-title" style="align-self: flex-start;">Graficar item(s): ({{ item.chartData.length }} )</div>
+        <mat-divider style="margin: 5px 0px;width: 100%"></mat-divider>
+        <mat-form-field appearance="fill" class="field__field" style="margin: 10px; width: unset;align-self: flex-start;max-height: 70px;">
+          <mat-label>Histórico a graficar</mat-label>
+          <mat-select
+            #selection
+            [formControl]="chartRange"          
+            name="chartRange"           
+            (selectionChange)="handleChartDataSourceSelectionChange($event)"         
+          >
+            <mat-option value="0">Últimos 50 valores</mat-option>
+            <mat-option value="1">Últimos 25 valores</mat-option>
+            <mat-option value="2">Últimos 30 días</mat-option>
+            <mat-option value="3">Últimos 15 días</mat-option>
+            <mat-option value="4">Últimos 7 días</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <div 
+          *ngIf="chartData.length > 0"
+          class="item-text-textbox mini-chart"
+          echarts
+          [options]="chartOption"      
+        >
+        </div>
+        <div 
+          *ngIf="chartData.length === 0"
+          class="item-text-textbox mini-chart"        
+        >
+          No hay datos a graficar...
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="question-toolbar"
+    [ngStyle]="{ 'margin-right': item.required ? '20px' : '2px' }"
+    *ngIf="item.state !== ChecklistQuestionStatus.CANCELLED && !inactive && item.buttons?.length > 0"
+  >
+    <app-question-toolbar
+      (buttonAction)="handleButton($event)"
+      [elements]="item.buttons"
     >
-      <app-question-toolbar 
-        (buttonAction)="handleButton($event)"
-        [elements]="item.buttons"
-      >
-      </app-question-toolbar>      
-      <span
-        *ngIf="item.required && !inactive && item.status !== ChecklistQuestionStatus.COMPLETED"
-        class="required"
-        matTooltip="Respuesta requerida"
-        matTooltipClass="tooltip-general"
-        matTooltipShowDelay="100"
-      >
-        !
-      </span>
-    </div>
-  </div>    
-  
+    </app-question-toolbar>      
+    <span
+      *ngIf="item.required && !inactive && item.state !== ChecklistQuestionStatus.COMPLETED"
+      class="required"
+      matTooltip="Respuesta requerida"
+      matTooltipClass="tooltip-general"
+      matTooltipShowDelay="100"
+    >
+      !
+    </span>
+  </div>  
 </ng-template>

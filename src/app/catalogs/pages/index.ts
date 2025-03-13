@@ -59,4 +59,10 @@ export * from './catalog-recipient-edition'
 export * from './catalog-sigma-types-list';
 export * from './catalog-sigma-type-edition'
 
+export * from './catalog-users-list';
+export * from './catalog-user-edition'
+
+export * from './catalog-queries-list';
+export * from './catalog-query-edition';
+
 export * from './catalogs-home';

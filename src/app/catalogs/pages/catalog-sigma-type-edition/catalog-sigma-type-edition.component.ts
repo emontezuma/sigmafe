@@ -497,8 +497,8 @@ export class CatalogSigmaTypeEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.sigmaType.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.sigmaType.translations.length > 0 ? $localize`Traducciones (${this.sigmaType.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.sigmaType.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.sigmaType.translations?.length > 0 ? $localize`Traducciones (${this.sigmaType.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.sigmaType.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -521,6 +521,7 @@ export class CatalogSigmaTypeEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -534,6 +535,7 @@ export class CatalogSigmaTypeEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -546,7 +548,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -559,7 +562,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -573,7 +577,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -586,7 +591,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -599,7 +605,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -614,6 +621,7 @@ export class CatalogSigmaTypeEditionComponent {
       loading: false,
       disabled: this.sigmaType?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -625,7 +633,8 @@ export class CatalogSigmaTypeEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -803,20 +812,33 @@ export class CatalogSigmaTypeEditionComponent {
         })
       }),
       tap((sigmaTypeData: SigmaTypeDetail) => {
-        if (!sigmaTypeData) return;
+        if (!sigmaTypeData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/sigma-types/create');
+          return;
+        }
         this.sigmaType =  sigmaTypeData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.sigmaType.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.sigmaType.translations.length > 0 ? $localize`Traducciones (${this.sigmaType.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.sigmaType.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.sigmaType.translations?.length > 0 ? $localize`Traducciones (${this.sigmaType.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.sigmaType.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.sigmaType.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = sigmaTypeData.translations.length > 0 ? $localize`Traducciones (${sigmaTypeData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = sigmaTypeData.translations?.length > 0 ? $localize`Traducciones (${sigmaTypeData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = sigmaTypeData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = sigmaTypeData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -997,7 +1019,7 @@ export class CatalogSigmaTypeEditionComponent {
   }
 
   processTranslations$(sigmaTypeId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.sigmaType.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.sigmaType.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.sigmaType.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1034,7 +1056,7 @@ export class CatalogSigmaTypeEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addSigmaTypeTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addSigmaTypeTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteSigmaTypeTranslations$(varToDelete) : of(null) 
       ]);
     } else {

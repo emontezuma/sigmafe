@@ -241,7 +241,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
             this.positionsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.positionsData.items);
           }      
         }        
-        this.positionsData.items.length = this.positionsData.totalCount;
+        // this.positionsData.items.length = this.positionsData.totalCount;
         this.positionsCatalogData = new MatTableDataSource<PlantItem>(this.positionsData.items);
         this.positionsCatalogData.paginator = this.paginator;
         // this.positionsCatalogData.sort = this.sort;
@@ -329,6 +329,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -342,7 +343,8 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -357,6 +359,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -371,6 +374,7 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -384,7 +388,8 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -398,7 +403,8 @@ export class CatalogPositionsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

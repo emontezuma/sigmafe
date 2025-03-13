@@ -511,8 +511,8 @@ export class CatalogDepartmentEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.department.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations.length > 0 ? $localize`Traducciones (${this.department.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations?.length > 0 ? $localize`Traducciones (${this.department.translations?.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -535,6 +535,7 @@ export class CatalogDepartmentEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -548,6 +549,7 @@ export class CatalogDepartmentEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -560,7 +562,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -573,7 +576,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -587,7 +591,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -600,7 +605,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -613,7 +619,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -628,6 +635,7 @@ export class CatalogDepartmentEditionComponent {
       loading: false,
       disabled: this.department?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -639,7 +647,8 @@ export class CatalogDepartmentEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -814,21 +823,34 @@ export class CatalogDepartmentEditionComponent {
         })
       }),
       tap((departmentData: DepartmentDetail) => {
-        if (!departmentData) return;
+        if (!departmentData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/departments/create');
+          return;
+        }
         console.log("here")
         this.department =  departmentData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.department.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations.length > 0 ? $localize`Traducciones (${this.department.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.department.translations?.length > 0 ? $localize`Traducciones (${this.department.translations?.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.department.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.department.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = departmentData.translations.length > 0 ? $localize`Traducciones (${departmentData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = departmentData.translations?.length > 0 ? $localize`Traducciones (${departmentData.translations?.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = departmentData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = departmentData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -856,7 +878,7 @@ export class CatalogDepartmentEditionComponent {
         this.departmentForm.controls.mainImageName.setValue(res.fileName);
         this.department.mainImagePath = res.filePath;
         this.department.mainImageGuid = res.fileGuid;
-        this.department.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.department.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde El departamento para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1063,7 +1085,7 @@ export class CatalogDepartmentEditionComponent {
   }
 
   processTranslations$(departmentId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.department.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.department.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.department.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1101,7 +1123,7 @@ export class CatalogDepartmentEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addDepartmentTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addDepartmentTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteDepartmentTranslations$(varToDelete) : of(null) 
       ]);
     } else {

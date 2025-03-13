@@ -20,7 +20,7 @@ export class MoldsHitsEffects {
               ...item,
               data: {
                 ...item.data,                            
-                mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
               }
             }
           });

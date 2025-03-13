@@ -16,6 +16,14 @@
     font-weight: 600;
     font-size: 1.3rem;
     cursor: pointer;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0px;
+    width: max-content;
+    max-width: 150px;
 }
 
 .divider {
@@ -30,6 +38,7 @@
     flex-wrap: nowrap;
     justify-content: flex-end;
     background-color: var(--z-colors-page-shadow);
+    padding: 10px
 }
 
 .title {
@@ -39,6 +48,7 @@
     align-items: center;
     height: 55px;
     padding-top: 10px;
+    padding-left: 10px;
 }
 
 .icon-medium {
@@ -78,6 +88,13 @@
     color: var(--z-colors-page-fore);
 }
 
+.dialog-bottom-message {    
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    padding: 20px;
+    color: var(--z-colors-page-fore);
+}
+
 .container {
     background-color: var(--z-colors-page-background-color);
     color: var(--z-colors-page-fore);
@@ -100,4 +117,15 @@
 
 .title-text {
     margin-left: 10px;
+    font-size: 1.5rem;
 }
+
+.field-items {
+    margin: 10px
+}
+
+.title-with-id {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }

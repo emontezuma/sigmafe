@@ -509,8 +509,8 @@ export class CatalogPlantEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.plant.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations?.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -533,6 +533,7 @@ export class CatalogPlantEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -546,6 +547,7 @@ export class CatalogPlantEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -558,7 +560,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -571,7 +574,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -585,7 +589,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -598,7 +603,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -611,7 +617,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -626,6 +633,7 @@ export class CatalogPlantEditionComponent {
       loading: false,
       disabled: this.plant?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -637,7 +645,8 @@ export class CatalogPlantEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -858,20 +867,33 @@ export class CatalogPlantEditionComponent {
         })
       }),
       tap((plantData: PlantDetail) => {
-        if (!plantData) return;
+        if (!plantData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/plants/create');
+          return;
+        }
         this.plant =  plantData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.plant.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.plant.translations?.length > 0 ? $localize`Traducciones (${this.plant.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.plant.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.plant.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = plantData.translations.length > 0 ? $localize`Traducciones (${plantData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = plantData.translations?.length > 0 ? $localize`Traducciones (${plantData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = plantData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = plantData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -916,7 +938,7 @@ export class CatalogPlantEditionComponent {
         this.plantForm.controls.mainImageName.setValue(res.fileName);
         this.plant.mainImagePath = res.filePath;
         this.plant.mainImageGuid = res.fileGuid;
-        this.plant.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.plant.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la planta para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1115,7 +1137,7 @@ export class CatalogPlantEditionComponent {
 
 
   processTranslations$(plantId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.plant.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.plant.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.plant.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
           st.id === t.id &&
@@ -1153,7 +1175,7 @@ export class CatalogPlantEditionComponent {
         translations: translationsToAdd,
       }
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addPlantTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addPlantTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deletePlantTranslations$(varToDelete) : of(null) 
       ]);
     } else {

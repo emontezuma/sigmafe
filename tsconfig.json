@@ -34,5 +34,10 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
     "strictNullChecks": false
+  },
+  "typescript": {
+    "updateImportsOnPaste": {
+      "enabled": false
+    }
   }
 }

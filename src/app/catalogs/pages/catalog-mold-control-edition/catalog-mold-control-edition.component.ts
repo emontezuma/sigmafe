@@ -138,8 +138,7 @@ export class CatalogMoldControlEditionComponent {
       Validators.required,      
     ),
     serialNumber: new FormControl(
-      '', 
-      Validators.required,      
+      ''
     ),
     startingDate: new FormControl(''),
     provider: new FormControl(emptyGeneralCatalogItem, [ CustomValidators.statusIsInactiveValidator() ]),
@@ -565,7 +564,7 @@ export class CatalogMoldControlEditionComponent {
         const mappedItems = items.map((item) => {
           return {
             isTranslated: item.isTranslated,
-            translatedName: item.translatedName,
+            translatedName: item.translatedName ?? item.name,
             translatedReference: item.translatedReference,
             id: item.id,
             valueRight: item.value,
@@ -1039,6 +1038,7 @@ export class CatalogMoldControlEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -1051,7 +1051,8 @@ export class CatalogMoldControlEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -1065,7 +1066,8 @@ export class CatalogMoldControlEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -1078,7 +1080,8 @@ export class CatalogMoldControlEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -1092,6 +1095,7 @@ export class CatalogMoldControlEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.MACROS,      
     },];
   }
@@ -1584,7 +1588,7 @@ export class CatalogMoldControlEditionComponent {
     if (filterStr) {
       filter = JSON.parse(`{ "and": [ { "data": { "moldId": { "eq": ${filterStr} } } }, { "data": { "status": { "eq": "${RecordStatus.ACTIVE}" } } } ] }`);
     }      
-    const skipRecords = this.maintenances.items.length;    
+    const skipRecords = 0;
     const moldParameters = {
       settingType: 'tables',
       skipRecords, 
@@ -1601,7 +1605,7 @@ export class CatalogMoldControlEditionComponent {
             ...h.data,
             provider: {
               ...h.data.provider,
-              name: h.data.provider.translations.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
+              name: h.data.provider.translations?.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
               isTranslated: h.data.provider.translations.length > 0 && h.data.provider.translations[0].languageId > 0 ? true : false,
             },
             isTranslated: h.isTranslated,
@@ -1658,7 +1662,20 @@ export class CatalogMoldControlEditionComponent {
         })
       }),
       tap((moldData: MoldDetail) => {
-        if (!moldData) return;        
+        if (!moldData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/molds/create');
+          return;
+        }
         this.mold =  moldData;
         //
         this.checklistYellowTemplatesCurrentSelection = [];
@@ -1902,7 +1919,7 @@ export class CatalogMoldControlEditionComponent {
         this.moldForm.controls.mainImageName.setValue(res.fileName);
         this.mold.mainImagePath = res.filePath;
         this.mold.mainImageGuid = res.fileGuid;
-        this.mold.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.mold.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -2264,8 +2281,6 @@ export class CatalogMoldControlEditionComponent {
   getFieldDescription(fieldControlName: string): string {
     if (fieldControlName === 'description') {
       return $localize`Descripción o nombre del molde`
-    } else if (fieldControlName === 'serialNumber') {
-      return $localize`Número de serie del molde`
     } else if (fieldControlName === 'startingDate') {
       return $localize`Fecha de inicio de operaciones`
     } else if (fieldControlName === 'manufacturingDate') {
@@ -2368,7 +2383,7 @@ export class CatalogMoldControlEditionComponent {
   }
 
   processTranslations$(moldId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.mold.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.mold.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.mold.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -2405,7 +2420,7 @@ export class CatalogMoldControlEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteMoldTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2472,7 +2487,7 @@ export class CatalogMoldControlEditionComponent {
       .filter(ct => ct.originalValueRight === null && !!ct.valueRight)
       .map(ct => {
         return {
-          process: SystemTables.CHECKLIST_PLANS_TEMPLATES,
+          process: SystemTables.MOLD_TEMPLATE_GM,
           processId,
           detailTableName: this.entityTable,
           value: ct.valueRight,

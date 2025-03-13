@@ -231,8 +231,8 @@ export class CatalogMoldEditionComponent {
 
   constructor(
     private _store: Store<AppState>,
-    public _sharedService: SharedService,
     private _catalogsService: CatalogsService,
+    public _sharedService: SharedService,
     private _router: Router,
     public _scrollDispatcher: ScrollDispatcher,
     private _route: ActivatedRoute,
@@ -1084,8 +1084,8 @@ export class CatalogMoldEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.mold.translations = [...response.translations];              
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';      
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations?.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations?.length > 0 ? 'accent' : '';      
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });        
@@ -1108,6 +1108,7 @@ export class CatalogMoldEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -1121,6 +1122,7 @@ export class CatalogMoldEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -1133,7 +1135,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -1146,7 +1149,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -1160,7 +1164,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -1173,7 +1178,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -1186,7 +1192,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -1201,6 +1208,7 @@ export class CatalogMoldEditionComponent {
       loading: false,
       disabled: this.mold?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -1212,7 +1220,8 @@ export class CatalogMoldEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -1240,6 +1249,7 @@ export class CatalogMoldEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.MACROS,      
     },];
   }
@@ -1749,7 +1759,7 @@ export class CatalogMoldEditionComponent {
             ...h.data,
             provider: {
               ...h.data.provider,
-              name: h.data.provider.translations.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
+              name: h.data.provider.translations?.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
               isTranslated: h.data.provider.translations.length > 0 && h.data.provider.translations[0].languageId > 0 ? true : false,
             },
             isTranslated: h.isTranslated,
@@ -1806,7 +1816,20 @@ export class CatalogMoldEditionComponent {
         })
       }),
       tap((moldData: MoldDetail) => {
-        if (!moldData) return;        
+        if (!moldData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/molds/create');
+          return;
+        }        
         this.mold =  moldData;
         //
         this.checklistYellowTemplatesCurrentSelection = [];
@@ -1822,16 +1845,16 @@ export class CatalogMoldEditionComponent {
         this.translationChanged = false;
         this.imageChanged = false;        
         this.storedTranslations = JSON.parse(JSON.stringify(this.mold.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations.length > 0 ? 'accent' : '';    
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.mold.translations?.length > 0 ? $localize`Traducciones (${this.mold.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.mold.translations?.length > 0 ? 'accent' : '';    
         this.pendingRecord = true;
         this.updateFormFromData();
         this.changeInactiveButton(this.mold.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = moldData.translations.length > 0 ? $localize`Traducciones (${moldData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = moldData.translations?.length > 0 ? $localize`Traducciones (${moldData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = moldData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = moldData.translations?.length > 0 ? 'accent' : '';
         }
         this.loaded = true;
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
@@ -2058,7 +2081,7 @@ export class CatalogMoldEditionComponent {
         this.moldForm.controls.mainImageName.setValue(res.fileName);
         this.mold.mainImagePath = res.filePath;
         this.mold.mainImageGuid = res.fileGuid;
-        this.mold.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.mold.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el molde para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -2460,7 +2483,7 @@ export class CatalogMoldEditionComponent {
       return $localize`Número de parte`
     } else if (fieldControlName === 'thresholdType') {
       return $localize`Tipo de control`
-    } else if (fieldControlName === 'state') {
+    /* } else if (fieldControlName === 'state') {
       return $localize`Estado del molde`
     } else if (fieldControlName === 'thresholdYellow') {
       return $localize`Umbral de golpes para Advertencia`
@@ -2471,9 +2494,9 @@ export class CatalogMoldEditionComponent {
     } else if (fieldControlName === 'thresholdDateRed') {
       return $localize`Umbral de número de días para ALARMA`
     } else if (fieldControlName === 'recipient') {
-      return $localize`Recipiente`
+      return $localize`Recipiente` */
     }
-    return '';
+    return fieldControlName;
   }
 
   setViewLoading(loading: boolean): void {
@@ -2538,7 +2561,7 @@ export class CatalogMoldEditionComponent {
   }
 
   processTranslations$(moldId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.mold.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.mold.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.mold.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -2575,7 +2598,7 @@ export class CatalogMoldEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addMoldTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteMoldTranslations$(varToDelete) : of(null) 
       ]);
     } else {

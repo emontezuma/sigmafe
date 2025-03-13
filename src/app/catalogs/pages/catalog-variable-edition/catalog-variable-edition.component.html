@@ -81,7 +81,7 @@
                 [bordered]="true"
                 [formField]="variableForm.controls.name"
                 leftHint="Campo requerido"
-                [fieldMaxLength]="300"
+                [fieldMaxLength]="100"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn_line"
@@ -99,8 +99,8 @@
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
                 [formField]="variableForm.controls.prefix"
-                leftHint="Campo requerido"
-                [fieldMaxLength]="50"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="30"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
                 fieldHelp="Especifique la abreviación de la variable"
@@ -116,7 +116,7 @@
                 [bordered]="true"
                 [formField]="variableForm.controls.reference"
                 leftHint="Campo opcional"
-                [fieldMaxLength]="100"
+                [fieldMaxLength]="50"
                 [showRightHint]="true"
                 [showCloseButton]="true"
                 fieldHelp="Especifique la referencia de la variable"
@@ -877,74 +877,9 @@
                 >Especifique el Recipiente a notificar</span
               >
             </fieldset>
-          </div>
-          <!--<div class="field-items">
-            <app-select-field
-              [formField]="variableForm.controls.resetValueMode"
-              [list]="resetValueModes.items"                
-              [fieldRequired]="true"
-              [showRightHint]="true"
-              currentErrorMessage="Este campo no puede estar vacío"
-              currentErrorIcon="warn_line"
-              fieldHelp="Modo de reseteo de la variable"
-            >
-              <span fieldTitle class="label field__label"
-                >Modo de reseteo de la variable</span
-              >
-            </app-select-field>                
-          </div>
-          <div class="field-items">
-            <app-multiple-selection-list
-              [bordered]="true"
-              [showSelect]="true"                  
-              [selectOptions]="moldsOptions"
-              [currentSelections]="moldsCurrentSelection"        
-              [formField]="variableForm.controls.molds"
-              [list]="molds.items"
-              [totalCount]="molds.totalCount"
-              [loading]="molds.loading"                                    
-              [catalog]="SystemTables.MOLDS"                  
-              (multipleSelectionChanged)="handleMultipleSelectionChanged($event)"
-              (getMoreData)="getMoreData($event)"
-            >
-            <span fieldTitle class="label field__label">Moldes donde se puede usar la variable</span>
-            </app-multiple-selection-list>                
-          </div-->
-          <!--<div class="field-items">
-            <app-select-field
-              [formField]="variableForm.controls.automaticActionPlan"                
-              [list]="genYesNoValues.items"                
-              fieldHelp="Especifique si la alarma de esta variable generará notificaciones"
-            >
-              <span fieldTitle class="label field__label"
-                >La alarma de la variable generará planes</span
-              >
-            </app-select-field>                
-          </div>
-          <div class="field-items">
-            <app-multiple-selection-list
-              [bordered]="true"
-              [showSelect]="true"                  
-              [selectOptions]="actionPlansToGenerateOptions"
-              [currentSelections]="actionPlansToGenerateCurrentSelection"        
-              [formField]="variableForm.controls.actionPlansToGenerate"
-              [list]="actionPlansToGenerate.items"
-              [totalCount]="actionPlansToGenerate.totalCount"
-              [loading]="actionPlansToGenerate.loading"                                    
-              [catalog]="SystemTables.TEMPLATE_ACTION_PLANS"
-              placeHolder="Filtrar..."
-              [defaultValue]="multipleSearchDefaultValue"
-              (multipleSelectionChanged)="setEditionButtonsState()"
-              (getMoreData)="getMoreData($event)"
-            >
-            <span fieldTitle class="label field__label">Lista de Planes de acción a generar de forma automática en caso de alarmarse</span>
-            </app-multiple-selection-list>                
-          </div>-->
+          </div>          
         </div>
-
         </mat-expansion-panel> 
-
-        
         <mat-expansion-panel
           (opened)="panelOpenState[2] = true"
           (closed)="panelOpenState[2] = false"

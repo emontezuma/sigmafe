@@ -1,2 +1,2 @@
 export * from './button-menu.component';
-export * from './';
+export * from './button-menu.module';

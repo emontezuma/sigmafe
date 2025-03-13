@@ -18,3 +18,5 @@ export * from './catalogs-shifts.models';
 export * from './catalogs-workgroups.models';
 export * from './catalogs-recipients.models';
 export * from './catalogs-sigma-types.models';
+export * from './catalogs-users.models';
+export * from './catalogs-queries.models';

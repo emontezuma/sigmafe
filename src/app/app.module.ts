@@ -19,21 +19,20 @@ import { NotFoundComponent } from './shared/pages';
 import { reducers } from '../app/state/app.state';
 import { MoldsHitsEffects, MoldsEffects, MoldEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects } from './state/effects';
 import { ImageNotFoundModule, OptionsScrollModule  } from './shared/directives';
-import { SnackComponent, SpinnerModule, GenericDialogComponent, ToolbarComponent, SearchBoxComponent, TranslationsDialogComponent, InputFieldModule, AreaFieldModule, SelectFieldModule, MultipleSelectionListModule, MaintenanceHistoryDialogComponent, AutoCompleteFieldModule } from './shared/components';
+import { SnackComponent, SpinnerModule, GenericDialogModule, TranslationsDialogComponent, InputFieldModule, AreaFieldModule, SelectFieldModule, MultipleSelectionListModule, MaintenanceHistoryDialogComponent, AutoCompleteFieldModule, SearchBoxModule, ToolbarModule, ButtonMenuModule } from './shared/components';
 import { GraphQLModule } from './graphql.module';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginator } from './shared/services';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { InterceptorInterceptor } from './interceptor.interceptor';
-import { ButtonMenuModule } from './shared/components/button-menu/button-menu.module';
+import { NgxScannerQrcodeModule, LOAD_WASM } from 'ngx-scanner-qrcode';
 
-@NgModule({
+LOAD_WASM('assets/wasm/ngx-scanner-qrcode.wasm').subscribe();
+
+@NgModule({  
   declarations: [
     AppComponent,
-    NotFoundComponent,
-    SearchBoxComponent,
-    ToolbarComponent,
-    GenericDialogComponent,
+    NotFoundComponent,            
     TranslationsDialogComponent,
     SnackComponent,
     MaintenanceHistoryDialogComponent,
@@ -55,14 +54,18 @@ import { ButtonMenuModule } from './shared/components/button-menu/button-menu.mo
     StoreModule.forRoot(reducers),
     EffectsModule.forRoot([MoldsHitsEffects, SettingsEffects, ProfileEffects, ColorsEffects, ChecklistFillingEffects, MoldsEffects, MoldEffects ]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode(), autoPause: true }),
-    SpinnerModule,
+    SpinnerModule,    
+    ToolbarModule,        
+    SearchBoxModule,
     ButtonMenuModule,
     GraphQLModule,
     InputFieldModule,
     AreaFieldModule,
     SelectFieldModule,
     MultipleSelectionListModule,
-    AutoCompleteFieldModule,    
+    AutoCompleteFieldModule,
+    GenericDialogModule,
+    NgxScannerQrcodeModule,
   ],
   providers: [
     DatePipe,

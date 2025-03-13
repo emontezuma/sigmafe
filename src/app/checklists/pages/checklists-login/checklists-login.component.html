@@ -1,0 +1,178 @@
+<!--(@routingAnimation.done)="pageAnimationFinished($event)"-->
+<div
+  class="container-animated"  
+  @routingAnimation  
+  i18n
+>
+  <ng-container *ngIf="login$ | async"></ng-container>  
+  <ng-container *ngIf="user$ | async"></ng-container>  
+  <div class="login-container">  
+    <div class="checklist-login">    
+      <div class="login-title" *ngIf="action === 'login'">Inicio de sesión</div>
+      <div class="login-title" *ngIf="action === 'change'">Reiniciar contraseña</div>
+      <div class="login-title" *ngIf="action === 'changePassword'">Cambio de contraseña</div>      
+      <form
+        class="layout"
+        (ngSubmit)="onSubmit()"
+        [formGroup]="loginForm"
+        #f="ngForm"
+      >
+        <div class="user-name" *ngIf="action === 'login'">
+          <mat-form-field appearance="fill" class="field__field" style="width: 100%;">
+            <input
+              class="field__input"
+              [required]="true"        
+              matInput
+              [formControl]="loginForm.controls.userName"
+              #selection
+              name="selection"
+              placeholder="Email o Perfil del usuario"
+              [maxlength]="50"        
+            />
+            <mat-hint class="field__hint" align="start">
+              <span class="field__required-label"
+                ><strong>Email o el perfil de usuario</strong></span
+              >
+            </mat-hint>
+            <mat-error        
+              class="field__error field__required"
+            >
+            <!--<mat-icon
+              class="field__required-icon"
+              svgIcon="warn_line"
+            ></mat-icon>-->
+            <span class="field__required-label"
+              ><strong>Error en el email o en perfil de usuario</strong></span
+            >
+          </mat-error>
+            <button
+              *ngIf="
+                selection?.value.length > 0"
+              style="margin-right: 5px;"
+              matSuffix
+              mat-icon-button
+              aria-label="Clear"
+              (click)="loginForm.controls.userName.setValue('')"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-form-field>
+        </div>
+
+        <div class="user-pass" *ngIf="action === 'login'">
+          <mat-form-field appearance="fill" class="field__field" style="width: 100%;">
+            <input
+              class="field__input"              
+              matInput
+              [formControl]="loginForm.controls.userPass"
+              type="password"                    
+              placeholder="Contraseña"
+              [maxlength]="50"        
+            />
+            <mat-hint class="field__hint" align="start">
+              <span class="field__required-label"
+                ><strong>Contraseña del usuario</strong></span
+              >
+            </mat-hint>
+            <mat-error        
+              class="field__error field__required"
+            >
+            <span class="field__required-label"
+              ><strong>Error en la contraseña del usuario</strong></span
+            >
+          </mat-error>        
+          </mat-form-field>
+        </div>
+
+        <div class="user-pass" *ngIf="action === 'changePassword'">
+          <mat-form-field appearance="fill" class="field__field" style="width: 100%;">
+            <input
+              class="field__input"              
+              matInput
+              [formControl]="loginForm.controls.currentPassword"
+              type="password"                    
+              placeholder="Contraseña"
+              [maxlength]="50"        
+            />
+            <mat-hint class="field__hint" align="start">
+              <span class="field__required-label"
+                ><strong>Contraseña actual</strong></span
+              >
+            </mat-hint>            
+          </mat-form-field>
+        </div>
+
+        <div class="user-pass" *ngIf="action === 'change' || action === 'changePassword'">
+          <mat-form-field appearance="fill" class="field__field" style="width: 100%;">
+            <input
+              class="field__input"              
+              matInput
+              [formControl]="loginForm.controls.newPassword"
+              type="password"                    
+              placeholder="Contraseña"
+              [maxlength]="50"        
+            />
+            <mat-hint class="field__hint" align="start">
+              <span class="field__required-label"
+                ><strong>{{ action === 'change' ? 'Contraseña' : 'Nueva contraseña' }}</strong></span
+              >
+            </mat-hint>
+            <mat-hint class="field__hint" align="end">
+              <span class="field__required-label"
+                ><strong>Política de contraseña: {{ passwordPolicy === "hard" ? "ROBUSTA" : passwordPolicy ===  "basic" ? "Básica" : passwordPolicy === "none" ? '(Ninguna)' : "No definido" }}</strong></span
+              >
+            </mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="user-pass" *ngIf="action === 'change' || action === 'changePassword'">
+          <mat-form-field appearance="fill" class="field__field" style="width: 100%;">
+            <input
+              class="field__input"              
+              matInput
+              [formControl]="loginForm.controls.confirmation"
+              type="password"                    
+              placeholder="Confirmación de la contraseña"
+              [maxlength]="50"        
+            />
+            <mat-hint class="field__hint" align="start">
+              <span class="field__required-label"
+                >Confirmación de la contraseña</span
+              >
+            </mat-hint>
+            <mat-hint                      
+              class="field__error field__required" align="end"
+            >
+            <span class="field__required-label"
+              ><strong>{{ !isValidPassword() ? "Contraseña inválida" : "" }}</strong></span
+            >
+          </mat-hint>        
+          </mat-form-field>
+        </div>
+      </form>      
+    </div>
+    <button
+      mat-button
+      class="toolbar-button"
+
+      [disabled]="loading || (action === 'login' && loginForm.controls.userName.value.length === 0) || 
+                  (action === 'change' && !isValidPassword())"
+      (click)="onSubmit()"        
+    >
+      <mat-icon
+       *ngIf="!loading"
+        class="svgicon icon-medium"
+        [svgIcon]="action === 'login' ? 'admin' : 'lock_closed'"
+      >
+      </mat-icon>
+      <mat-progress-spinner
+        *ngIf="loading"
+        class="spinner-regular-button"
+        diameter="32"
+        mode="indeterminate"
+      >
+      </mat-progress-spinner>
+      <label class="button-label">{{ action === 'login' ? 'Ingresar' : 'Cambiar contraseña' }}</label>
+    </button>    
+  </div>
+</div>

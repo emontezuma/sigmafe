@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { LineButton } from 'src/app/shared/models';
 
 @Component({
   selector: 'app-question-toolbar',
@@ -6,7 +7,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrls: ['./question-toolbar.component.scss']
 })
 export class QuestionToolbarComponent {
-  @Input() elements: any[];
+  @Input() elements: LineButton[];
   @Output() buttonAction = new EventEmitter<string>();;
 
   constructor (    

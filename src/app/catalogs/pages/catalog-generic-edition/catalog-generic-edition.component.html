@@ -15,6 +15,7 @@
   <ng-container *ngIf="updateGeneric$ | async "></ng-container> 
   <ng-container *ngIf="genTablesValues$ | async "></ng-container>  
   <ng-container *ngIf="generic$ | async "></ng-container>    
+  <ng-container *ngIf="updateGenericCatalog$ | async "></ng-container>      
 
   <mat-card class="card">
     <form
@@ -79,7 +80,7 @@
                 [bordered]="true"
                 [formField]="genericForm.controls.name"
                 leftHint="Campo requerido"
-                [fieldMaxLength]="300"
+                [fieldMaxLength]="100"
                 [showRightHint]="true"
                 currentErrorMessage="Este campo no puede estar vacío"
                 currentErrorIcon="warn-line"
@@ -97,8 +98,8 @@
                 [focused]="focusThisField==='prefix'"
                 [bordered]="true"
                 [formField]="genericForm.controls.prefix"
-                leftHint="Campo requerido"
-                [fieldMaxLength]="50"
+                leftHint="Campo opcional"
+                [fieldMaxLength]="30"
                 [showRightHint]="true"                
                 [showCloseButton]="true"
                 fieldHelp="Especifique la abreviación del registro genérico"
@@ -114,7 +115,7 @@
                 [bordered]="true"
                 [formField]="genericForm.controls.reference"
                 leftHint="Campo opcional"
-                [fieldMaxLength]="100"
+                [fieldMaxLength]="50"
                 [showRightHint]="true"
                 [showCloseButton]="true"
                 fieldHelp="Especifique la referencia del registro genérico"

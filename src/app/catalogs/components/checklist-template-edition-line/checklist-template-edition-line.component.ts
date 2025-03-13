@@ -668,6 +668,7 @@ export class ChecklistTemplateEditionLineComponent implements OnChanges, OnDestr
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
           icon: this._sharedService.setIconName(res.fileType), 
+          containerType: this._sharedService.setContainerType(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.line.attachments);    
         this.setEditionButtonsState();

@@ -1,21 +1,37 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ChecklistFillingComponent, ChecklistsHomeComponent } from './pages';
+import { ChecklistFillingComponent, ChecklistsHomeComponent, ChecklistsListComponent, ChecklistsLoginComponent } from './pages';
 import { accessValidationGuard } from '../guards/access-validation.guard';
-import { formDeactivateGuard } from '../guards/form-deactivate.guard';
 
 const routes: Routes = [
   {
     path: '',
     component: ChecklistsHomeComponent,
     data: { animation: 'ChecklistsHomeComponent' },
-    canActivate: [accessValidationGuard],        
-    canDeactivate: [formDeactivateGuard],
     children: [
+      {
+        path: 'list',
+        component: ChecklistsListComponent,
+        data: { animation: 'ChecklistsListComponent', accessType: 'team-member' },        
+        canActivate: [accessValidationGuard],
+      },
+      {
+        path: 'login',
+        component: ChecklistsLoginComponent,
+        data: { animation: 'ChecklistsListComponent' },                
+      },
       {
         path: 'fill/:id',
         component: ChecklistFillingComponent,        
-      },      
+        data: { animation: 'ChecklistsListComponent', accessType: 'team-member' },        
+        canActivate: [accessValidationGuard],
+      },
+      {
+        path: '**',
+        component: ChecklistsListComponent,
+        data: { animation: 'ChecklistsListComponent', accessType: 'team-member' },        
+        canActivate: [accessValidationGuard],
+      },   
     ]
   },
 ];

@@ -1,16 +1,17 @@
 import { Attachment, PageInfo } from "./helpers.models";
+import { GeneralCatalogInternalData } from "./profile.models";
 
 export interface GeneralTranslation {
-    languageId: number;
-    languageName: string;
-    languageIso: string;
-    updatedByUserName: string;
-    updatedAt: string;
-    description: string;
-    name: string;
-    reference: string;
-    notes: string;
-    status: string;
+    languageId?: number;
+    languageName?: string;
+    languageIso?: string;
+    updatedByUserName?: string;
+    updatedAt?: string;
+    description?: string;
+    name?: string;
+    reference?: string;
+    notes?: string;
+    status?: string;
   }
 
 export interface MoldLastMaintenance {
@@ -41,6 +42,8 @@ export interface GeneralCatalogMappedItem {
     translatedNotes?: string;  
     translatedPrefix?: string;
     sortedField?: string;
+    catalogDetailId?:  number;
+    originalValueRight?: number | null;
   }
 
   export interface GeneralMultipleSelcetionItems {    
@@ -48,6 +51,15 @@ export interface GeneralCatalogMappedItem {
     valueRight?: number | null;    
     originalValueRight?: number | null;
     catalogDetailId?:  number;
+    status?: string;
+    selected?: boolean;
+    isTranslated?: boolean;
+    translatedName?: string;
+    translatedDescription?: string;
+    translatedReference?: string;  
+    translatedNotes?: string;  
+    translatedPrefix?: string;
+    sortedField?: string;    
   }
   
 export interface MoldDetail {
@@ -137,31 +149,6 @@ export interface MoldDetail {
     translatedPrefix?: string;
   }
   
-  export interface GeneralCatalogTranslation {
-    id?: number;
-    customerId?: number;
-    isTranslated?: boolean;
-    languageId?: number;
-    name?: string;
-    reference: string;
-    description?: string;
-    notes?: string;
-    prefix?: string;
-    status?: string;
-  }
-
-  export interface GeneralCatalogInternalData {  
-    id?: number;
-    customerId?: number,
-    name?: string;
-    description?: string;
-    reference?: string;
-    notes?: string;
-    prefix?: string;
-    status?: string;
-    translations: GeneralCatalogTranslation[];
-  }
-  
   export interface GqlParameters {
     settingType: string,
     skipRecords?: number,
@@ -174,6 +161,8 @@ export interface MoldDetail {
     process?: string,
     processId?: number,
     companyId?: number,
+    initialized?: string;
+    executeNow?: string;
   }
   
   export interface MoldItem {
@@ -365,6 +354,7 @@ export interface MoldDetail {
     reference?: string;
     notes?: string;
     prefix?: string;
+    valueToAlarm?: string;
     mainImageGuid?: string;
     mainImagePath?: string;
     mainImageName?: string;
@@ -415,8 +405,9 @@ export interface MoldDetail {
   }
 
   export interface ChecklistLine {
-    checklistTemplateId?: number;
-    buttons: []
+    checklistTemplateDetailId?: number;
+    buttons?: LineButton[];
+    data?: any;
     id?: number;
     customerId?: number;
     line?: number;
@@ -428,11 +419,13 @@ export interface MoldDetail {
     variableId?: number;
     recipientId?: number;
     alarmed?: boolean;
+    reset?: boolean;
     name?: string;
     notes?: string;
     minimum?: string;
     maximum?: string;
-    required?: string;
+    valueToAlarm?: string;
+    required?: boolean;
     byDefault?: string;
     allowNoCapture?: string;
     allowComments?: string;
@@ -447,13 +440,20 @@ export interface MoldDetail {
     showChart?: string;
     useVariableAttachments?: string;
     showLastValue?: string;
+    lastAnswer?: string;
+    answeredDate?: string;
+    answersCount?: number;
+    alarmsCount?: number;
     showParameters?: string;
     useVariableSettings?: string;
+    lastValueRecorded?: string;
+    lastValueDate?: string;
     showNotes?: string;
     allowAlarm?: string;
     notifyAlarm?: string;  
     recipient?: GeneralCatalogInternalData,  
     status?: string;
+    state?: string;
     uom?: GeneralCatalogInternalData,
     attachments?: Attachment[];
     attachmentsList?: string;
@@ -461,11 +461,35 @@ export interface MoldDetail {
     friendlyVariableValueType?: string;
     variableAttachments?: Attachment[];
     variable?: VariableDetail;
-    value?: String;
-    text?: String;
-    icon?: String;
+    value?: string;
+    text?: string;
+    icon?: string;
     actionRequired?: boolean;
     attachmentRequired?: boolean;
     attachmentCompleted?: boolean;
+    lastValue?: string;
+    lastValueUser?: string;
+    lastValueAlarmed?: string;
+    lastChecklistId?: string;
+    comments?: ChecklistLineComment[];
+    chartData?: [];
+  }
+
+  export interface ChecklistLineComment {
+    checklistLineId?: number;
+    id?: number;
+    comment?: string;
+    commentDate?: string;    
+    commentedBy?: string;    
+    commentedById?: number;    
+}
+  
+  export interface LineButton {
+    disabled: boolean,
+    type: string;
+    icon: string;
+    tooltip: string;
+    action: string;
+    alarmed: boolean;
   }
   

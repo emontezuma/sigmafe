@@ -211,7 +211,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${item.data.mainImagePath.replace(item.data.mainImageName, item.data.mainImageGuid + '.' + extension)}` : '',                 
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -228,7 +228,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
             this.workgroupsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.workgroupsData.items);
           }      
         }        
-        this.workgroupsData.items.length = this.workgroupsData.totalCount;
+        // this.workgroupsData.items.length = this.workgroupsData.totalCount;
         this.workgroupsCatalogData = new MatTableDataSource<PlantItem>(this.workgroupsData.items);
         this.workgroupsCatalogData.paginator = this.paginator;
         // this.workgroupsCatalogData.sort = this.sort;
@@ -316,6 +316,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -329,7 +330,8 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -344,6 +346,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -358,6 +361,7 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -371,7 +375,8 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -385,7 +390,8 @@ export class CatalogWorkgroupsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

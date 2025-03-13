@@ -219,7 +219,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   uom: {
                     ...item.data.uom,
                     name: item.data.uom?.translations?.length > 0 ? item.data.uom.translations[0].name : item.data.uom?.name,
@@ -232,8 +232,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
                   },
                   sigmaType: {
                     ...item.data.sigmaType,
-                    name: item.data.sigmaType?.translations.length > 0 ? item.data.sigmaType.translations[0].name : item.data.sigmaType?.name,
-                    isTranslated: item.data.sigmaType?.translations.length > 0 ? true : false,
+                    name: item.data.sigmaType?.translations?.length > 0 ? item.data.sigmaType.translations[0].name : item.data.sigmaType?.name,
+                    isTranslated: item.data.sigmaType?.translations?.length > 0 ? true : false,
                   }
                 }
               }
@@ -251,7 +251,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
             this.variablesData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.variablesData.items);
           }      
         }        
-        this.variablesData.items.length = this.variablesData.totalCount;
+        // this.variablesData.items.length = this.variablesData.totalCount;
         this.variablesCatalogData = new MatTableDataSource<VariableItem>(this.variablesData.items);
         this.variablesCatalogData.paginator = this.paginator;
         // this.variablesCatalogData.sort = this.sort;
@@ -339,6 +339,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -352,7 +353,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -367,6 +369,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -381,6 +384,7 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -394,7 +398,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -408,7 +413,8 @@ export class CatalogVariablesListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

@@ -213,7 +213,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                   plant: {
                     ...item.data.plant,
                     name: item.data.plant?.translations?.length > 0 ? item.data.plant.translations[0].name : item.data.plant?.name,
@@ -235,7 +235,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
             this.equipmentsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.equipmentsData.items);
           }      
         }        
-        this.equipmentsData.items.length = this.equipmentsData.totalCount;
+        // this.equipmentsData.items.length = this.equipmentsData.totalCount;
         this.equipmentsCatalogData = new MatTableDataSource<PlantItem>(this.equipmentsData.items);
         this.equipmentsCatalogData.paginator = this.paginator;
         // this.equipmentsCatalogData.sort = this.sort;
@@ -323,6 +323,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -336,7 +337,8 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -351,6 +353,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -365,6 +368,7 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -378,7 +382,8 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -392,7 +397,8 @@ export class CatalogEquipmentsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

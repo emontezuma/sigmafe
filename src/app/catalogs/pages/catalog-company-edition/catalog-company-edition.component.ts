@@ -503,8 +503,8 @@ export class CatalogCompanyEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.company.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.company.translations.length > 0 ? $localize`Traducciones (${this.company.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.company.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.company.translations?.length > 0 ? $localize`Traducciones (${this.company.translations?.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.company.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -527,6 +527,7 @@ export class CatalogCompanyEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -540,6 +541,7 @@ export class CatalogCompanyEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -552,7 +554,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -565,7 +568,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -579,7 +583,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -592,7 +597,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -605,7 +611,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -620,6 +627,7 @@ export class CatalogCompanyEditionComponent {
       loading: false,
       disabled: this.company?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -631,7 +639,8 @@ export class CatalogCompanyEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -647,6 +656,7 @@ export class CatalogCompanyEditionComponent {
       loading: false,
       disabled: !!!this.company.id,
       action: ButtonActions.TRANSLATIONS,      
+      visible: true
     },];
   }
 
@@ -806,20 +816,34 @@ export class CatalogCompanyEditionComponent {
         })
       }),
       tap((companyData: CompanyDetail) => {
-        if (!companyData) return;
+        
+        if (!companyData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/companies/create');
+          return;
+        }
         this.company =  companyData;
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.company.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.company.translations.length > 0 ? $localize`Traducciones (${this.company.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.company.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.company.translations?.length > 0 ? $localize`Traducciones (${this.company.translations?.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.company.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.company.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = companyData.translations.length > 0 ? $localize`Traducciones (${companyData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = companyData.translations?.length > 0 ? $localize`Traducciones (${companyData.translations?.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = companyData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = companyData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -847,7 +871,7 @@ export class CatalogCompanyEditionComponent {
         this.companyForm.controls.mainImageName.setValue(res.fileName);
         this.company.mainImagePath = res.filePath;
         this.company.mainImageGuid = res.fileGuid;
-        this.company.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.company.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la compañía para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1028,7 +1052,7 @@ export class CatalogCompanyEditionComponent {
   }
 
   processTranslations$(companyId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.company.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.company.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.company.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1067,7 +1091,7 @@ export class CatalogCompanyEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addCompanyTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addCompanyTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteCompanyTranslations$(varToDelete) : of(null) 
       ]);
     } else {

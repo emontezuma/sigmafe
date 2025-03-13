@@ -232,7 +232,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
             this.shiftsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.shiftsData.items);
           }      
         }        
-        this.shiftsData.items.length = this.shiftsData.totalCount;
+        // this.shiftsData.items.length = this.shiftsData.totalCount;
         this.shiftsCatalogData = new MatTableDataSource<Object>(this.shiftsData.items);  // PlantItem
         this.shiftsCatalogData.paginator = this.paginator; 
         // this.shiftsCatalogData.sort = this.sort;
@@ -320,6 +320,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -333,7 +334,8 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -348,6 +350,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -362,6 +365,7 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -375,7 +379,8 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -389,7 +394,8 @@ export class CatalogShiftsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

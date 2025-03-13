@@ -8,11 +8,11 @@
         </mat-icon>
         <app-label-ellipsis
           *ngIf="reference"
-          [class]="referenceClass"
+          [class]="referenceClass"          
           [labelInnerHTML]="reference"
         >
         </app-label-ellipsis>
-        <app-label-ellipsis [class]="labelClass" [labelInnerHTML]="label">
+        <app-label-ellipsis [lines]="labelLines" [class]="labelClass" [labelInnerHTML]="label">
         </app-label-ellipsis>
         <button
           *ngIf="showGoToRecord"

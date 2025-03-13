@@ -22,7 +22,7 @@
           fieldHelp="Especifique si la variable se basará en los valores directos del catálogo"
         >
           <span fieldTitle class="label field__label"
-            >¿Tomar los datos del catálogo de variables?</span
+            >¿Tomar los parámetros del catálogo de variables?</span
           >
         </app-select-field>                
       </div>
@@ -510,10 +510,10 @@
         <app-select-field
           [formField]="variableForm.controls.allowComments"
           [list]="genYesNoValues.items"                
-          fieldHelp="Especifique si la variable permite la entrada de comentarios"
+          fieldHelp="Especifique si la variable requiere que se agregue al menos un comentario"
         >
           <span fieldTitle class="label field__label"
-            >¿La variable permite la entrada de comentarios?</span
+            >¿La variable requiere de comentarios?</span
           >
         </app-select-field>                
       </div>

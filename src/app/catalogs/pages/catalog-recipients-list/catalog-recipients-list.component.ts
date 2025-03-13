@@ -228,7 +228,7 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
             this.recipientsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.recipientsData.items);
           }      
         }        
-        this.recipientsData.items.length = this.recipientsData.totalCount;
+       //  this.recipientsData.items.length = this.recipientsData.totalCount;
         this.recipientsCatalogData = new MatTableDataSource<RecipientItem>(this.recipientsData.items);
         this.recipientsCatalogData.paginator = this.paginator;
         // this.recipientsCatalogData.sort = this.sort;
@@ -317,6 +317,7 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -330,7 +331,8 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -345,6 +347,7 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -359,6 +362,7 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -372,7 +376,8 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -386,7 +391,8 @@ export class CatalogRecipientsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

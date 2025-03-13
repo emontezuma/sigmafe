@@ -6,6 +6,7 @@ import { AppState } from 'src/app/state/app.state';
 import { SharedService } from 'src/app/shared/services/shared.service';
 import { SmallFont, SpinnerFonts, SpinnerLimits, ButtonActions, ButtonState, ShowElement, ToolbarControl, Screen } from 'src/app/shared/models';
 import { selectSharedScreen } from 'src/app/state/selectors/screen.selectors';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-toolbar',
@@ -20,6 +21,7 @@ export class ToolbarComponent implements AfterViewInit {
   toolbarHeight: number = 64;
   changeState$: Observable<ButtonState>;
   showSearch$: Observable<ShowElement>;
+  updateButtons$: Observable<boolean>;
   screenData$: Observable<Screen>;
   scrollbarActivated: boolean = false;
   mostRight: number = 0;
@@ -34,6 +36,7 @@ export class ToolbarComponent implements AfterViewInit {
   timeOutCountdown: number = 0;
   everySecond$: Observable<boolean>;
   timeInterval$: Observable<number>;
+  searchField = new FormControl();
 
   intervalSeconds: any;
   classLegacy: string = 'spinner-card-font';
@@ -78,11 +81,33 @@ export class ToolbarComponent implements AfterViewInit {
         this.showSearchBox = searchBox;
       })
     );
+
+    this.updateButtons$ = this._sharedService.updateButtons.pipe(
+      tap((searchBox) => {
+        if (!searchBox) return;
+        let buttonsToLeft = 0;
+        let lastVisible = buttonsToLeft;
+        this.toolbar.elements.forEach((b) => {
+          if (b.alignment === 'left') {
+            buttonsToLeft++
+            if (b.visible) {
+              lastVisible = buttonsToLeft; 
+            }
+          }          
+        })
+        this.toolbar = {
+          ...this.toolbar,
+          buttonsToLeft: lastVisible,
+        }
+      })
+    );
+
+    
     this.changeState$ = this._sharedService.buttonStateChange.pipe(
       tap((buttonState) => {
         const element = this.toolbar.elements.find((element) => {
           return element.action === buttonState.action
-        });
+        }); 
         if (element) {
           element.disabled = !buttonState.enabled;
         }

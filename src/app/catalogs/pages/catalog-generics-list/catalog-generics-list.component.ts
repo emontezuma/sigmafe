@@ -229,7 +229,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
             this.genericsData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.genericsData.items);
           }      
         }        
-        this.genericsData.items.length = this.genericsData.totalCount;
+        // this.genericsData.items.length = this.genericsData.totalCount;
         this.genericsCatalogData = new MatTableDataSource<PlantItem>(this.genericsData.items);
         this.genericsCatalogData.paginator = this.paginator;
         // this.genericsCatalogData.sort = this.sort;
@@ -318,6 +318,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -331,7 +332,8 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -346,6 +348,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -360,6 +363,7 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -373,7 +377,8 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -387,7 +392,8 @@ export class CatalogGenericsListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

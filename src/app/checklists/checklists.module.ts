@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { NGX_ECHARTS_CONFIG, NgxEchartsModule } from 'ngx-echarts';
-
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MaterialModule } from '../material';
-import { ChecklistFillingComponent, ChecklistsHomeComponent } from './pages';
+import { ChecklistFillingComponent, ChecklistsHomeComponent, ChecklistsListComponent, ChecklistsLoginComponent } from './pages';
 import { NgxSkeletonLoaderModule } from 'ngx-skeleton-loader';
 import { ChecklistsRoutingModule } from './checklists-routing.module';
-import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, MultipleSelectionListModule } from '../shared/components';
+import { LabelEllipsisModule, SpinnerModule, ReadonlyFieldModule, MultipleSelectionListModule, GenericDialogModule } from '../shared/components';
 import { IconsModule } from '../shared/icons';
 import { ImageNotFoundModule } from '../shared/directives';
 import { ChecklistFillingItemsComponent, QuestionToolbarComponent } from './components';
@@ -18,6 +18,8 @@ import { ButtonMenuModule } from '../shared/components/button-menu/button-menu.m
     ChecklistsHomeComponent,
     ChecklistFillingItemsComponent,
     QuestionToolbarComponent,
+    ChecklistsListComponent,
+    ChecklistsLoginComponent,
   ],
   imports: [
     CommonModule,
@@ -35,6 +37,9 @@ import { ButtonMenuModule } from '../shared/components/button-menu/button-menu.m
     ImageNotFoundModule,
     ReadonlyFieldModule,
     ButtonMenuModule,
+    ReactiveFormsModule,
+    FormsModule,
+    GenericDialogModule,
   ],
   providers: [
     {

@@ -11,6 +11,7 @@ export class ReadonlyFieldComponent {
   @Input() recordId: string;
   @Input() loading: boolean;
   @Input() label: string;
+  @Input() labelLines: number;
   @Input() subtitle: string;
   @Input() icon: string;
   @Input() reference: string;

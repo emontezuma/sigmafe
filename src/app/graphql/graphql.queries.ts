@@ -2,7 +2,9 @@ import { gql } from 'apollo-angular';
 
 export const GET_MOLDS_HITS = gql`
 query MoldsUnlimited {
-  moldsUnlimited {
+  moldsUnlimited(
+    where: { data: { status: { eq: "active" } } }
+  ) {
     data {
       serialNumber
       description
@@ -406,6 +408,14 @@ export const GET_ALL_WORKGROUPS_TO_CSV = gql`
   }
 `;
 
+export const GET_ALL_USERS_TO_CSV = gql`
+  query ExportUserToCSV {
+    exportUserToCSV {
+        exportedFilename
+        downloadFilename
+    }
+  }
+`;
 
 export const GET_ALL_DEPARTMENTS_TO_CSV = gql`
   query ExportDepartmentToCSV {
@@ -430,6 +440,22 @@ export const GET_ALL_GENERICS_TO_CSV = gql`
     exportGenericToCSV {
         exportedFilename
         downloadFilename
+    }
+  }
+`;
+
+export const GET_ALL_CHECKLIST_LINES_REPORT_TO_CSV = gql`
+  query ExportChecklistReportToCsv (
+    $queryId: Long!,
+    $customerId: Long!
+  ) {
+    exportChecklistReportToCsv (
+      queryId: $queryId,
+      customerId: $customerId,
+      timeZone: 6
+    ) {
+      exportedFilename
+      downloadFilename
     }
   }
 `;
@@ -737,6 +763,34 @@ export const GET_MOLD = gql`
         translatedNotes
         translatedPrefix
         friendlyStatus
+      }
+    }
+  }
+`;
+
+export const GET_MOLD_FAST = gql`
+  query Molds (
+    $filter: MoldFilterInput,
+  ) {
+  molds (
+    where: $filter        
+  ) {
+      items {
+        serialNumber
+        description
+        notes
+        reference
+        hits
+        lastHit
+        state
+        position
+        mainImagePath
+        mainImageGuid
+        mainImageName
+        partNumber {
+          name
+          reference
+        }        
       }
     }
   }
@@ -1129,6 +1183,70 @@ export const GET_VARIABLES = gql`
   }
 `;
 
+export const GET_CATALOG_DETAILS_VARIABLES_LAZY_LOADING = gql`
+  query CatalogDetailVariable (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+  catalogDetailVariable (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
+export const GET_CATALOG_DETAILS_PART_NUMBERS_LAZY_LOADING = gql`
+  query CatalogDetailPartNumber (    
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $filterBy: MultipleCatalogSelectionDtoFilterInput,
+    $process: String,
+    $processId: Long
+  ) {
+  catalogDetailPartNumber (
+    where: $filterBy, 
+    skip: $recordsToSkip, 
+    take: $recordsToTake,
+    process: $process,
+    processId: $processId
+  ) {
+      totalCount
+      items {
+        id
+        catalogDetailId
+        translatedName
+        translatedReference
+        isTranslated
+        value
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }  
+    }
+  }
+`;
+
 export const GET_CHECKLIST_TEMPLATES = gql`
   query ChecklistTemplatesPaginated (
     $recordsToSkip: Int,
@@ -1360,6 +1478,169 @@ export const UPSERT_CHECKLIST_TEMPLATE = gql`
   }
 `;
 
+export const UPSERT_CHECKLIST_STATE = gql`
+  mutation createOrUpdateChecklist (
+    $state: String,
+    $startDate: DateTime,
+    $id: Long,
+    $customerId: Long,    
+    $partial: String,
+    $completed: String,
+    $completedById: Long,
+    $completedDate: DateTime,
+    $rejected: String,
+    $rejectedById: Long,
+    $rejectedDate: DateTime,
+    $approved: String,
+    $approvedById: Long,
+    $approvalDate: DateTime,
+    $alarmNotifiedDate: DateTime,
+    $alarmed: String,
+    $inUse: String,
+    $inUseById: Long,
+    $inUseSince: DateTime,
+    $reassignedToId: Long,
+    $reassignedBy: Long,
+    $reassignedDate: DateTime,    
+    $multiUser: String,      
+  ) {
+  createOrUpdateChecklist (
+  inputs: {
+      id: $id,
+      customerId: $customerId,
+      state: $state,
+      startDate: $startDate,
+      partial: $partial,
+      completed: $completed,
+      completedById: $completedById,
+      completedDate: $completedDate,
+      rejected: $rejected,
+      rejectedById: $rejectedById,
+      rejectedDate: $rejectedDate,
+      approved: $approved,
+      approvedById: $approvedById,
+      approvalDate: $approvalDate,
+      inUse: $inUse,
+      inUseById: $inUseById,
+      inUseSince: $inUseSince,
+      reassignedToId: $reassignedToId,
+      reassignedBy: $reassignedBy,
+      reassignedDate: $reassignedDate,    
+      multiUser: $multiUser,    
+      alarmNotifiedDate: $alarmNotifiedDate,
+      alarmed: $alarmed,
+  }) {
+      id
+      state
+      status
+      startDate
+      requiresApproval
+      createdAt
+      updatedAt
+      deletedAt
+      updatedBy {
+        name
+      }
+      reassignedTo {
+        name,
+        id
+      }
+      assignedTo {
+        name,
+        id
+      }
+      inUseBy {
+        name,
+        id
+      }
+    } 
+  }
+`;
+
+export const UPSERT_CHECKLIST_COMMENT = gql`
+  mutation createOrUpdateChecklistComment
+ (
+    $id: Long,
+    $customerId: Long,
+    $status: String,
+    $commentDate: DateTime,
+    $commentById: Long,
+    $comment: String,  
+    $checklistLineId: Long,  
+  ) {
+  createOrUpdateChecklistComment (
+  inputs: {
+      id: $id,
+      customerId: $customerId,      
+      status: $status,     
+      commentDate: $commentDate,
+      commentById: $commentById,
+      comment: $comment,
+      checklistLineId: $checklistLineId,              
+  }) {
+      id
+      status
+      comment
+      commentDate
+      checklistLineId
+      commentBy {
+        name,
+        id
+      }      
+    } 
+  }
+`;
+
+export const UPSERT_CHECKLIST_PARTIALLY = gql`
+  mutation createOrUpdateChecklist (
+    $value: String,
+    $alarmed: String,
+    $alarmedDate: DateTime,
+    $answeredDate: DateTime,          
+    $lastAnswer: date,          
+    $answersCount: date,
+    $alarmsCount: date,
+    $id: Long,
+    $customerId: Long,    
+    $state: strijg
+  ) {
+  createOrUpdateChecklist (
+  inputs: {
+      id: $id,
+      customerId: $customerId,
+      partial: $state,
+      startDate: $startDate,
+  }) {
+      id
+      state
+      status
+      startDate
+      requiresApproval
+      createdAt
+      updatedAt
+      deletedAt
+      updatedBy {
+        name
+      }
+    } 
+  }
+`;
+
+export const UPSERT_CHECKLIST_LINES = gql`
+  mutation CreateOrUpdateChecklistLine (
+    $checklistLines: [ChecklistLineDtoInput!]!    
+  ) {
+    createOrUpdateChecklistLine (
+      inputs: $checklistLines
+    ) {
+      id,
+      checklistId,
+      customerId,
+      line,      
+    }
+  }
+`;
+
 export const UPSERT_CHECKLIST_PLAN = gql`
   mutation CreateOrUpdateChecklistPlan (
     $customerId: Long,
@@ -1419,6 +1700,7 @@ export const UPSERT_VARIABLE = gql`
     $id: Long,
     $status: String    
     $name: String,
+    $valueToAlarm: String,
     $reference: String,
     $notes: String,
     $valueType: String,
@@ -1466,6 +1748,7 @@ export const UPSERT_VARIABLE = gql`
       allowNoCapture: $allowNoCapture,
       automaticActionPlan: $automaticActionPlan,
       actionPlansToGenerate: $actionPlansToGenerate,
+      valueToAlarm: $valueToAlarm,
       possibleValues: $possibleValues,
       byDefaultDateType: $byDefaultDateType,
       byDefault: $byDefault,
@@ -1758,6 +2041,7 @@ export const GET_VARIABLE = gql`
       applyRange
       minimum
       maximum
+      valueToAlarm
       required
       byDefault
       allowNoCapture
@@ -2123,6 +2407,74 @@ export const GET_CHECKLIST_TEMPLATE = gql`
 }
 `;
 
+export const GET_CHECKLISTS = gql`
+  query ChecklistsPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedChecklistDtoSortInput!],
+    $filterBy: TranslatedChecklistDtoFilterInput,
+  ) {
+  checklistsPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        friendlyState
+        friendlyGenerationMode
+        friendlyFrequency
+        data {
+          id
+          name
+          reference
+          notes
+          prefix
+          customerId
+          startDate
+          completed
+          department {
+            id
+            name
+            translations {
+              name
+              languageId
+            }
+          }
+          workgroup {
+            id
+            name
+            translations {
+              name
+              languageId
+            }
+          }
+          assignedTo {
+            id
+            name
+          }
+          reassignedTo {
+            id
+            name
+          }
+          checklistTemplate {
+            mainImagePath
+            mainImageGuid
+            mainImageName
+          }
+          
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
 export const GET_CHECKLIST = gql`
   query oneChecklist ($checklistId: Long!) {
     oneChecklist (id: $checklistId) {      
@@ -2145,7 +2497,18 @@ export const GET_CHECKLIST = gql`
         startDate
         timeToFill
         moldId
+        status
+        state
+        allowExpiring
+        allowDiscard
+        allowPartialSaving
+        allowReassignment
+        requiresApproval
+        completed
         checklistTemplateId
+        requiresActivation
+        allowRestarting
+        partial
         mold {
           description
           reference
@@ -2161,10 +2524,43 @@ export const GET_CHECKLIST = gql`
             assignedToId
           }
         }
+        assignedTo {
+            name
+            id
+        }
+        reassignedTo {
+            name
+            id
+        }
+        workgroup {
+            name
+            id
+        }
+        department {
+            name
+            id
+        }
       }    
     }
   }
 `;
+
+export const GET_CHECKLIST_IN_USE = gql`
+  query oneChecklist ($checklistId: Long!) {
+    oneChecklist (id: $checklistId) {      
+       data {
+        inUseBy {
+          name
+          email
+          phone
+        }
+        inUse
+        inUseSince        
+      } 
+    }
+  }
+`;
+
 
 export const GET_CHECKLIST_TEMPLATE_DETAILS = gql`
 query ChecklistTemplateDetailsUnlimited (
@@ -2181,6 +2577,7 @@ query ChecklistTemplateDetailsUnlimited (
           variableId
           minimum
           maximum
+          valueToAlarm
           required
           byDefault
           allowNoCapture
@@ -2195,6 +2592,7 @@ query ChecklistTemplateDetailsUnlimited (
           showNotes
           showLastValue
           showParameters
+          showLastValue
           useVariableSettings
           useVariableAttachments
           id
@@ -2224,6 +2622,20 @@ query ChecklistTemplateDetailsUnlimited (
             valueType
             notes
             prefix
+            minimum
+            maximum
+            required
+            valueToAlarm
+            byDefault
+            allowNoCapture
+            allowComments
+            showChart
+            allowAlarm
+            notifyAlarm
+            recipientId
+            possibleValues        
+            notes
+            showNotes
             id
             status          
             translations {
@@ -2278,12 +2690,12 @@ query ChecklistLinesUnlimited (
             plannedDate
             alarmed
             alarmedDate
+            answersCount
+            alarmsCount
             answeredDate
             isAutonomous
             sensorId
             lastAnswer
-            answersCount
-            alarmsCount
             actionPlan
             actionPlanExists
             resetedById
@@ -2467,6 +2879,57 @@ export const GET_CHECKLIST_PLAN_TRANSLATIONS = gql`
 }
 `;
 
+export const GET_LAST_CHCEKLIST_MOLD_VALUE = gql`
+  query ChecklistLines (
+      $filterBy: ChecklistLineFilterInput,
+      $recordsToTake: Int,
+  ) {
+    checklistLines (
+    take: $recordsToTake,
+    where: $filterBy, 
+    order: { answeredDate: DESC }    
+  ) {
+      items {
+        value
+        id
+        alarmed
+        answeredDate
+        variableId
+        checklist {
+          id
+          assignedTo {
+              name
+          }
+        }              
+      }      
+    }
+  }
+`;
+
+export const GET__CHCEKLIST_LINE_COMMENTS = gql`
+  query ChecklistComments (
+      $filterBy: ChecklistCommentFilterInput,      
+  ) {
+    checklistComments (    
+    where: $filterBy, 
+    order: { commentDate: DESC }    
+  ) {
+      totalCount
+      items {
+        id
+        checklistLineId
+        comment
+        commentDate
+        commentById
+        commentBy {
+            name
+            id
+        }        
+      }   
+    }
+  }
+`;
+
 export const INACTIVATE_CHECKLIST_TMEPLATE = gql`
   mutation CreateOrUpdateChecklistTemplate (
     $id: Long,
@@ -2502,6 +2965,25 @@ export const INACTIVATE_CHECKLIST_PLAN = gql`
     } 
   }
 `;
+
+export const EXECUTE_NOW_CHECKLIST_PLAN = gql`
+  mutation CreateOrUpdateChecklistPlan (
+    $id: Long,
+    $customerId: Long,
+    $executeNow: String
+  ) {
+  createOrUpdateChecklistPlan (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      executeNow: $executeNow
+    }) {
+      id
+      executeNow
+    } 
+  }
+`;
+
 
 export const INACTIVATE_COMPANY = gql`
   mutation CreateOrUpdateCompany (
@@ -2752,7 +3234,7 @@ export const GET_CATALOG_DETAILS_USERS_LAZY_LOADING = gql`
         catalogDetailId
         translatedName
         translatedReference
-        isTranslated
+        isTranslated        
         value
       }
       pageInfo {
@@ -2932,6 +3414,91 @@ export const DELETE_CUSTOMER_TRANSLATIONS = gql`
       customerId: $customerId,
     ) 
   }
+`;
+
+
+export const GET_USERS = gql`
+  query UsersPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedUserDtoSortInput!],
+    $filterBy: TranslatedUserDtoFilterInput,
+  ) {
+  usersPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          name
+          reference
+          email
+          roles
+          passwordPolicy
+          mainImagePath
+          mainImageName
+          mainImageGuid
+          id         
+          status
+          updatedAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query OneUser  (
+    $userId: Long!,
+  ) {
+  oneUser (
+    id: $userId        
+  ) {
+    data {
+      name
+      reference      
+      email
+      roles
+      mainImageGuid
+      mainImageName
+      mainImagePath     
+      passwordPolicy
+      id
+      customerId
+      approver {
+        id
+        customerId
+        name
+        status        
+      }
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+    }
+    friendlyStatus
+  }
+}
 `;
 
 //manufacturers================================================
@@ -4175,8 +4742,6 @@ query UploadedFiles (
 `
   ;
 
-  //=======uoms
-
 
 export const GET_UOM = gql`
   query OneUom (
@@ -4901,7 +5466,9 @@ export const GET_PART_NUMBER = gql`
       dieId
       id
       customerId
-     
+      mainImagePath
+      mainImageGuid
+      mainImageName
       status
       createdById
       createdAt
@@ -5072,8 +5639,8 @@ export const DELETE_PART_NUMBER_TRANSLATIONS = gql`
     deletePartNumbersTranslationsTable (      
       ids: $ids,
       customerId: $customerId,
-    
-    ) 
+      ) 
+      
   }
 `;
 
@@ -5497,7 +6064,7 @@ export const UPSERT_GENERIC = gql`
     $name: String,
     $prefix: String,
     $reference: String,
-    $notes: String,
+    $notes: String,    
     $tableName: String,
   ) {
   createOrUpdateGeneric (
@@ -5509,7 +6076,7 @@ export const UPSERT_GENERIC = gql`
       prefix: $prefix,
       reference: $reference,
       notes: $notes,
-      tableName: $tableName,
+      tableName: $tableName,      
     }]) {
       id
       createdAt
@@ -5701,6 +6268,52 @@ export const GET_WORKGROUP_TRANSLATIONS = gql`
 }
 `;
 
+export const GET_USER_TRANSLATIONS = gql`
+  query UsersTranslationsTable (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [UserTranslationTableSortInput!],
+    $filterBy: UserTranslationTableFilterInput,
+  ) {
+    usersTranslationsTable(
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+    totalCount
+    items {
+        userId
+        name
+        reference
+        notes
+        languageId
+        id
+        customerId
+        status
+        createdById
+        createdAt
+        updatedById
+        updatedAt
+        deletedById
+        deletedAt
+        language {
+            name
+            reference
+            id
+            iso
+        }
+        updatedBy {
+          name
+        }
+    }
+    pageInfo {
+        hasNextPage
+        hasPreviousPage
+    }      
+  }
+}
+`;
 export const UPSERT_WORKGROUP_TRANSLATIONS = gql`
   mutation CreateOrUpdateWorkgroupTranslationTable (
     $translations: [WorkgroupTranslationTableDtoInput!]!    
@@ -5710,6 +6323,20 @@ export const UPSERT_WORKGROUP_TRANSLATIONS = gql`
     ) {
       id,
       workgroupId,
+      languageId      
+    }
+  }
+`;
+
+export const UPSERT_USER_TRANSLATIONS = gql`
+  mutation CreateOrUpdateUserTranslationTable (
+    $translations: [UserTranslationTableDtoInput!]!    
+  ) {
+    createOrUpdateUserTranslationTable (
+      inputs: $translations
+    ) {
+      id,
+      userId,
       languageId      
     }
   }
@@ -5763,6 +6390,52 @@ export const UPSERT_WORKGROUP = gql`
   }
 `;
 
+export const UPSERT_USER = gql`
+  mutation CreateOrUpdateUser (
+    $customerId: Long,
+  
+    $id: Long,
+    $status: String    
+    $name: String,
+    $email: String,
+    $roles: String,
+    $approverId: Long,    
+    $mainImageGuid: String,
+    $mainImageName: String,
+    $mainImagePath: String,   
+    $passwordPolicy: String,    
+  ) {
+  createOrUpdateUser (
+    inputs: [{
+      customerId: $customerId
+     
+      id: $id      
+      status: $status
+      name: $name,
+      email: $email,
+      roles: $roles,
+      mainImageGuid: $mainImageGuid,
+      mainImageName: $mainImageName,
+      mainImagePath: $mainImagePath,
+      approverId: $approverId,
+      passwordPolicy: $passwordPolicy  
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
 
 export const DELETE_WORKGROUP_TRANSLATIONS = gql`
   mutation DeleteWorkgroupsTranslationsTable (
@@ -5771,6 +6444,19 @@ export const DELETE_WORKGROUP_TRANSLATIONS = gql`
   
   ) {
     deleteWorkgroupsTranslationsTable (      
+      ids: $ids,
+      customerId: $customerId,    
+    ) 
+  }
+`;
+
+export const DELETE_USER_TRANSLATIONS = gql`
+  mutation DeleteUsersTranslationsTable (
+    $ids: [IdToDeleteInput!]!,
+    $customerId: Long!
+  
+  ) {
+    deleteUsersTranslationsTable (      
       ids: $ids,
       customerId: $customerId,    
     ) 
@@ -5788,6 +6474,43 @@ export const INACTIVATE_WORKGROUP = gql`
       id: $id
       customerId: $customerId
       status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+export const INACTIVATE_USER = gql`
+  mutation CreateOrUpdateUser (
+    $id: Long,
+    $customerId: Long,    
+    $status: String
+  ) {
+  createOrUpdateUser (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+
+export const UPDATE_PASSWOPRD_USER = gql`
+  mutation CreateOrUpdateUser (
+    $id: Long,
+    $customerId: Long,    
+    $initialized: String
+  ) {
+  createOrUpdateUser (
+    inputs: {
+      id: $id
+      customerId: $customerId
+      initialized: $initialized
     }) {
       id
       status
@@ -6644,6 +7367,176 @@ export const INACTIVATE_SIGMATYPE = gql`
       id
       status
     } 
+  }
+`;
+
+export const GET_QUERY = gql`
+  query OneUserDefinedQuery (
+    $queryId: Long!,
+  ) {
+  oneUserDefinedQuery (
+    id: $queryId        
+  ) {
+    data {
+      name
+      id
+      alarmed
+      partNumbers
+      molds
+      variables
+      byDefault
+      public
+      checklistState
+      customerId
+      periodTime
+      toDate
+      fromDate
+      status
+      createdById
+      createdAt
+      updatedById
+      updatedAt
+      deletedById
+      deletedAt
+      userId
+      
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }      
+      user {
+            name
+        }  
+    }
+    friendlyStatus    
+  }
+}
+`;
+
+export const GET_QUERIES = gql`
+  query UserDefinedQueriesPaginated (
+    $recordsToSkip: Int,
+    $recordsToTake: Int,
+    $orderBy: [TranslatedUserDefinedQueryDtoSortInput!],
+    $filterBy: TranslatedUserDefinedQueryDtoFilterInput,
+  ) {
+  userDefinedQueriesPaginated (
+    skip: $recordsToSkip,
+    take: $recordsToTake,
+    order: $orderBy,
+    where: $filterBy
+  ) {
+      items {
+        friendlyStatus
+        data {
+          
+          name
+          public
+          byDefault
+          id
+          customerId
+          
+          status
+          updatedAt
+          updatedBy {
+            name
+          }   
+          user {
+              name
+          }       
+        }
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+      }    
+      totalCount    
+    }
+  }
+`;
+
+
+export const UPSERT_QUERY = gql`
+  mutation CreateOrUpdateUserDefinedQuery (
+    $customerId: Long,
+    $id: Long,
+    $status: String    
+    $name: String,
+    $byDefault: String,
+    $public: String,
+    $partNumbers: String,
+    $variables: String,
+    $molds: String,
+    $checklistState: String,
+    $alarmed: String,
+    $fromDate: DateTime,
+    $toDate: DateTime,
+    $periodTime: String,
+  ) {
+  createOrUpdateUserDefinedQuery (
+    inputs: [{
+      customerId: $customerId
+      id: $id      
+      status: $status
+      name: $name,
+      byDefault: $byDefault,
+      public: $public,
+      partNumbers: $partNumbers,
+      variables: $variables,
+      molds: $molds,
+      alarmed: $alarmed,
+      checklistState: $checklistState,
+      fromDate: $fromDate,
+      toDate: $toDate,
+      periodTime: $periodTime    
+    }]) {
+      id
+      createdAt
+      updatedAt
+      deletedAt
+      createdBy {
+        name
+      }
+      updatedBy {
+        name
+      }
+      deletedBy {
+        name
+      }  
+    } 
+  }
+`;
+
+
+export const INACTIVATE_QUERY = gql`
+  mutation CreateOrUpdateUpdateUserDefinedQuery (
+    $id: Long,
+    $customerId: Long,    
+    $status: String
+  ) {
+  createOrUpdateUpdateUserDefinedQuery (
+    inputs: {
+      id: $id
+      customerId: $customerId      
+      status: $status
+    }) {
+      id
+      status
+    } 
+  }
+`;
+
+export const GET_ALL_QUERIES_TO_CSV = gql`
+  query ExportUserDefinedQueryToCSV {
+    exportUserDefinedQueryToCSV {
+        exportedFilename
+        downloadFilename
+    }
   }
 `;
 

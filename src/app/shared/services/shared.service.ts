@@ -1,14 +1,16 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, interval } from 'rxjs';
-import { SearchBox, ShowElement, ToolbarControl, ToolbarElement, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, } from '../models/screen.models';
+import { BehaviorSubject, Observable, Subject, combineLatest, interval, of } from 'rxjs';
+import { SearchBox, ShowElement, ToolbarControl, GoTopButtonStatus, AnimationStatus, ButtonActions, ToolbarButtonClicked, SnackMessage, ButtonState, dialogByDefaultButton } from '../models/screen.models';
 import { DatePipe } from '@angular/common';
 import { Attachment, CapitalizationMethod, DatesDifference, RecordStatus } from '../models/helpers.models';
-import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_MOLDS, GET_PLANTS_LAZY_LOADING } from '../../graphql/graphql.queries';
+import { GET_HARDCODED_VALUES, GET_LANGUAGES_LAZY_LOADING, GET_USER, GET_USERS } from '../../graphql/graphql.queries';
+import { MatDialog } from '@angular/material/dialog';
 import { Apollo } from 'apollo-angular';
 import { environment } from 'src/environments/environment';
 import { Store } from '@ngrx/store';
 import { AppState, updateMoldsHitsData } from 'src/app/state';
-import { GqlParameters } from '../models';
+import { GqlParameters, ProfileData } from '../models';
+import { GenericDialogComponent } from 'src/app/shared/components';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +28,7 @@ export class SharedService {
   });
   toolbarAction: Observable<ToolbarButtonClicked> = this.toolbarActionBehaviorSubject.asObservable();
 
-  private buttonStateChangeBehaviorSubject: BehaviorSubject<ButtonState> = new BehaviorSubject<ButtonState>({ action: undefined, enabled: true });
+  private buttonStateChangeBehaviorSubject: Subject<ButtonState> = new Subject<ButtonState>();
   buttonStateChange: Observable<ButtonState> = this.buttonStateChangeBehaviorSubject.asObservable();
 
   private snackMessageBehaviorSubject: BehaviorSubject<SnackMessage> = new BehaviorSubject<SnackMessage>({ 
@@ -39,9 +41,24 @@ export class SharedService {
     showProgressBar: true,
   });
   snackMessage: Observable<SnackMessage> = this.snackMessageBehaviorSubject.asObservable();
+
+  private showUserprofileBehaviorSubject: BehaviorSubject<ProfileData> = new BehaviorSubject<ProfileData>({ 
+    id: null,
+    customerId: null,
+    languageId: null,
+    animate: true,
+    name: '',
+    roles: '',
+    mainImage: '',
+    email: '',
+  });
+  showProfileData: Observable<ProfileData> = this.showUserprofileBehaviorSubject.asObservable();
   
   private showSearchBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showSearch: Observable<ShowElement> = this.showSearchBehaviorSubject.asObservable();
+
+  private updateButtonsBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  updateButtons: Observable<boolean> = this.updateButtonsBehaviorSubject.asObservable();
 
   private showLoaderBehaviorSubject: BehaviorSubject<ShowElement> = new BehaviorSubject<ShowElement>({ from: '', show: false });
   showLoader: Observable<ShowElement> = this.showLoaderBehaviorSubject.asObservable();
@@ -94,10 +111,16 @@ export class SharedService {
   private scrollbarInToolbarBehaviorSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>( false );
   scrollbarInToolbar: Observable<boolean> = this.scrollbarInToolbarBehaviorSubject.asObservable();
 
+  isAuthenticated: boolean = false;
+  userRoles: string = 'team-member';
+  changingPassword: boolean = false;
+  currentProfile: ProfileData;
+
   constructor (    
     public _datePipe: DatePipe,
     private _apollo: Apollo,
     private _store: Store<AppState>,
+    public _dialog: MatDialog,
   ) {}
 
 // Functions ================
@@ -115,6 +138,21 @@ export class SharedService {
 
   setSearchBox(from: string, showSearchBox: boolean) {
     this.showSearchBehaviorSubject.next({ from, show: showSearchBox });
+  }
+
+  setProfileData(profile: ProfileData) {
+    this.isAuthenticated = profile && profile?.id !== null;
+    this.userRoles = profile ? profile?.roles : '';
+    this.currentProfile = profile;
+    this.showUserprofileBehaviorSubject.next(profile);
+  }
+
+  setChangingPassword(changingPassword: boolean) {
+    this.changingPassword = changingPassword;
+  }
+
+  setUpdateButtons(updateButton: boolean) {
+    this.updateButtonsBehaviorSubject.next(updateButton);
   }
 
   setGeneralLoading(from: string, showLoading: boolean) {
@@ -436,7 +474,7 @@ export class SharedService {
     });
   }
 
-  getlanguagesLazyLoadingDataGql$(variables: any): Observable<any> {
+  getLanguagesLazyLoadingDataGql$(variables: any): Observable<any> {
     return this._apollo.watchQuery({ 
       query: GET_LANGUAGES_LAZY_LOADING,
       variables,
@@ -463,9 +501,27 @@ export class SharedService {
 
 
   //==============================
+
+  getUserDataGql$(parameters: any): Observable<any> {
+      const userId = { userId: parameters.userId };
+  
+    return combineLatest([
+      this._apollo.query({
+        query: GET_USER,
+        variables: userId,
+      }),
+
+    of(null)
+        /* this._apollo.query({
+          query: GET__TRANSLATIONS,
+          variables,
+        }) */
+    ]);
+  }
+  
   
   setGraphqlGen(genParameters: GqlParameters): any {
-    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process, customerId, companyId } = genParameters;
+    const { settingType, skipRecords, takeRecords, filter, order, id, status, processId, process, customerId, companyId, initialized, executeNow } = genParameters;
 
     if (settingType === 'multiSelection') {
       return {
@@ -488,6 +544,18 @@ export class SharedService {
         id,
         customerId,
         status
+      };      
+    } else if (settingType === 'initPassword') {
+      return { 
+        id,
+        customerId,
+        initialized,
+      }; 
+    } else if (settingType === 'executeNow') {
+      return { 
+        id,
+        customerId,
+        executeNow,
       };      
     } else if (settingType === 'statusCustomer') {
       return { 
@@ -529,6 +597,7 @@ export class SharedService {
         image: `${environment.serverUrl}/files/${t.path}`,
         id: t.fileId,
         icon: this.setIconName(t.fileType),
+        containerType: this.setContainerType(t.fileType),
       }
     });
   }
@@ -544,7 +613,73 @@ export class SharedService {
     return 'faq';
   }
 
+  setContainerType(fileType: string): string {
+    if (fileType.toLowerCase().indexOf('pdf') > -1) {
+      return 'pdf'
+    } else if (fileType.toLowerCase().indexOf('video') > -1) {
+      return 'video'
+    }
+    return 'image';
+  }
+
+  showDialogWithNoAnswer(title: string, message: string, bottomMessage: string = '', topIcon: string = 'problems', width: string = '450px', panelClass: string = null): void {    
+    const dialogResponse = this._dialog.open(GenericDialogComponent, {
+      width,
+      disableClose: false,
+      panelClass, 
+      data: {
+        title: $localize`${title}`,
+        topIcon,
+        defaultButtons: dialogByDefaultButton.ACCEPT,
+        buttons: [],
+        body: {
+          message,
+          bottomMessage
+        },
+        showCloseButton: true,
+      },
+    });
+    dialogResponse.afterClosed().subscribe((response) => {
+    });    
+  }
   
+  getUsersDataGql$(recordsToSkip: number = 0, recordsToTake: number = 50, orderBy: any = null, filterBy: any = null): Observable<any> {
+    const variables = {
+      ...(recordsToSkip !== 0) && { recordsToSkip },
+      ...(recordsToTake !== 0) && { recordsToTake },
+      ...(orderBy) && { orderBy },
+      ...(filterBy) && { filterBy },
+    }
+
+    return this._apollo.watchQuery({
+      query: GET_USERS,
+      variables
+    }).valueChanges
+  }
+
+  userIsAuthenticated() : boolean {
+    return this.isAuthenticated;
+  }
+  
+  getUserProfile() : ProfileData {
+    return this.currentProfile;
+  }
+
+  isAdminUser() : boolean {
+    return this.userRoles === 'admin';
+  }
+
+  isTeamLeader() : boolean {
+    return this.userRoles === 'team-leader';
+  }
+
+  isTeamMember() : boolean {
+    return this.userRoles === 'team-member';
+  }
+
+  isChangingPassword() : boolean {
+    return this.changingPassword;
+  }
   
 // End ======================
 }

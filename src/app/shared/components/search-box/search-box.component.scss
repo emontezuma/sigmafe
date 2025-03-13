@@ -1,8 +1,4 @@
-.container {
-    margin-top: 20px;
-    width: 180px;
+.container {    
+    width: 100%;
 }
 
-::ng-deep .mat-mdc-text-field-wrapper {
-    background-color: var(--z-colors-page-shadow) !important;
-}

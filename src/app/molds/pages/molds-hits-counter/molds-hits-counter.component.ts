@@ -250,6 +250,12 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
           elements: this.elements,
           alignment: 'right',
         });
+        this.toolbarAction({          
+          action: 'in-production',
+          buttonIndex: 1,
+          field: 'mold-state',  
+          from: 'molds-hits-view',
+        })
       }, 10);
     // }
   }
@@ -283,11 +289,13 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       type: 'label',      
       caption: this.currentLabel,
       class: 'tab-spinner-text',
+      visible: true,
     },{
       type: 'button-menu',
       field: 'mold-state',
       caption: $localize`Estado del molde`,
       tooltip:  $localize`FIltrar el estado del molde`,
+      visible: true,
       disabled: false,
       options: [{
         caption: $localize`(Todos los moldes)`,
@@ -318,6 +326,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
     },{
       type: 'button-menu',
       field: 'mold-status',
+      visible: true,
       caption: $localize`Estatus del molde`,
       tooltip:  $localize`FIltrar el Status del molde`,
       disabled: false,
@@ -386,7 +395,8 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+      visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -401,6 +411,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.SAVE,
     },{
       type: 'divider',
@@ -414,7 +425,8 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+      visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -429,6 +441,7 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_EXCEL,
     },{
       type: 'divider',
@@ -442,7 +455,8 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+      visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -456,7 +470,8 @@ export class MoldsHitsCounterComponent implements OnInit, AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+      visible: true,
       action: undefined,
     },];
 

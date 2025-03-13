@@ -6,7 +6,7 @@ export const initialState: ChecklistFillingState = {
   loading: false,
   checklistFillingData: {
     questions: 0,
-    completed: 0,
+    questionsCompleted: 0,
     valueToPrint: 0,
     alarmed: false,
     viewType: ChecklistView.FLEXBOX,
@@ -64,7 +64,7 @@ export const checklistFillingReducer = createReducer(
     const updatedChecklistFillingData = { 
       ...state.checklistFillingData, 
       items: updatedQuestionnaire,
-      completed: newCompleted,
+      questionsCompleted: newCompleted,
       actionRequired,
       alarmedItems,
       alarmed,

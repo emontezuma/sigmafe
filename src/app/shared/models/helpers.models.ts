@@ -1,15 +1,20 @@
+import { SafeResourceUrl } from "@angular/platform-browser";
+
 export interface Attachment {
     index?: number;
     id?: string;
     icon?: string;    
     image?: string;    
+    pdfUrl?: SafeResourceUrl;    
     name?: string;    
+    containerType?: string;    
 }
 
 export interface SimpleTable {
     id?: string;
     code?: string;
     description?: string;
+    name?: string;
 }
 
 export interface Priority {
@@ -68,10 +73,11 @@ export interface PageInfo {
     CATALOGS_CHECKLIST_TEMPLATE_HEADER_ATTACHMENTS = 'catalogs-checklist-template-header-attachments',
     CATALOGS_CHECKLIST_TEMPLATE_LINES_ATTACHMENTS = 'catalogs-checklist-template-lines-attachments',    
     CATALOGS_CHECKLIST_LINES_ATTACHMENTS = 'catalogs-checklist-lines-attachments',
+    CATALOGS_CHECKLIST_ATTACHMENTS = 'catalogs-checklist-attachments',
     CATALOGS_CUSTOMERS = 'catalogs-custmomers',
     CATALOGS_WORKGROUPS = 'catalogs-workgroups',
     CATALOGS_PROVIDERS = 'catalogs-providers',
-    CHECKLIST_ATTACHMENTS = 'checklist-header-attachments',
+    CHECKLIST_ATTACHMENTS = 'checklist-attachments',
 }
   
 export enum SystemTables {
@@ -88,6 +94,7 @@ export enum SystemTables {
     WORKGROUPS = 'workgroups',
     POSITIONS = 'positions',
     PARTNUMBERS = 'partNumbers',
+    PARTNUMBERS_QUERY = 'part-numbers',
     MOLD_TYPES = 'mold-types',
     MOLD_CLASSES = 'mold-classes',
     MOLDS = 'molds',    
@@ -113,18 +120,23 @@ export enum SystemTables {
     CHECKLIST_TEMPLATES = 'checklist-templates',
     CHECKLIST_TEMPLATE_TYPES = 'checklist-template-types',
     CHECKLIST_TEMPLATE_MACROS = 'checklist-templates-macros',
-    CHECKLIST_TEMPLATE_INITIAL_STATES = 'checklist-templates-initial-states',    
+    CHECKLIST_TEMPLATE_INITIAL_STATES = 'checklist-templates-initial-states',   
+    USER_ROLES = "user-roles",
+    PASSWORD_POLICIES = "password-policies",
     MOLDS_CATALOGS_MACROS = 'molds-catalog-macros',    
     CHECKLIST_TEMPLATE_NOTIFYING = 'checklist-template-notifying',    
     CHANNELS = 'channels',        
     RECIPIENTS = 'recipients',        
-    CHECKLIST_PLAN_TYPES = 'checklist-plan-types',    
+    CHECKLIST_PLAN_TYPES = 'checklist-plan-types',   
+    MOLD_TEMPLATE_GM = 'mold-template-gm',
+    REPORTS = 'reports',
 }
 
 export enum GeneralValues {
     N_A = 'n/a',
     YES = 'y',
-    YESNO = 'yesNo',
+    YESNO = 'yes-no',
+    YES_AND_NO = 'yn',
     NO = 'n',
     FREE_TEXT = 'free-text',
     SPECIFIC = 'specific',
@@ -167,4 +179,15 @@ export enum HarcodedChecklistPlanGenerationMode {
     BY_POSITIONS = 'by-position',
     BY_WORKGROUP = 'by-workgroup',
     BY_USER = 'by-user',
+}
+
+export enum HarcodedChecklistReportPeriodOfTime {
+    SPECIFIC = 'specific',
+    CURRENT_YEAR = 'current-year',
+    CURRENT_MONTH = 'current-month',
+    CURRENT_WEEK = 'current-week',
+    CURRENT_DAY = 'current-day',
+    PREVIOUS_YEAR = 'previous-year',
+    PREVIOUS_MONTH = 'previous-month',
+    PREVIOUS_WEEK = 'previous-week',    
 }

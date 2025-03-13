@@ -546,11 +546,11 @@ export class CatalogCustomerEditionComponent {
                 (e) => e.action === ButtonActions.TRANSLATIONS
               ).caption =
                 this.customer.translations.length > 0
-                  ? $localize`Traducciones (${this.customer.translations.length})`
+                  ? $localize`Traducciones (${this.customer.translations?.length})`
                   : $localize`Traducciones`;
               this.elements.find(
                 (e) => e.action === ButtonActions.TRANSLATIONS
-              ).class = this.customer.translations.length > 0 ? 'accent' : '';
+              ).class = this.customer.translations?.length > 0 ? 'accent' : '';
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -674,6 +674,7 @@ export class CatalogCustomerEditionComponent {
         loading: false,
         disabled: this.customer?.status !== RecordStatus.ACTIVE,
         action: ButtonActions.INACTIVATE,
+        visible: true,
       },
       {
         type: 'divider',
@@ -839,7 +840,7 @@ export class CatalogCustomerEditionComponent {
   }
 
   requestCustomerData(customerId: number): void {
-    console.log("bringing")
+  
     let customers = undefined;
     customers = { customerId };
 
@@ -876,11 +877,11 @@ export class CatalogCustomerEditionComponent {
             (e) => e.action === ButtonActions.TRANSLATIONS
           ).caption =
             this.customer.translations.length > 0
-              ? $localize`Traducciones (${this.customer.translations.length})`
+              ? $localize`Traducciones (${this.customer.translations?.length})`
               : $localize`Traducciones`;
           this.elements.find(
             (e) => e.action === ButtonActions.TRANSLATIONS
-          ).class = this.customer.translations.length > 0 ? 'accent' : '';
+          ).class = this.customer.translations?.length > 0 ? 'accent' : '';
           this.updateFormFromData();
           this.changeInactiveButton(this.customer.status);
           const toolbarButton = this.elements.find(
@@ -889,11 +890,11 @@ export class CatalogCustomerEditionComponent {
           if (toolbarButton) {
             toolbarButton.caption =
               customerData.translations.length > 0
-                ? $localize`Traducciones (${customerData.translations.length})`
+                ? $localize`Traducciones (${customerData.translations?.length})`
                 : $localize`Traducciones`;
             toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
             toolbarButton.class =
-              customerData.translations.length > 0 ? 'accent' : '';
+              customerData.translations?.length > 0 ? 'accent' : '';
           }
           this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
           this.setViewLoading(false);
@@ -952,7 +953,7 @@ export class CatalogCustomerEditionComponent {
         this.customerForm.controls.mainImageName.setValue(res.fileName);
         this.customer.mainImagePath = res.filePath;
         this.customer.mainImageGuid = res.fileGuid;
-        this.customer.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.customer.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde el cliente para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1176,7 +1177,7 @@ export class CatalogCustomerEditionComponent {
 
 
   processTranslations$(customerId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.customer.translations.length || 
+    const differences = this.storedTranslations?.length !== this.customer.translations.length || 
     this.storedTranslations.some((st: any) => {
       return this.customer.translations.find((t: any) => {
         return st.languageId === t.languageId &&
@@ -1215,7 +1216,7 @@ export class CatalogCustomerEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addCustomerTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addCustomerTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteCustomerTranslations$(varToDelete) : of(null) 
       ]);
     } else {

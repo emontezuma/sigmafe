@@ -927,8 +927,8 @@ export class CatalogVariableEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.variable.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations?.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -951,6 +951,7 @@ export class CatalogVariableEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -964,6 +965,7 @@ export class CatalogVariableEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -976,7 +978,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -989,7 +992,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -1003,7 +1007,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -1016,7 +1021,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -1029,7 +1035,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -1044,6 +1051,7 @@ export class CatalogVariableEditionComponent {
       loading: false,
       disabled: this.variable?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -1055,7 +1063,8 @@ export class CatalogVariableEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -1457,16 +1466,16 @@ export class CatalogVariableEditionComponent {
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.variable.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.variable.translations?.length > 0 ? $localize`Traducciones (${this.variable.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.variable.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.prepareListOfValues();
         this.changeInactiveButton(this.variable.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = variableData.translations.length > 0 ? $localize`Traducciones (${variableData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = variableData.translations?.length > 0 ? $localize`Traducciones (${variableData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = variableData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = variableData.translations?.length > 0 ? 'accent' : '';
         }        
         this.loaded = true;
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
@@ -1585,7 +1594,7 @@ export class CatalogVariableEditionComponent {
         this.variableForm.controls.mainImageName.setValue(res.fileName);
         this.variable.mainImagePath = res.filePath;
         this.variable.mainImageGuid = res.fileGuid;
-        this.variable.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.variable.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la variable para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -1867,7 +1876,7 @@ export class CatalogVariableEditionComponent {
   }
 
   processTranslations$(variableId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.variable.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.variable.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.variable.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1905,7 +1914,7 @@ export class CatalogVariableEditionComponent {
       }
      
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addVariableTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addVariableTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteVariableTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2232,6 +2241,7 @@ export class CatalogVariableEditionComponent {
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
           icon: this._sharedService.setIconName(res.fileType), 
+          containerType: this._sharedService.setContainerType(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);    
         this.setEditionButtonsState();
@@ -2318,6 +2328,7 @@ export class CatalogVariableEditionComponent {
             image: `${environment.serverUrl}/files/${na.path}`, 
             id: na.fileId, 
             icon: this._sharedService.setIconName(na.fileType), 
+            containerType: this._sharedService.setContainerType(na.fileType), 
           }
         });
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.variable.attachments);

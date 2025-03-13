@@ -501,8 +501,8 @@ export class CatalogUomEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.uom.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations?.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -525,6 +525,7 @@ export class CatalogUomEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -538,6 +539,7 @@ export class CatalogUomEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -550,7 +552,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -563,7 +566,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -577,7 +581,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -590,7 +595,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -603,7 +609,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -618,6 +625,7 @@ export class CatalogUomEditionComponent {
       loading: false,
       disabled: this.uom?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -629,7 +637,8 @@ export class CatalogUomEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -804,20 +813,33 @@ export class CatalogUomEditionComponent {
         })
       }),
       tap((uomData: UomDetail) => {
-        if (!uomData) return;
+        if (!uomData) {
+          const message = $localize`El registro no existe...`;
+          this._sharedService.showSnackMessage({
+            message,
+            duration: 2500,
+            snackClass: 'snack-warn',
+            icon: 'check',
+          });
+          this.setToolbarMode(toolbarMode.INITIAL_WITH_NO_DATA);
+          this.setViewLoading(false);
+          this.loaded = true;
+          this._location.replaceState('/catalogs/uoms/create');
+          return;
+        }
         this.uom =  uomData;
         this.translationChanged = false;
       
         this.storedTranslations = JSON.parse(JSON.stringify(this.uom.translations));
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.uom.translations?.length > 0 ? $localize`Traducciones (${this.uom.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.uom.translations?.length > 0 ? 'accent' : '';   
         this.updateFormFromData();
         this.changeInactiveButton(this.uom.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = uomData.translations.length > 0 ? $localize`Traducciones (${uomData.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = uomData.translations?.length > 0 ? $localize`Traducciones (${uomData.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = uomData.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = uomData.translations?.length > 0 ? 'accent' : '';
         }        
         this.setToolbarMode(toolbarMode.INITIAL_WITH_DATA);
         this.setViewLoading(false);
@@ -985,7 +1007,7 @@ export class CatalogUomEditionComponent {
   }
 
   processTranslations$(uomId: number): Observable<any> { 
-    const differences = this.storedTranslations.length !== this.uom.translations.length || this.storedTranslations.some((st: any) => {
+    const differences = this.storedTranslations?.length !== this.uom.translations?.length || this.storedTranslations?.some((st: any) => {
       return this.uom.translations.find((t: any) => {        
         return st.languageId === t.languageId &&
         st.id === t.id &&
@@ -1024,7 +1046,7 @@ export class CatalogUomEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.addUomTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.addUomTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteUomTranslations$(varToDelete) : of(null) 
       ]);
     } else {

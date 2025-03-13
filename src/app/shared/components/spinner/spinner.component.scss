@@ -95,3 +95,10 @@
         stroke: var(--z-colors-page-card-fore) !important;
     }
 }
+
+.spinner-card-font-tab {
+    color: var(--z-colors-page-tab-fore) !important;
+    ::ng-deep circle {
+        stroke: var(--z-colors-page-tab-fore) !important;
+    }
+}

@@ -810,8 +810,8 @@ export class CatalogChecklistTemplatesEditionComponent {
               //this._store.dispatch(updateMoldTranslations({ 
               this.checklistTemplate.translations = [...response.translations];
               //}));
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
-              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';   
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations?.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
+              this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations?.length > 0 ? 'accent' : '';   
               this.setToolbarMode(toolbarMode.EDITING_WITH_DATA);
             }
           });
@@ -834,6 +834,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.BACK,
     },{
       type: 'button',
@@ -847,6 +848,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -859,7 +861,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -872,7 +875,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       elementType: 'submit',
       action: ButtonActions.SAVE,
     },{
@@ -886,7 +890,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.CANCEL,
     },{
       type: 'divider',
@@ -899,7 +904,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -912,7 +918,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: ButtonActions.COPY,
     },{
       type: 'button',
@@ -927,6 +934,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       loading: false,
       disabled: this.checklistTemplate?.status !== RecordStatus.ACTIVE,
       action: ButtonActions.INACTIVATE,
+      visible: true,
     },{
       type: 'divider',
       caption: '',
@@ -938,7 +946,8 @@ export class CatalogChecklistTemplatesEditionComponent {
       showTooltip: true,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     
     },{
@@ -966,6 +975,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.MACROS,      
     },];
   }
@@ -1420,11 +1430,12 @@ export class CatalogChecklistTemplatesEditionComponent {
         customerId: 1, // TODO: Get from profile        
         recipientId: line.recipientId,
         variableId: line.variableId,
-        required: line.required,
+        required: line.required ? GeneralValues.YES : GeneralValues.NO,
         allowComments: line.allowComments,
         allowNoCapture: line.allowNoCapture,
         allowAlarm: line.allowAlarm,
         showChart: line.showChart,
+        valueToAlarm: line.valueToAlarm,
         showParameters: line.showParameters ? line.showParameters : GeneralValues.NO,
         useVariableSettings: line.useVariableSettings ? line.useVariableSettings : GeneralValues.NO,
         showLastValue: line.showLastValue ? line.showLastValue : GeneralValues.NO,
@@ -1593,6 +1604,7 @@ export class CatalogChecklistTemplatesEditionComponent {
               id: a.fileId, 
               image: `${environment.serverUrl}/files/${a.path}`, 
               icon: this._sharedService.setIconName(a.fileType), 
+              containerType: this._sharedService.setContainerType(a.fileType), 
             }            
           });
           if (attachments.length > 1) {
@@ -1603,6 +1615,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                 id: a.fileId, 
                 image: `${environment.serverUrl}/files/${a.path}`, 
                 icon: this._sharedService.setIconName(a.fileType), 
+                containerType: this._sharedService.setContainerType(a.fileType), 
               }            
             });
           }          
@@ -1612,16 +1625,16 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.translationChanged = false;
         this.imageChanged = false;
         this.storedTranslations = JSON.parse(JSON.stringify(this.checklistTemplate.translations));        
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
-        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';   
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).caption = this.checklistTemplate.translations?.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
+        this.elements.find(e => e.action === ButtonActions.TRANSLATIONS).class = this.checklistTemplate.translations?.length > 0 ? 'accent' : '';   
         this.pendingRecord = 0;        
         this.updateFormFromData();
         this.changeInactiveButton(this.checklistTemplate.status);
         const toolbarButton = this.elements.find(e => e.action === ButtonActions.TRANSLATIONS);
         if (toolbarButton) {
-          toolbarButton.caption = this.checklistTemplate.translations.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
+          toolbarButton.caption = this.checklistTemplate.translations?.length > 0 ? $localize`Traducciones (${this.checklistTemplate.translations.length})` : $localize`Traducciones`;
           toolbarButton.tooltip = $localize`Agregar traducciones al registro...`;
-          toolbarButton.class = this.checklistTemplate.translations.length > 0 ? 'accent' : '';
+          toolbarButton.class = this.checklistTemplate.translations?.length > 0 ? 'accent' : '';
         }        
         this.molds.items = [];
         this.requestMoldsData(0);
@@ -1728,7 +1741,7 @@ export class CatalogChecklistTemplatesEditionComponent {
         this.checklistTemplateForm.controls.mainImageName.setValue(res.fileName);
         this.checklistTemplate.mainImagePath = res.filePath;
         this.checklistTemplate.mainImageGuid = res.fileGuid;
-        this.checklistTemplate.mainImage = `${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
+        this.checklistTemplate.mainImage = `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${res.filePath}`;
         const message = $localize`El archivo ha sido subido satisfactoriamente<br>Guarde la plantilla de checklist para aplicar el cambio`;
         this._sharedService.showSnackMessage({
           message,
@@ -2248,7 +2261,7 @@ export class CatalogChecklistTemplatesEditionComponent {
       }
   
       return combineLatest([ 
-        varToAdd.translations.length > 0 ? this._catalogsService.updateChecklistTemplateTranslations$(varToAdd) : of(null),
+        varToAdd.translations?.length > 0 ? this._catalogsService.updateChecklistTemplateTranslations$(varToAdd) : of(null),
         varToDelete.ids.length > 0 ? this._catalogsService.deleteChecklistTemplateTranslations$(varToDelete) : of(null) 
       ]);
     } else {
@@ -2461,6 +2474,7 @@ export class CatalogChecklistTemplatesEditionComponent {
           id: res.fileGuid, 
           image: `${environment.serverUrl}/files/${res.filePath}`, 
           icon: this._sharedService.setIconName(res.fileType), 
+          containerType: this._sharedService.setContainerType(res.fileType), 
         })
         this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);    
         this.setEditionButtonsState();
@@ -2547,6 +2561,7 @@ export class CatalogChecklistTemplatesEditionComponent {
             image: `${environment.serverUrl}/files/${na.path}`, 
             id: na.fileId, 
             icon: this._sharedService.setIconName(na.fileType), 
+            containerType: this._sharedService.setContainerType(na.fileType), 
           }
         });
       })
@@ -3276,6 +3291,7 @@ export class CatalogChecklistTemplatesEditionComponent {
               image: `${environment.serverUrl}/files/${na.path}`, 
               id: na.fileId, 
               icon: this._sharedService.setIconName(na.fileType), 
+              containerType: this._sharedService.setContainerType(na.fileType), 
             }
           });
           this.attachmentsTable = new MatTableDataSource<Attachment>(this.checklistTemplate.attachments);
@@ -3294,6 +3310,7 @@ export class CatalogChecklistTemplatesEditionComponent {
                   id: na.fileId, 
                   image: `${environment.serverUrl}/files/${na.path}`, 
                   icon: this._sharedService.setIconName(na.fileType), 
+                  containerType: this._sharedService.setContainerType(na.fileType), 
                 }            
               });                        
             }            

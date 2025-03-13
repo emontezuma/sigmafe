@@ -238,7 +238,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
             this.checklistPlansData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.checklistPlansData.items);
           }      
         }        
-        this.checklistPlansData.items.length = this.checklistPlansData.totalCount;
+        // this.checklistPlansData.items.length = this.checklistPlansData.totalCount;
         this.checklistPlansCatalogData = new MatTableDataSource<ChecklistPlanItem>(this.checklistPlansData.items);
         this.checklistPlansCatalogData.paginator = this.paginator;
         // this.checklistPlansCatalogData.sort = this.sort;
@@ -326,6 +326,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -340,6 +341,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -354,6 +356,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -368,6 +371,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -382,6 +386,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -396,6 +401,7 @@ export class CatalogChecklistPlansListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: true,
+      visible: true,
       action: undefined,
     },];
 

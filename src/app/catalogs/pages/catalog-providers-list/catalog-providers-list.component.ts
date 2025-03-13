@@ -214,7 +214,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -231,7 +231,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
             this.providersData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.providersData.items);
           }      
         }        
-        this.providersData.items.length = this.providersData.totalCount;
+        // this.providersData.items.length = this.providersData.totalCount;
         this.providersCatalogData = new MatTableDataSource<ProviderItem>(this.providersData.items);
         this.providersCatalogData.paginator = this.paginator;
         // this.providersCatalogData.sort = this.sort;
@@ -320,6 +320,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -333,7 +334,8 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -348,6 +350,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -362,6 +365,7 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -375,7 +379,8 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -389,7 +394,8 @@ export class CatalogProvidersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

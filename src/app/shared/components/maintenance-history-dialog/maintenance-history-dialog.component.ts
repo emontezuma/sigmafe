@@ -434,7 +434,7 @@ export class MaintenanceHistoryDialogComponent implements AfterViewInit {
             ...h.data,
             provider: {
               ...h.data.provider,
-              translatedName: h.data.provider.translations.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
+              translatedName: h.data.provider.translations?.length > 0 ? h.data.provider.translations[0].name : h.data.provider.name,
               isTranslated: h.data.provider.translations.length > 0 && h.data.provider.translations[0].languageId > 0 ? true : false,
             },
             isTranslated: h.isTranslated,

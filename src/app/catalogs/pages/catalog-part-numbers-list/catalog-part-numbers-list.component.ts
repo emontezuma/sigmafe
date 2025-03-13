@@ -212,7 +212,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
                 ...item,
                 data: {
                   ...item.data,                  
-                  mainImage: item.data.mainImageName ? `${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
+                  mainImage: item.data.mainImageName ? `${environment.serverUrl}/${environment.uploadFolders.completePathToFiles}/${item.data.mainImagePath}` : '',
                 }
               }
             })          
@@ -229,7 +229,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
             this.partNumbersData.items = new Array(this.pageInfo.currentPage * this.pageInfo.pageSize).fill(null).concat(this.partNumbersData.items);
           }      
         }        
-        this.partNumbersData.items.length = this.partNumbersData.totalCount;
+        // this.partNumbersData.items.length = this.partNumbersData.totalCount;
         this.partNumbersCatalogData = new MatTableDataSource<PartNumberItem>(this.partNumbersData.items);
         this.partNumbersCatalogData.paginator = this.paginator;
         // this.partNumbersCatalogData.sort = this.sort;
@@ -318,6 +318,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.NEW,
     },{
       type: 'divider',
@@ -331,7 +332,8 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'button',
@@ -346,6 +348,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.RELOAD,
     },{
       type: 'button',
@@ -360,6 +363,7 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       showCaption: true,
       loading: false,
       disabled: false,
+      visible: true,
       action: ButtonActions.EXPORT_TO_CSV,
     },{
       type: 'divider',
@@ -373,7 +377,8 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },{
       type: 'searchbox',
@@ -387,7 +392,8 @@ export class CatalogPartNumbersListComponent implements AfterViewInit {
       locked: false,
       showCaption: true,
       loading: false,
-      disabled: true,
+      disabled: false,
+            visible: true,
       action: undefined,
     },];
 

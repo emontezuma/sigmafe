@@ -3,7 +3,6 @@ import { SettingsData } from '../shared/models/settings.models';
 import { colorsReducer } from '../state/reducers/colors.reducer';
 import {
   ChecklistQuestionStatus,
-  ChecklistAnswerType,
   ChecklistView,
   ChecklistFillingData,
   ChecklistState,
@@ -14,6 +13,9 @@ import { ColorsData, Colors } from './models/colors.models';
 import { ProfileData } from './models/profile.models';
 import { RecordStatus } from './models/helpers.models';
 import { ButtonActions } from './models/screen.models';
+import { HarcodedVariableValueType } from './models/helpers.models';
+
+
 
 /*
 export const sampleMoldsHitsQueryData: MoldsHitsQueryData = {
@@ -452,12 +454,12 @@ export const sampleSettings: SettingsData = {
 
 export const sampleProfile: ProfileData = {
   animate: true,
-  firstName: 'ADMINISTRADOR',
-  lastName: 'DEL SISTEMA',
-  userProfile: 'ADMIN',
-  avatar: 'assets/images/bydefault/avatar.png',
+  name: 'ADMINISTRADOR',
+  mainImage: 'assets/images/bydefault/avatar.png',
   email: 'admin@admin.com',
-  id: 'tetettee-ooeiiie-jjd73',
+  customerId: 1,
+  languageId: 1,
+  id: 1,
 };
 
 export const sampleColors: ColorsData = {
@@ -562,7 +564,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   startDate: '2023/09/03 11:30:00',
   dueDateToFinish: '2023/09/08 21:30:00',
   questions: 3,
-  completed: 0,
+  questionsCompleted: 0,
   cancelled: 0,
   warnedItems: 0,
   valueToPrint: 0,  
@@ -572,7 +574,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
   canExpire: true,
   startingMode: ChecklistStartingMode.ANYTIME,
   equipment: {
-    id: 'abbdgd-999383-agaga',
+    id: 2,
     number: 'AB4334',
     description: 'MAQUINA PAPELERA AF-1465-23SF',
     notes: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
@@ -587,7 +589,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       text: '¿La tapa del motor está bien sellada?',
       extendedInfo:
         'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-      answerType: ChecklistAnswerType.YES_NO,
+      answerType: HarcodedVariableValueType.YES_NO,
       answerByDefault: 'y',
       answer: '',
       status: ChecklistQuestionStatus.READY,
@@ -666,7 +668,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
         alarmed: false,
       },],
       component: {
-        id: 'aaa-bb-10010',
+        id: 1,
         number: 'SN:219982',
         description: 'BRAZO MECANICO',
         notes: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
@@ -692,7 +694,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       index: 2,
       order: 2,
       text: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga. Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum error molestias maiores, officia vel quisquam esse inventore fuga sint voluptates voluptatem ab amet corrupti. Sed illo repudiandae at veniam fuga.',
-      answerType: ChecklistAnswerType.YES_NO,
+      answerType: HarcodedVariableValueType.YES_NO,
       answerByDefault: undefined,
       answer: undefined,
       showExtendedInfo: false,
@@ -749,7 +751,7 @@ export const sampleChecklistFillingData: ChecklistFillingData = {
       index: 3,
       order: 3,
       text: '¿This is a question?',
-      answerType: ChecklistAnswerType.YES_NO,
+      answerType: HarcodedVariableValueType.YES_NO,
       answerByDefault: undefined,
       answer: undefined,
       showExtendedInfo: false,

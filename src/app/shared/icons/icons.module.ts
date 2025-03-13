@@ -198,6 +198,10 @@ export class IconsModule {
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/lock_closed.svg`)
     );        
     iconRegistry.addSvgIcon(
+      'lock_open',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/lock_open.svg`)
+    );        
+    iconRegistry.addSvgIcon(
       'arrow_left',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/arrow_left.svg`)
     );
@@ -365,6 +369,43 @@ export class IconsModule {
       'project_stage_initiation',
       sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/project_stage_initiation.svg`)
     );
+    iconRegistry.addSvgIcon(
+      'speech_ballon',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/speech_ballon.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'economics',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/economics.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'messages_empty',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/messages_empty.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'messages_filled',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/messages_filled.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'encryption',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/encryption.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'qr_code_access',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/qr_code_access.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'essay',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/essay.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'grouped_tasks',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/grouped_tasks.svg`)
+    );
+    iconRegistry.addSvgIcon(
+      'excel',
+      sanitizer.bypassSecurityTrustResourceUrl(`../../../${environment.assetsUrl}/icons/excel.svg`)
+    );
+    
     
   }
   

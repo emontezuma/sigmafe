@@ -1,9 +1,11 @@
 <div>
-    <mat-form-field class="container">
+    <mat-form-field class="container"
+        
+    >
         <input
-            class="textbox"
+            class="search-box-textbox"
             matInput
-            [formControl]="textBox"
+            [formControl]="formField"
             [maxlength]="maxLength"
             [placeholder]="placeHolder"
             name="search"
@@ -11,10 +13,10 @@
         <button
             class="close-button"
             mat-mini-fab
-            [disabled]="!textBox.value"
+            [disabled]="!formField.value"
             matSuffix
             aria-label="Clear"
-            (click)="textBox.setValue('')"  
+            (click)="formField.setValue('')"  
         >
             <mat-icon class="close-icon">close</mat-icon>   
         </button>        
