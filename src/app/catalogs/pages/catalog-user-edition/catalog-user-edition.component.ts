@@ -510,7 +510,7 @@ export class CatalogUserEditionComponent {
                 if (data?.data?.createOrUpdateUser.length > 0) {
                   setTimeout(() => {
                     this.changeInactiveButton(RecordStatus.INACTIVE)
-                    const message = $localize`La contraseña del usuairo se ha reiniciado`;
+                    const message = $localize`La contraseña del usuario se ha reiniciado`;
                     this.user.status = RecordStatus.INACTIVE;
                     this._sharedService.showSnackMessage({
                       message,

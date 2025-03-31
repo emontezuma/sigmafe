@@ -1,0 +1,5 @@
+{
+    "dataworkspace.excludedProjects": [
+        "sigmav2/sigmav2.sqlproj"
+    ]
+}
